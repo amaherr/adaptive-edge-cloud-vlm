@@ -3,10 +3,10 @@
 Adaptive runtime orchestration and model partitioning for low-latency
 vision-language model inference across heterogeneous edge and cloud resources.
 
-The repository is being built in gated chunks. Chunks 1 and 2 provide the
+The repository is being built in gated chunks. Chunks 1 through 3 provide the
 experiment contracts, deterministic test foundation, pinned Moondream2
-artifact, verified CUDA inventory, and monolithic feasibility evidence. Model
-decomposition and the real execution policies begin in Chunk 3.
+artifact, verified CUDA inventory, explicit vision/projector boundary, and a
+measured all-edge execution policy. Networking begins in Chunk 4.
 
 ## Planning
 
@@ -58,9 +58,9 @@ Validate and print a fully resolved configuration:
 adaptive-vlm config validate configs/experiments/baseline_edge.yaml
 ```
 
-The Moondream2 model remains `candidate` until local decomposition equivalence
-passes in Chunk 3. The edge hardware is verified; cloud hardware is still
-`pending` and must be recorded before remote benchmarks.
+The Moondream2 model is `approved` after exact local decomposition equivalence.
+The edge hardware is verified; cloud hardware is still `pending` and must be
+recorded before remote benchmarks.
 
 ## CPU-only smoke run
 
@@ -112,6 +112,43 @@ scripts/probe_moondream.py \
 
 See the [feasibility report](docs/reports/chunk_2_feasibility.md) for the
 measured edge result and the retained GPU infeasibility evidence.
+
+## Local decomposition and all-edge inference
+
+Verify that the original and decomposed CPU paths produce identical projected
+tensors and native token IDs:
+
+```bash
+.venv-model/bin/python scripts/verify_local_decomposition.py \
+  --config configs/experiments/baseline_edge.yaml \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache \
+  --offline \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --repetitions 2 \
+  --output artifacts/chunk3/equivalence.json
+```
+
+Run the correctness-preserving all-edge policy and save its manifest and
+request record:
+
+```bash
+.venv-model/bin/adaptive-vlm edge-infer \
+  --config configs/experiments/baseline_edge.yaml \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache \
+  --offline \
+  --vision-device cpu \
+  --text-device cpu \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --prompt "Describe this image." \
+  --output-dir artifacts/edge
+```
+
+Using `--vision-device cuda:0 --text-device cpu` is supported and substantially
+accelerates vision processing, but it is currently experimental: CPU and CUDA
+BF16 vision kernels did not produce identical complete output sequences. See
+the [Chunk 3 report](docs/reports/chunk_3_decomposition.md) for measurements.
 
 ## Quality checks
 

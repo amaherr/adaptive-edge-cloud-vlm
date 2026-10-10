@@ -3,7 +3,7 @@ model_id: vikhyatk/moondream2
 release_tag: "2025-06-21"
 revision: 9a7d4024050840e001defacec2b00727e89149e6
 artifact_sha256: 70a7d94c0c8349eb58ed2d9e636ef2d0916960f321ecabeac6354b8ba3d7403f
-status: candidate
+status: approved
 precision: bf16
 preprocessing_backend: pillow
 trust_remote_code: true

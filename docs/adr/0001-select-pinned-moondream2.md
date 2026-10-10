@@ -1,6 +1,6 @@
 # ADR 0001: Select pinned Moondream2 for the first baseline
 
-- Status: accepted for decomposition
+- Status: accepted
 - Date: 2026-10-10
 
 ## Context
@@ -28,8 +28,8 @@ to `null`. This prevents variant/LoRA downloads and keeps preprocessing
 identical when the environment is reproduced. Dependency versions are frozen
 in `requirements/model-cu128.lock`.
 
-The model remains marked `candidate` until Chunk 3 proves monolithic versus
-locally decomposed token equivalence.
+Chunk 3 proved exact CPU monolithic-versus-decomposed equivalence, so the model
+configuration is now marked `approved`.
 
 ## Evidence
 
@@ -47,7 +47,12 @@ locally decomposed token equivalence.
 
 The public `encode_image()` method is not the split boundary: after producing
 the projected visual embedding it also runs text-model prefill and returns KV
-caches. Chunk 3 must therefore wrap the lower-level projected embedding path.
+caches. The adapter therefore captures the lower-level tensor returned by
+`_run_vision_encoder()` and resumes text prefill from that tensor.
+
+Chunk 3 verified that this tensor has shape `729 × 2048`, BF16 dtype, and an
+uncompressed size of 2,985,984 bytes. CPU monolithic and decomposed executions
+produced a bit-identical tensor and the same 32 native output token IDs.
 
 ## Edge feasibility outcome
 
@@ -76,15 +81,16 @@ unexpected network-capable path is optional LoRA variant retrieval in
 `lora.py`; it is unreachable when `variant` is `null`. The model constructor
 also loads `moondream/starmie-v1` without specifying a revision. Its resolved
 commit and tokenizer hash are therefore pinned separately in
-`configs/model/moondream2_artifact.yaml`. Chunk 3 should replace the implicit
-lookup with an explicitly verified local tokenizer path where practical.
+`configs/model/moondream2_artifact.yaml`. The adapter verifies that file and
+replaces the implicitly loaded tokenizer with the exact local pinned artifact.
 
 ## Consequences
 
-- All-edge will initially use CPU BF16 and will retain the failed GPU load as
-  feasibility evidence.
-- Distributed execution can use the RTX 3050 for vision and projection, but
-  this must be measured rather than assumed.
+- All-edge defaults to CPU BF16, preserving the exact monolithic token sequence.
+- Vision and projection fit on the RTX 3050 with a measured 913.8 MiB peak CUDA
+  allocation, but the mixed GPU-vision/CPU-text output diverged after a
+  19-token common prefix. That placement remains experimental rather than the
+  correctness reference.
 - The cloud must have enough memory for the language model and KV cache; its
   hardware remains a required input.
 - No quantization, feature compression, or alternate checkpoint is introduced.
