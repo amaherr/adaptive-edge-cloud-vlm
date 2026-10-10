@@ -7,6 +7,10 @@ README. The edge client transmits the original encoded image bytes and prompt;
 only the server loads and runs Moondream. Stop the server with Ctrl+C after the
 request completes.
 
+Progress milestones and elapsed times are shown by default. Add `--verbose` to
+either command for model, device, configuration, and contract-fingerprint
+details. Progress uses stderr while the result/readiness JSON remains on stdout.
+
 For a fast transport-only smoke test, use the fake configuration on both
 commands:
 

@@ -22,6 +22,8 @@ external follow-up because no cloud machine has been supplied.
   E2E latency, and returned server component/memory metrics;
 - fake and real localhost experiment configurations;
 - `cloud-server` and `cloud-infer` commands with standard result artifacts;
+- default stderr progress and optional `--verbose` diagnostics for long-running
+  inference and verification commands;
 - real-TCP 100-request stability and real-model equivalence harnesses; and
 - localhost and physical-host deployment instructions.
 
@@ -48,8 +50,9 @@ external follow-up because no cloud machine has been supplied.
   --output artifacts/chunk4/cloud_equivalence.json
 ```
 
-Final CPU-only gates: 80 tests passed, strict mypy and Ruff passed, and coverage
-was 83.33%. Both real-TCP harnesses completed successfully.
+Final CPU-only gates after the progress-reporting enhancement: 84 tests passed,
+strict mypy and Ruff passed, and coverage was 83.93%. Both real-TCP harnesses
+completed successfully.
 
 ## Next entry point
 

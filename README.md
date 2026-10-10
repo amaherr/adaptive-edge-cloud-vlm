@@ -180,6 +180,12 @@ response. See the [cloud deployment guide](docs/deployment/cloud.md) before
 using separate hosts; this baseline transport intentionally has no TLS or
 authentication and must not be exposed to an untrusted network.
 
+Inference and verification commands print progress milestones to stderr by
+default, including model loading, readiness checks, inference, shutdown, and
+elapsed time. Add `--verbose` for configuration paths, model/device details,
+contract fingerprints, and per-request stability progress. The final JSON stays
+on stdout, so redirection and machine parsing remain safe.
+
 Reproduce the Chunk 4 localhost gates with:
 
 ```bash
