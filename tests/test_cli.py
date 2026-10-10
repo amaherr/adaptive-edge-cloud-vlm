@@ -100,6 +100,13 @@ def test_edge_infer_uses_local_policy_and_writes_artifacts(
     assert record["mode"] == "edge"
     assert record["metrics"]["model_load_ms"] >= 0
     run_directory = next(tmp_path.iterdir())
-    assert (run_directory / "run_manifest.json").is_file()
+    manifest_path = run_directory / "run_manifest.json"
+    assert manifest_path.is_file()
     assert (run_directory / "request.json").is_file()
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["environment"]["execution_placement"] == {
+        "vision_device": "cpu",
+        "text_device": "cpu",
+        "offline_model_cache": False,
+    }
 

@@ -180,6 +180,11 @@ def _edge_infer(
     seeded = seed_everything(config.runtime.seed)
     environment = collect_environment()
     environment["seeded_providers"] = list(seeded)
+    environment["execution_placement"] = {
+        "vision_device": vision_device,
+        "text_device": text_device,
+        "offline_model_cache": offline,
+    }
     manifest = create_run_manifest(config, environment)
     load_started = perf_counter()
     adapter = MoondreamAdapter.from_pretrained(
