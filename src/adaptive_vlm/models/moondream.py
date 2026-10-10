@@ -201,7 +201,16 @@ class MoondreamAdapter(ModelAdapter):
 
             self._synchronize_all()
             metrics["end_to_end_ms"] = (perf_counter_ns() - started_ns) / 1_000_000
-            metrics.update(text_features.metadata())
+            metrics.update(
+                {
+                    "projected_visual_tokens": text_features.shape[0],
+                    "projected_hidden_size": text_features.shape[1],
+                    "projected_dtype": text_features.dtype,
+                    "projected_source_device": projected.device,
+                    "projected_target_device": text_features.device,
+                    "projected_nbytes": text_features.nbytes,
+                }
+            )
             metrics["output_tokens"] = len(token_ids)
             metrics.update(self._memory_metrics(rss_before))
 
@@ -263,7 +272,12 @@ class MoondreamAdapter(ModelAdapter):
                 "language_generation_ms": generation.elapsed_ms,
                 "end_to_end_ms": (perf_counter_ns() - started_ns) / 1_000_000,
                 "output_tokens": len(token_ids),
-                **projected.metadata(),
+                "projected_visual_tokens": projected.shape[0],
+                "projected_hidden_size": projected.shape[1],
+                "projected_dtype": projected.dtype,
+                "projected_source_device": projected.device,
+                "projected_target_device": projected.device,
+                "projected_nbytes": projected.nbytes,
                 **self._memory_metrics(rss_before),
             }
             result = InferenceResult(
