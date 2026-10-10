@@ -3,10 +3,10 @@
 Adaptive runtime orchestration and model partitioning for low-latency
 vision-language model inference across heterogeneous edge and cloud resources.
 
-The repository is being built in gated chunks. Chunks 1 through 3 provide the
+The repository is being built in gated chunks. Chunks 1 through 4 provide the
 experiment contracts, deterministic test foundation, pinned Moondream2
 artifact, verified CUDA inventory, explicit vision/projector boundary, and a
-measured all-edge execution policy. Networking begins in Chunk 4.
+measured all-edge policy plus a bounded all-cloud TCP path.
 
 ## Planning
 
@@ -149,6 +149,55 @@ Using `--vision-device cuda:0 --text-device cpu` is supported and substantially
 accelerates vision processing, but it is currently experimental: CPU and CUDA
 BF16 vision kernels did not produce identical complete output sequences. See
 the [Chunk 3 report](docs/reports/chunk_3_decomposition.md) for measurements.
+
+## All-cloud localhost inference
+
+Start the pinned monolithic model server in one terminal:
+
+```bash
+.venv-model/bin/adaptive-vlm cloud-server \
+  --config configs/experiments/chunk4_local_cloud.yaml \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache \
+  --offline \
+  --device cpu
+```
+
+After it prints a JSON readiness record, submit a raw image and prompt from a
+second terminal:
+
+```bash
+.venv-model/bin/adaptive-vlm cloud-infer \
+  --config configs/experiments/chunk4_local_cloud.yaml \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --prompt "Describe this image." \
+  --output-dir artifacts/cloud
+```
+
+The client checks the protocol version and a fingerprint covering the model
+artifact, precision, preprocessing, and generation contract before accepting a
+response. See the [cloud deployment guide](docs/deployment/cloud.md) before
+using separate hosts; this baseline transport intentionally has no TLS or
+authentication and must not be exposed to an untrusted network.
+
+Reproduce the Chunk 4 localhost gates with:
+
+```bash
+.venv/bin/python scripts/verify_cloud_stability.py \
+  --config configs/experiments/chunk4_fake_cloud.yaml \
+  --image tests/fixtures/smoke_image.txt \
+  --requests 100 \
+  --output artifacts/chunk4/cloud_stability.json
+
+.venv-model/bin/python scripts/verify_cloud_equivalence.py \
+  --config configs/experiments/chunk4_local_cloud.yaml \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache \
+  --offline \
+  --device cpu \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --output artifacts/chunk4/cloud_equivalence.json
+```
 
 ## Quality checks
 
