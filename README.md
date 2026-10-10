@@ -3,10 +3,10 @@
 Adaptive runtime orchestration and model partitioning for low-latency
 vision-language model inference across heterogeneous edge and cloud resources.
 
-The repository is being built in gated chunks. Chunk 1 provides the
-configuration contracts, structured artifacts, deterministic fake adapter,
-environment inventory, and CPU-only test foundation. It does not download or
-execute a real VLM.
+The repository is being built in gated chunks. Chunks 1 and 2 provide the
+experiment contracts, deterministic test foundation, pinned Moondream2
+artifact, verified CUDA inventory, and monolithic feasibility evidence. Model
+decomposition and the real execution policies begin in Chunk 3.
 
 ## Planning
 
@@ -14,9 +14,8 @@ execute a real VLM.
 
 ## Development setup
 
-Python 3.11 is the reference version. Python 3.12 is also suitable for the
-CPU-only infrastructure in Chunk 1, but the model environment will be frozen
-after the model-feasibility work.
+Python 3.11 is the model-runtime reference version. Python 3.12 remains suitable
+for the CPU-only development and quality-check environment.
 
 ```bash
 python3.11 -m venv .venv
@@ -25,7 +24,18 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
-No PyTorch or model dependency is installed at this stage.
+For the pinned CUDA model environment used from Chunk 2 onward:
+
+```bash
+uv python install 3.11.17
+uv venv --python 3.11.17 .venv-model
+uv pip install --python .venv-model/bin/python \
+  -r requirements/model-cu128.lock
+```
+
+The lock targets Linux and CUDA 12.8. The model artifact itself is not included
+in the repository; its immutable revision and hashes are recorded in
+[`configs/model/moondream2_artifact.yaml`](configs/model/moondream2_artifact.yaml).
 
 ## Configuration
 
@@ -48,10 +58,9 @@ Validate and print a fully resolved configuration:
 adaptive-vlm config validate configs/experiments/baseline_edge.yaml
 ```
 
-The Moondream2 model is marked `candidate`, the edge hardware is `declared`,
-and the cloud hardware is `pending`. Those statuses are intentional and must
-be replaced with verified records during the model and hardware feasibility
-chunk.
+The Moondream2 model remains `candidate` until local decomposition equivalence
+passes in Chunk 3. The edge hardware is verified; cloud hardware is still
+`pending` and must be recorded before remote benchmarks.
 
 ## CPU-only smoke run
 
@@ -81,7 +90,28 @@ scripts/collect_environment.sh artifacts/environment.json
 ```
 
 An unavailable GPU is recorded as structured data instead of failing the
-command. GPU access from PyTorch is handled in Chunk 2.
+command. WSL CUDA access and BF16 execution were verified in Chunk 2; restricted
+development sandboxes may still hide `/dev/dxg`.
+
+## Monolithic model probe
+
+The Chunk 2 probe records deterministic outputs, load and request latency,
+process RAM, and CUDA memory when available. Pass `--image` more than once to
+exercise multiple correctness fixtures in a single model load:
+
+```bash
+scripts/probe_moondream.py \
+  --revision 9a7d4024050840e001defacec2b00727e89149e6 \
+  --artifact-sha256 70a7d94c0c8349eb58ed2d9e636ef2d0916960f321ecabeac6354b8ba3d7403f \
+  --cache-dir .model-cache \
+  --offline \
+  --device cpu \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --output artifacts/chunk2/moondream_bf16_cpu_probe.json
+```
+
+See the [feasibility report](docs/reports/chunk_2_feasibility.md) for the
+measured edge result and the retained GPU infeasibility evidence.
 
 ## Quality checks
 
