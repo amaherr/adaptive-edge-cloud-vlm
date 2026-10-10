@@ -6,6 +6,8 @@ from pathlib import Path
 import pytest
 
 from adaptive_vlm.cli import main
+from adaptive_vlm.config import ExecutionMode
+from adaptive_vlm.execution.cloud import HealthStatus
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
 
@@ -109,4 +111,103 @@ def test_edge_infer_uses_local_policy_and_writes_artifacts(
         "text_device": "cpu",
         "offline_model_cache": False,
     }
+
+
+def test_cloud_infer_uses_remote_policy_and_writes_artifacts(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    adapter = FakeModelAdapter()
+
+    class StubCloudPolicy:
+        mode = ExecutionMode.CLOUD
+
+        def __init__(self, **_: object) -> None:
+            pass
+
+        def health(self) -> HealthStatus:
+            return HealthStatus(True, adapter.metadata.fingerprint)
+
+        def infer(self, request: object) -> object:
+            return adapter.generate(request)  # type: ignore[arg-type]
+
+    monkeypatch.setattr("adaptive_vlm.cli.CloudExecutionPolicy", StubCloudPolicy)
+    exit_code = main(
+        [
+            "cloud-infer",
+            "--config",
+            str(ROOT / "configs/experiments/chunk4_fake_cloud.yaml"),
+            "--image",
+            str(ROOT / "tests/fixtures/smoke_image.txt"),
+            "--prompt",
+            "Describe this fixture.",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    record = json.loads(capsys.readouterr().out)
+    assert record["mode"] == "cloud"
+    run_directory = next(tmp_path.iterdir())
+    assert (run_directory / "run_manifest.json").is_file()
+    assert (run_directory / "request.json").is_file()
+
+
+def test_cloud_server_starts_fake_adapter(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    instances: list[object] = []
+
+    class StubServer:
+        def __init__(self, *, host: str, port: int, **_: object) -> None:
+            self.host = host
+            self.port = port
+            self.started = False
+            self.served = False
+            self.stopped = False
+            instances.append(self)
+
+        def start(self) -> None:
+            self.started = True
+
+        def serve_forever(self) -> None:
+            self.served = True
+
+        def shutdown(self) -> None:
+            self.stopped = True
+
+    monkeypatch.setattr("adaptive_vlm.cli.CloudServer", StubServer)
+    exit_code = main(
+        [
+            "cloud-server",
+            "--config",
+            str(ROOT / "configs/experiments/chunk4_fake_cloud.yaml"),
+        ]
+    )
+
+    assert exit_code == 0
+    ready = json.loads(capsys.readouterr().out)
+    assert ready["ready"] is True
+    assert ready["model_fingerprint"] == FakeModelAdapter().metadata.fingerprint
+    server = instances[0]
+    assert server.started  # type: ignore[attr-defined]
+    assert server.served  # type: ignore[attr-defined]
+    assert server.stopped  # type: ignore[attr-defined]
+
+
+def test_cloud_commands_reject_pending_hardware(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(
+        [
+            "cloud-server",
+            "--config",
+            str(ROOT / "configs/experiments/baseline_cloud.yaml"),
+        ]
+    )
+
+    assert exit_code == 2
+    assert "pending" in capsys.readouterr().err
 

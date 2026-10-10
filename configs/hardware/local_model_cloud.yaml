@@ -1,0 +1,12 @@
+host_id: localhost-model-server
+role: cloud
+status: verified
+operating_system: WSL 2.5.10.0 / Linux 6.6.87.2 on Windows 10.0.26200.9457
+cpu: 11th Gen Intel Core i7-11800H
+ram_gib: 7.637
+gpu: NVIDIA GeForce RTX 3050 Laptop GPU
+gpu_vram_mib: 4096
+notes: >-
+  Loopback-only cloud role used to validate the real all-cloud path on the same
+  verified host as the edge process. It is not evidence of physical-host
+  network performance.

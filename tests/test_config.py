@@ -44,6 +44,17 @@ def test_resolved_config_is_json_compatible() -> None:
     assert resolved["source_path"].endswith("baseline_edge.yaml")
 
 
+@pytest.mark.parametrize(
+    "filename", ["chunk4_fake_cloud.yaml", "chunk4_local_cloud.yaml"]
+)
+def test_loads_chunk_four_local_configs(filename: str) -> None:
+    config = load_experiment_config(EXPERIMENTS / filename)
+
+    assert config.mode is ExecutionMode.CLOUD
+    assert config.cloud.status in {"declared", "verified"}
+    assert config.transport.host == "127.0.0.1"
+
+
 def test_rejects_moving_model_revision(tmp_path: Path) -> None:
     model = yaml.safe_load((ROOT / "configs/model/moondream2.yaml").read_text())
     model["revision"] = "main"
