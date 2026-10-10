@@ -1,0 +1,45 @@
+schema_version: 1
+repository: vikhyatk/moondream2
+release_tag: "2025-06-21"
+revision: 9a7d4024050840e001defacec2b00727e89149e6
+license: apache-2.0
+weights:
+  filename: model.safetensors
+  size_bytes: 3854538968
+  sha256: 70a7d94c0c8349eb58ed2d9e636ef2d0916960f321ecabeac6354b8ba3d7403f
+  dtype: BF16
+  tensor_count: 592
+  parameter_count: 1927237104
+  component_parameter_counts:
+    vision_encoder: 412987248
+    projector: 35661824
+    language_model: 1418270720
+    region_model: 60317312
+tokenizer_dependency:
+  repository: moondream/starmie-v1
+  revision: 35192e10a54e36eabe0a7cc57a2c1aab371cafc5
+  filename: tokenizer.json
+  size_bytes: 3694206
+  sha256: 0512fdcac4a5f9e7746cbefce4a468dc93bf0f93f11e701b84f8b31bff199e9c
+remote_code_sha256:
+  config.py: ee7707c9b4d091dd6d3441ceebc54a36be4023e97d0504e59b5ea7d71147854b
+  configuration_moondream.py: 3dd654ce842b71fbe050e4d4098d2818ba7fccd7eea186e7c24b672ba756a489
+  fourier_features.py: 83729dd2b1341ed388c850c799ac417a73eae78ff1b2f0418ed7a88f69acf69d
+  handler.py: c7b6dc4288ed81475187a87def69d33889095e1df24fc7bb6f3bd93e270d5fd7
+  hf_moondream.py: 7c1d25f918a50547843919e202700780e69c1680fece415c7242ffa11891c9b5
+  image_crops.py: 1f3f469fcbd3291966c6f9fda5c90f8044d39b391261bac14ef6bbcfb76496cb
+  layers.py: 9b3bab95b3571b39bd3d37c124bb6205bf881b55652e89cda360e522079962d8
+  lora.py: d180359b1739e9a087a9c756c4671e536debb702d591370741af75ce4e27762d
+  modeling_phi.py: e485c439475605f8be8a575d14d01b0d119a9cd4e4072e5e16e6b85cf9dbfa17
+  moondream.py: 52e8d0357eb12fdc1be36de13b3a53b225b970cc47fe7798783f177cf2262e59
+  region.py: 225bd962af02fedbf6d4a423c3282cada452fdc11efb478558b82df659dbf726
+  region_model.py: 7e72c196778cbe59e810cdb67a0b9995a1f31fe95b0eafc6d6ab5b64fc0cbf6c
+  rope.py: 0032ace75443a81888b957b28b7fd00ac808effdfdace14855d31b5c14ea5770
+  text.py: 9ec56dd5f1a78c9116c8f60e83db90c887034e0183ec3acb6245a91b493ce352
+  utils.py: 08d33430923d83ad26dfdbbc58d6df0f363a4c3c05cbfd8018f6e2c98c82ed59
+  vision.py: f524cd4227df0394b0b1e73f281c93791267849729fc13a874a9071fff6f1eed
+  vision_encoder.py: cc8fc22277d7f21417361d0cbf6203b4923814a24ccc336d33ed78754f4de2bf
+  weights.py: e47fb56bd1830cb71b7017dfbbb96ce0c66d4e328674c64091015b3e7e1eef29
+dependency_lock:
+  path: requirements/model-cu128.lock
+  sha256: 96d07ba6bb6310b29d259c64652de18f4c5f72f2f0629a17844d09ffacedffbd

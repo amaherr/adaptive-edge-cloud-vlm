@@ -1,12 +1,15 @@
 adapter: fake
 model_id: test/deterministic-vlm
 revision: v1
+artifact_sha256: 3e127045e236c3ef164519389f581290534e8f2a8424d52cd3ed54ff1d9b0262
 status: test
 precision: fp32
+preprocessing_backend: synthetic
 trust_remote_code: false
 generation:
   max_new_tokens: 8
   do_sample: false
   temperature: 0.0
   batch_size: 1
+  variant: null
 

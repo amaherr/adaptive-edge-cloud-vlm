@@ -1,12 +1,13 @@
 host_id: edge-rtx3050
 role: edge
-status: declared
-operating_system: Windows host with WSL runtime
+status: verified
+operating_system: WSL 2.5.10.0 / Linux 6.6.87.2 on Windows 10.0.26200.9457
 cpu: 11th Gen Intel Core i7-11800H
-ram_gib: 8.0
+ram_gib: 7.637
 gpu: NVIDIA GeForce RTX 3050 Laptop GPU
 gpu_vram_mib: 4096
 notes: >-
-  Windows reports WDDM driver 610.62, CUDA UMD 13.3, and a 75 W power limit.
-  GPU access from WSL and total Windows host RAM remain to be verified.
+  WDDM driver 610.62 and CUDA UMD 13.3. PyTorch 2.7.1+cu128 verified CUDA,
+  compute capability 8.6, BF16 support, and a BF16 matrix operation through
+  WSL /dev/dxg. Restricted development commands require elevated sandbox access.
 

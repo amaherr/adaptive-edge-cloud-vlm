@@ -1,12 +1,16 @@
 adapter: moondream2
 model_id: vikhyatk/moondream2
-revision: "2025-06-21"
+release_tag: "2025-06-21"
+revision: 9a7d4024050840e001defacec2b00727e89149e6
+artifact_sha256: 70a7d94c0c8349eb58ed2d9e636ef2d0916960f321ecabeac6354b8ba3d7403f
 status: candidate
 precision: bf16
+preprocessing_backend: pillow
 trust_remote_code: true
 generation:
   max_new_tokens: 32
   do_sample: false
   temperature: 0.0
   batch_size: 1
+  variant: null
 

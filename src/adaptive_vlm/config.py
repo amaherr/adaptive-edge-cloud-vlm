@@ -31,14 +31,18 @@ class Precision(StrEnum):
 class ModelConfig:
     adapter: str
     model_id: str
+    release_tag: str | None
     revision: str
+    artifact_sha256: str
     status: str
     precision: Precision
+    preprocessing_backend: str
     trust_remote_code: bool
     max_new_tokens: int
     do_sample: bool
     temperature: float
     batch_size: int
+    variant: str | None
 
 
 @dataclass(frozen=True)
@@ -168,9 +172,12 @@ def _parse_model(data: Mapping[str, Any]) -> ModelConfig:
         {
             "adapter",
             "model_id",
+            "release_tag",
             "revision",
+            "artifact_sha256",
             "status",
             "precision",
+            "preprocessing_backend",
             "trust_remote_code",
             "generation",
         },
@@ -179,7 +186,7 @@ def _parse_model(data: Mapping[str, Any]) -> ModelConfig:
     generation = _required_mapping(data, "generation", context)
     _reject_unknown(
         generation,
-        {"max_new_tokens", "do_sample", "temperature", "batch_size"},
+        {"max_new_tokens", "do_sample", "temperature", "batch_size", "variant"},
         "model.generation",
     )
 
@@ -198,6 +205,11 @@ def _parse_model(data: Mapping[str, Any]) -> ModelConfig:
     )
     if revision.lower() in {"main", "master", "latest"}:
         raise ConfigError("model.revision must be pinned, not a moving reference")
+    artifact_sha256 = _required(data, "artifact_sha256", str, context).lower()
+    if len(artifact_sha256) != 64 or any(
+        character not in "0123456789abcdef" for character in artifact_sha256
+    ):
+        raise ConfigError("model.artifact_sha256 must be a 64-character hex digest")
 
     status = _required(data, "status", str, context)
     if status not in {"candidate", "approved", "test"}:
@@ -208,12 +220,18 @@ def _parse_model(data: Mapping[str, Any]) -> ModelConfig:
         model_id=_non_empty(
             _required(data, "model_id", str, context), "model.model_id"
         ),
+        release_tag=_optional(data, "release_tag", str, context),
         revision=revision,
+        artifact_sha256=artifact_sha256,
         status=status,
         precision=_enum_value(
             Precision,
             _required(data, "precision", str, context),
             "model.precision",
+        ),
+        preprocessing_backend=_non_empty(
+            _required(data, "preprocessing_backend", str, context),
+            "model.preprocessing_backend",
         ),
         trust_remote_code=_required(data, "trust_remote_code", bool, context),
         max_new_tokens=_positive_int(
@@ -222,6 +240,7 @@ def _parse_model(data: Mapping[str, Any]) -> ModelConfig:
         do_sample=do_sample,
         temperature=temperature,
         batch_size=batch_size,
+        variant=_optional(generation, "variant", str, "model.generation"),
     )
 
 

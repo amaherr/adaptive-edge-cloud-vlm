@@ -23,7 +23,11 @@ def test_loads_baseline_configs(filename: str, mode: ExecutionMode) -> None:
     config = load_experiment_config(EXPERIMENTS / filename)
 
     assert config.mode is mode
-    assert config.model.revision == "2025-06-21"
+    assert config.model.release_tag == "2025-06-21"
+    assert config.model.revision == "9a7d4024050840e001defacec2b00727e89149e6"
+    assert config.model.artifact_sha256.startswith("70a7d94c")
+    assert config.model.preprocessing_backend == "pillow"
+    assert config.model.variant is None
     assert config.edge.gpu_vram_mib == 4096
     assert config.cloud.status == "pending"
     assert config.runtime.measured_repetitions == 30
@@ -50,6 +54,19 @@ def test_rejects_moving_model_revision(tmp_path: Path) -> None:
     experiment_path.write_text(yaml.safe_dump(experiment), encoding="utf-8")
 
     with pytest.raises(ConfigError, match="must be pinned"):
+        load_experiment_config(experiment_path)
+
+
+def test_rejects_invalid_artifact_digest(tmp_path: Path) -> None:
+    model = yaml.safe_load((ROOT / "configs/model/moondream2.yaml").read_text())
+    model["artifact_sha256"] = "not-a-digest"
+    model_path = tmp_path / "model.yaml"
+    model_path.write_text(yaml.safe_dump(model), encoding="utf-8")
+    experiment = _experiment_with_model(model_path)
+    experiment_path = tmp_path / "experiment.yaml"
+    experiment_path.write_text(yaml.safe_dump(experiment), encoding="utf-8")
+
+    with pytest.raises(ConfigError, match="64-character"):
         load_experiment_config(experiment_path)
 
 
