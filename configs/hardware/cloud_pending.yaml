@@ -1,0 +1,8 @@
+host_id: cloud-pending
+role: cloud
+status: pending
+operating_system: unknown
+cpu: unknown
+ram_gib: 1.0
+notes: Replace every placeholder and set status to verified before benchmarking.
+

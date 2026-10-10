@@ -1,0 +1,12 @@
+host_id: edge-rtx3050
+role: edge
+status: declared
+operating_system: Windows host with WSL runtime
+cpu: 11th Gen Intel Core i7-11800H
+ram_gib: 8.0
+gpu: NVIDIA GeForce RTX 3050 Laptop GPU
+gpu_vram_mib: 4096
+notes: >-
+  Windows reports WDDM driver 610.62, CUDA UMD 13.3, and a 75 W power limit.
+  GPU access from WSL and total Windows host RAM remain to be verified.
+

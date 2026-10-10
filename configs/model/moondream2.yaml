@@ -1,0 +1,12 @@
+adapter: moondream2
+model_id: vikhyatk/moondream2
+revision: "2025-06-21"
+status: candidate
+precision: bf16
+trust_remote_code: true
+generation:
+  max_new_tokens: 32
+  do_sample: false
+  temperature: 0.0
+  batch_size: 1
+

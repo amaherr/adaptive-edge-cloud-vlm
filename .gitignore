@@ -51,6 +51,12 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Generated experiment outputs and downloaded model/data caches
+/artifacts/
+/models/
+/data/raw/
+/data/cache/
+
 # Translations
 *.mo
 *.pot

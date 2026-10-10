@@ -1,0 +1,12 @@
+adapter: fake
+model_id: test/deterministic-vlm
+revision: v1
+status: test
+precision: fp32
+trust_remote_code: false
+generation:
+  max_new_tokens: 8
+  do_sample: false
+  temperature: 0.0
+  batch_size: 1
+

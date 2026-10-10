@@ -1,0 +1,20 @@
+schema_version: 1
+name: baseline-cloud
+mode: cloud
+model_config: ../model/moondream2.yaml
+edge_hardware_config: ../hardware/edge_rtx3050.yaml
+cloud_hardware_config: ../hardware/cloud_pending.yaml
+dataset:
+  manifest_path: ../../data/manifests/correctness.jsonl
+  revision: pending
+runtime:
+  seed: 42
+  warmup_requests: 10
+  measured_repetitions: 30
+transport:
+  host: 127.0.0.1
+  port: 5050
+  timeout_seconds: 120.0
+  protocol_version: 1
+artifacts_dir: ../../artifacts
+

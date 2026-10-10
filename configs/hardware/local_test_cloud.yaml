@@ -1,0 +1,8 @@
+host_id: local-test-cloud
+role: cloud
+status: declared
+operating_system: local test process
+cpu: fake
+ram_gib: 1.0
+notes: CPU-only placeholder used exclusively by infrastructure smoke tests.
+
