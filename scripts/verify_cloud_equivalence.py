@@ -15,10 +15,15 @@ from time import perf_counter
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
-from adaptive_vlm.config import ExecutionMode, load_experiment_config
+from adaptive_vlm.config import (
+    ExecutionMode,
+    load_experiment_config,
+    model_contract_fingerprint,
+)
 from adaptive_vlm.contracts import InferenceRequest
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
+from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.moondream import MoondreamAdapter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
@@ -86,10 +91,11 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         prompt=args.prompt,
     )
     reference = adapter.run_monolithic(request).result
+    contract_fingerprint = model_contract_fingerprint(config.model)
 
     processor = CloudRequestProcessor(
         protocol_version=config.transport.protocol_version,
-        model_fingerprint=adapter.metadata.fingerprint,
+        model_fingerprint=contract_fingerprint,
         inference_function=lambda remote: adapter.run_monolithic(remote).result,
     )
     server = CloudServer(
@@ -106,7 +112,12 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
     )
     server_thread.start()
     transport = replace(config.transport, host="127.0.0.1", port=server.port)
-    policy = CloudExecutionPolicy(transport=transport, model=adapter.metadata)
+    remote_model = ModelMetadata(
+        model_id=adapter.metadata.model_id,
+        revision=adapter.metadata.revision,
+        fingerprint=contract_fingerprint,
+    )
+    policy = CloudExecutionPolicy(transport=transport, model=remote_model)
     try:
         health = policy.health()
         remote = policy.infer(request)
@@ -131,6 +142,7 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
                 "model_id": adapter.metadata.model_id,
                 "revision": adapter.metadata.revision,
                 "fingerprint": adapter.metadata.fingerprint,
+                "contract_fingerprint": contract_fingerprint,
             },
             "server_ready": health.ready,
             "server_model_fingerprint": health.model_fingerprint,

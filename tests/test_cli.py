@@ -6,7 +6,11 @@ from pathlib import Path
 import pytest
 
 from adaptive_vlm.cli import main
-from adaptive_vlm.config import ExecutionMode
+from adaptive_vlm.config import (
+    ExecutionMode,
+    load_experiment_config,
+    model_contract_fingerprint,
+)
 from adaptive_vlm.execution.cloud import HealthStatus
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
@@ -190,7 +194,13 @@ def test_cloud_server_starts_fake_adapter(
     assert exit_code == 0
     ready = json.loads(capsys.readouterr().out)
     assert ready["ready"] is True
-    assert ready["model_fingerprint"] == FakeModelAdapter().metadata.fingerprint
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk4_fake_cloud.yaml"
+    )
+    assert ready["model_artifact_sha256"] == FakeModelAdapter().metadata.fingerprint
+    assert ready["model_contract_fingerprint"] == model_contract_fingerprint(
+        config.model
+    )
     server = instances[0]
     assert server.started  # type: ignore[attr-defined]
     assert server.served  # type: ignore[attr-defined]

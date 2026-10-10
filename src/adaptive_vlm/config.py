@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from enum import Enum, StrEnum
@@ -97,6 +99,33 @@ class ExperimentConfig:
         """Return a JSON-serializable resolved representation."""
 
         return _as_json_dict(asdict(self))
+
+
+def model_contract_fingerprint(model: ModelConfig) -> str:
+    """Hash every model setting that can affect preprocessing or generation."""
+
+    contract = {
+        "schema_version": 1,
+        "adapter": model.adapter,
+        "model_id": model.model_id,
+        "release_tag": model.release_tag,
+        "revision": model.revision,
+        "artifact_sha256": model.artifact_sha256,
+        "precision": model.precision.value,
+        "preprocessing_backend": model.preprocessing_backend,
+        "trust_remote_code": model.trust_remote_code,
+        "generation": {
+            "max_new_tokens": model.max_new_tokens,
+            "do_sample": model.do_sample,
+            "temperature": model.temperature,
+            "batch_size": model.batch_size,
+            "variant": model.variant,
+        },
+    }
+    canonical = json.dumps(
+        contract, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
 
 
 T = TypeVar("T")

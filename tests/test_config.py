@@ -5,7 +5,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-from adaptive_vlm.config import ConfigError, ExecutionMode, load_experiment_config
+from adaptive_vlm.config import (
+    ConfigError,
+    ExecutionMode,
+    load_experiment_config,
+    model_contract_fingerprint,
+)
 
 ROOT = Path(__file__).parents[1]
 EXPERIMENTS = ROOT / "configs" / "experiments"
@@ -53,6 +58,18 @@ def test_loads_chunk_four_local_configs(filename: str) -> None:
     assert config.mode is ExecutionMode.CLOUD
     assert config.cloud.status in {"declared", "verified"}
     assert config.transport.host == "127.0.0.1"
+
+
+def test_model_contract_fingerprint_covers_generation_settings() -> None:
+    config = load_experiment_config(EXPERIMENTS / "chunk4_local_cloud.yaml")
+    changed = config.model.__class__(
+        **{**config.model.__dict__, "max_new_tokens": 1}
+    )
+
+    assert len(model_contract_fingerprint(config.model)) == 64
+    assert model_contract_fingerprint(changed) != model_contract_fingerprint(
+        config.model
+    )
 
 
 def test_rejects_moving_model_revision(tmp_path: Path) -> None:

@@ -10,7 +10,12 @@ from pathlib import Path
 from time import perf_counter
 
 from adaptive_vlm.artifacts import create_run_manifest, write_json_atomic
-from adaptive_vlm.config import ConfigError, ExecutionMode, load_experiment_config
+from adaptive_vlm.config import (
+    ConfigError,
+    ExecutionMode,
+    load_experiment_config,
+    model_contract_fingerprint,
+)
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult, RequestRecord
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.environment import collect_environment
@@ -303,10 +308,11 @@ def _cloud_server(
     else:
         raise ConfigError(f"unsupported cloud model adapter: {config.model.adapter}")
     model_load_ms = (perf_counter() - load_started) * 1000
+    contract_fingerprint = model_contract_fingerprint(config.model)
 
     processor = CloudRequestProcessor(
         protocol_version=config.transport.protocol_version,
-        model_fingerprint=model_metadata.fingerprint,
+        model_fingerprint=contract_fingerprint,
         inference_function=inference_function,
     )
     server = CloudServer(
@@ -322,7 +328,8 @@ def _cloud_server(
                 "ready": True,
                 "host": server.host,
                 "port": server.port,
-                "model_fingerprint": model_metadata.fingerprint,
+                "model_artifact_sha256": model_metadata.fingerprint,
+                "model_contract_fingerprint": contract_fingerprint,
                 "model_load_ms": model_load_ms,
                 "seeded_providers": list(seeded),
             },
@@ -362,7 +369,7 @@ def _cloud_infer(
     model = ModelMetadata(
         model_id=config.model.model_id,
         revision=config.model.revision,
-        fingerprint=config.model.artifact_sha256,
+        fingerprint=model_contract_fingerprint(config.model),
     )
     policy = CloudExecutionPolicy(transport=config.transport, model=model)
     health = policy.health()

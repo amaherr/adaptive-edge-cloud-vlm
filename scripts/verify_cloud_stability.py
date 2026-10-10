@@ -15,9 +15,14 @@ from pathlib import Path
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
-from adaptive_vlm.config import ExecutionMode, load_experiment_config
+from adaptive_vlm.config import (
+    ExecutionMode,
+    load_experiment_config,
+    model_contract_fingerprint,
+)
 from adaptive_vlm.contracts import InferenceRequest
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
+from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
@@ -70,9 +75,10 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         raise ValueError("stability verification requires a fake cloud config")
 
     adapter = FakeModelAdapter()
+    contract_fingerprint = model_contract_fingerprint(config.model)
     processor = CloudRequestProcessor(
         protocol_version=config.transport.protocol_version,
-        model_fingerprint=adapter.metadata.fingerprint,
+        model_fingerprint=contract_fingerprint,
         inference_function=adapter.generate,
     )
     server = CloudServer(
@@ -89,7 +95,12 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
     )
     server_thread.start()
     transport = replace(config.transport, host="127.0.0.1", port=server.port)
-    policy = CloudExecutionPolicy(transport=transport, model=adapter.metadata)
+    remote_model = ModelMetadata(
+        model_id=adapter.metadata.model_id,
+        revision=adapter.metadata.revision,
+        fingerprint=contract_fingerprint,
+    )
+    policy = CloudExecutionPolicy(transport=transport, model=remote_model)
     image_path = args.image.resolve()
     rss_samples = [_rss_mib()]
     request_bytes: list[int] = []
@@ -136,6 +147,7 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
             "status": "ok",
             "requests": args.requests,
             "outputs_match": outputs_match,
+            "model_contract_fingerprint": contract_fingerprint,
             "server_stats": {
                 "completed": stats.completed_requests,
                 "rejected": stats.rejected_requests,
