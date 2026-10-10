@@ -13,15 +13,23 @@ from adaptive_vlm.transport.protocol import (
     receive_frame,
     send_frame,
 )
+from adaptive_vlm.transport.server import (
+    CloudRequestProcessor,
+    CloudServer,
+    ServerStats,
+)
 
 __all__ = [
     "ChecksumMismatch",
+    "CloudRequestProcessor",
+    "CloudServer",
     "Frame",
     "FrameTooLarge",
     "MessageType",
     "PeerDisconnected",
     "ProtocolError",
     "ReceivedFrame",
+    "ServerStats",
     "VersionMismatch",
     "encode_frame",
     "receive_frame",

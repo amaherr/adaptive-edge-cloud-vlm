@@ -170,6 +170,21 @@ def test_message_schema_rejects_unexpected_metadata() -> None:
         )
 
 
+def test_image_suffix_cannot_escape_temporary_directory() -> None:
+    with pytest.raises(ProtocolError, match="image_suffix"):
+        Frame(
+            version=1,
+            message_type=MessageType.INFERENCE_REQUEST,
+            request_id="request-1",
+            metadata={
+                "prompt": "Describe.",
+                "model_fingerprint": FINGERPRINT,
+                "image_suffix": "../image.png",
+            },
+            payload=b"image",
+        )
+
+
 def test_non_finite_metric_is_rejected() -> None:
     with pytest.raises(ProtocolError, match="non-finite"):
         Frame(

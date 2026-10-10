@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 import struct
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -227,7 +228,7 @@ def _validate_message(frame: Frame) -> None:
         if not prompt.strip() or len(prompt) > MAX_PROMPT_CHARACTERS:
             raise ProtocolError("prompt is empty or too long")
         suffix = _require_type(metadata, "image_suffix", str)
-        if len(suffix) > 16 or (suffix and not suffix.startswith(".")):
+        if suffix and re.fullmatch(r"\.[A-Za-z0-9]{1,10}", suffix) is None:
             raise ProtocolError("image_suffix is invalid")
         _require_fingerprint(metadata)
         if not frame.payload:
