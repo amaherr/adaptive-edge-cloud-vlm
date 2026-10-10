@@ -26,6 +26,7 @@ from adaptive_vlm.transport.protocol import (
 
 LOGGER = logging.getLogger(__name__)
 InferenceFunction = Callable[[InferenceRequest], InferenceResult]
+EventCallback = Callable[[str], None]
 
 
 @dataclass(frozen=True)
@@ -44,10 +45,12 @@ class CloudRequestProcessor:
         protocol_version: int,
         model_fingerprint: str,
         inference_function: InferenceFunction,
+        event_callback: EventCallback | None = None,
     ) -> None:
         self.protocol_version = protocol_version
         self.model_fingerprint = model_fingerprint
         self._inference_function = inference_function
+        self._event_callback = event_callback
         self._completed_requests = 0
         self._rejected_requests = 0
         self._failed_requests = 0
@@ -90,9 +93,14 @@ class CloudRequestProcessor:
             )
 
         try:
+            self._emit(
+                f"Request {frame.request_id}: received {received.wire_bytes} bytes; "
+                "running model inference"
+            )
             return self._run_inference(received)
         except Exception as exc:  # The process must survive one bad model request.
             LOGGER.exception("inference request %s failed", frame.request_id)
+            self._emit(f"Request {frame.request_id}: model inference failed")
             self._increment("failed")
             return self._error(
                 frame.request_id,
@@ -127,6 +135,10 @@ class CloudRequestProcessor:
             }
         )
         self._increment("completed")
+        self._emit(
+            f"Request {frame.request_id}: completed in {server_total_ms / 1000:.1f}s "
+            f"with {len(result.output_token_ids)} output tokens"
+        )
         return Frame(
             version=self.protocol_version,
             message_type=MessageType.INFERENCE_RESPONSE,
@@ -155,6 +167,10 @@ class CloudRequestProcessor:
                 self._rejected_requests += 1
             else:
                 self._failed_requests += 1
+
+    def _emit(self, message: str) -> None:
+        if self._event_callback is not None:
+            self._event_callback(message)
 
 
 class CloudServer:

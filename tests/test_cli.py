@@ -102,7 +102,10 @@ def test_edge_infer_uses_local_policy_and_writes_artifacts(
     )
 
     assert exit_code == 0
-    record = json.loads(capsys.readouterr().out)
+    captured = capsys.readouterr()
+    record = json.loads(captured.out)
+    assert "Loading and verifying the pinned Moondream2 model" in captured.err
+    assert "Running edge inference" in captured.err
     assert record["mode"] == "edge"
     assert record["metrics"]["model_load_ms"] >= 0
     run_directory = next(tmp_path.iterdir())
@@ -152,7 +155,10 @@ def test_cloud_infer_uses_remote_policy_and_writes_artifacts(
     )
 
     assert exit_code == 0
-    record = json.loads(capsys.readouterr().out)
+    captured = capsys.readouterr()
+    record = json.loads(captured.out)
+    assert "Checking cloud server" in captured.err
+    assert "Running cloud inference" in captured.err
     assert record["mode"] == "cloud"
     run_directory = next(tmp_path.iterdir())
     assert (run_directory / "run_manifest.json").is_file()
@@ -192,7 +198,10 @@ def test_cloud_server_starts_fake_adapter(
     )
 
     assert exit_code == 0
-    ready = json.loads(capsys.readouterr().out)
+    captured = capsys.readouterr()
+    ready = json.loads(captured.out)
+    assert "Cloud server ready" in captured.err
+    assert "Waiting for requests" in captured.err
     assert ready["ready"] is True
     config = load_experiment_config(
         ROOT / "configs/experiments/chunk4_fake_cloud.yaml"
@@ -220,4 +229,32 @@ def test_cloud_commands_reject_pending_hardware(
 
     assert exit_code == 2
     assert "pending" in capsys.readouterr().err
+
+
+def test_edge_verbose_reports_model_details(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        MoondreamAdapter,
+        "from_pretrained",
+        lambda *_args, **_kwargs: FakeModelAdapter(),
+    )
+
+    exit_code = main(
+        [
+            "edge-infer",
+            "--config",
+            str(ROOT / "configs/experiments/baseline_edge.yaml"),
+            "--artifact-manifest",
+            str(ROOT / "configs/model/moondream2_artifact.yaml"),
+            "--image",
+            str(ROOT / "tests/fixtures/moondream_smoke.ppm"),
+            "--prompt",
+            "Describe this fixture.",
+            "--verbose",
+        ]
+    )
+
+    assert exit_code == 0
+    assert "vikhyatk/moondream2@9a7d402" in capsys.readouterr().err
 

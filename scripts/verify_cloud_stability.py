@@ -24,6 +24,7 @@ from adaptive_vlm.contracts import InferenceRequest
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
+from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
 
@@ -35,6 +36,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--requests", default=100, type=int)
     parser.add_argument("--max-rss-growth-mib", default=16.0, type=float)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("-v", "--verbose", action="store_true")
     return parser
 
 
@@ -66,6 +68,8 @@ def main() -> int:
 
 
 def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
+    progress = ProgressReporter(args.verbose)
+    progress.detail(f"Loading experiment configuration from {args.config.resolve()}")
     if args.requests <= 0:
         raise ValueError("requests must be positive")
     if args.max_rss_growth_mib < 0:
@@ -87,7 +91,8 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         timeout_seconds=config.transport.timeout_seconds,
         processor=processor,
     )
-    server.start()
+    with progress.phase("Starting localhost fake-model server"):
+        server.start()
     server_thread = threading.Thread(
         target=server.serve_forever,
         name="chunk4-cloud-server",
@@ -107,27 +112,34 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
     response_bytes: list[int] = []
     outputs_match = True
     try:
-        health = policy.health()
+        with progress.phase("Checking server readiness and contract fingerprint"):
+            health = policy.health()
         if not health.ready:
             raise RuntimeError("localhost server did not report ready")
-        for index in range(args.requests):
-            request = InferenceRequest(
-                request_id=f"stability-{index:04d}",
-                image_path=image_path,
-                prompt=args.prompt,
-            )
-            expected = adapter.generate(request)
-            actual = policy.infer(request)
-            outputs_match &= (
-                actual.output_token_ids == expected.output_token_ids
-                and actual.output_text == expected.output_text
-            )
-            request_bytes.append(int(actual.metrics["request_wire_bytes"]))
-            response_bytes.append(int(actual.metrics["response_wire_bytes"]))
-            rss_samples.append(_rss_mib())
+        with progress.phase(f"Sending {args.requests} sequential TCP requests"):
+            for index in range(args.requests):
+                request = InferenceRequest(
+                    request_id=f"stability-{index:04d}",
+                    image_path=image_path,
+                    prompt=args.prompt,
+                )
+                expected = adapter.generate(request)
+                actual = policy.infer(request)
+                outputs_match &= (
+                    actual.output_token_ids == expected.output_token_ids
+                    and actual.output_text == expected.output_text
+                )
+                request_bytes.append(int(actual.metrics["request_wire_bytes"]))
+                response_bytes.append(int(actual.metrics["response_wire_bytes"]))
+                rss_samples.append(_rss_mib())
+                progress.detail(
+                    f"Completed request {index + 1}/{args.requests}; "
+                    f"RSS={rss_samples[-1]:.3f} MiB"
+                )
     finally:
         server.shutdown()
         server_thread.join(timeout=config.transport.timeout_seconds + 1)
+        progress.info("Localhost fake-model server stopped")
 
     if server_thread.is_alive():
         raise RuntimeError("server did not shut down within the timeout")
@@ -162,6 +174,10 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
             "response_wire_bytes_min": min(response_bytes),
             "response_wire_bytes_max": max(response_bytes),
         }
+    )
+    progress.info(
+        f"Stability gate passed: {args.requests} requests, "
+        f"peak RSS growth {peak_growth_mib:.3f} MiB"
     )
 
 

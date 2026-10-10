@@ -24,6 +24,7 @@ from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
+from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
 
@@ -58,6 +59,7 @@ def build_parser() -> argparse.ArgumentParser:
     fake_parser.add_argument("--prompt", required=True)
     fake_parser.add_argument("--request-id", default="smoke-0001")
     fake_parser.add_argument("--output-dir", type=Path)
+    fake_parser.add_argument("-v", "--verbose", action="store_true")
 
     edge_parser = subcommands.add_parser(
         "edge-infer", help="Run pinned Moondream inference on the edge host"
@@ -72,6 +74,7 @@ def build_parser() -> argparse.ArgumentParser:
     edge_parser.add_argument("--text-device", default="cpu")
     edge_parser.add_argument("--offline", action="store_true")
     edge_parser.add_argument("--output-dir", type=Path)
+    edge_parser.add_argument("-v", "--verbose", action="store_true")
 
     server_parser = subcommands.add_parser(
         "cloud-server", help="Serve monolithic inference on the cloud host"
@@ -82,6 +85,7 @@ def build_parser() -> argparse.ArgumentParser:
     server_parser.add_argument("--device", default="cpu")
     server_parser.add_argument("--offline", action="store_true")
     server_parser.add_argument("--bind-host")
+    server_parser.add_argument("-v", "--verbose", action="store_true")
 
     cloud_parser = subcommands.add_parser(
         "cloud-infer", help="Send one raw image request to a cloud server"
@@ -91,6 +95,7 @@ def build_parser() -> argparse.ArgumentParser:
     cloud_parser.add_argument("--prompt", required=True)
     cloud_parser.add_argument("--request-id", default="cloud-0001")
     cloud_parser.add_argument("--output-dir", type=Path)
+    cloud_parser.add_argument("-v", "--verbose", action="store_true")
     return parser
 
 
@@ -108,6 +113,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 prompt=args.prompt,
                 request_id=args.request_id,
                 output_dir=args.output_dir,
+                verbose=args.verbose,
             )
         if args.command == "edge-infer":
             return _edge_infer(
@@ -121,6 +127,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 text_device=args.text_device,
                 offline=args.offline,
                 output_dir=args.output_dir,
+                verbose=args.verbose,
             )
         if args.command == "cloud-server":
             return _cloud_server(
@@ -130,6 +137,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 device=args.device,
                 offline=args.offline,
                 bind_host=args.bind_host,
+                verbose=args.verbose,
             )
         if args.command == "cloud-infer":
             return _cloud_infer(
@@ -138,6 +146,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 prompt=args.prompt,
                 request_id=args.request_id,
                 output_dir=args.output_dir,
+                verbose=args.verbose,
             )
     except (ConfigError, OSError, RuntimeError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -169,7 +178,10 @@ def _fake_infer(
     prompt: str,
     request_id: str,
     output_dir: Path | None,
+    verbose: bool,
 ) -> int:
+    progress = ProgressReporter(verbose)
+    progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
     config = load_experiment_config(config_path)
     if config.model.adapter != "fake":
         raise ConfigError(
@@ -181,13 +193,14 @@ def _fake_infer(
     manifest = create_run_manifest(config, environment)
 
     policy = LocalExecutionPolicy(FakeModelAdapter())
-    result = policy.infer(
-        InferenceRequest(
-            request_id=request_id,
-            image_path=image_path.resolve(),
-            prompt=prompt,
+    with progress.phase(f"Running fake inference for {request_id}"):
+        result = policy.infer(
+            InferenceRequest(
+                request_id=request_id,
+                image_path=image_path.resolve(),
+                prompt=prompt,
+            )
         )
-    )
     record = RequestRecord.from_result(
         run_id=manifest.run_id,
         mode=config.mode,
@@ -198,6 +211,8 @@ def _fake_infer(
         run_directory = output_dir / manifest.run_id
         write_json_atomic(run_directory / "run_manifest.json", manifest.to_dict())
         write_json_atomic(run_directory / "request.json", record.to_dict())
+        progress.info(f"Saved run artifacts to {run_directory}")
+    progress.info(f"Inference complete with {len(result.output_token_ids)} tokens")
     print(json.dumps(record.to_dict(), indent=2, sort_keys=True))
     return 0
 
@@ -214,7 +229,10 @@ def _edge_infer(
     text_device: str,
     offline: bool,
     output_dir: Path | None,
+    verbose: bool,
 ) -> int:
+    progress = ProgressReporter(verbose)
+    progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
     config = load_experiment_config(config_path)
     if config.mode is not ExecutionMode.EDGE:
         raise ConfigError("edge-infer requires an edge experiment configuration")
@@ -230,24 +248,30 @@ def _edge_infer(
         "offline_model_cache": offline,
     }
     manifest = create_run_manifest(config, environment)
-    load_started = perf_counter()
-    adapter = MoondreamAdapter.from_pretrained(
-        config.model,
-        cache_dir=cache_dir,
-        artifact_manifest=artifact_manifest,
-        vision_device=vision_device,
-        text_device=text_device,
-        offline=offline,
+    progress.detail(
+        f"Model {config.model.model_id}@{config.model.revision}; "
+        f"vision={vision_device}, text={text_device}, offline={offline}"
     )
+    load_started = perf_counter()
+    with progress.phase("Loading and verifying the pinned Moondream2 model"):
+        adapter = MoondreamAdapter.from_pretrained(
+            config.model,
+            cache_dir=cache_dir,
+            artifact_manifest=artifact_manifest,
+            vision_device=vision_device,
+            text_device=text_device,
+            offline=offline,
+        )
     model_load_ms = (perf_counter() - load_started) * 1000
     policy = LocalExecutionPolicy(adapter)
-    result = policy.infer(
-        InferenceRequest(
-            request_id=request_id,
-            image_path=image_path.resolve(),
-            prompt=prompt,
+    with progress.phase(f"Running edge inference for {request_id}"):
+        result = policy.infer(
+            InferenceRequest(
+                request_id=request_id,
+                image_path=image_path.resolve(),
+                prompt=prompt,
+            )
         )
-    )
     result = InferenceResult(
         request_id=result.request_id,
         output_text=result.output_text,
@@ -264,6 +288,8 @@ def _edge_infer(
         run_directory = output_dir / manifest.run_id
         write_json_atomic(run_directory / "run_manifest.json", manifest.to_dict())
         write_json_atomic(run_directory / "request.json", record.to_dict())
+        progress.info(f"Saved run artifacts to {run_directory}")
+    progress.info(f"Inference complete with {len(result.output_token_ids)} tokens")
     print(json.dumps(record.to_dict(), indent=2, sort_keys=True))
     return 0
 
@@ -276,44 +302,52 @@ def _cloud_server(
     device: str,
     offline: bool,
     bind_host: str | None,
+    verbose: bool,
 ) -> int:
+    progress = ProgressReporter(verbose)
+    progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
     config = load_experiment_config(config_path)
     _validate_cloud_config(config.mode, config.cloud.status)
     seeded = seed_everything(config.runtime.seed)
     load_started = perf_counter()
     inference_function: Callable[[InferenceRequest], InferenceResult]
-    if config.model.adapter == "fake":
-        fake_adapter = FakeModelAdapter()
-        model_metadata = fake_adapter.metadata
-        inference_function = fake_adapter.generate
-    elif config.model.adapter == "moondream2":
-        if artifact_manifest is None:
-            raise ConfigError(
-                "cloud-server requires --artifact-manifest for Moondream2"
+    with progress.phase(f"Loading {config.model.model_id} on {device}"):
+        if config.model.adapter == "fake":
+            fake_adapter = FakeModelAdapter()
+            model_metadata = fake_adapter.metadata
+            inference_function = fake_adapter.generate
+        elif config.model.adapter == "moondream2":
+            if artifact_manifest is None:
+                raise ConfigError(
+                    "cloud-server requires --artifact-manifest for Moondream2"
+                )
+            moondream_adapter = MoondreamAdapter.from_pretrained(
+                config.model,
+                cache_dir=cache_dir,
+                artifact_manifest=artifact_manifest,
+                vision_device=device,
+                text_device=device,
+                offline=offline,
             )
-        moondream_adapter = MoondreamAdapter.from_pretrained(
-            config.model,
-            cache_dir=cache_dir,
-            artifact_manifest=artifact_manifest,
-            vision_device=device,
-            text_device=device,
-            offline=offline,
-        )
-        model_metadata = moondream_adapter.metadata
+            model_metadata = moondream_adapter.metadata
 
-        def run_monolithic(request: InferenceRequest) -> InferenceResult:
-            return moondream_adapter.run_monolithic(request).result
+            def run_monolithic(request: InferenceRequest) -> InferenceResult:
+                return moondream_adapter.run_monolithic(request).result
 
-        inference_function = run_monolithic
-    else:
-        raise ConfigError(f"unsupported cloud model adapter: {config.model.adapter}")
+            inference_function = run_monolithic
+        else:
+            raise ConfigError(
+                f"unsupported cloud model adapter: {config.model.adapter}"
+            )
     model_load_ms = (perf_counter() - load_started) * 1000
     contract_fingerprint = model_contract_fingerprint(config.model)
+    progress.detail(f"Model contract fingerprint: {contract_fingerprint}")
 
     processor = CloudRequestProcessor(
         protocol_version=config.transport.protocol_version,
         model_fingerprint=contract_fingerprint,
         inference_function=inference_function,
+        event_callback=progress.info,
     )
     server = CloudServer(
         host=bind_host or config.transport.host,
@@ -322,6 +356,8 @@ def _cloud_server(
         processor=processor,
     )
     server.start()
+    progress.info(f"Cloud server ready on {server.host}:{server.port}")
+    progress.info("Waiting for requests; press Ctrl+C to stop")
     print(
         json.dumps(
             {
@@ -343,6 +379,7 @@ def _cloud_server(
         server.shutdown()
     finally:
         server.shutdown()
+        progress.info("Cloud server stopped")
     return 0
 
 
@@ -353,7 +390,10 @@ def _cloud_infer(
     prompt: str,
     request_id: str,
     output_dir: Path | None,
+    verbose: bool,
 ) -> int:
+    progress = ProgressReporter(verbose)
+    progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
     config = load_experiment_config(config_path)
     _validate_cloud_config(config.mode, config.cloud.status)
     seeded = seed_everything(config.runtime.seed)
@@ -372,16 +412,21 @@ def _cloud_infer(
         fingerprint=model_contract_fingerprint(config.model),
     )
     policy = CloudExecutionPolicy(transport=config.transport, model=model)
-    health = policy.health()
+    progress.detail(f"Expected model contract fingerprint: {model.fingerprint}")
+    with progress.phase(
+        f"Checking cloud server at {config.transport.host}:{config.transport.port}"
+    ):
+        health = policy.health()
     if not health.ready:
         raise RuntimeError("cloud server is not ready")
-    result = policy.infer(
-        InferenceRequest(
-            request_id=request_id,
-            image_path=image_path.resolve(),
-            prompt=prompt,
+    with progress.phase(f"Running cloud inference for {request_id}"):
+        result = policy.infer(
+            InferenceRequest(
+                request_id=request_id,
+                image_path=image_path.resolve(),
+                prompt=prompt,
+            )
         )
-    )
     record = RequestRecord.from_result(
         run_id=manifest.run_id,
         mode=policy.mode,
@@ -391,6 +436,15 @@ def _cloud_infer(
         run_directory = output_dir / manifest.run_id
         write_json_atomic(run_directory / "run_manifest.json", manifest.to_dict())
         write_json_atomic(run_directory / "request.json", record.to_dict())
+        progress.info(f"Saved run artifacts to {run_directory}")
+    completion = f"Inference complete with {len(result.output_token_ids)} tokens"
+    request_bytes = result.metrics.get("request_wire_bytes")
+    response_bytes = result.metrics.get("response_wire_bytes")
+    if request_bytes is not None and response_bytes is not None:
+        completion += (
+            f"; sent {request_bytes} bytes and received {response_bytes} bytes"
+        )
+    progress.info(completion)
     print(json.dumps(record.to_dict(), indent=2, sort_keys=True))
     return 0
 

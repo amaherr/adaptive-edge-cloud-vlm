@@ -25,6 +25,7 @@ from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.moondream import MoondreamAdapter
+from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
 
@@ -38,6 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("-v", "--verbose", action="store_true")
     return parser
 
 
@@ -69,6 +71,8 @@ def main() -> int:
 
 
 def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
+    progress = ProgressReporter(args.verbose)
+    progress.detail(f"Loading experiment configuration from {args.config.resolve()}")
     config = load_experiment_config(args.config)
     if config.mode is not ExecutionMode.CLOUD:
         raise ValueError("cloud equivalence requires a cloud config")
@@ -76,21 +80,27 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         raise ValueError("cloud equivalence requires the Moondream2 adapter")
     seeded = seed_everything(config.runtime.seed)
     load_started = perf_counter()
-    adapter = MoondreamAdapter.from_pretrained(
-        config.model,
-        cache_dir=args.cache_dir,
-        artifact_manifest=args.artifact_manifest,
-        vision_device=args.device,
-        text_device=args.device,
-        offline=args.offline,
+    progress.detail(
+        f"Model {config.model.model_id}@{config.model.revision}; "
+        f"device={args.device}, offline={args.offline}"
     )
+    with progress.phase("Loading and verifying the pinned Moondream2 model"):
+        adapter = MoondreamAdapter.from_pretrained(
+            config.model,
+            cache_dir=args.cache_dir,
+            artifact_manifest=args.artifact_manifest,
+            vision_device=args.device,
+            text_device=args.device,
+            offline=args.offline,
+        )
     model_load_ms = (perf_counter() - load_started) * 1000
     request = InferenceRequest(
         request_id="chunk4-equivalence",
         image_path=args.image.resolve(),
         prompt=args.prompt,
     )
-    reference = adapter.run_monolithic(request).result
+    with progress.phase("Running local monolithic reference inference"):
+        reference = adapter.run_monolithic(request).result
     contract_fingerprint = model_contract_fingerprint(config.model)
 
     processor = CloudRequestProcessor(
@@ -104,7 +114,8 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         timeout_seconds=config.transport.timeout_seconds,
         processor=processor,
     )
-    server.start()
+    with progress.phase("Starting localhost Moondream server"):
+        server.start()
     server_thread = threading.Thread(
         target=server.serve_forever,
         name="chunk4-moondream-server",
@@ -119,11 +130,14 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
     )
     policy = CloudExecutionPolicy(transport=transport, model=remote_model)
     try:
-        health = policy.health()
-        remote = policy.infer(request)
+        with progress.phase("Checking server readiness and contract fingerprint"):
+            health = policy.health()
+        with progress.phase("Running inference through the localhost TCP path"):
+            remote = policy.infer(request)
     finally:
         server.shutdown()
         server_thread.join(timeout=config.transport.timeout_seconds + 1)
+        progress.info("Localhost Moondream server stopped")
 
     if server_thread.is_alive():
         raise RuntimeError("server did not shut down within the timeout")
@@ -157,6 +171,7 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
             },
         }
     )
+    progress.info("Equivalence gate passed: token IDs and text match exactly")
 
 
 def _utc_now() -> str:
