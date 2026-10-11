@@ -20,6 +20,7 @@ from adaptive_vlm.contracts import InferenceRequest, InferenceResult, RequestRec
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.environment import collect_environment
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
+from adaptive_vlm.execution.distributed import DistributedExecutionPolicy
 from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
@@ -96,6 +97,39 @@ def build_parser() -> argparse.ArgumentParser:
     cloud_parser.add_argument("--request-id", default="cloud-0001")
     cloud_parser.add_argument("--output-dir", type=Path)
     cloud_parser.add_argument("-v", "--verbose", action="store_true")
+
+    distributed_server_parser = subcommands.add_parser(
+        "distributed-server",
+        help="Serve the language stage of split Moondream inference",
+    )
+    distributed_server_parser.add_argument("--config", required=True, type=Path)
+    distributed_server_parser.add_argument(
+        "--artifact-manifest", required=True, type=Path
+    )
+    distributed_server_parser.add_argument(
+        "--cache-dir", default=Path(".model-cache"), type=Path
+    )
+    distributed_server_parser.add_argument("--device", default="cpu")
+    distributed_server_parser.add_argument("--offline", action="store_true")
+    distributed_server_parser.add_argument("--bind-host")
+    distributed_server_parser.add_argument("-v", "--verbose", action="store_true")
+
+    distributed_parser = subcommands.add_parser(
+        "distributed-infer",
+        help="Encode an image locally and send projected features to the cloud",
+    )
+    distributed_parser.add_argument("--config", required=True, type=Path)
+    distributed_parser.add_argument("--artifact-manifest", required=True, type=Path)
+    distributed_parser.add_argument(
+        "--cache-dir", default=Path(".model-cache"), type=Path
+    )
+    distributed_parser.add_argument("--image", required=True, type=Path)
+    distributed_parser.add_argument("--prompt", required=True)
+    distributed_parser.add_argument("--request-id", default="distributed-0001")
+    distributed_parser.add_argument("--vision-device", default="cpu")
+    distributed_parser.add_argument("--offline", action="store_true")
+    distributed_parser.add_argument("--output-dir", type=Path)
+    distributed_parser.add_argument("-v", "--verbose", action="store_true")
     return parser
 
 
@@ -145,6 +179,29 @@ def main(argv: Sequence[str] | None = None) -> int:
                 image_path=args.image,
                 prompt=args.prompt,
                 request_id=args.request_id,
+                output_dir=args.output_dir,
+                verbose=args.verbose,
+            )
+        if args.command == "distributed-server":
+            return _distributed_server(
+                config_path=args.config,
+                artifact_manifest=args.artifact_manifest,
+                cache_dir=args.cache_dir,
+                device=args.device,
+                offline=args.offline,
+                bind_host=args.bind_host,
+                verbose=args.verbose,
+            )
+        if args.command == "distributed-infer":
+            return _distributed_infer(
+                config_path=args.config,
+                artifact_manifest=args.artifact_manifest,
+                cache_dir=args.cache_dir,
+                image_path=args.image,
+                prompt=args.prompt,
+                request_id=args.request_id,
+                vision_device=args.vision_device,
+                offline=args.offline,
                 output_dir=args.output_dir,
                 verbose=args.verbose,
             )
@@ -449,12 +506,187 @@ def _cloud_infer(
     return 0
 
 
+def _distributed_server(
+    *,
+    config_path: Path,
+    artifact_manifest: Path,
+    cache_dir: Path,
+    device: str,
+    offline: bool,
+    bind_host: str | None,
+    verbose: bool,
+) -> int:
+    progress = ProgressReporter(verbose)
+    progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
+    config = load_experiment_config(config_path)
+    _validate_distributed_config(config.mode, config.cloud.status)
+    if config.model.adapter != "moondream2":
+        raise ConfigError("distributed-server requires the Moondream2 adapter")
+
+    seeded = seed_everything(config.runtime.seed)
+    load_started = perf_counter()
+    with progress.phase(f"Loading the Moondream language stage on {device}"):
+        adapter = MoondreamAdapter.from_pretrained(
+            config.model,
+            cache_dir=cache_dir,
+            artifact_manifest=artifact_manifest,
+            vision_device="cpu",
+            text_device=device,
+            offline=offline,
+            components="text",
+        )
+    model_load_ms = (perf_counter() - load_started) * 1000
+    contract_fingerprint = model_contract_fingerprint(config.model)
+    processor = CloudRequestProcessor(
+        protocol_version=config.transport.protocol_version,
+        model_fingerprint=contract_fingerprint,
+        tensor_inference_function=adapter.generate_from_payload,
+        event_callback=progress.info,
+    )
+    server = CloudServer(
+        host=bind_host or config.transport.host,
+        port=config.transport.port,
+        timeout_seconds=config.transport.timeout_seconds,
+        processor=processor,
+    )
+    server.start()
+    progress.info(f"Distributed server ready on {server.host}:{server.port}")
+    progress.info("Waiting for projected tensors; press Ctrl+C to stop")
+    print(
+        json.dumps(
+            {
+                "ready": True,
+                "component_role": adapter.component_role,
+                "host": server.host,
+                "port": server.port,
+                "model_artifact_sha256": adapter.metadata.fingerprint,
+                "model_contract_fingerprint": contract_fingerprint,
+                "model_load_ms": model_load_ms,
+                "seeded_providers": list(seeded),
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.shutdown()
+    finally:
+        server.shutdown()
+        progress.info("Distributed server stopped")
+    return 0
+
+
+def _distributed_infer(
+    *,
+    config_path: Path,
+    artifact_manifest: Path,
+    cache_dir: Path,
+    image_path: Path,
+    prompt: str,
+    request_id: str,
+    vision_device: str,
+    offline: bool,
+    output_dir: Path | None,
+    verbose: bool,
+) -> int:
+    progress = ProgressReporter(verbose)
+    progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
+    config = load_experiment_config(config_path)
+    _validate_distributed_config(config.mode, config.cloud.status)
+    if config.model.adapter != "moondream2":
+        raise ConfigError("distributed-infer requires the Moondream2 adapter")
+
+    seeded = seed_everything(config.runtime.seed)
+    environment = collect_environment()
+    environment["seeded_providers"] = list(seeded)
+    environment["execution_placement"] = {
+        "vision_device": vision_device,
+        "language_server": config.cloud.host_id,
+        "server_address": config.transport.host,
+        "server_port": config.transport.port,
+        "offline_model_cache": offline,
+    }
+    manifest = create_run_manifest(config, environment)
+    load_started = perf_counter()
+    with progress.phase(f"Loading the Moondream vision stage on {vision_device}"):
+        adapter = MoondreamAdapter.from_pretrained(
+            config.model,
+            cache_dir=cache_dir,
+            artifact_manifest=artifact_manifest,
+            vision_device=vision_device,
+            text_device="cpu",
+            offline=offline,
+            components="vision",
+        )
+    model_load_ms = (perf_counter() - load_started) * 1000
+    model = ModelMetadata(
+        model_id=config.model.model_id,
+        revision=config.model.revision,
+        fingerprint=model_contract_fingerprint(config.model),
+    )
+    policy = DistributedExecutionPolicy(
+        encoder=adapter,
+        transport=config.transport,
+        model=model,
+    )
+    with progress.phase(
+        f"Checking language server at {config.transport.host}:{config.transport.port}"
+    ):
+        health = policy.health()
+    if not health.ready:
+        raise RuntimeError("distributed language server is not ready")
+    with progress.phase(f"Running distributed inference for {request_id}"):
+        result = policy.infer(
+            InferenceRequest(
+                request_id=request_id,
+                image_path=image_path.resolve(),
+                prompt=prompt,
+            )
+        )
+    result = InferenceResult(
+        request_id=result.request_id,
+        output_text=result.output_text,
+        output_token_ids=result.output_token_ids,
+        metrics={**result.metrics, "edge_model_load_ms": model_load_ms},
+    )
+    record = RequestRecord.from_result(
+        run_id=manifest.run_id,
+        mode=policy.mode,
+        result=result,
+    )
+    if output_dir is not None:
+        run_directory = output_dir / manifest.run_id
+        write_json_atomic(run_directory / "run_manifest.json", manifest.to_dict())
+        write_json_atomic(run_directory / "request.json", record.to_dict())
+        progress.info(f"Saved run artifacts to {run_directory}")
+    completion = f"Inference complete with {len(result.output_token_ids)} tokens"
+    payload_bytes = result.metrics.get("projected_payload_bytes")
+    if payload_bytes is not None:
+        completion += f"; sent {payload_bytes} projected-tensor bytes"
+    progress.info(completion)
+    print(json.dumps(record.to_dict(), indent=2, sort_keys=True))
+    return 0
+
+
 def _validate_cloud_config(mode: ExecutionMode, cloud_status: str) -> None:
     if mode is not ExecutionMode.CLOUD:
         raise ConfigError("cloud commands require a cloud experiment configuration")
     if cloud_status == "pending":
         raise ConfigError(
             "cloud hardware is pending; declare or verify it before use"
+        )
+
+
+def _validate_distributed_config(mode: ExecutionMode, cloud_status: str) -> None:
+    if mode is not ExecutionMode.DISTRIBUTED:
+        raise ConfigError(
+            "distributed commands require a distributed experiment configuration"
+        )
+    if cloud_status == "pending":
+        raise ConfigError(
+            "cloud hardware is pending; use a declared or verified split server"
         )
 
 

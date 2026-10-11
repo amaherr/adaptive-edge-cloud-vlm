@@ -12,6 +12,7 @@ from adaptive_vlm.config import (
     model_contract_fingerprint,
 )
 from adaptive_vlm.execution.cloud import HealthStatus
+from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
 
@@ -257,4 +258,137 @@ def test_edge_verbose_reports_model_details(
 
     assert exit_code == 0
     assert "vikhyatk/moondream2@9a7d402" in capsys.readouterr().err
+
+
+def test_distributed_server_loads_only_text_stage(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    loader_kwargs: dict[str, object] = {}
+
+    class StubTextAdapter:
+        component_role = "text"
+        metadata = ModelMetadata("model", "revision", "a" * 64)
+
+        @staticmethod
+        def generate_from_payload(_request: object) -> object:
+            raise AssertionError("the stub server should not receive a request")
+
+    class StubServer:
+        def __init__(self, *, host: str, port: int, **_: object) -> None:
+            self.host = host
+            self.port = port
+
+        def start(self) -> None:
+            pass
+
+        def serve_forever(self) -> None:
+            pass
+
+        def shutdown(self) -> None:
+            pass
+
+    def fake_loader(*_args: object, **kwargs: object) -> StubTextAdapter:
+        loader_kwargs.update(kwargs)
+        return StubTextAdapter()
+
+    monkeypatch.setattr(MoondreamAdapter, "from_pretrained", fake_loader)
+    monkeypatch.setattr("adaptive_vlm.cli.CloudServer", StubServer)
+
+    exit_code = main(
+        [
+            "distributed-server",
+            "--config",
+            str(ROOT / "configs/experiments/chunk5_local_distributed.yaml"),
+            "--artifact-manifest",
+            str(ROOT / "configs/model/moondream2_artifact.yaml"),
+        ]
+    )
+
+    assert exit_code == 0
+    assert loader_kwargs["components"] == "text"
+    ready = json.loads(capsys.readouterr().out)
+    assert ready["component_role"] == "text"
+
+
+def test_distributed_infer_uses_vision_stage_and_writes_artifacts(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    loader_kwargs: dict[str, object] = {}
+    fake = FakeModelAdapter()
+
+    class StubVisionAdapter:
+        component_role = "vision"
+
+    class StubDistributedPolicy:
+        mode = ExecutionMode.DISTRIBUTED
+
+        def __init__(self, **_: object) -> None:
+            pass
+
+        @staticmethod
+        def health() -> HealthStatus:
+            return HealthStatus(True, "contract")
+
+        @staticmethod
+        def infer(request: object) -> object:
+            return fake.generate(request)  # type: ignore[arg-type]
+
+    def fake_loader(*_args: object, **kwargs: object) -> StubVisionAdapter:
+        loader_kwargs.update(kwargs)
+        return StubVisionAdapter()
+
+    monkeypatch.setattr(MoondreamAdapter, "from_pretrained", fake_loader)
+    monkeypatch.setattr(
+        "adaptive_vlm.cli.DistributedExecutionPolicy", StubDistributedPolicy
+    )
+
+    exit_code = main(
+        [
+            "distributed-infer",
+            "--config",
+            str(ROOT / "configs/experiments/chunk5_local_distributed.yaml"),
+            "--artifact-manifest",
+            str(ROOT / "configs/model/moondream2_artifact.yaml"),
+            "--image",
+            str(ROOT / "tests/fixtures/moondream_smoke.ppm"),
+            "--prompt",
+            "Describe this fixture.",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert loader_kwargs["components"] == "vision"
+    captured = capsys.readouterr()
+    record = json.loads(captured.out)
+    assert record["mode"] == "distributed"
+    assert "Loading the Moondream vision stage" in captured.err
+    assert "Running distributed inference" in captured.err
+    run_directory = next(tmp_path.iterdir())
+    assert (run_directory / "run_manifest.json").is_file()
+    assert (run_directory / "request.json").is_file()
+
+
+def test_distributed_commands_reject_pending_cloud(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(
+        [
+            "distributed-infer",
+            "--config",
+            str(ROOT / "configs/experiments/baseline_distributed.yaml"),
+            "--artifact-manifest",
+            str(ROOT / "configs/model/moondream2_artifact.yaml"),
+            "--image",
+            str(ROOT / "tests/fixtures/moondream_smoke.ppm"),
+            "--prompt",
+            "Describe this fixture.",
+        ]
+    )
+
+    assert exit_code == 2
+    assert "pending" in capsys.readouterr().err
 
