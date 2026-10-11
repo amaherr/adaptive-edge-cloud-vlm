@@ -121,3 +121,11 @@ def test_component_role_prevents_wrong_stage_execution() -> None:
 
     with pytest.raises(RuntimeError, match="requires text"):
         adapter._require_component("text", "full")
+
+
+def test_retain_only_is_irreversible() -> None:
+    adapter, _, _ = _component_adapter()
+    adapter.retain_only("vision")
+
+    with pytest.raises(RuntimeError, match="only be pruned from a full"):
+        adapter.retain_only("text")

@@ -176,6 +176,13 @@ class MoondreamAdapter(ModelAdapter):
 
         return self._component_role
 
+    def retain_only(self, role: Literal["vision", "text"]) -> None:
+        """Irreversibly release the opposite stage after a full-model check."""
+
+        if self._component_role != "full":
+            raise RuntimeError("components can only be pruned from a full adapter")
+        self._retain_components(role)
+
     def generate(self, request: InferenceRequest) -> InferenceResult:
         """Run the decomposed local path used by the all-edge policy."""
 
