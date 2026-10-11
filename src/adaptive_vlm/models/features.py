@@ -57,5 +57,7 @@ class ProjectedVisionFeatures:
 
 @dataclass(frozen=True)
 class VisionEncoding:
+    """Projected features and measurements produced by the edge stage."""
+
     projected: ProjectedVisionFeatures
     metrics: Mapping[str, MetricValue]

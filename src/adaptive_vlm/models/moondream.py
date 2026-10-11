@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import gc
 import os
 import threading
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter_ns
-from typing import Any, Self, cast
+from typing import Any, Literal, Self, cast
 
 import yaml
 
@@ -17,7 +18,10 @@ from adaptive_vlm.contracts import InferenceRequest, InferenceResult, MetricValu
 from adaptive_vlm.measurement import measure_call
 from adaptive_vlm.model_artifact import sha256_file
 from adaptive_vlm.models.base import ModelAdapter, ModelMetadata
-from adaptive_vlm.models.features import ProjectedVisionFeatures
+from adaptive_vlm.models.features import ProjectedVisionFeatures, VisionEncoding
+from adaptive_vlm.transport.tensors import TensorInferenceRequest
+
+ComponentRole = Literal["full", "vision", "text"]
 
 
 @dataclass(frozen=True)
@@ -49,6 +53,7 @@ class MoondreamAdapter(ModelAdapter):
         runtime: _RuntimeModules,
         vision_device: str,
         text_device: str,
+        component_role: ComponentRole = "full",
     ) -> None:
         self._model = model
         self._core = model.model
@@ -56,6 +61,7 @@ class MoondreamAdapter(ModelAdapter):
         self._runtime = runtime
         self._vision_device = str(runtime.torch.device(vision_device))
         self._text_device = str(runtime.torch.device(text_device))
+        self._component_role = component_role
         self._process = runtime.psutil.Process()
         self._lock = threading.RLock()
         self._metadata = ModelMetadata(
@@ -74,10 +80,13 @@ class MoondreamAdapter(ModelAdapter):
         vision_device: str = "cpu",
         text_device: str = "cpu",
         offline: bool = True,
+        components: ComponentRole = "full",
     ) -> Self:
-        """Load and verify the exact model and tokenizer artifacts."""
+        """Load the pinned model, then retain only the requested components."""
 
         _validate_model_config(config)
+        if components not in {"full", "vision", "text"}:
+            raise ValueError(f"unsupported component role: {components}")
         cache_path = Path(cache_dir).expanduser().resolve()
         cache_path.mkdir(parents=True, exist_ok=True)
         os.environ["HF_HOME"] = str(cache_path)
@@ -139,13 +148,15 @@ class MoondreamAdapter(ModelAdapter):
         model._setup_caches()
         model.model.vision.to(torch.device(vision_device))
 
-        return cls(
+        adapter = cls(
             model=model,
             config=config,
             runtime=runtime,
             vision_device=vision_device,
             text_device=text_device,
         )
+        adapter._retain_components(components)
+        return adapter
 
     @property
     def metadata(self) -> ModelMetadata:
@@ -159,14 +170,138 @@ class MoondreamAdapter(ModelAdapter):
     def text_device(self) -> str:
         return self._text_device
 
+    @property
+    def component_role(self) -> ComponentRole:
+        """Report which compute stages remain available in this process."""
+
+        return self._component_role
+
     def generate(self, request: InferenceRequest) -> InferenceResult:
         """Run the decomposed local path used by the all-edge policy."""
 
+        self._require_component("full")
         return self.run_decomposed(request).result
+
+    def encode_projected(self, request: InferenceRequest) -> VisionEncoding:
+        """Run only the vision encoder and projector for a distributed request."""
+
+        self._require_component("vision", "full")
+        with self._lock, self._runtime.torch.inference_mode():
+            self._validate_request(request)
+            self._reset_memory_stats()
+            rss_before = self._rss_mib()
+            self._synchronize_all()
+            started_ns = perf_counter_ns()
+            image = self._open_image(request.image_path)
+            projected, metrics = self._encode_projected(image)
+            self._synchronize_all()
+            metrics.update(
+                {
+                    "edge_vision_end_to_end_ms": (
+                        perf_counter_ns() - started_ns
+                    )
+                    / 1_000_000,
+                    "projected_visual_tokens": projected.shape[0],
+                    "projected_hidden_size": projected.shape[1],
+                    "projected_dtype": projected.dtype,
+                    "projected_source_device": projected.device,
+                    "projected_nbytes": projected.nbytes,
+                    **self._memory_metrics(rss_before),
+                }
+            )
+            return VisionEncoding(projected=projected, metrics=metrics)
+
+    def generate_from_projected(
+        self,
+        *,
+        request_id: str,
+        prompt: str,
+        projected: ProjectedVisionFeatures,
+    ) -> InferenceResult:
+        """Run only image prefill and language generation in the cloud stage."""
+
+        self._require_component("text", "full")
+        if not request_id.strip():
+            raise ValueError("request_id must not be empty")
+        if not prompt.strip():
+            raise ValueError("prompt must not be empty")
+
+        with self._lock, self._runtime.torch.inference_mode():
+            self._reset_memory_stats()
+            rss_before = self._rss_mib()
+            self._synchronize_all()
+            started_ns = perf_counter_ns()
+            transferred = measure_call(
+                lambda: projected.tensor.to(self._text_device),
+                synchronize=self._synchronizer(self._text_device),
+            )
+            text_features = ProjectedVisionFeatures.from_tensor(transferred.value)
+            image_prefill = measure_call(
+                lambda: self._prefill_projected(text_features.tensor),
+                synchronize=self._synchronizer(self._text_device),
+            )
+            generation = measure_call(
+                lambda: self._generate_token_ids(prompt, image_prefill.value),
+                synchronize=self._synchronizer(self._text_device),
+            )
+            token_ids = generation.value
+            self._synchronize_all()
+            metrics: dict[str, MetricValue] = {
+                "feature_transfer_ms": transferred.elapsed_ms,
+                "image_prefill_ms": image_prefill.elapsed_ms,
+                "language_generation_ms": generation.elapsed_ms,
+                "cloud_text_end_to_end_ms": (
+                    perf_counter_ns() - started_ns
+                )
+                / 1_000_000,
+                "projected_visual_tokens": text_features.shape[0],
+                "projected_hidden_size": text_features.shape[1],
+                "projected_dtype": text_features.dtype,
+                "projected_source_device": projected.device,
+                "projected_target_device": text_features.device,
+                "projected_nbytes": text_features.nbytes,
+                "output_tokens": len(token_ids),
+                **self._memory_metrics(rss_before),
+            }
+            return InferenceResult(
+                request_id=request_id,
+                output_text=self._core.tokenizer.decode(list(token_ids)),
+                output_token_ids=token_ids,
+                metrics=metrics,
+            )
+
+    def generate_from_payload(
+        self, request: TensorInferenceRequest
+    ) -> InferenceResult:
+        """Reconstruct a wire tensor without changing bits, then run text inference."""
+
+        self._require_component("text", "full")
+        deserialized = measure_call(
+            lambda: request.tensor.to_torch(
+                self._runtime.torch,
+                device=self._text_device,
+            ),
+            synchronize=self._synchronizer(self._text_device),
+        )
+        result = self.generate_from_projected(
+            request_id=request.request_id,
+            prompt=request.prompt,
+            projected=ProjectedVisionFeatures.from_tensor(deserialized.value),
+        )
+        return InferenceResult(
+            request_id=result.request_id,
+            output_text=result.output_text,
+            output_token_ids=result.output_token_ids,
+            metrics={
+                "tensor_deserialization_ms": deserialized.elapsed_ms,
+                **result.metrics,
+            },
+        )
 
     def run_decomposed(self, request: InferenceRequest) -> MoondreamRun:
         """Encode projected tokens, transfer them, then run the text model."""
 
+        self._require_component("full")
         with self._lock, self._runtime.torch.inference_mode():
             self._validate_request(request)
             self._reset_memory_stats()
@@ -225,6 +360,7 @@ class MoondreamAdapter(ModelAdapter):
     def run_monolithic(self, request: InferenceRequest) -> MoondreamRun:
         """Run the pinned model's original image encoding and text prefill path."""
 
+        self._require_component("full")
         if self._vision_device != self._text_device:
             raise ValueError("monolithic execution requires one shared device")
 
@@ -458,14 +594,14 @@ class MoondreamAdapter(ModelAdapter):
         return lambda: torch.cuda.synchronize(resolved)
 
     def _synchronize_all(self) -> None:
-        for device in dict.fromkeys((self._vision_device, self._text_device)):
+        for device in self._active_devices():
             synchronize = self._synchronizer(device)
             if synchronize is not None:
                 synchronize()
 
     def _reset_memory_stats(self) -> None:
         torch = self._runtime.torch
-        for device in dict.fromkeys((self._vision_device, self._text_device)):
+        for device in self._active_devices():
             resolved = torch.device(device)
             if resolved.type == "cuda":
                 torch.cuda.reset_peak_memory_stats(resolved)
@@ -478,10 +614,12 @@ class MoondreamAdapter(ModelAdapter):
             "rss_after_mib": rss_after,
             "rss_delta_mib": rss_after - rss_before,
         }
-        for role, device in (
-            ("vision", self._vision_device),
-            ("text", self._text_device),
-        ):
+        roles = []
+        if self._component_role in {"full", "vision"}:
+            roles.append(("vision", self._vision_device))
+        if self._component_role in {"full", "text"}:
+            roles.append(("text", self._text_device))
+        for role, device in roles:
             resolved = torch.device(device)
             if resolved.type == "cuda":
                 metrics[f"{role}_cuda_peak_allocated_mib"] = (
@@ -494,6 +632,39 @@ class MoondreamAdapter(ModelAdapter):
 
     def _rss_mib(self) -> float:
         return float(self._process.memory_info().rss / 1024**2)
+
+    def _active_devices(self) -> tuple[str, ...]:
+        devices: list[str] = []
+        if self._component_role in {"full", "vision"}:
+            devices.append(self._vision_device)
+        if self._component_role in {"full", "text"}:
+            devices.append(self._text_device)
+        return tuple(dict.fromkeys(devices))
+
+    def _require_component(self, *allowed: ComponentRole) -> None:
+        if self._component_role not in allowed:
+            expected = " or ".join(allowed)
+            raise RuntimeError(
+                f"operation requires {expected} components; "
+                f"adapter retains {self._component_role}"
+            )
+
+    def _retain_components(self, role: ComponentRole) -> None:
+        """Release modules that must not execute on this deployment side."""
+
+        if role == "vision":
+            del self._core.text
+            del self._core.region
+            del self._core.attn_mask
+        elif role == "text":
+            del self._core.vision
+            del self._core.region
+        self._component_role = role
+        if role != "full":
+            gc.collect()
+            torch = self._runtime.torch
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
 
 def _validate_model_config(config: ModelConfig) -> None:
