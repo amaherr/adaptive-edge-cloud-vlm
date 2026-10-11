@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,7 @@ from adaptive_vlm.transport.protocol import (
     receive_frame,
 )
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
+from adaptive_vlm.transport.tensors import TensorInferenceRequest
 
 FINGERPRINT = FakeModelAdapter().metadata.fingerprint
 
@@ -171,6 +173,73 @@ def test_wrong_model_fingerprint_is_rejected_without_model_call() -> None:
     assert response.metadata["code"] == "model_fingerprint_mismatch"
     assert calls == 0
     assert processor.stats.rejected_requests == 1
+
+
+def test_tensor_request_uses_only_tensor_inference_function() -> None:
+    received_data: list[bytes] = []
+
+    def tensor_infer(request: TensorInferenceRequest) -> InferenceResult:
+        received_data.append(request.tensor.data)
+        return InferenceResult(
+            request_id=request.request_id,
+            output_text="tensor-result",
+            output_token_ids=(1, 2),
+            metrics={"tensor_bytes": len(request.tensor.data)},
+        )
+
+    processor = CloudRequestProcessor(
+        protocol_version=1,
+        model_fingerprint=FINGERPRINT,
+        tensor_inference_function=tensor_infer,
+    )
+    data = bytes(range(16))
+    request = Frame(
+        version=1,
+        message_type=MessageType.TENSOR_REQUEST,
+        request_id="tensor-1",
+        metadata={
+            "prompt": "Describe.",
+            "model_fingerprint": FINGERPRINT,
+            "shape": [2, 4],
+            "dtype": "bfloat16",
+            "byte_order": sys.byteorder,
+            "layout": "contiguous",
+            "nbytes": len(data),
+        },
+        payload=data,
+    )
+
+    response = processor.handle(_received(request))
+
+    assert response.message_type is MessageType.INFERENCE_RESPONSE
+    assert response.metadata["output_text"] == "tensor-result"
+    assert received_data == [data]
+    assert processor.stats.completed_requests == 1
+
+
+def test_tensor_request_is_rejected_by_image_only_server() -> None:
+    processor = _processor()
+    data = bytes(16)
+    request = Frame(
+        version=1,
+        message_type=MessageType.TENSOR_REQUEST,
+        request_id="tensor-1",
+        metadata={
+            "prompt": "Describe.",
+            "model_fingerprint": FINGERPRINT,
+            "shape": [2, 4],
+            "dtype": "bfloat16",
+            "byte_order": sys.byteorder,
+            "layout": "contiguous",
+            "nbytes": len(data),
+        },
+        payload=data,
+    )
+
+    response = processor.handle(_received(request))
+
+    assert response.message_type is MessageType.ERROR
+    assert response.metadata["code"] == "unsupported_execution_path"
 
 
 def test_model_failure_becomes_safe_error_and_server_remains_usable() -> None:

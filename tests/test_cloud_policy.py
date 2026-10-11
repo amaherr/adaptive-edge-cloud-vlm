@@ -77,7 +77,7 @@ def _install_loopback(
         return connection
 
     monkeypatch.setattr(
-        "adaptive_vlm.execution.cloud.socket.create_connection", connect
+        "adaptive_vlm.transport.client.socket.create_connection", connect
     )
     return connections
 

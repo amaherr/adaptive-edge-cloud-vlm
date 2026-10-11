@@ -10,6 +10,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter_ns
+from typing import cast
 
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
 from adaptive_vlm.transport.protocol import (
@@ -23,9 +24,11 @@ from adaptive_vlm.transport.protocol import (
     receive_frame,
     send_frame,
 )
+from adaptive_vlm.transport.tensors import TensorInferenceRequest, TensorPayload
 
 LOGGER = logging.getLogger(__name__)
 InferenceFunction = Callable[[InferenceRequest], InferenceResult]
+TensorInferenceFunction = Callable[[TensorInferenceRequest], InferenceResult]
 EventCallback = Callable[[str], None]
 
 
@@ -44,12 +47,16 @@ class CloudRequestProcessor:
         *,
         protocol_version: int,
         model_fingerprint: str,
-        inference_function: InferenceFunction,
+        inference_function: InferenceFunction | None = None,
+        tensor_inference_function: TensorInferenceFunction | None = None,
         event_callback: EventCallback | None = None,
     ) -> None:
+        if inference_function is None and tensor_inference_function is None:
+            raise ValueError("at least one inference function is required")
         self.protocol_version = protocol_version
         self.model_fingerprint = model_fingerprint
         self._inference_function = inference_function
+        self._tensor_inference_function = tensor_inference_function
         self._event_callback = event_callback
         self._completed_requests = 0
         self._rejected_requests = 0
@@ -77,7 +84,10 @@ class CloudRequestProcessor:
                     "model_fingerprint": self.model_fingerprint,
                 },
             )
-        if frame.message_type is not MessageType.INFERENCE_REQUEST:
+        if frame.message_type not in {
+            MessageType.INFERENCE_REQUEST,
+            MessageType.TENSOR_REQUEST,
+        }:
             self._increment("rejected")
             return self._error(
                 frame.request_id,
@@ -92,12 +102,28 @@ class CloudRequestProcessor:
                 message="requested model fingerprint is not loaded on this server",
             )
 
+        if (
+            frame.message_type is MessageType.INFERENCE_REQUEST
+            and self._inference_function is None
+        ) or (
+            frame.message_type is MessageType.TENSOR_REQUEST
+            and self._tensor_inference_function is None
+        ):
+            self._increment("rejected")
+            return self._error(
+                frame.request_id,
+                code="unsupported_execution_path",
+                message=f"server is not configured for {frame.message_type.value}",
+            )
+
         try:
             self._emit(
                 f"Request {frame.request_id}: received {received.wire_bytes} bytes; "
                 "running model inference"
             )
-            return self._run_inference(received)
+            if frame.message_type is MessageType.TENSOR_REQUEST:
+                return self._run_tensor_inference(received)
+            return self._run_image_inference(received)
         except Exception as exc:  # The process must survive one bad model request.
             LOGGER.exception("inference request %s failed", frame.request_id)
             self._emit(f"Request {frame.request_id}: model inference failed")
@@ -108,8 +134,10 @@ class CloudRequestProcessor:
                 message=f"{type(exc).__name__}: {str(exc)[:1900]}",
             )
 
-    def _run_inference(self, received: ReceivedFrame) -> Frame:
+    def _run_image_inference(self, received: ReceivedFrame) -> Frame:
         frame = received.frame
+        inference_function = self._inference_function
+        assert inference_function is not None
         suffix = str(frame.metadata["image_suffix"])
         with tempfile.TemporaryDirectory(prefix="adaptive-vlm-") as directory:
             image_path = Path(directory) / f"input{suffix}"
@@ -120,8 +148,40 @@ class CloudRequestProcessor:
                 prompt=str(frame.metadata["prompt"]),
             )
             started_ns = perf_counter_ns()
-            result = self._inference_function(request)
+            result = inference_function(request)
             server_total_ms = (perf_counter_ns() - started_ns) / 1_000_000
+
+        return self._response(received, result, server_total_ms)
+
+    def _run_tensor_inference(self, received: ReceivedFrame) -> Frame:
+        frame = received.frame
+        inference_function = self._tensor_inference_function
+        assert inference_function is not None
+        metadata = frame.metadata
+        tensor = TensorPayload(
+            shape=tuple(cast(list[int], metadata["shape"])),
+            dtype=cast(str, metadata["dtype"]),
+            byte_order=cast(str, metadata["byte_order"]),
+            layout=cast(str, metadata["layout"]),
+            data=frame.payload,
+        )
+        request = TensorInferenceRequest(
+            request_id=frame.request_id,
+            prompt=cast(str, metadata["prompt"]),
+            tensor=tensor,
+        )
+        started_ns = perf_counter_ns()
+        result = inference_function(request)
+        server_total_ms = (perf_counter_ns() - started_ns) / 1_000_000
+        return self._response(received, result, server_total_ms)
+
+    def _response(
+        self,
+        received: ReceivedFrame,
+        result: InferenceResult,
+        server_total_ms: float,
+    ) -> Frame:
+        frame = received.frame
 
         if result.request_id != frame.request_id:
             raise ValueError("model result request_id does not match request")

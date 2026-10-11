@@ -271,7 +271,15 @@ def _validate_tensor_request(frame: Frame) -> None:
     metadata = frame.metadata
     _require_keys(
         metadata,
-        {"prompt", "model_fingerprint", "shape", "dtype", "nbytes"},
+        {
+            "prompt",
+            "model_fingerprint",
+            "shape",
+            "dtype",
+            "byte_order",
+            "layout",
+            "nbytes",
+        },
     )
     prompt = _require_type(metadata, "prompt", str)
     if not prompt.strip() or len(prompt) > MAX_PROMPT_CHARACTERS:
@@ -284,11 +292,20 @@ def _validate_tensor_request(frame: Frame) -> None:
     ):
         raise ProtocolError("tensor shape is invalid")
     dtype = _require_type(metadata, "dtype", str)
-    if dtype not in {"bfloat16", "float16", "float32"}:
+    dtype_sizes = {"bfloat16": 2, "float16": 2, "float32": 4}
+    if dtype not in dtype_sizes:
         raise ProtocolError("tensor dtype is unsupported")
+    byte_order = _require_type(metadata, "byte_order", str)
+    if byte_order not in {"little", "big"}:
+        raise ProtocolError("tensor byte_order is unsupported")
+    layout = _require_type(metadata, "layout", str)
+    if layout != "contiguous":
+        raise ProtocolError("tensor layout is unsupported")
     nbytes = _require_type(metadata, "nbytes", int)
     if isinstance(nbytes, bool) or nbytes != len(frame.payload):
         raise ProtocolError("tensor nbytes does not match payload")
+    if nbytes != math.prod(shape) * dtype_sizes[dtype]:
+        raise ProtocolError("tensor shape, dtype, and nbytes are inconsistent")
     if not frame.payload:
         raise ProtocolError("tensor payload is empty")
 

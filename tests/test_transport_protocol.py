@@ -151,6 +151,8 @@ def test_tensor_payload_round_trips_bit_exactly() -> None:
             "model_fingerprint": FINGERPRINT,
             "shape": [512],
             "dtype": "bfloat16",
+            "byte_order": "little",
+            "layout": "contiguous",
             "nbytes": len(payload),
         },
         payload=payload,

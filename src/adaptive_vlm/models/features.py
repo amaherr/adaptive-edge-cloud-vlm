@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
+
+from adaptive_vlm.contracts import MetricValue
 
 MOONDREAM_VISUAL_TOKENS = 729
 MOONDREAM_HIDDEN_SIZE = 2048
@@ -50,3 +53,9 @@ class ProjectedVisionFeatures:
             "device": self.device,
             "nbytes": self.nbytes,
         }
+
+
+@dataclass(frozen=True)
+class VisionEncoding:
+    projected: ProjectedVisionFeatures
+    metrics: Mapping[str, MetricValue]

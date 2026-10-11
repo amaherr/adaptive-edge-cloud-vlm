@@ -18,6 +18,7 @@ from adaptive_vlm.transport.server import (
     CloudServer,
     ServerStats,
 )
+from adaptive_vlm.transport.tensors import TensorInferenceRequest, TensorPayload
 
 __all__ = [
     "ChecksumMismatch",
@@ -30,6 +31,8 @@ __all__ = [
     "ProtocolError",
     "ReceivedFrame",
     "ServerStats",
+    "TensorInferenceRequest",
+    "TensorPayload",
     "VersionMismatch",
     "encode_frame",
     "receive_frame",
