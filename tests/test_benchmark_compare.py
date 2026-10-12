@@ -49,6 +49,8 @@ def test_compare_reports_exact_mismatch(tmp_path: Path) -> None:
     assert report["common_measured_pairs"] == len(manifest.items)
     assert len(report["mismatches"]) == len(manifest.items)
     assert report["exact_token_matches"] == 0
+    assert report["text_mismatches"] == []
+    assert report["quality_by_mode"]["edge"]["quality_scored_attempts"] > 0
     assert report["complete_and_equal"] is False
     assert json.loads(report_path.read_text()) == report
 

@@ -40,7 +40,14 @@ def compare_runs(run_dirs: list[Path], *, output: Path | None = None) -> dict[st
         raise ValueError("comparison requires distinct execution modes")
     by_mode: dict[str, dict[tuple[int, str], dict[str, Any]]] = {}
     failures: dict[str, list[dict[str, Any]]] = {}
+    quality_by_mode: dict[str, dict[str, Any]] = {}
     for mode, directory in zip(modes, run_dirs, strict=True):
+        summary = json.loads((directory / "summary.json").read_text())
+        quality_by_mode[mode] = {
+            "quality_mean_success": summary["quality_mean_success"],
+            "quality_scored_attempts": summary["quality_scored_attempts"],
+            "quality_metric": summary["quality_metric"],
+        }
         rows = [json.loads(line) for line in
                 (directory / "requests.jsonl").read_text().splitlines()]
         if any(row.get("plan_sha256") != plans[modes.index(mode)]["plan_sha256"]
@@ -65,6 +72,7 @@ def compare_runs(run_dirs: list[Path], *, output: Path | None = None) -> dict[st
         for trial in plans[0]["schedule"] if not trial["warmup"]
     }
     mismatches: list[dict[str, Any]] = []
+    text_mismatches: list[dict[str, Any]] = []
     matched = 0
     for repetition, request_id in sorted(common_pairs):
         request_rows = {
@@ -75,15 +83,19 @@ def compare_runs(run_dirs: list[Path], *, output: Path | None = None) -> dict[st
         tokens = {
             mode: row["output_token_ids"] for mode, row in request_rows.items()
         }
+        outputs = {mode: row["output_text"] for mode, row in request_rows.items()}
+        if len(set(outputs.values())) != 1:
+            text_mismatches.append(
+                {"request_id": request_id, "repetition": repetition,
+                 "outputs": outputs}
+            )
         if len({tuple(value) for value in tokens.values()}) == 1:
             matched += 1
         else:
             mismatches.append(
                 {"request_id": request_id, "repetition": repetition,
                  "tokens": tokens,
-                 "outputs": {
-                     mode: row["output_text"] for mode, row in request_rows.items()
-                 }}
+                 "outputs": outputs}
             )
     report = {
         "schema_version": 1,
@@ -94,10 +106,13 @@ def compare_runs(run_dirs: list[Path], *, output: Path | None = None) -> dict[st
         "expected_measured_pairs": len(expected_pairs),
         "exact_token_matches": matched,
         "mismatches": mismatches,
+        "text_mismatches": text_mismatches,
+        "quality_by_mode": quality_by_mode,
         "failures": failures,
         "complete_and_equal": (
             common_pairs == expected_pairs and matched == len(expected_pairs)
-            and not mismatches and not any(failures.values())
+            and not mismatches and not text_mismatches
+            and not any(failures.values())
         ),
     }
     if output is not None:
