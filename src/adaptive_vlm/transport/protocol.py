@@ -33,6 +33,8 @@ class MessageType(StrEnum):
     HEALTH_RESPONSE = "health_response"
     INFERENCE_REQUEST = "inference_request"
     INFERENCE_RESPONSE = "inference_response"
+    PROMPT_REQUEST = "prompt_request"
+    PROMPT_RESPONSE = "prompt_response"
     TENSOR_REQUEST = "tensor_request"
     ERROR = "error"
 
@@ -255,6 +257,18 @@ def _validate_message(frame: Frame) -> None:
         ):
             raise ProtocolError("response metrics are invalid")
         _require_empty_payload(frame)
+    elif frame.message_type is MessageType.PROMPT_REQUEST:
+        _require_keys(metadata, {"prompt", "model_fingerprint"})
+        prompt = _require_type(metadata, "prompt", str)
+        if not prompt.strip() or len(prompt) > MAX_PROMPT_CHARACTERS:
+            raise ProtocolError("prompt is empty or too long")
+        _require_fingerprint(metadata)
+        _require_empty_payload(frame)
+    elif frame.message_type is MessageType.PROMPT_RESPONSE:
+        _require_keys(metadata, {"accepted", "model_fingerprint"})
+        _require_type(metadata, "accepted", bool)
+        _require_fingerprint(metadata)
+        _require_empty_payload(frame)
     elif frame.message_type is MessageType.TENSOR_REQUEST:
         _validate_tensor_request(frame)
     elif frame.message_type is MessageType.ERROR:
@@ -279,12 +293,16 @@ def _validate_tensor_request(frame: Frame) -> None:
             "byte_order",
             "layout",
             "nbytes",
+            "pipeline",
         },
     )
     prompt = _require_type(metadata, "prompt", str)
     if not prompt.strip() or len(prompt) > MAX_PROMPT_CHARACTERS:
         raise ProtocolError("prompt is empty or too long")
     _require_fingerprint(metadata)
+    pipeline = _require_type(metadata, "pipeline", str)
+    if pipeline not in {"synchronous", "prompt_first"}:
+        raise ProtocolError("tensor pipeline is unsupported")
     shape = _require_type(metadata, "shape", list)
     if not 1 <= len(shape) <= 8 or any(
         not isinstance(size, int) or isinstance(size, bool) or size <= 0

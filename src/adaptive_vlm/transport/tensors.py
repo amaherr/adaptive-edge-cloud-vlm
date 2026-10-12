@@ -7,7 +7,7 @@ import sys
 from dataclasses import dataclass
 from functools import reduce
 from operator import mul
-from typing import Any
+from typing import Any, Literal
 
 SUPPORTED_DTYPES = {"bfloat16": 2, "float16": 2, "float32": 4}
 
@@ -84,3 +84,4 @@ class TensorInferenceRequest:
     request_id: str
     prompt: str
     tensor: TensorPayload
+    pipeline: Literal["synchronous", "prompt_first"] = "synchronous"

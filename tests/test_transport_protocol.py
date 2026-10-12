@@ -154,12 +154,49 @@ def test_tensor_payload_round_trips_bit_exactly() -> None:
             "byte_order": "little",
             "layout": "contiguous",
             "nbytes": len(payload),
+            "pipeline": "synchronous",
         },
         payload=payload,
     )
     received = receive_frame(_connection_for(encode_frame(frame)), expected_version=1)
 
     assert received.frame.payload == payload
+
+
+def test_prompt_prepare_frame_round_trips() -> None:
+    frame = Frame(
+        version=1,
+        message_type=MessageType.PROMPT_REQUEST,
+        request_id="prompt-1",
+        metadata={
+            "prompt": "Describe.",
+            "model_fingerprint": FINGERPRINT,
+        },
+    )
+
+    received = receive_frame(_connection_for(encode_frame(frame)), expected_version=1)
+
+    assert received.frame == frame
+
+
+def test_tensor_request_rejects_unknown_pipeline() -> None:
+    with pytest.raises(ProtocolError, match="pipeline"):
+        Frame(
+            version=1,
+            message_type=MessageType.TENSOR_REQUEST,
+            request_id="tensor-1",
+            metadata={
+                "prompt": "Describe.",
+                "model_fingerprint": FINGERPRINT,
+                "shape": [1],
+                "dtype": "bfloat16",
+                "byte_order": "little",
+                "layout": "contiguous",
+                "nbytes": 2,
+                "pipeline": "unknown",
+            },
+            payload=b"\x00\x00",
+        )
 
 
 def test_message_schema_rejects_unexpected_metadata() -> None:

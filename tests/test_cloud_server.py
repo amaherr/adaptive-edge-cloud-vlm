@@ -205,6 +205,7 @@ def test_tensor_request_uses_only_tensor_inference_function() -> None:
             "byte_order": sys.byteorder,
             "layout": "contiguous",
             "nbytes": len(data),
+            "pipeline": "synchronous",
         },
         payload=data,
     )
@@ -232,6 +233,7 @@ def test_tensor_request_is_rejected_by_image_only_server() -> None:
             "byte_order": sys.byteorder,
             "layout": "contiguous",
             "nbytes": len(data),
+            "pipeline": "synchronous",
         },
         payload=data,
     )
@@ -240,6 +242,143 @@ def test_tensor_request_is_rejected_by_image_only_server() -> None:
 
     assert response.message_type is MessageType.ERROR
     assert response.metadata["code"] == "unsupported_execution_path"
+
+
+def _prompt_request(
+    *, request_id: str = "prompt-first-1", prompt: str = "Describe."
+) -> ReceivedFrame:
+    return _received(
+        Frame(
+            version=1,
+            message_type=MessageType.PROMPT_REQUEST,
+            request_id=request_id,
+            metadata={"prompt": prompt, "model_fingerprint": FINGERPRINT},
+        )
+    )
+
+
+def _tensor_request(
+    *, request_id: str = "prompt-first-1", prompt: str = "Describe."
+) -> ReceivedFrame:
+    data = bytes(16)
+    return _received(
+        Frame(
+            version=1,
+            message_type=MessageType.TENSOR_REQUEST,
+            request_id=request_id,
+            metadata={
+                "prompt": prompt,
+                "model_fingerprint": FINGERPRINT,
+                "shape": [2, 4],
+                "dtype": "bfloat16",
+                "byte_order": sys.byteorder,
+                "layout": "contiguous",
+                "nbytes": len(data),
+                "pipeline": "prompt_first",
+            },
+            payload=data,
+        )
+    )
+
+
+def test_prompt_first_state_is_consumed_by_matching_tensor() -> None:
+    prepared_calls: list[tuple[str, object]] = []
+
+    def prepared_infer(
+        request: TensorInferenceRequest, prepared: object
+    ) -> InferenceResult:
+        prepared_calls.append((request.prompt, prepared))
+        return InferenceResult(request.request_id, "prepared", (7,), {})
+
+    processor = CloudRequestProcessor(
+        protocol_version=1,
+        model_fingerprint=FINGERPRINT,
+        tensor_inference_function=lambda request: InferenceResult(
+            request.request_id, "sync", (), {}
+        ),
+        prompt_prepare_function=lambda prompt: tuple(prompt.upper()),
+        prepared_tensor_inference_function=prepared_infer,
+    )
+
+    prompt_response = processor.handle(_prompt_request())
+    tensor_response = processor.handle(_tensor_request())
+
+    assert prompt_response.message_type is MessageType.PROMPT_RESPONSE
+    assert prompt_response.metadata["accepted"] is True
+    assert tensor_response.message_type is MessageType.INFERENCE_RESPONSE
+    assert prepared_calls == [("Describe.", tuple("DESCRIBE."))]
+    assert processor.pending_requests == 0
+
+
+def test_prompt_first_state_expires_and_is_cleaned_up() -> None:
+    now = [10.0]
+    processor = CloudRequestProcessor(
+        protocol_version=1,
+        model_fingerprint=FINGERPRINT,
+        tensor_inference_function=lambda request: InferenceResult(
+            request.request_id, "sync", (), {}
+        ),
+        prompt_prepare_function=lambda prompt: prompt,
+        prepared_tensor_inference_function=lambda request, _: InferenceResult(
+            request.request_id, "prepared", (), {}
+        ),
+        pending_timeout_seconds=5.0,
+        clock=lambda: now[0],
+    )
+    processor.handle(_prompt_request())
+    now[0] = 16.0
+
+    removed = processor.cleanup_pending()
+    response = processor.handle(_tensor_request())
+
+    assert removed == 1
+    assert processor.pending_requests == 0
+    assert response.message_type is MessageType.ERROR
+    assert response.metadata["code"] == "pending_prompt_not_found"
+
+
+def test_prompt_first_rejects_mismatched_prompt_and_discards_state() -> None:
+    processor = CloudRequestProcessor(
+        protocol_version=1,
+        model_fingerprint=FINGERPRINT,
+        tensor_inference_function=lambda request: InferenceResult(
+            request.request_id, "sync", (), {}
+        ),
+        prompt_prepare_function=lambda prompt: prompt,
+        prepared_tensor_inference_function=lambda request, _: InferenceResult(
+            request.request_id, "prepared", (), {}
+        ),
+    )
+    processor.handle(_prompt_request(prompt="Original"))
+
+    response = processor.handle(_tensor_request(prompt="Changed"))
+
+    assert response.message_type is MessageType.ERROR
+    assert response.metadata["code"] == "prompt_mismatch"
+    assert processor.pending_requests == 0
+
+
+def test_prompt_first_rejects_duplicate_and_full_pending_state() -> None:
+    processor = CloudRequestProcessor(
+        protocol_version=1,
+        model_fingerprint=FINGERPRINT,
+        tensor_inference_function=lambda request: InferenceResult(
+            request.request_id, "sync", (), {}
+        ),
+        prompt_prepare_function=lambda prompt: prompt,
+        prepared_tensor_inference_function=lambda request, _: InferenceResult(
+            request.request_id, "prepared", (), {}
+        ),
+        max_pending_requests=1,
+    )
+    processor.handle(_prompt_request(request_id="first"))
+
+    duplicate = processor.handle(_prompt_request(request_id="first"))
+    full = processor.handle(_prompt_request(request_id="second"))
+
+    assert duplicate.metadata["code"] == "duplicate_request_id"
+    assert full.metadata["code"] == "pending_capacity_exceeded"
+    assert processor.pending_requests == 1
 
 
 def test_model_failure_becomes_safe_error_and_server_remains_usable() -> None:
