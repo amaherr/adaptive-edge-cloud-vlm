@@ -69,3 +69,26 @@ def test_semantic_config_hash_ignores_only_file_locations() -> None:
     assert semantic_config_sha256(config) == semantic_config_sha256(alternate)
     alternate["model"]["revision"] = "other-revision"
     assert semantic_config_sha256(config) != semantic_config_sha256(alternate)
+
+
+def test_compare_three_identical_policies(tmp_path: Path) -> None:
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"
+    )
+    manifest = load_frozen_manifest(config.dataset.manifest_path)
+    directories = []
+    for mode in ExecutionMode:
+        directory = tmp_path / mode.value
+        run_benchmark(
+            config=config, manifest=manifest, policy=StaticPolicy(mode, 7),
+            run_manifest=create_run_manifest(
+                config, {}, dataset_manifest_sha256=manifest.sha256
+            ),
+            run_dir=directory, warmups=1, repetitions=2,
+            pipeline="synchronous",
+        )
+        directories.append(directory)
+    report = compare_runs(directories)
+    assert report["complete_and_equal"] is True
+    assert report["exact_token_matches"] == 2 * len(manifest.items)
+    assert report["mismatches"] == []
