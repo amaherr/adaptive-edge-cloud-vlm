@@ -303,8 +303,13 @@ above is a correctness smoke, not a latency study.
 
 The checked-in correctness and 100-request manifests contain tiny synthetic
 images. Their exact-match score is a fixture diagnostic, not public VQA
-accuracy. If official VQA v2 val2014 JSON files and COCO val2014 images are
-available locally, freeze a deterministic subset without copying images:
+accuracy. For a quick 100-request storage/scheduling check with no model
+download, use
+`configs/experiments/chunk6_fake_benchmark.yaml`, `--mode edge`, and
+`--manifest data/manifests/benchmark_fixture.jsonl`; select a new `--run-dir`.
+
+If official VQA v2 val2014 JSON files and COCO val2014 images are available
+locally, freeze a deterministic subset without copying images:
 
 ```bash
 .venv/bin/adaptive-vlm import-vqa-v2 \
