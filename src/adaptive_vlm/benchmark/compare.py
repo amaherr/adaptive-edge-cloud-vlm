@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from itertools import zip_longest
 from pathlib import Path
 from typing import Any
 
@@ -92,10 +93,22 @@ def compare_runs(run_dirs: list[Path], *, output: Path | None = None) -> dict[st
         if len({tuple(value) for value in tokens.values()}) == 1:
             matched += 1
         else:
+            reference_tokens = tokens[modes[0]]
             mismatches.append(
                 {"request_id": request_id, "repetition": repetition,
                  "tokens": tokens,
-                 "outputs": outputs}
+                 "outputs": outputs,
+                 "first_differing_token_index": {
+                     mode: next(
+                         (
+                             index for index, pair in enumerate(
+                                 zip_longest(reference_tokens, mode_tokens)
+                             ) if pair[0] != pair[1]
+                         ),
+                         None,
+                     )
+                     for mode, mode_tokens in tokens.items() if mode != modes[0]
+                 }}
             )
     report = {
         "schema_version": 1,

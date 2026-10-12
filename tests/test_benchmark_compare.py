@@ -48,6 +48,9 @@ def test_compare_reports_exact_mismatch(tmp_path: Path) -> None:
     report = compare_runs(directories, output=report_path)
     assert report["common_measured_pairs"] == len(manifest.items)
     assert len(report["mismatches"]) == len(manifest.items)
+    assert report["mismatches"][0]["first_differing_token_index"] == {
+        "cloud": 0
+    }
     assert report["exact_token_matches"] == 0
     assert report["text_mismatches"] == []
     assert report["quality_by_mode"]["edge"]["quality_scored_attempts"] > 0
