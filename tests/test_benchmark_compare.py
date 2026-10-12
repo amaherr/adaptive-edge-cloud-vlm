@@ -46,7 +46,7 @@ def test_compare_reports_exact_mismatch(tmp_path: Path) -> None:
         directories.append(directory)
     report_path = tmp_path / "comparison.json"
     report = compare_runs(directories, output=report_path)
-    assert report["common_first_repetition_requests"] == len(manifest.items)
+    assert report["common_measured_pairs"] == len(manifest.items)
     assert len(report["mismatches"]) == len(manifest.items)
     assert report["exact_token_matches"] == 0
     assert report["complete_and_equal"] is False

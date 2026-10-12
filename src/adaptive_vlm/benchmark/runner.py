@@ -131,6 +131,10 @@ def run_benchmark(
     plan = {
         "schema_version": 1,
         "config": config.to_dict(),
+        "config_sha256": hashlib.sha256(
+            json.dumps(config.to_dict(), sort_keys=True,
+                       separators=(",", ":")).encode()
+        ).hexdigest(),
         "model_contract_sha256": model_contract_fingerprint(config.model),
         "dataset_manifest_sha256": manifest.sha256,
         "mode": policy.mode.value,
@@ -175,7 +179,11 @@ def run_benchmark(
             or existing_row.get("warmup") != trial.warmup
             or existing_row.get("repetition") != trial.repetition
             or existing_row.get("plan_sha256") != plan_hash
-            or existing_row.get("run_id") != run_id):
+            or existing_row.get("run_id") != run_id
+            or existing_row.get("config_sha256") != plan["config_sha256"]
+            or existing_row.get("model_contract_sha256") !=
+            plan["model_contract_sha256"]
+            or existing_row.get("dataset_manifest_sha256") != manifest.sha256):
             raise ValueError(f"raw result does not match plan: {trial_id}")
         completed.add(trial_id)
 
@@ -192,6 +200,9 @@ def run_benchmark(
         row: dict[str, Any] = {
             **trial.to_dict(),
             "plan_sha256": plan_hash,
+            "config_sha256": plan["config_sha256"],
+            "model_contract_sha256": plan["model_contract_sha256"],
+            "dataset_manifest_sha256": manifest.sha256,
             "run_id": run_id,
             "mode": policy.mode.value,
             "image_sha256": item.image_sha256,
