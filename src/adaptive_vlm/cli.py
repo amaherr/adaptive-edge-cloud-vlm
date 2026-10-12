@@ -127,6 +127,12 @@ def build_parser() -> argparse.ArgumentParser:
     distributed_parser.add_argument("--prompt", required=True)
     distributed_parser.add_argument("--request-id", default="distributed-0001")
     distributed_parser.add_argument("--vision-device", default="cpu")
+    distributed_parser.add_argument(
+        "--pipeline",
+        choices=("synchronous", "prompt_first"),
+        default="synchronous",
+        help="Send the prompt ahead of vision encoding when prompt_first is selected",
+    )
     distributed_parser.add_argument("--offline", action="store_true")
     distributed_parser.add_argument("--output-dir", type=Path)
     distributed_parser.add_argument("-v", "--verbose", action="store_true")
@@ -201,6 +207,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 prompt=args.prompt,
                 request_id=args.request_id,
                 vision_device=args.vision_device,
+                pipeline=args.pipeline,
                 offline=args.offline,
                 output_dir=args.output_dir,
                 verbose=args.verbose,
@@ -541,6 +548,9 @@ def _distributed_server(
         protocol_version=config.transport.protocol_version,
         model_fingerprint=contract_fingerprint,
         tensor_inference_function=adapter.generate_from_payload,
+        prompt_prepare_function=adapter.prepare_prompt,
+        prepared_tensor_inference_function=adapter.generate_from_payload,
+        pending_timeout_seconds=config.transport.timeout_seconds,
         event_callback=progress.info,
     )
     server = CloudServer(
@@ -587,6 +597,7 @@ def _distributed_infer(
     prompt: str,
     request_id: str,
     vision_device: str,
+    pipeline: str,
     offline: bool,
     output_dir: Path | None,
     verbose: bool,
@@ -607,6 +618,7 @@ def _distributed_infer(
         "server_address": config.transport.host,
         "server_port": config.transport.port,
         "offline_model_cache": offline,
+        "distributed_pipeline": pipeline,
     }
     manifest = create_run_manifest(config, environment)
     load_started = perf_counter()
@@ -630,6 +642,7 @@ def _distributed_infer(
         encoder=adapter,
         transport=config.transport,
         model=model,
+        pipeline=pipeline,
     )
     with progress.phase(
         f"Checking language server at {config.transport.host}:{config.transport.port}"

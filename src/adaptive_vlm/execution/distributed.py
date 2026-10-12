@@ -1,8 +1,9 @@
-"""Synchronous edge-vision/cloud-language execution policy."""
+"""Edge-vision/cloud-language execution with optional prompt-first overlap."""
 
 from __future__ import annotations
 
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from time import perf_counter_ns
 from typing import Protocol
 
@@ -13,11 +14,12 @@ from adaptive_vlm.execution.remote import (
     HealthStatus,
     check_remote_health,
     parse_inference_response,
+    validate_response,
 )
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.features import VisionEncoding
 from adaptive_vlm.transport.client import exchange_frame
-from adaptive_vlm.transport.protocol import Frame, MessageType
+from adaptive_vlm.transport.protocol import Frame, MessageType, ProtocolError
 from adaptive_vlm.transport.tensors import TensorPayload
 
 TensorSerializer = Callable[[object], TensorPayload]
@@ -38,13 +40,17 @@ class DistributedExecutionPolicy(ExecutionPolicy):
         transport: TransportConfig,
         model: ModelMetadata,
         tensor_serializer: TensorSerializer = TensorPayload.from_torch,
+        pipeline: str = "synchronous",
     ) -> None:
         if encoder.component_role != "vision":
             raise ValueError("distributed edge adapter must retain only vision")
+        if pipeline not in {"synchronous", "prompt_first"}:
+            raise ValueError(f"unsupported distributed pipeline: {pipeline}")
         self._encoder = encoder
         self._transport = transport
         self._model = model
         self._tensor_serializer = tensor_serializer
+        self._pipeline = pipeline
 
     @property
     def mode(self) -> ExecutionMode:
@@ -55,7 +61,16 @@ class DistributedExecutionPolicy(ExecutionPolicy):
 
     def infer(self, request: InferenceRequest) -> InferenceResult:
         started_ns = perf_counter_ns()
-        encoding = self._encoder.encode_projected(request)
+        prompt_metrics: dict[str, MetricValue] = {}
+        if self._pipeline == "prompt_first":
+            # Send text before local vision starts so cloud tokenization can
+            # proceed while the edge encoder is busy.
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                prompt_future = executor.submit(self._prepare_remote_prompt, request)
+                encoding = self._encoder.encode_projected(request)
+                prompt_metrics = prompt_future.result()
+        else:
+            encoding = self._encoder.encode_projected(request)
 
         serialization_started_ns = perf_counter_ns()
         tensor = self._tensor_serializer(encoding.projected.tensor)
@@ -70,6 +85,7 @@ class DistributedExecutionPolicy(ExecutionPolicy):
         metadata = {
             "prompt": request.prompt,
             "model_fingerprint": self._model.fingerprint,
+            "pipeline": self._pipeline,
             **tensor.metadata(),
         }
         network_started_ns = perf_counter_ns()
@@ -93,6 +109,7 @@ class DistributedExecutionPolicy(ExecutionPolicy):
         )
 
         metrics: dict[str, MetricValue] = dict(encoding.metrics)
+        metrics.update(prompt_metrics)
         metrics.update(remote.metrics)
         metrics.update(
             {
@@ -105,6 +122,7 @@ class DistributedExecutionPolicy(ExecutionPolicy):
                 "request_wire_bytes": exchange.request_wire_bytes,
                 "response_wire_bytes": exchange.response_wire_bytes,
                 "projected_payload_bytes": len(tensor.data),
+                "distributed_pipeline": self._pipeline,
                 "request_metadata_and_framing_bytes": (
                     exchange.request_wire_bytes - len(tensor.data)
                 ),
@@ -116,3 +134,33 @@ class DistributedExecutionPolicy(ExecutionPolicy):
             output_token_ids=remote.output_token_ids,
             metrics=metrics,
         )
+
+    def _prepare_remote_prompt(
+        self, request: InferenceRequest
+    ) -> dict[str, MetricValue]:
+        started_ns = perf_counter_ns()
+        exchange = exchange_frame(
+            self._transport,
+            Frame(
+                version=self._transport.protocol_version,
+                message_type=MessageType.PROMPT_REQUEST,
+                request_id=request.request_id,
+                metadata={
+                    "prompt": request.prompt,
+                    "model_fingerprint": self._model.fingerprint,
+                },
+            ),
+        )
+        response = exchange.response
+        validate_response(response, request.request_id)
+        if response.message_type is not MessageType.PROMPT_RESPONSE:
+            raise ProtocolError("server returned a non-prompt response")
+        if response.metadata["model_fingerprint"] != self._model.fingerprint:
+            raise ProtocolError("prompt response model fingerprint differs")
+        if response.metadata["accepted"] is not True:
+            raise ProtocolError("server did not accept prompt preparation")
+        return {
+            "prompt_round_trip_ms": (perf_counter_ns() - started_ns) / 1_000_000,
+            "prompt_request_wire_bytes": exchange.request_wire_bytes,
+            "prompt_response_wire_bytes": exchange.response_wire_bytes,
+        }

@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
+from threading import Event
 from typing import Any
 
 import pytest
@@ -187,3 +188,53 @@ def test_distributed_health_uses_shared_contract_check(
 
     assert health.ready
     assert health.model_fingerprint == FINGERPRINT
+
+
+def test_prompt_first_overlaps_prepare_and_vision(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Any
+) -> None:
+    prompt_received = Event()
+    prepared_calls: list[tuple[str, object]] = []
+
+    def prepare(prompt: str) -> object:
+        prompt_received.set()
+        return tuple(prompt)
+
+    def prepared_infer(
+        request: TensorInferenceRequest, prepared: object
+    ) -> InferenceResult:
+        prepared_calls.append((request.prompt, prepared))
+        return InferenceResult(request.request_id, "remote text", (10, 11), {})
+
+    class WaitingEncoder(_FakeEncoder):
+        def encode_projected(self, request: InferenceRequest) -> VisionEncoding:
+            assert prompt_received.wait(2), "prompt was not sent during vision encoding"
+            return super().encode_projected(request)
+
+    processor = CloudRequestProcessor(
+        protocol_version=1,
+        model_fingerprint=FINGERPRINT,
+        tensor_inference_function=lambda request: InferenceResult(
+            request.request_id, "sync", (), {}
+        ),
+        prompt_prepare_function=prepare,
+        prepared_tensor_inference_function=prepared_infer,
+    )
+    _install_loopback(monkeypatch, processor.handle)
+    image = tmp_path / "image.png"
+    image.write_bytes(b"image")
+    policy = DistributedExecutionPolicy(
+        encoder=WaitingEncoder(),
+        transport=_transport(),
+        model=MODEL,
+        tensor_serializer=_serializer,
+        pipeline="prompt_first",
+    )
+
+    result = policy.infer(InferenceRequest("overlap-1", image, "Describe."))
+
+    assert result.output_token_ids == (10, 11)
+    assert result.metrics["distributed_pipeline"] == "prompt_first"
+    assert result.metrics["prompt_request_wire_bytes"] > 0
+    assert prepared_calls == [("Describe.", tuple("Describe."))]
+    assert processor.pending_requests == 0

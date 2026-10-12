@@ -224,6 +224,7 @@ class MoondreamAdapter(ModelAdapter):
         request_id: str,
         prompt: str,
         projected: ProjectedVisionFeatures,
+        prepared_prompt_ids: tuple[int, ...] | None = None,
     ) -> InferenceResult:
         """Run only image prefill and language generation in the cloud stage."""
 
@@ -248,7 +249,11 @@ class MoondreamAdapter(ModelAdapter):
                 synchronize=self._synchronizer(self._text_device),
             )
             generation = measure_call(
-                lambda: self._generate_token_ids(prompt, image_prefill.value),
+                lambda: self._generate_token_ids(
+                    prompt,
+                    image_prefill.value,
+                    prepared_prompt_ids=prepared_prompt_ids,
+                ),
                 synchronize=self._synchronizer(self._text_device),
             )
             token_ids = generation.value
@@ -278,7 +283,9 @@ class MoondreamAdapter(ModelAdapter):
             )
 
     def generate_from_payload(
-        self, request: TensorInferenceRequest
+        self,
+        request: TensorInferenceRequest,
+        prepared_prompt_ids: object | None = None,
     ) -> InferenceResult:
         """Reconstruct a wire tensor without changing bits, then run text inference."""
 
@@ -294,6 +301,11 @@ class MoondreamAdapter(ModelAdapter):
             request_id=request.request_id,
             prompt=request.prompt,
             projected=ProjectedVisionFeatures.from_tensor(deserialized.value),
+            prepared_prompt_ids=(
+                self._validate_prepared_prompt(prepared_prompt_ids)
+                if prepared_prompt_ids is not None
+                else None
+            ),
         )
         return InferenceResult(
             request_id=result.request_id,
@@ -521,8 +533,25 @@ class MoondreamAdapter(ModelAdapter):
         self._core._prefill(inputs, mask, positions, None)
         return sequence_length
 
-    def _generate_token_ids(self, prompt: str, position: int) -> tuple[int, ...]:
-        torch = self._runtime.torch
+    def prepare_prompt(self, prompt: str) -> tuple[int, ...]:
+        """Tokenize the pinned query template ahead of visual inference."""
+
+        self._require_component("text", "full")
+        if not prompt.strip():
+            raise ValueError("prompt must not be empty")
+        with self._lock:
+            return self._prepare_prompt_ids(prompt)
+
+    @staticmethod
+    def _validate_prepared_prompt(value: object) -> tuple[int, ...]:
+        if not isinstance(value, tuple) or not value or any(
+            not isinstance(token, int) or isinstance(token, bool) or token < 0
+            for token in value
+        ):
+            raise ValueError("prepared prompt must contain non-negative token IDs")
+        return value
+
+    def _prepare_prompt_ids(self, prompt: str) -> tuple[int, ...]:
         tokenizer_config = self._core.config.tokenizer
         query_template = tokenizer_config.templates["query"]
         if query_template is None:
@@ -535,6 +564,22 @@ class MoondreamAdapter(ModelAdapter):
             + self._core.tokenizer.encode(prompt).ids
             + list(query_template["suffix"])
             + list(query_template["suffix"])
+        )
+        return tuple(prompt_ids)
+
+    def _generate_token_ids(
+        self,
+        prompt: str,
+        position: int,
+        *,
+        prepared_prompt_ids: tuple[int, ...] | None = None,
+    ) -> tuple[int, ...]:
+        torch = self._runtime.torch
+        tokenizer_config = self._core.config.tokenizer
+        prompt_ids = (
+            prepared_prompt_ids
+            if prepared_prompt_ids is not None
+            else self._prepare_prompt_ids(prompt)
         )
         prompt_tensor = torch.tensor(
             [prompt_ids], device=self._text_device, dtype=torch.long

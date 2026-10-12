@@ -134,6 +134,9 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         protocol_version=config.transport.protocol_version,
         model_fingerprint=contract_fingerprint,
         tensor_inference_function=cloud_adapter.generate_from_payload,
+        prompt_prepare_function=cloud_adapter.prepare_prompt,
+        prepared_tensor_inference_function=cloud_adapter.generate_from_payload,
+        pending_timeout_seconds=config.transport.timeout_seconds,
     )
     server = CloudServer(
         host="127.0.0.1",
@@ -161,17 +164,26 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         sent_payloads.append(payload)
         return payload
 
-    policy = DistributedExecutionPolicy(
+    synchronous_policy = DistributedExecutionPolicy(
         encoder=edge_adapter,
         transport=transport,
         model=model,
         tensor_serializer=capture_payload,
     )
+    overlap_policy = DistributedExecutionPolicy(
+        encoder=edge_adapter,
+        transport=transport,
+        model=model,
+        tensor_serializer=capture_payload,
+        pipeline="prompt_first",
+    )
     try:
         with progress.phase("Checking the text-stage server contract"):
-            health = policy.health()
+            health = synchronous_policy.health()
         with progress.phase("Running synchronous distributed inference over TCP"):
-            distributed = policy.infer(request)
+            synchronous = synchronous_policy.infer(request)
+        with progress.phase("Running prompt-first distributed inference over TCP"):
+            overlap = overlap_policy.infer(request)
     finally:
         server.shutdown()
         server_thread.join(timeout=config.transport.timeout_seconds + 1)
@@ -179,13 +191,27 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
 
     if server_thread.is_alive():
         raise RuntimeError("server did not shut down within the timeout")
-    if len(sent_payloads) != 1:
-        raise RuntimeError("distributed policy did not serialize exactly one tensor")
-    edge_tensor_equal = sent_payloads[0].data == reference_payload.data
-    token_ids_equal = reference.output_token_ids == distributed.output_token_ids
-    text_equal = reference.output_text == distributed.output_text
-    if not edge_tensor_equal or not token_ids_equal or not text_equal:
-        raise RuntimeError("distributed result differs from the local reference")
+    if len(sent_payloads) != 2:
+        raise RuntimeError("distributed policies did not each serialize one tensor")
+    edge_tensor_equal = all(
+        payload.data == reference_payload.data for payload in sent_payloads
+    )
+    synchronous_tokens_equal = (
+        reference.output_token_ids == synchronous.output_token_ids
+    )
+    overlap_tokens_equal = reference.output_token_ids == overlap.output_token_ids
+    synchronous_text_equal = reference.output_text == synchronous.output_text
+    overlap_text_equal = reference.output_text == overlap.output_text
+    if not all(
+        (
+            edge_tensor_equal,
+            synchronous_tokens_equal,
+            overlap_tokens_equal,
+            synchronous_text_equal,
+            overlap_text_equal,
+        )
+    ):
+        raise RuntimeError("a distributed result differs from the local reference")
 
     stats = processor.stats
     result.update(
@@ -201,10 +227,17 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
             "tensor_roundtrip_bits_equal": tensor_roundtrip_equal,
             "reencoded_edge_tensor_bits_equal": edge_tensor_equal,
             "projected_tensor": reference_payload.metadata(),
-            "token_ids_equal": token_ids_equal,
-            "text_equal": text_equal,
+            "synchronous_token_ids_equal": synchronous_tokens_equal,
+            "overlap_token_ids_equal": overlap_tokens_equal,
+            "synchronous_text_equal": synchronous_text_equal,
+            "overlap_text_equal": overlap_text_equal,
+            "overlap_latency_difference_ms": (
+                float(overlap.metrics["client_end_to_end_ms"])
+                - float(synchronous.metrics["client_end_to_end_ms"])
+            ),
             "reference": reference.to_dict(),
-            "distributed": distributed.to_dict(),
+            "synchronous": synchronous.to_dict(),
+            "overlap": overlap.to_dict(),
             "server_stats": {
                 "completed": stats.completed_requests,
                 "rejected": stats.rejected_requests,
@@ -212,7 +245,7 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
             },
         }
     )
-    progress.info("Equivalence gate passed: tensor bits, tokens, and text match")
+    progress.info("Both distributed variants match tensor bits, tokens, and text")
 
 
 def _utc_now() -> str:

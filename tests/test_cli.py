@@ -270,6 +270,10 @@ def test_distributed_server_loads_only_text_stage(
         metadata = ModelMetadata("model", "revision", "a" * 64)
 
         @staticmethod
+        def prepare_prompt(_prompt: str) -> tuple[int, ...]:
+            return (1,)
+
+        @staticmethod
         def generate_from_payload(_request: object) -> object:
             raise AssertionError("the stub server should not receive a request")
 
