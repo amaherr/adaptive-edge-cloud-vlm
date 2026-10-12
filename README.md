@@ -205,6 +205,66 @@ Reproduce the Chunk 4 localhost gates with:
   --output artifacts/chunk4/cloud_equivalence.json
 ```
 
+## Distributed vision and language inference
+
+Start the text-only server in one terminal:
+
+```bash
+.venv-model/bin/adaptive-vlm distributed-server \
+  --config configs/experiments/chunk5_local_distributed.yaml \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache --offline --device cpu
+```
+
+After the readiness JSON appears, run the vision stage in another terminal:
+
+```bash
+.venv-model/bin/adaptive-vlm distributed-infer \
+  --config configs/experiments/chunk5_local_distributed.yaml \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache --offline --vision-device cuda:0 \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --prompt "Describe this image." \
+  --output-dir artifacts/distributed
+```
+
+The default `--pipeline synchronous` sends the projected BF16 tensor after
+vision finishes. Use `--pipeline prompt_first` to send the prompt while vision
+is running; the server prepares token IDs and joins them with the tensor by
+request ID. The server bounds and expires unfinished prompt state. Each result
+records the selected pipeline, exact wire bytes, component times, and memory
+measurements. These two pipelines are variants of the distributed policy, not
+additional execution configurations.
+
+Run the localhost correctness and transport stability gates with:
+
+```bash
+.venv-model/bin/python scripts/verify_distributed_equivalence.py \
+  --config configs/experiments/chunk5_local_distributed.yaml \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache --offline \
+  --vision-device cuda:0 --text-device cpu \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --output artifacts/chunk5/distributed_variants_equivalence.json
+
+.venv-model/bin/python scripts/verify_distributed_stability.py \
+  --config configs/experiments/chunk5_local_distributed.yaml \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --requests 100 \
+  --output artifacts/chunk5/distributed_stability.json
+
+.venv-model/bin/python scripts/verify_distributed_stability.py \
+  --config configs/experiments/chunk5_local_distributed.yaml \
+  --image tests/fixtures/moondream_smoke.ppm \
+  --pipeline prompt_first --requests 100 \
+  --output artifacts/chunk5/distributed_overlap_stability.json
+```
+
+The pinned loader currently constructs the whole checkpoint before discarding
+the unneeded modules. Its steady-state placement is split, but load-time RAM
+is still that of the full checkpoint. The localhost configuration validates
+behavior and is not a physical network measurement.
+
 ## Quality checks
 
 ```bash
