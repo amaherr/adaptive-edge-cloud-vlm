@@ -5,7 +5,7 @@ from pathlib import Path
 
 from adaptive_vlm.artifacts import create_run_manifest
 from adaptive_vlm.benchmark.compare import compare_runs
-from adaptive_vlm.benchmark.runner import run_benchmark
+from adaptive_vlm.benchmark.runner import run_benchmark, semantic_config_sha256
 from adaptive_vlm.config import ExecutionMode, load_experiment_config
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
 from adaptive_vlm.data.manifest import load_frozen_manifest
@@ -51,3 +51,16 @@ def test_compare_reports_exact_mismatch(tmp_path: Path) -> None:
     assert report["exact_token_matches"] == 0
     assert report["complete_and_equal"] is False
     assert json.loads(report_path.read_text()) == report
+
+
+def test_semantic_config_hash_ignores_only_file_locations() -> None:
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"
+    ).to_dict()
+    alternate = json.loads(json.dumps(config))
+    alternate["source_path"] = "/another/path/config.yaml"
+    alternate["artifacts_dir"] = "/another/path/artifacts"
+    alternate["dataset"]["manifest_path"] = "/another/path/manifest.jsonl"
+    assert semantic_config_sha256(config) == semantic_config_sha256(alternate)
+    alternate["model"]["revision"] = "other-revision"
+    assert semantic_config_sha256(config) != semantic_config_sha256(alternate)

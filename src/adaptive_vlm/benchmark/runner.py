@@ -107,6 +107,20 @@ def _read_rows(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def semantic_config_sha256(config: Mapping[str, Any]) -> str:
+    """Hash experimental settings, excluding machine-specific file locations."""
+
+    semantic = dict(config)
+    semantic.pop("source_path", None)
+    semantic.pop("artifacts_dir", None)
+    dataset = dict(semantic["dataset"])
+    dataset.pop("manifest_path", None)  # Content is checked separately by SHA-256.
+    semantic["dataset"] = dataset
+    return hashlib.sha256(
+        json.dumps(semantic, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
 def run_benchmark(
     *,
     config: ExperimentConfig,
@@ -131,10 +145,7 @@ def run_benchmark(
     plan = {
         "schema_version": 1,
         "config": config.to_dict(),
-        "config_sha256": hashlib.sha256(
-            json.dumps(config.to_dict(), sort_keys=True,
-                       separators=(",", ":")).encode()
-        ).hexdigest(),
+        "config_sha256": semantic_config_sha256(config.to_dict()),
         "model_contract_sha256": model_contract_fingerprint(config.model),
         "dataset_manifest_sha256": manifest.sha256,
         "mode": policy.mode.value,
@@ -248,6 +259,16 @@ def summarize(
     latency = sorted(float(row["observed_end_to_end_ms"]) for row in successful)
     quality = [float(row["quality_score"]) for row in successful
                if row["quality_score"] is not None]
+    wire_bytes: list[int] = []
+    for row in successful:
+        metrics = row["metrics"]
+        if "total_wire_bytes" in metrics:
+            wire_bytes.append(int(metrics["total_wire_bytes"]))
+        elif "request_wire_bytes" in metrics and "response_wire_bytes" in metrics:
+            wire_bytes.append(
+                int(metrics["request_wire_bytes"])
+                + int(metrics["response_wire_bytes"])
+            )
     status_counts = dict(Counter(str(row["status"]) for row in measured))
     return {
         "schema_version": 1,
@@ -259,12 +280,32 @@ def summarize(
         "warmup_attempts": len(rows) - len(measured),
         "measured_attempts": len(measured),
         "status_counts": status_counts,
+        "failure_rate": (
+            (len(measured) - len(successful)) / len(measured) if measured else None
+        ),
         "latency_ms_mean_success": sum(latency) / len(latency) if latency else None,
         "latency_ms_median_success": (
             (latency[(len(latency) - 1) // 2] + latency[len(latency) // 2]) / 2
             if latency else None
         ),
+        "latency_ms_p95_success": _percentile(latency, 0.95) if latency else None,
+        "latency_ms_iqr_success": (
+            _percentile(latency, 0.75) - _percentile(latency, 0.25)
+            if latency else None
+        ),
+        "wire_bytes_mean_success": (
+            sum(wire_bytes) / len(wire_bytes) if wire_bytes else None
+        ),
         "quality_mean_success": sum(quality) / len(quality) if quality else None,
         "quality_scored_attempts": len(quality),
         "quality_metric": "fixture_exact_match_or_provisional_vqa_consensus",
     }
+
+
+def _percentile(values: list[float], fraction: float) -> float:
+    if not values:
+        raise ValueError("percentile requires observations")
+    position = (len(values) - 1) * fraction
+    lower = int(position)
+    upper = min(lower + 1, len(values) - 1)
+    return values[lower] + (values[upper] - values[lower]) * (position - lower)

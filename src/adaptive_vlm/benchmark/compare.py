@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
+from adaptive_vlm.benchmark.runner import semantic_config_sha256
 
 
 def compare_runs(run_dirs: list[Path], *, output: Path | None = None) -> dict[str, Any]:
@@ -22,7 +23,7 @@ def compare_runs(run_dirs: list[Path], *, output: Path | None = None) -> dict[st
     model_hashes = {plan["model_contract_sha256"] for plan in plans}
     if len(dataset_hashes) != 1 or len(model_hashes) != 1:
         raise ValueError("runs differ in request manifest or model contract")
-    if len({plan["config_sha256"] for plan in plans}) != 1:
+    if len({semantic_config_sha256(plan["config"]) for plan in plans}) != 1:
         raise ValueError("runs differ in resolved experiment configuration")
     if any(
         [

@@ -7,30 +7,29 @@ Status meanings:
   evidence is still required.
 - **Satisfied:** implemented and supported by baseline experiment evidence.
 
-Statuses below include the completed Chunk 4 localhost all-cloud evidence.
-Requirements spanning the distributed policy or physical cloud remain at
-foundation level until those experiments are available.
+Statuses below include the Chunk 5 same-host distributed evidence and Chunk 6
+runner/fixture evidence. Physical-host and public VQA evidence remain pending.
 
 | ID | Requirement | Status | Current evidence / next evidence |
 | --- | --- | --- | --- |
-| R1 | Identical pretrained VLM in all configurations | Foundation | Moondream commit and artifact are pinned; prove reuse in all real policies. |
-| R2 | Identical preprocessing | Foundation | Edge and localhost cloud reuse the pinned Pillow adapter; the contract fingerprint rejects a different backend. Distributed and physical-host evidence remain pending. |
-| R3 | Identical generation settings | Foundation | Edge and localhost cloud share the adapter and a fingerprint covering precision and every generation setting. Distributed evidence remains pending. |
-| R4 | Attempt unmodified all-edge execution | Satisfied | Two GPU loads recorded infeasibility; the identical BF16 artifact completed repeated edge-CPU inference on three fixtures. |
-| R5 | All-cloud transmits input and runs full model remotely | Foundation | The client sent original image bytes/prompt and the localhost server ran monolithic Moondream with exact output. Repeat on the physical cloud host. |
-| R6 | Distributed vision encoder and projector run at edge | Pending | Chunk 5. |
-| R7 | Distributed LLM runs in cloud | Pending | Chunk 5. |
-| R8 | Intermediate visual features transmitted correctly | Pending | Chunk 5 tensor round-trip tests. |
-| R9 | Output equivalence verified | Foundation | Local decomposition and localhost all-cloud each matched the 32-token monolithic reference exactly; distributed and physical-host comparison remain pending. |
-| R10 | Component latency recorded | Foundation | Synchronized edge components and returned localhost cloud image/prefill/generation times are recorded; physical cloud remains pending. |
-| R11 | End-to-end latency recorded | Foundation | Edge E2E and client-observed localhost cloud E2E are recorded automatically; physical cloud remains pending. |
-| R12 | Communication volume recorded | Satisfied | Framing returns exact request/response wire bytes; real-model evidence recorded 504-byte request and 1,344-byte response. |
-| R13 | Edge/cloud memory recorded | Foundation | Edge CUDA/RSS and localhost server model RSS are recorded; physical cloud memory remains pending. |
-| R14 | Warm-up precedes measurement | Foundation | Chunk 2 probe warmed each fixture before timing; policy benchmark runner is Chunk 6. |
-| R15 | Reproducible config files | Foundation | `configs/`, strict loader, CLI validation, and `tests/test_config.py`. |
-| R16 | Results stored automatically | Foundation | `artifacts.py`, fake smoke artifacts, and artifact tests. |
-| R17 | Hardware/software/version information logged | Foundation | WSL/CUDA/PyTorch inventory is verified and edge hardware config updated; cloud remains pending. |
-| R18 | Random seeds controlled where applicable | Foundation | `seed_everything`, config seed, fake CLI integration, and seed tests. |
+| R1 | Identical pretrained VLM in all configurations | Foundation | [Pinned model](../configs/model/moondream2.yaml), [Chunk 5 evidence](../artifacts/chunk5/distributed_variants_equivalence.json); physical-host repeat pending. |
+| R2 | Identical preprocessing | Foundation | [Shared Moondream adapter](../src/adaptive_vlm/models/moondream.py), [Chunk 5 evidence](../artifacts/chunk5/distributed_variants_equivalence.json); physical-host repeat pending. |
+| R3 | Identical generation settings | Foundation | [Model fingerprint contract](../src/adaptive_vlm/config.py), [benchmark row hashes](../src/adaptive_vlm/benchmark/runner.py); physical-host repeat pending. |
+| R4 | Attempt unmodified all-edge execution | Satisfied | [Chunk 2 probe report](reports/chunk_2_feasibility.md), [edge config](../configs/hardware/edge_rtx3050.yaml); GPU OOM and CPU fallback recorded. |
+| R5 | All-cloud transmits input and runs full model remotely | Foundation | [Cloud policy](../src/adaptive_vlm/execution/cloud.py), [Chunk 4 equivalence](../artifacts/chunk4/cloud_equivalence.json); physical cloud pending. |
+| R6 | Distributed vision encoder and projector run at edge | Foundation | [Split policy](../src/adaptive_vlm/execution/distributed.py), [Chunk 5 evidence](../artifacts/chunk5/distributed_variants_equivalence.json); physical cloud pending. |
+| R7 | Distributed LLM runs in cloud | Foundation | [Text-only server](../src/adaptive_vlm/cli.py), [Chunk 5 evidence](../artifacts/chunk5/distributed_variants_equivalence.json); physical cloud pending. |
+| R8 | Intermediate visual features transmitted correctly | Foundation | [Tensor tests](../tests/test_tensor_payload.py), [Chunk 5 evidence](../artifacts/chunk5/distributed_variants_equivalence.json); physical cloud pending. |
+| R9 | Output equivalence verified | Foundation | [Chunk 3-5 same-host evidence](../artifacts/chunk5/distributed_variants_equivalence.json), [all-pair comparison tests](../tests/test_benchmark_compare.py); full real manifest and physical hosts pending. |
+| R10 | Component latency recorded | Foundation | [Moondream adapter](../src/adaptive_vlm/models/moondream.py), [Chunk 5 report](reports/chunk_5_distributed.md); physical cloud pending. |
+| R11 | End-to-end latency recorded | Foundation | [Runner](../src/adaptive_vlm/benchmark/runner.py), [cloud policy](../src/adaptive_vlm/execution/cloud.py); physical cloud pending. |
+| R12 | Communication volume recorded | Satisfied | [Wire accounting](../src/adaptive_vlm/transport/client.py), [Chunk 4 report](reports/chunk_4_cloud.md). |
+| R13 | Edge/cloud memory recorded | Foundation | [Model adapter](../src/adaptive_vlm/models/moondream.py), [Chunk 5 report](reports/chunk_5_distributed.md); physical cloud pending. |
+| R14 | Warm-up precedes measurement | Satisfied | [Runner](../src/adaptive_vlm/benchmark/runner.py) excludes warm-ups; [tests](../tests/test_benchmark_runner.py). |
+| R15 | Reproducible config files | Foundation | [Strict config](../src/adaptive_vlm/config.py), [frozen manifest](../src/adaptive_vlm/data/manifest.py), [resume tests](../tests/test_benchmark_runner.py); public VQA and physical hardware pending. |
+| R16 | Results stored automatically | Satisfied | [Artifact writer](../src/adaptive_vlm/artifacts.py), [runner](../src/adaptive_vlm/benchmark/runner.py), [OOM/resume tests](../tests/test_benchmark_runner.py). |
+| R17 | Hardware/software/version information logged | Foundation | [Environment collector](../src/adaptive_vlm/environment.py), [edge inventory](../configs/hardware/edge_rtx3050.yaml); physical cloud pending. |
+| R18 | Random seeds controlled where applicable | Satisfied | [Seed utility](../src/adaptive_vlm/determinism.py), [schedule tests](../tests/test_benchmark_runner.py), [VQA importer tests](../tests/test_vqa_import.py). |
 
 Update this table at every chunk handoff. A requirement becomes **Satisfied**
 only when its real-model or experimental evidence is retained and reproducible.

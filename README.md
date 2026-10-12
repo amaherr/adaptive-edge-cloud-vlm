@@ -265,6 +265,65 @@ the unneeded modules. Its steady-state placement is split, but load-time RAM
 is still that of the full checkpoint. The localhost configuration validates
 behavior and is not a physical network measurement.
 
+## Unified benchmark and correctness runs
+
+Run all three modes with the same resolved `chunk6_local_campaign.yaml` config
+and frozen request manifest. Use separate run directories. A model server must
+already be running for each remote mode; start `cloud-server` with
+`chunk4_local_cloud.yaml` for `cloud`, or `distributed-server` with
+`chunk5_local_distributed.yaml` for `distributed`. Stop one server before
+starting the other on port 5050. Their model contract must match the benchmark
+config; the benchmark performs a health/fingerprint check.
+
+```bash
+.venv-model/bin/adaptive-vlm benchmark \
+  --config configs/experiments/chunk6_local_campaign.yaml \
+  --mode edge --run-dir artifacts/chunk6/correctness-edge \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache --offline --vision-device cpu --text-device cpu \
+  --warmups 1 --repetitions 1
+
+# Change --mode and --run-dir for cloud or distributed. The distributed client
+# also needs --artifact-manifest and --vision-device; cloud needs neither.
+.venv-model/bin/adaptive-vlm compare-runs \
+  artifacts/chunk6/correctness-edge \
+  artifacts/chunk6/correctness-cloud \
+  artifacts/chunk6/correctness-distributed \
+  --output artifacts/chunk6/correctness-comparison.json
+```
+
+The command prints every trial as it runs. An interrupted run can be continued
+with identical arguments plus `--resume`; the plan and hashes must still match.
+Each run stores `plan.json`, `run_manifest.json`, fsynced `requests.jsonl`, and
+`summary.json`. Warm-ups are recorded but excluded from measured summaries;
+failed/OOM attempts remain in the denominator. `compare-runs` checks every
+measured request/repetition pair and lists exact token mismatches. Default
+config settings are 10 warm-ups and 30 repetitions; the one-repetition command
+above is a correctness smoke, not a latency study.
+
+The checked-in correctness and 100-request manifests contain tiny synthetic
+images. Their exact-match score is a fixture diagnostic, not public VQA
+accuracy. If official VQA v2 val2014 JSON files and COCO val2014 images are
+available locally, freeze a deterministic subset without copying images:
+
+```bash
+.venv/bin/adaptive-vlm import-vqa-v2 \
+  --questions data/raw/vqa/v2_OpenEnded_mscoco_val2014_questions.json \
+  --annotations data/raw/vqa/v2_mscoco_val2014_annotations.json \
+  --images-dir data/raw/coco/val2014 \
+  --output data/manifests/vqa_val2014_seed42.jsonl \
+  --count 100 --seed 42 --revision vqa-v2-val2014-local
+```
+
+Set the experiment `dataset.manifest_path` and `dataset.revision` to that
+manifest before running it. The importer expects the
+[official VQA v2](https://visualqa.org/download.html)
+question/annotation schema and ten human answers. The runner's VQA consensus
+score is provisional because it does not implement the official answer
+normalization; do not report it as official VQA accuracy. The official
+[evaluator](https://visualqa.org/evaluation.html) remains necessary for
+thesis-quality public-dataset results.
+
 ## Quality checks
 
 ```bash

@@ -89,6 +89,9 @@ def test_runner_records_failures_and_resumes_without_duplicate_trials(
     assert summary["measured_attempts"] == 4
     assert summary["warmup_attempts"] == 1
     assert summary["status_counts"] == {"oom": 1, "ok": 3}
+    assert summary["failure_rate"] == 0.25
+    assert summary["latency_ms_p95_success"] is not None
+    assert summary["latency_ms_iqr_success"] is not None
     assert summary["quality_mean_success"] == 1.0
     assert summary["quality_scored_attempts"] == 3
     assert policy.calls == 5
