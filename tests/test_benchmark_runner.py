@@ -103,6 +103,15 @@ def test_runner_records_failures_and_resumes_without_duplicate_trials(
     assert len(rows) == 5
     assert len({row["trial_id"] for row in rows}) == 5
     assert all(row["run_id"] == rows[0]["run_id"] for row in rows)
+    # A process interrupted before its last append can resume just that trial.
+    raw_path = run_dir / "requests.jsonl"
+    raw_path.write_text("\n".join(raw_lines[:-1]) + "\n", encoding="utf-8")
+    recovered = run_benchmark(**kwargs, resume=True)
+    assert recovered["measured_attempts"] == 4
+    assert policy.calls == 6
+    recovered_rows = [json.loads(line) for line in raw_path.read_text().splitlines()]
+    assert len(recovered_rows) == 5
+    assert all(row["run_id"] == rows[0]["run_id"] for row in recovered_rows)
     with pytest.raises(FileExistsError):
         run_benchmark(**kwargs)
 
