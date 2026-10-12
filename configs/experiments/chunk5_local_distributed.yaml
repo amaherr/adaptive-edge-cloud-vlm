@@ -6,7 +6,7 @@ edge_hardware_config: ../hardware/edge_rtx3050.yaml
 cloud_hardware_config: ../hardware/local_model_cloud.yaml
 dataset:
   manifest_path: ../../data/manifests/correctness.jsonl
-  revision: pending
+  revision: synthetic-fixtures-v1
 runtime:
   seed: 42
   warmup_requests: 0
