@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from adaptive_vlm.artifacts import create_run_manifest
 from adaptive_vlm.benchmark.compare import compare_runs
 from adaptive_vlm.benchmark.runner import run_benchmark, semantic_config_sha256
@@ -92,3 +94,30 @@ def test_compare_three_identical_policies(tmp_path: Path) -> None:
     assert report["complete_and_equal"] is True
     assert report["exact_token_matches"] == 2 * len(manifest.items)
     assert report["mismatches"] == []
+
+
+def test_compare_rejects_tampered_result_hash(tmp_path: Path) -> None:
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"
+    )
+    manifest = load_frozen_manifest(config.dataset.manifest_path)
+    directories = []
+    for mode in (ExecutionMode.EDGE, ExecutionMode.CLOUD):
+        directory = tmp_path / mode.value
+        run_benchmark(
+            config=config, manifest=manifest, policy=StaticPolicy(mode, 7),
+            run_manifest=create_run_manifest(
+                config, {}, dataset_manifest_sha256=manifest.sha256
+            ),
+            run_dir=directory, warmups=0, repetitions=1,
+            pipeline="synchronous",
+        )
+        directories.append(directory)
+    raw_path = directories[0] / "requests.jsonl"
+    rows = [json.loads(line) for line in raw_path.read_text().splitlines()]
+    rows[0]["model_contract_sha256"] = "0" * 64
+    raw_path.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="raw results do not match plan"):
+        compare_runs(directories)

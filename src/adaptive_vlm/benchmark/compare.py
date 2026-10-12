@@ -51,8 +51,16 @@ def compare_runs(run_dirs: list[Path], *, output: Path | None = None) -> dict[st
         }
         rows = [json.loads(line) for line in
                 (directory / "requests.jsonl").read_text().splitlines()]
-        if any(row.get("plan_sha256") != plans[modes.index(mode)]["plan_sha256"]
-               for row in rows):
+        plan = plans[modes.index(mode)]
+        if any(
+            row.get("plan_sha256") != plan["plan_sha256"]
+            or row.get("config_sha256") != plan["config_sha256"]
+            or row.get("model_contract_sha256") != plan["model_contract_sha256"]
+            or row.get("dataset_manifest_sha256") !=
+            plan["dataset_manifest_sha256"]
+            or row.get("mode") != mode
+            for row in rows
+        ):
             raise ValueError(f"raw results do not match plan for {mode}")
         measured = [row for row in rows if not row["warmup"]]
         failures[mode] = [
