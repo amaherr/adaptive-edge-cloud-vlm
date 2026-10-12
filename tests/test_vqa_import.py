@@ -67,3 +67,18 @@ def test_import_vqa_subset_is_deterministic_and_refuses_overwrite(
             seed=42,
             revision="vqa-v2-val2014-test",
         )
+
+
+def test_import_vqa_rejects_missing_annotation(tmp_path: Path) -> None:
+    questions = tmp_path / "questions.json"
+    annotations = tmp_path / "annotations.json"
+    questions.write_text(
+        json.dumps({"questions": [{"question_id": 1, "image_id": 1,
+                                    "question": "What?"}]}), encoding="utf-8"
+    )
+    annotations.write_text(json.dumps({"annotations": []}), encoding="utf-8")
+    with pytest.raises(ValueError, match="different IDs"):
+        import_vqa_v2(
+            questions, annotations, tmp_path, tmp_path / "out.jsonl",
+            count=1, seed=42, revision="test",
+        )

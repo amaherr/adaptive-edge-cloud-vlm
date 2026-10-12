@@ -45,7 +45,9 @@ def import_vqa_v2(
         if question_id in question_by_id:
             raise ValueError(f"duplicate VQA question: {question_id}")
         question_by_id[question_id] = question
-    candidates = sorted(set(question_by_id) & set(answer_by_id))
+    if set(question_by_id) != set(answer_by_id):
+        raise ValueError("VQA questions and annotations contain different IDs")
+    candidates = sorted(question_by_id)
     if count > len(candidates):
         raise ValueError(f"requested {count} questions; only {len(candidates)} paired")
     selected = sorted(random.Random(seed).sample(candidates, count))
