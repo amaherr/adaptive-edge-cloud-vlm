@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from time import perf_counter_ns
-from typing import Protocol
+from typing import Protocol, cast
 
 from adaptive_vlm.config import ExecutionMode, TransportConfig
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult, MetricValue
@@ -108,6 +108,12 @@ class DistributedExecutionPolicy(ExecutionPolicy):
             model_fingerprint=self._model.fingerprint,
         )
 
+        prompt_request_bytes = cast(
+            int, prompt_metrics.get("prompt_request_wire_bytes", 0)
+        )
+        prompt_response_bytes = cast(
+            int, prompt_metrics.get("prompt_response_wire_bytes", 0)
+        )
         metrics: dict[str, MetricValue] = dict(encoding.metrics)
         metrics.update(prompt_metrics)
         metrics.update(remote.metrics)
@@ -121,6 +127,14 @@ class DistributedExecutionPolicy(ExecutionPolicy):
                 / 1_000_000,
                 "request_wire_bytes": exchange.request_wire_bytes,
                 "response_wire_bytes": exchange.response_wire_bytes,
+                "total_request_wire_bytes": exchange.request_wire_bytes
+                + prompt_request_bytes,
+                "total_response_wire_bytes": exchange.response_wire_bytes
+                + prompt_response_bytes,
+                "total_wire_bytes": exchange.request_wire_bytes
+                + exchange.response_wire_bytes
+                + prompt_request_bytes
+                + prompt_response_bytes,
                 "projected_payload_bytes": len(tensor.data),
                 "distributed_pipeline": self._pipeline,
                 "request_metadata_and_framing_bytes": (
@@ -163,4 +177,5 @@ class DistributedExecutionPolicy(ExecutionPolicy):
             "prompt_round_trip_ms": (perf_counter_ns() - started_ns) / 1_000_000,
             "prompt_request_wire_bytes": exchange.request_wire_bytes,
             "prompt_response_wire_bytes": exchange.response_wire_bytes,
+            "server_prompt_prepare_ms": response.metadata["prompt_prepare_ms"],
         }

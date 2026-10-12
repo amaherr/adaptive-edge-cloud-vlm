@@ -320,6 +320,7 @@ def test_distributed_infer_uses_vision_stage_and_writes_artifacts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     loader_kwargs: dict[str, object] = {}
+    policy_kwargs: dict[str, object] = {}
     fake = FakeModelAdapter()
 
     class StubVisionAdapter:
@@ -328,8 +329,8 @@ def test_distributed_infer_uses_vision_stage_and_writes_artifacts(
     class StubDistributedPolicy:
         mode = ExecutionMode.DISTRIBUTED
 
-        def __init__(self, **_: object) -> None:
-            pass
+        def __init__(self, **kwargs: object) -> None:
+            policy_kwargs.update(kwargs)
 
         @staticmethod
         def health() -> HealthStatus:
@@ -361,11 +362,14 @@ def test_distributed_infer_uses_vision_stage_and_writes_artifacts(
             "Describe this fixture.",
             "--output-dir",
             str(tmp_path),
+            "--pipeline",
+            "prompt_first",
         ]
     )
 
     assert exit_code == 0
     assert loader_kwargs["components"] == "vision"
+    assert policy_kwargs["pipeline"] == "prompt_first"
     captured = capsys.readouterr()
     record = json.loads(captured.out)
     assert record["mode"] == "distributed"

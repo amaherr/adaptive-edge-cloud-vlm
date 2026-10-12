@@ -151,6 +151,9 @@ def test_synchronous_distributed_policy_sends_projected_tensor_only(
     assert result.metrics["server_model_language_generation_ms"] == 4.0
     assert result.metrics["projected_payload_bytes"] == 2_985_984
     assert result.metrics["request_metadata_and_framing_bytes"] > 0
+    assert result.metrics["total_request_wire_bytes"] == result.metrics[
+        "request_wire_bytes"
+    ]
 
 
 def test_distributed_policy_requires_vision_only_adapter() -> None:
@@ -236,5 +239,10 @@ def test_prompt_first_overlaps_prepare_and_vision(
     assert result.output_token_ids == (10, 11)
     assert result.metrics["distributed_pipeline"] == "prompt_first"
     assert result.metrics["prompt_request_wire_bytes"] > 0
+    assert result.metrics["server_prompt_prepare_ms"] >= 0
+    assert result.metrics["total_request_wire_bytes"] == (
+        result.metrics["request_wire_bytes"]
+        + result.metrics["prompt_request_wire_bytes"]
+    )
     assert prepared_calls == [("Describe.", tuple("Describe."))]
     assert processor.pending_requests == 0

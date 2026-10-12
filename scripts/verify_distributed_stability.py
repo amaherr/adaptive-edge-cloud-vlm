@@ -34,6 +34,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--image", required=True, type=Path)
     parser.add_argument("--requests", default=100, type=int)
+    parser.add_argument(
+        "--pipeline",
+        choices=("synchronous", "prompt_first"),
+        default="synchronous",
+    )
     parser.add_argument("--max-rss-growth-mib", default=64.0, type=float)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -108,6 +113,8 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         protocol_version=config.transport.protocol_version,
         model_fingerprint=contract_fingerprint,
         tensor_inference_function=tensor_infer,
+        prompt_prepare_function=lambda prompt: tuple(prompt),
+        prepared_tensor_inference_function=lambda request, _: tensor_infer(request),
     )
     server = CloudServer(
         host="127.0.0.1",
@@ -132,6 +139,7 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         encoder=StaticEncoder(),
         transport=transport,
         model=model,
+        pipeline=args.pipeline,
     )
     image_path = args.image.resolve()
     request_bytes: list[int] = []
@@ -177,6 +185,8 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
     stats = processor.stats
     if stats.completed_requests != args.requests + 1:
         raise RuntimeError("server did not complete every request")
+    if processor.pending_requests:
+        raise RuntimeError("server retained prompt state after completed requests")
     peak_growth_mib = max(rss_samples) - rss_samples[0]
     if peak_growth_mib > args.max_rss_growth_mib:
         raise RuntimeError(
@@ -187,6 +197,7 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
         {
             "status": "ok",
             "requests": args.requests,
+            "pipeline": args.pipeline,
             "warmup_requests": 1,
             "projected_tensor": projected.metadata(),
             "model_contract_fingerprint": contract_fingerprint,
@@ -195,6 +206,7 @@ def _run(args: argparse.Namespace, result: dict[str, Any]) -> None:
                 "rejected": stats.rejected_requests,
                 "failed": stats.failed_requests,
             },
+            "pending_requests": processor.pending_requests,
             "rss_initial_mib": rss_samples[0],
             "rss_final_mib": rss_samples[-1],
             "rss_peak_mib": max(rss_samples),

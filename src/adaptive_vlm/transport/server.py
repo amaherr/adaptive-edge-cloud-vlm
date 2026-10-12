@@ -69,7 +69,11 @@ class CloudRequestProcessor:
         clock: Callable[[], float] = monotonic,
         event_callback: EventCallback | None = None,
     ) -> None:
-        if inference_function is None and tensor_inference_function is None:
+        if (
+            inference_function is None
+            and tensor_inference_function is None
+            and prepared_tensor_inference_function is None
+        ):
             raise ValueError("at least one inference function is required")
         if (prompt_prepare_function is None) != (
             prepared_tensor_inference_function is None
@@ -177,9 +181,14 @@ class CloudRequestProcessor:
             )
 
         try:
+            action = (
+                "preparing prompt"
+                if frame.message_type is MessageType.PROMPT_REQUEST
+                else "running model inference"
+            )
             self._emit(
                 f"Request {frame.request_id}: received {received.wire_bytes} bytes; "
-                "running model inference"
+                f"{action}"
             )
             if frame.message_type is MessageType.TENSOR_REQUEST:
                 return self._run_tensor_inference(received)
@@ -297,7 +306,9 @@ class CloudRequestProcessor:
                 message="server pending prompt capacity is full",
             )
         prompt = cast(str, frame.metadata["prompt"])
+        started_ns = perf_counter_ns()
         prepared = prepare(prompt)
+        prompt_prepare_ms = (perf_counter_ns() - started_ns) / 1_000_000
         with self._pending_lock:
             self._pending[frame.request_id] = _PendingPrompt(
                 prompt=prompt,
@@ -312,6 +323,7 @@ class CloudRequestProcessor:
             metadata={
                 "accepted": True,
                 "model_fingerprint": self.model_fingerprint,
+                "prompt_prepare_ms": prompt_prepare_ms,
             },
         )
 

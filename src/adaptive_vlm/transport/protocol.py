@@ -265,9 +265,18 @@ def _validate_message(frame: Frame) -> None:
         _require_fingerprint(metadata)
         _require_empty_payload(frame)
     elif frame.message_type is MessageType.PROMPT_RESPONSE:
-        _require_keys(metadata, {"accepted", "model_fingerprint"})
+        _require_keys(
+            metadata, {"accepted", "model_fingerprint", "prompt_prepare_ms"}
+        )
         _require_type(metadata, "accepted", bool)
         _require_fingerprint(metadata)
+        prepare_ms = metadata.get("prompt_prepare_ms")
+        if (
+            not isinstance(prepare_ms, (int, float))
+            or isinstance(prepare_ms, bool)
+            or prepare_ms < 0
+        ):
+            raise ProtocolError("prompt_prepare_ms must be non-negative")
         _require_empty_payload(frame)
     elif frame.message_type is MessageType.TENSOR_REQUEST:
         _validate_tensor_request(frame)
