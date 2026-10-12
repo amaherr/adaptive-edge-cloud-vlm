@@ -17,6 +17,7 @@ from adaptive_vlm.config import (
     model_contract_fingerprint,
 )
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult, RequestRecord
+from adaptive_vlm.data.vqa_import import import_vqa_v2
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.environment import collect_environment
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
@@ -35,6 +36,17 @@ def build_parser() -> argparse.ArgumentParser:
         description="Edge-cloud VLM baseline tooling.",
     )
     subcommands = parser.add_subparsers(dest="command", required=True)
+
+    import_parser = subcommands.add_parser(
+        "import-vqa-v2", help="Freeze a seeded VQA v2 val2014 subset"
+    )
+    import_parser.add_argument("--questions", required=True, type=Path)
+    import_parser.add_argument("--annotations", required=True, type=Path)
+    import_parser.add_argument("--images-dir", required=True, type=Path)
+    import_parser.add_argument("--output", required=True, type=Path)
+    import_parser.add_argument("--count", type=int, default=100)
+    import_parser.add_argument("--seed", type=int, default=42)
+    import_parser.add_argument("--revision", required=True)
 
     config_parser = subcommands.add_parser("config", help="Configuration tools")
     config_commands = config_parser.add_subparsers(
@@ -142,6 +154,18 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        if args.command == "import-vqa-v2":
+            count = import_vqa_v2(
+                args.questions,
+                args.annotations,
+                args.images_dir,
+                args.output,
+                count=args.count,
+                seed=args.seed,
+                revision=args.revision,
+            )
+            print(f"Frozen {count} VQA requests at {args.output}")
+            return 0
         if args.command == "config":
             return _validate_config(args.path, args.output)
         if args.command == "environment":

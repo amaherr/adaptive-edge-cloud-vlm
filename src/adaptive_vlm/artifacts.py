@@ -6,7 +6,7 @@ import json
 import os
 import tempfile
 import uuid
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -20,6 +20,8 @@ def create_run_manifest(
     environment: Mapping[str, Any],
     *,
     now: datetime | None = None,
+    dataset_manifest_sha256: str | None = None,
+    dependency_lock_sha256: str | None = None,
 ) -> RunManifest:
     """Create the immutable metadata record for one experiment run."""
 
@@ -39,6 +41,8 @@ def create_run_manifest(
         git_dirty=dirty if isinstance(dirty, bool) else None,
         config=config.to_dict(),
         environment=environment,
+        dataset_manifest_sha256=dataset_manifest_sha256,
+        dependency_lock_sha256=dependency_lock_sha256,
     )
 
 
@@ -71,4 +75,28 @@ def append_jsonl(path: str | Path, payload: Mapping[str, Any]) -> None:
     with destination.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(payload, sort_keys=True, separators=(",", ":")))
         handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
+def write_jsonl_atomic(path: str | Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    """Write a complete JSONL file with atomic replacement."""
+
+    destination = Path(path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            for row in rows:
+                handle.write(json.dumps(row, sort_keys=True, separators=(",", ":")))
+                handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary_path.replace(destination)
+    except BaseException:
+        temporary_path.unlink(missing_ok=True)
+        raise
 
