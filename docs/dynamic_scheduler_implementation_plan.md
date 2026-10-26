@@ -1,6 +1,6 @@
 # Dynamic VLM configuration scheduler: implementation plan
 
-Status: implementation plan, based on the repository as inspected on 2026-10-25 and the supplied `dynamic_vlm_configuration_framework.md`. G0-local and G1-local passed on 2026-10-26; physical-host validation is pending. See the [Phase 0 handoff](phase0_handoff.md) and [Phase 1 handoff](phase1_handoff.md). The gates below are proposed acceptance criteria for this phase; record any threshold changes **before** running the final evaluation.
+Status: implementation plan, based on the repository as inspected on 2026-10-25 and the supplied `dynamic_vlm_configuration_framework.md`. G0-local, G1-local, and the narrow G2 local-profile check passed on 2026-10-26; controlled-network and physical-host G2 work is pending. See the [Phase 0 handoff](phase0_handoff.md), [Phase 1 handoff](phase1_handoff.md), and [Phase 2 handoff](phase2_handoff.md). The gates below are proposed acceptance criteria for this phase; record any threshold changes **before** running the final evaluation.
 
 ## 1. Baseline audit and scope
 
@@ -95,6 +95,8 @@ Each gate is checked in order. A failed gate produces an artifact explaining the
 **Internal split discovery (research branch).** Inspect the pinned Moondream computation graph and shortlist stable boundaries such as vision encoder sub-blocks, encoder output before projector, and existing projected features. For each, document tensor shape/dtype/bytes, required side inputs and skip connections, edge/cloud model partition, server handler, reconstruction fidelity and host memory. The current fixed `(729, 2048)` `ProjectedVisionFeatures` and `TENSOR_REQUEST` semantics are specific to the existing split; a new boundary needs its own validated payload contract and protocol/capability version. Do not name an internal split executable because it can be observed in a hook alone.
 
 **Gate G2.** The profiler emits versioned, hash-linked rows with no ambiguous units, no silent missing values and exact wire-byte accounting. Instrumentation overhead is measured and reported; stage accounting is reconciled against request duration with a documented residual on every successful sample. For each declared supported task/network bucket, require at least 10 successful measured trials per baseline configuration drawn from at least three distinct request IDs; all other buckets are marked uncovered. Failures remain in the raw data and failure rates are reported. Each activated new split passes tensor round-trip and end-to-end token equivalence on the correctness manifest and fits payload/memory limits. Otherwise the V1 registry remains at three candidates.
+
+**Current check:** the single-host 4×4 fixture/short-prompt/loopback bucket meets the local sample, provenance, byte, residual and equivalence checks (12 successful measured trials per configuration). Its network state is explicitly uncontrolled, its timing-wrapper overhead probe is CPU-only, and its CPU RSS values are after-request snapshots. The full controlled-network/physical-host gate is open; see the [Phase 2 handoff](phase2_handoff.md).
 
 ### Phase 3 — Build and calibrate a simple predictor
 

@@ -335,6 +335,8 @@ The [Phase 0 handoff](docs/phase0_handoff.md) records a fresh three-policy local
 
 The [Phase 1 handoff](docs/phase1_handoff.md) records a resident three-policy localhost campaign through the new manual dispatcher and dual-path server. All 36 request/configuration results completed, all 12 request triples matched, and each matched the Phase 0 edge tokens. The report includes the observed client and server memory footprint; it is not a dynamic scheduling or physical-host performance result.
 
+The [Phase 2 handoff](docs/phase2_handoff.md) documents per-stage timing and exact-byte instrumentation, the validated profile command, and a fresh local Moondream campaign. The local profile has 12/12 measured successes per configuration, 12/12 matching token triples, and zero negative accounting residuals. Its declared loopback condition is uncontrolled; the physical-host and controlled-network G2 checks remain pending.
+
 On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 12-request synthetic manifest with one excluded warm-up per policy. All three modes completed 12/12 measured requests, and the local `artifacts/chunk6/correctness-comparison.json` audit reported **12/12 identical token sequences and decoded texts**, zero failures, and a fixture exact-match score of 3/9 scored prompts in each policy. G1 projected-feature equivalence and G2 tensor serialization checks also passed in earlier focused tests. A fake-adapter 100-request fixture run completed 100/100 measured attempts after 10 warm-ups.
 
 | Policy | Median observed request time | Mean application wire bytes | Fixture score |

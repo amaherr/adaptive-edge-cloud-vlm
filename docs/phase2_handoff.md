@@ -9,7 +9,23 @@ Date: 2026-10-26 (Africa/Cairo). Phase 2 follows the [implementation plan](dynam
 - The benchmark now timestamps every attempt. `profile-runs` validates complete matching schedules, raw trial provenance, model/config/manifest and image hashes, exact prompt/output counts, client/server request bytes, and payload bounds. It emits versioned rows containing measured successes, warmups, failures, stage residuals, null reasons, memory readings, output hashes and raw metrics. Its summary reports sample coverage, failure rates and cross-configuration equality.
 - The [profile schema](phase2_profile_schema.md) defines every timing boundary and limitation. The [split inspection](phase2_split_feasibility.md) identifies possible vision/text boundaries in the pinned graph. None passed the new tensor-contract and end-to-end equivalence gate, so the executable registry remains the three Phase 1 configurations.
 
-Implementation commits: `624d3f8`, `119be9c`, `28d9e2b`, `61a2066`, and `e2fad49`. The run artifacts preserve their own Git commit and dirty flag; profile rows link their run manifests and the pinned model/dataset hashes.
+Implementation was checkpointed regularly from `624d3f8` through `187ca7a` (see `git log --oneline 624d3f8^..187ca7a`). The run artifacts preserve their own Git commit and dirty flag; profile rows link their run manifests and the pinned model/dataset hashes.
+
+## Local campaign evidence
+
+The [profile summary](../artifacts/phase2/2026-10-26/local-1/profile/summary.json) reports `local_gate_passed=true` for the one declared 4×4 fixture/short-prompt/loopback bucket and `controlled_network_gate_passed=false`. There are 39 rows: three excluded warmups and 36 measured results. Each configuration has 12/12 successful measured trials across 12 distinct request IDs, zero failures, and no negative stage or transport residual. Every successful three-way trial has matching prompt-token count and output-token hash. The independent [comparison](../artifacts/phase2/2026-10-26/local-1/comparison.json) reports 12/12 exact token and text matches, and each configuration's 12 measured token sequences also match the Phase 0 edge reference.
+
+| Local CPU configuration | Median observed request | Median stage residual | Largest observed post-request process RSS | Median full request bytes |
+| --- | ---: | ---: | ---: | ---: |
+| Edge/full | 27.657 s | 2.356 ms | 4,451 MiB edge | No network request |
+| Cloud/raw image | 28.293 s | 0.744 ms | 4,870 MiB cloud | 526.5 B |
+| Distributed/projected synchronous | 29.333 s | 2.429 ms | 1,604 MiB edge; 4,825 MiB cloud | 2,986,434.5 B |
+
+The prompt input length was 9–13 exact tokens, median 11. The projected payload is exactly 2,985,984 bytes in every split row, with additional framing and metadata bytes recorded separately. The no-op CPU timing-wrapper estimate in the final summary is 0.000673 ms per call. The median cloud transport residual is 3.458 ms; the split residual is 16.591 ms and includes transfer/framing on localhost. These times are descriptive observations under one WSL host, **not** a network-performance ranking. The reported RSS values are snapshots after each request, not isolated per-request peaks.
+
+The [archive](../artifacts/phase2/2026-10-26/local-1.tar.gz) contains the three raw runs, final profile, comparison, specification, and [per-file hashes](../artifacts/phase2/2026-10-26/local-1/file_hashes.json). Archive SHA-256: `b995bf01874725d8f6d0d89dea8b6194d6107755e685fc07a4038f088daed1f2`. The profile specification SHA-256 is `8c194ed46b5752bf4a5c8af5ead19fb1be082803f4f7e6fdf8b8207254402f8e`, model contract `e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1`, and dataset manifest `c5bc9df4a010dcefbcbb7fd60c9dd1e47dc0e0cf798acff579a1a004006ce8d1`.
+
+Ruff, strict mypy, and the complete test suite passed (`135 passed`, zero skipped with loopback access). The cloud and edge run manifests truthfully show `git_dirty=true` because profile tooling/documentation was being edited while their inference processes ran. The distributed run started clean. The measured inference path had already been committed as `624d3f8` and was not modified during the campaign. A clean-tree rerun is advisable before publication-quality latency claims.
 
 ## How to reproduce and view the local results
 
