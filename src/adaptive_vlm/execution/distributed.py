@@ -126,6 +126,9 @@ class DistributedExecutionPolicy(ExecutionPolicy):
             {
                 "tensor_serialization_ms": serialization_ms,
                 "network_round_trip_ms": network_round_trip_ms,
+                "network_connect_ms": exchange.connect_ms,
+                "network_send_ms": exchange.send_ms,
+                "network_receive_ms": exchange.receive_ms,
                 "client_end_to_end_ms": (
                     perf_counter_ns() - started_ns
                 )

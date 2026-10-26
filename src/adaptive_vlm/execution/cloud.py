@@ -41,8 +41,10 @@ class CloudExecutionPolicy(ExecutionPolicy):
         return check_remote_capabilities(self._transport, self._model)
 
     def infer(self, request: InferenceRequest) -> InferenceResult:
-        image = request.image_path.read_bytes()
         started_ns = perf_counter_ns()
+        image = request.image_path.read_bytes()
+        image_read_ms = (perf_counter_ns() - started_ns) / 1_000_000
+        exchange_started_ns = perf_counter_ns()
         exchange = exchange_frame(
             self._transport,
             Frame(
@@ -57,7 +59,9 @@ class CloudExecutionPolicy(ExecutionPolicy):
                 payload=image,
             )
         )
-        client_end_to_end_ms = (perf_counter_ns() - started_ns) / 1_000_000
+        network_round_trip_ms = (
+            perf_counter_ns() - exchange_started_ns
+        ) / 1_000_000
         remote = parse_inference_response(
             exchange,
             request_id=request.request_id,
@@ -66,10 +70,17 @@ class CloudExecutionPolicy(ExecutionPolicy):
         metrics: dict[str, MetricValue] = dict(remote.metrics)
         metrics.update(
             {
-                "client_end_to_end_ms": client_end_to_end_ms,
+                "client_end_to_end_ms": (
+                    perf_counter_ns() - started_ns
+                ) / 1_000_000,
+                "image_read_ms": image_read_ms,
+                "network_round_trip_ms": network_round_trip_ms,
                 "request_wire_bytes": exchange.request_wire_bytes,
                 "response_wire_bytes": exchange.response_wire_bytes,
                 "image_bytes": len(image),
+                "network_connect_ms": exchange.connect_ms,
+                "network_send_ms": exchange.send_ms,
+                "network_receive_ms": exchange.receive_ms,
             }
         )
         return InferenceResult(

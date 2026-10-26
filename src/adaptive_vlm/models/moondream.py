@@ -33,6 +33,25 @@ class MoondreamRun:
 
 
 @dataclass(frozen=True)
+class _GenerationTrace:
+    token_ids: tuple[int, ...]
+    prompt_tokens: int
+    prompt_prepare_ms: float
+    prompt_prefill_ms: float
+    decode_ms: float
+    decode_steps: int
+
+    def metrics(self) -> dict[str, MetricValue]:
+        return {
+            "prompt_tokens": self.prompt_tokens,
+            "prompt_prepare_ms": self.prompt_prepare_ms,
+            "prompt_prefill_ms": self.prompt_prefill_ms,
+            "decode_ms": self.decode_ms,
+            "decode_steps": self.decode_steps,
+        }
+
+
+@dataclass(frozen=True)
 class _RuntimeModules:
     torch: Any
     image: Any
@@ -200,6 +219,7 @@ class MoondreamAdapter(ModelAdapter):
             self._synchronize_all()
             started_ns = perf_counter_ns()
             image = self._open_image(request.image_path)
+            image_width, image_height = image.size
             projected, metrics = self._encode_projected(image)
             self._synchronize_all()
             metrics.update(
@@ -213,6 +233,8 @@ class MoondreamAdapter(ModelAdapter):
                     "projected_dtype": projected.dtype,
                     "projected_source_device": projected.device,
                     "projected_nbytes": projected.nbytes,
+                    "image_width": image_width,
+                    "image_height": image_height,
                     **self._memory_metrics(rss_before),
                 }
             )
@@ -256,12 +278,14 @@ class MoondreamAdapter(ModelAdapter):
                 ),
                 synchronize=self._synchronizer(self._text_device),
             )
-            token_ids = generation.value
+            trace = generation.value
+            token_ids = trace.token_ids
             self._synchronize_all()
             metrics: dict[str, MetricValue] = {
                 "feature_transfer_ms": transferred.elapsed_ms,
                 "image_prefill_ms": image_prefill.elapsed_ms,
                 "language_generation_ms": generation.elapsed_ms,
+                **trace.metrics(),
                 "cloud_text_end_to_end_ms": (
                     perf_counter_ns() - started_ns
                 )
@@ -328,6 +352,7 @@ class MoondreamAdapter(ModelAdapter):
             self._synchronize_all()
             started_ns = perf_counter_ns()
             image = self._open_image(request.image_path)
+            image_width, image_height = image.size
 
             projected, metrics = self._encode_projected(image)
             transferred = measure_call(
@@ -350,8 +375,10 @@ class MoondreamAdapter(ModelAdapter):
                 ),
                 synchronize=self._synchronizer(self._text_device),
             )
-            token_ids = generation.value
+            trace = generation.value
+            token_ids = trace.token_ids
             metrics["language_generation_ms"] = generation.elapsed_ms
+            metrics.update(trace.metrics())
 
             self._synchronize_all()
             metrics["end_to_end_ms"] = (perf_counter_ns() - started_ns) / 1_000_000
@@ -366,6 +393,8 @@ class MoondreamAdapter(ModelAdapter):
                 }
             )
             metrics["output_tokens"] = len(token_ids)
+            metrics["image_width"] = image_width
+            metrics["image_height"] = image_height
             metrics.update(self._memory_metrics(rss_before))
 
             result = InferenceResult(
@@ -390,6 +419,7 @@ class MoondreamAdapter(ModelAdapter):
             self._synchronize_all()
             started_ns = perf_counter_ns()
             image = self._open_image(request.image_path)
+            image_width, image_height = image.size
             captured: list[Any] = []
             original = self._core._run_vision_encoder
 
@@ -420,13 +450,17 @@ class MoondreamAdapter(ModelAdapter):
                 lambda: self._generate_token_ids(request.prompt, encoded.value.pos),
                 synchronize=self._synchronizer(self._text_device),
             )
-            token_ids = generation.value
+            trace = generation.value
+            token_ids = trace.token_ids
             self._synchronize_all()
             metrics: dict[str, MetricValue] = {
                 "image_encode_and_prefill_ms": encoded.elapsed_ms,
                 "language_generation_ms": generation.elapsed_ms,
+                **trace.metrics(),
                 "end_to_end_ms": (perf_counter_ns() - started_ns) / 1_000_000,
                 "output_tokens": len(token_ids),
+                "image_width": image_width,
+                "image_height": image_height,
                 "projected_visual_tokens": projected.shape[0],
                 "projected_hidden_size": projected.shape[1],
                 "projected_dtype": projected.dtype,
@@ -573,9 +607,10 @@ class MoondreamAdapter(ModelAdapter):
         position: int,
         *,
         prepared_prompt_ids: tuple[int, ...] | None = None,
-    ) -> tuple[int, ...]:
+    ) -> _GenerationTrace:
         torch = self._runtime.torch
         tokenizer_config = self._core.config.tokenizer
+        prepare_started_ns = perf_counter_ns()
         prompt_ids = (
             prepared_prompt_ids
             if prepared_prompt_ids is not None
@@ -584,15 +619,20 @@ class MoondreamAdapter(ModelAdapter):
         prompt_tensor = torch.tensor(
             [prompt_ids], device=self._text_device, dtype=torch.long
         )
-        _, _, next_token, position = self._core._prefill_prompt(
-            prompt_tensor,
-            position,
-            0.0,
-            1.0,
-            None,
-            attn_mask=self._core.attn_mask,
-            lora=None,
+        prompt_prepare_ms = (perf_counter_ns() - prepare_started_ns) / 1_000_000
+        prefill = measure_call(
+            lambda: self._core._prefill_prompt(
+                prompt_tensor,
+                position,
+                0.0,
+                1.0,
+                None,
+                attn_mask=self._core.attn_mask,
+                lora=None,
+            ),
+            synchronize=self._synchronizer(self._text_device),
         )
+        _, _, next_token, position = prefill.value
 
         mask = torch.zeros(
             1,
@@ -607,7 +647,8 @@ class MoondreamAdapter(ModelAdapter):
         )
         generated: list[int] = []
         eos_id = tokenizer_config.eos_id
-
+        decode_started_ns = perf_counter_ns()
+        decode_steps = 0
         while (
             int(next_token.item()) != eos_id
             and len(generated) < self._config.max_new_tokens
@@ -624,11 +665,22 @@ class MoondreamAdapter(ModelAdapter):
                 position_ids,
                 None,
             )
+            decode_steps += 1
             logits[:, tokenizer_config.answer_id] = float("-inf")
             position += 1
             next_token = torch.argmax(logits, dim=-1).unsqueeze(1)
 
-        return tuple(generated)
+        synchronize = self._synchronizer(self._text_device)
+        if synchronize is not None:
+            synchronize()
+        return _GenerationTrace(
+            token_ids=tuple(generated),
+            prompt_tokens=len(prompt_ids),
+            prompt_prepare_ms=prompt_prepare_ms,
+            prompt_prefill_ms=prefill.elapsed_ms,
+            decode_ms=(perf_counter_ns() - decode_started_ns) / 1_000_000,
+            decode_steps=decode_steps,
+        )
 
     def _validate_request(self, request: InferenceRequest) -> None:
         if not request.image_path.is_file():
