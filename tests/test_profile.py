@@ -143,3 +143,17 @@ def test_profile_rejects_incomplete_schedule(tmp_path: Path) -> None:
         build_profile(
             run_dirs=dirs, specification=spec, output_dir=tmp_path / "profile"
         )
+
+
+def test_controlled_network_requires_hashed_evidence(tmp_path: Path) -> None:
+    dirs, original = _campaign(tmp_path)
+    spec = json.loads(original.read_text())
+    spec["network_state"].update(
+        controlled=True, uplink_bps=1_000_000, downlink_bps=1_000_000, rtt_ms=5
+    )
+    path = tmp_path / "controlled.json"
+    path.write_text(json.dumps(spec))
+    with pytest.raises(ValueError, match="measurement evidence hash"):
+        build_profile(
+            run_dirs=dirs, specification=path, output_dir=tmp_path / "profile"
+        )

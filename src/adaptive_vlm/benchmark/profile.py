@@ -12,6 +12,7 @@ from time import perf_counter_ns
 from typing import Any, cast
 
 from adaptive_vlm.artifacts import write_json_atomic
+from adaptive_vlm.benchmark.runner import make_schedule
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.measurement import measure_call
 
@@ -126,8 +127,16 @@ def build_profile(
             if not isinstance(value, (int, float)) or value <= 0:
                 raise ValueError(f"controlled network requires positive {name}")
         evidence = network.get("measurement_evidence_sha256")
-        if not isinstance(evidence, str) or len(evidence) != 64:
+        evidence_path = network.get("measurement_evidence_path")
+        if (
+            not isinstance(evidence, str)
+            or len(evidence) != 64
+            or not isinstance(evidence_path, str)
+        ):
             raise ValueError("controlled network requires measurement evidence hash")
+        source = (specification.parent / evidence_path).resolve(strict=True)
+        if hashlib.sha256(source.read_bytes()).hexdigest() != evidence:
+            raise ValueError("controlled network measurement evidence hash differs")
     if not network["controlled"] and any(
         network.get(name) is not None
         for name in ("uplink_bps", "downlink_bps", "rtt_ms")
@@ -164,6 +173,23 @@ def build_profile(
     )
     if frozen.sha256 != reference["dataset_manifest_sha256"]:
         raise ValueError("frozen manifest hash differs from benchmark plan")
+    planned = reference["schedule"]
+    warmups = sum(bool(trial["warmup"]) for trial in planned)
+    repetitions = (
+        max(
+            (int(trial["repetition"]) for trial in planned if not trial["warmup"]),
+            default=-1,
+        )
+        + 1
+    )
+    expected_schedule = make_schedule(
+        frozen,
+        warmups=warmups,
+        repetitions=repetitions,
+        seed=int(config["runtime"]["seed"]),
+    )
+    if planned != [trial.to_dict() for trial in expected_schedule]:
+        raise ValueError("benchmark schedule differs from frozen seeded schedule")
     items = {item.request_id: item for item in frozen.items}
     rows_out: list[dict[str, Any]] = []
     for plan, run_manifest, rows in runs:
