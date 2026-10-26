@@ -40,12 +40,13 @@ testpaths = ["tests"]
 [tool.coverage.run]
 branch = true
 source = ["adaptive_vlm"]
-omit = ["src/adaptive_vlm/models/moondream.py"]
+omit = ["*/adaptive_vlm/models/moondream.py"]
 
 [tool.coverage.report]
 fail_under = 80
 show_missing = true
 skip_covered = true
+omit = ["*/adaptive_vlm/models/moondream.py"]
 
 [tool.ruff]
 line-length = 88

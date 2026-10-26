@@ -97,9 +97,7 @@ def load_adaptive_replay(
     }:
         raise ValueError("replay task bucket has no calibration")
     task_types = {item.task_type for item in manifest.items}
-    if len(task_types) != 1:
-        raise ValueError("one adaptive campaign must have one task type")
-    if "task_type" in replay and replay["task_type"] not in task_types:
+    if "task_type" in replay and task_types != {replay["task_type"]}:
         raise ValueError("replay task type differs from frozen manifest")
     if (
         manifest.source == "vqa-v2-val2014"
