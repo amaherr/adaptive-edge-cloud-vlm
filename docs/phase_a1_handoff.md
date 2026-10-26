@@ -16,9 +16,9 @@ Date: 2026-10-27 (Africa/Cairo). This implements only Phase A1 of the [physical 
 | Strict mypy | Passed, 54 source files |
 | Pytest | 185 passed |
 | Branch-aware coverage | **80.54%**, threshold 80% |
-| GitHub CI | Remote run pending |
+| GitHub CI | [Passed on implementation commit `6a8f9fa`](https://github.com/amaherr/adaptive-edge-cloud-vlm/actions/runs/40403134849) |
 
-The initial local run measured 75.73% because the configured model-adapter omission did not carry through to the coverage report; applying the intended omission to that same baseline measured 79.12%, consistent with the roadmap's approximately 79.15% failure. Focused replay tests and the CLI boundary test then brought the final local figure to 80.54%. The [machine-readable coverage result](../artifacts/phase_a1/2026-10-27/coverage.json) is Git-ignored. The local environment uses Python 3.12; GitHub CI is configured for Python 3.11, so a remote green run is still required before declaring the whole A1 gate closed.
+The initial local run measured 75.73% because the configured model-adapter omission did not carry through to the coverage report; applying the intended omission to that same baseline measured 79.12%, consistent with the roadmap's approximately 79.15% failure. Focused replay tests and the CLI boundary test then brought the final local figure to 80.54%. The [machine-readable coverage result](../artifacts/phase_a1/2026-10-27/coverage.json) is Git-ignored. The local environment uses Python 3.12; the linked GitHub CI run verified the pushed implementation commit under its configured Python 3.11 job. **Gate A1 is closed.**
 
 ## Run and inspect
 
@@ -36,4 +36,4 @@ The pytest footer reports the coverage gate and test count. The coverage JSON co
 
 ## Remaining before Phase A2
 
-GitHub CI must run green on this code. The configured `gh` account currently reports an invalid token, so remote status could not yet be verified. Phase A2 requires a separate deliberate baseline commit/SHA after the CI result; no physical-hardware inventory, model change or network experiment was started in A1.
+Phase A2 requires a separate deliberate baseline commit/SHA after this green CI result; no physical-hardware inventory, model change or network experiment was started in A1.
