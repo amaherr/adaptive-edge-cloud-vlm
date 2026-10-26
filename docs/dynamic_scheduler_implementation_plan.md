@@ -1,6 +1,6 @@
 # Dynamic VLM configuration scheduler: implementation plan
 
-Status: implementation plan, based on the repository as inspected on 2026-10-25 and the supplied `dynamic_vlm_configuration_framework.md`. The gates below are proposed acceptance criteria for this phase; record any threshold changes **before** running the final evaluation.
+Status: implementation plan, based on the repository as inspected on 2026-10-25 and the supplied `dynamic_vlm_configuration_framework.md`. G0-local passed on 2026-10-26; G0-physical is pending. See the [Phase 0 handoff](phase0_handoff.md). The gates below are proposed acceptance criteria for this phase; record any threshold changes **before** running the final evaluation.
 
 ## 1. Baseline audit and scope
 

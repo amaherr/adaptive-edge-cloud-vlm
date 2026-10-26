@@ -315,6 +315,8 @@ The actual cloud host, real-link G4 correctness, network-condition campaign, and
 
 ## Results and limitations
 
+The [Phase 0 handoff](docs/phase0_handoff.md) records a fresh three-policy localhost CPU correctness campaign, its input hashes, passing gates, reproducible runner, and local artifact paths. All 12 measured requests passed in each policy and the comparison found 12/12 matching token sequences. The separate physical cloud host is still unavailable, so the physical-host gate remains pending. These are correctness observations, not controlled performance estimates.
+
 On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 12-request synthetic manifest with one excluded warm-up per policy. All three modes completed 12/12 measured requests, and the local `artifacts/chunk6/correctness-comparison.json` audit reported **12/12 identical token sequences and decoded texts**, zero failures, and a fixture exact-match score of 3/9 scored prompts in each policy. G1 projected-feature equivalence and G2 tensor serialization checks also passed in earlier focused tests. A fake-adapter 100-request fixture run completed 100/100 measured attempts after 10 warm-ups.
 
 | Policy | Median observed request time | Mean application wire bytes | Fixture score |
