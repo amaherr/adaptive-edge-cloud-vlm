@@ -371,6 +371,8 @@ CPU-only CI runs Ruff, strict mypy, and pytest with an 80% coverage threshold wi
 
 Run `adaptive-vlm --help` or `adaptive-vlm COMMAND --help` for machine-readable, version-matched usage. This table covers the current public commands; bracketed flags are optional.
 
+The parser and command routing live in `cli.py`; command execution lives in [`commands/`](src/adaptive_vlm/commands). The [CLI refactor handoff](docs/cli_refactor_handoff.md) maps each workflow to its module and records verification. The public command names and flags are unchanged.
+
 | Command | Required arguments | Optional arguments and defaults |
 | --- | --- | --- |
 | `config validate` | `PATH` | `--output PATH` writes resolved JSON; it is always printed. |
@@ -463,8 +465,8 @@ configs/model/                     VLM and artifact contract; fake adapter setti
 configs/hardware/                  Edge, localhost cloud, and pending cloud inventories
 configs/experiments/               Runnable smoke, local, shared benchmark, and templates
 data/manifests/                    Frozen synthetic correctness and benchmark requests
-src/adaptive_vlm/cli.py            Public commands and policy/server wiring
-src/adaptive_vlm/commands/        Extracted CLI orchestration (adaptive benchmark first)
+src/adaptive_vlm/cli.py            Argument parsing, routing, and common CLI errors
+src/adaptive_vlm/commands/        Benchmark, adaptive, evaluation, VQA, inference, and server commands
 src/adaptive_vlm/models/moondream.py  Pinned full, vision-only, and text-only adapter
 src/adaptive_vlm/execution/        Edge, cloud, and distributed execution policies
 src/adaptive_vlm/scheduler/        Phase 1 configuration, state, capability, and manual decision contracts
