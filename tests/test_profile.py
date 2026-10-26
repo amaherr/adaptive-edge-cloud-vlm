@@ -58,6 +58,8 @@ class ProfileFixturePolicy(ExecutionPolicy):
                     projected_payload_bytes=729 * 2048 * 2,
                     edge_vision_end_to_end_ms=0.000001,
                     tensor_serialization_ms=0.000001,
+                    image_width=16,
+                    image_height=16,
                 )
         return InferenceResult(request.request_id, "red", (1,), metrics)
 
@@ -117,6 +119,13 @@ def test_profile_validates_and_retains_failures(tmp_path: Path) -> None:
     assert cloud["fields"]["prompt_tokens"] == 12
     assert cloud["task_type"] is None
     assert cloud["null_reasons"]["task_type"] == "not_recorded_in_frozen_manifest"
+    split = next(
+        row
+        for row in rows
+        if row["configuration_id"] == "distributed/projected/synchronous"
+        and row["status"] == "ok"
+    )
+    assert split["fields"]["image_width"] == 16
     with pytest.raises(FileExistsError):
         build_profile(
             run_dirs=dirs, specification=spec, output_dir=tmp_path / "profile"

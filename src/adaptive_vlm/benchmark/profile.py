@@ -216,8 +216,16 @@ def build_profile(
                 "output_tokens",
             )
             if success and config["model"]["adapter"] == "moondream2":
-                for name in (*required, "image_width", "image_height"):
+                for name in required:
                     if _metric(metrics, name, remote=remote) is None:
+                        raise ValueError(f"missing {name}: {row['trial_id']}")
+                for name in ("image_width", "image_height"):
+                    image_value = (
+                        metrics.get(name)
+                        if mode == "distributed"
+                        else _metric(metrics, name, remote=remote)
+                    )
+                    if image_value is None:
                         raise ValueError(f"missing {name}: {row['trial_id']}")
             exchange_ms = metrics.get("network_round_trip_ms") if success else None
             server_ms = metrics.get("server_total_ms") if success else None
@@ -314,8 +322,12 @@ def build_profile(
             )
             observed = float(row["observed_end_to_end_ms"])
             fields: dict[str, Any] = {
-                "image_width": _metric(metrics, "image_width", remote=remote),
-                "image_height": _metric(metrics, "image_height", remote=remote),
+                "image_width": metrics.get("image_width")
+                if mode == "distributed"
+                else _metric(metrics, "image_width", remote=remote),
+                "image_height": metrics.get("image_height")
+                if mode == "distributed"
+                else _metric(metrics, "image_height", remote=remote),
                 "image_bytes": item.image_path.stat().st_size,
                 "prompt_tokens": _metric(metrics, "prompt_tokens", remote=remote),
                 "actual_output_tokens": len(token_ids) if success else None,
