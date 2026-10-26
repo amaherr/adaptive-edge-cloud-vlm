@@ -34,6 +34,13 @@ class AdaptiveExecution:
     error: Exception | None
     selection_overhead_ms: float
     retry_overhead_ms: float
+    monitor_overhead_ms: float = 0.0
+
+
+@dataclass(frozen=True)
+class RegistrySnapshot:
+    registry: CapabilityRegistry
+    monitoring: dict[str, Any]
 
 
 def execute_adaptive_request(
@@ -45,7 +52,7 @@ def execute_adaptive_request(
     healthy: Mapping[ConfigurationId, bool],
     constraints: SelectionConstraints,
     predictor: Predictor,
-    registry_provider: Callable[[], CapabilityRegistry],
+    registry_provider: Callable[[], CapabilityRegistry | RegistrySnapshot],
     allow_safe_retry: bool = True,
 ) -> AdaptiveExecution:
     """Hold each choice stable through inference and retry only before send.
@@ -61,9 +68,22 @@ def execute_adaptive_request(
     excluded: set[ConfigurationId] = set()
     total_selection_ms = 0.0
     retry_overhead_ms = 0.0
+    monitor_overhead_ms = 0.0
     for attempt_index in range(2 if allow_safe_retry else 1):
         selection_start = perf_counter_ns()
-        registry = registry_provider()
+        registry_result = registry_provider()
+        registry = (
+            registry_result.registry
+            if isinstance(registry_result, RegistrySnapshot)
+            else registry_result
+        )
+        monitoring = (
+            registry_result.monitoring
+            if isinstance(registry_result, RegistrySnapshot)
+            else None
+        )
+        if monitoring is not None:
+            monitor_overhead_ms += float(monitoring["sampling_overhead_ms"])
         snapshots = tuple(
             CandidateSnapshot(
                 spec.id,
@@ -90,6 +110,8 @@ def execute_adaptive_request(
             "execution_ms": 0.0,
             "status": "not_started",
         }
+        if monitoring is not None:
+            attempt["monitoring"] = monitoring
         attempts.append(attempt)
         if selected is None:
             attempt["status"] = "no_feasible_candidate"
@@ -100,6 +122,7 @@ def execute_adaptive_request(
                 ValueError("no feasible candidate"),
                 total_selection_ms,
                 retry_overhead_ms,
+                monitor_overhead_ms,
             )
         configuration_id = ConfigurationId(selected)
         execution_start = perf_counter_ns()
@@ -128,6 +151,7 @@ def execute_adaptive_request(
                 exc,
                 total_selection_ms,
                 retry_overhead_ms,
+                monitor_overhead_ms,
             )
         attempt["execution_ms"] = (perf_counter_ns() - execution_start) / 1_000_000
         attempt["status"] = "ok"
@@ -138,5 +162,6 @@ def execute_adaptive_request(
             None,
             total_selection_ms,
             retry_overhead_ms,
+            monitor_overhead_ms,
         )
     raise AssertionError("adaptive retry loop exhausted unexpectedly")

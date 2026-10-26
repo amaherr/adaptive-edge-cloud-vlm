@@ -1,0 +1,209 @@
+{
+  "calibration_id": "2e0e3f84126ad35a1ce249c849524206c7a4289f39d0562849478710e21a7c86",
+  "campaign_id": "phase6-synthetic-controlled-v1",
+  "constraints": {},
+  "max_probe_age_ms": 100.0,
+  "noisy_segment_id": "constant-fast",
+  "samples": [
+    {
+      "expected_configuration_id": "edge/full",
+      "monitoring": {
+        "age_ms": 0,
+        "error": null,
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": true,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 1000000.0
+      },
+      "sample_id": "slow",
+      "segment": "slow",
+      "warmup": false
+    },
+    {
+      "expected_configuration_id": "distributed/projected/synchronous",
+      "monitoring": {
+        "age_ms": 0,
+        "error": null,
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": true,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 100000000.0
+      },
+      "sample_id": "fast",
+      "segment": "fast",
+      "warmup": false
+    },
+    {
+      "expected_configuration_id": "distributed/projected/synchronous",
+      "monitoring": {
+        "age_ms": 0,
+        "error": null,
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": true,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 90000000.0
+      },
+      "sample_id": "noisy-warmup",
+      "segment": "constant-fast",
+      "warmup": true
+    },
+    {
+      "expected_configuration_id": "distributed/projected/synchronous",
+      "monitoring": {
+        "age_ms": 0,
+        "error": null,
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": true,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 85000000.0
+      },
+      "sample_id": "noisy-1",
+      "segment": "constant-fast",
+      "warmup": false
+    },
+    {
+      "expected_configuration_id": "distributed/projected/synchronous",
+      "monitoring": {
+        "age_ms": 0,
+        "error": null,
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": true,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 100000000.0
+      },
+      "sample_id": "noisy-2",
+      "segment": "constant-fast",
+      "warmup": false
+    },
+    {
+      "expected_configuration_id": "distributed/projected/synchronous",
+      "monitoring": {
+        "age_ms": 0,
+        "error": null,
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": true,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 95000000.0
+      },
+      "sample_id": "noisy-3",
+      "segment": "constant-fast",
+      "warmup": false
+    },
+    {
+      "expected_configuration_id": "edge/full",
+      "monitoring": {
+        "age_ms": 200,
+        "error": null,
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": true,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 100000000.0
+      },
+      "sample_id": "stale",
+      "segment": "stale",
+      "warmup": false
+    },
+    {
+      "expected_configuration_id": "edge/full",
+      "monitoring": {
+        "age_ms": 0,
+        "error": "timeout",
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": false,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 100000000.0
+      },
+      "sample_id": "probe-failed",
+      "segment": "failed",
+      "warmup": false
+    },
+    {
+      "edge_memory_budget_mib": 500.0,
+      "expected_configuration_id": null,
+      "monitoring": {
+        "age_ms": 0,
+        "error": "timeout",
+        "health_probe_rtt_ms": 2.0,
+        "health_ready": false,
+        "passive_uplink_application_bps": null,
+        "sampled_at_utc": "2026-10-26T00:00:00Z"
+      },
+      "network_state": {
+        "bucket_id": "controlled-fixture",
+        "downlink_bps": 100000000.0,
+        "rtt_ms": 10.0,
+        "source": "synthetic_replay",
+        "uplink_bps": 100000000.0
+      },
+      "sample_id": "memory-unknown",
+      "segment": "unsafe-memory",
+      "warmup": false
+    }
+  ],
+  "schema_version": 1,
+  "task": {
+    "expected_output_tokens": null,
+    "image_bytes": 208,
+    "image_height": 4,
+    "image_width": 4,
+    "prompt_tokens": 11,
+    "requested_max_new_tokens": 32,
+    "task_bucket": "correctness-fixtures-all-prompts-32-token-budget"
+  }
+}

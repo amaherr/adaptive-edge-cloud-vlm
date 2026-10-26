@@ -83,6 +83,11 @@ def analyze_adaptive_run(
     selection_overheads: list[float] = []
     wire_bytes: dict[str, list[int]] = {spec.id.value: [] for spec in CONFIGURATIONS}
     retry_count = 0
+    monitor_overheads: list[float] = []
+    monitor_fractions: list[float] = []
+    probe_failures = 0
+    passive_updates = 0
+    live_monitor = plan.get("monitor_config", {}).get("mode") == "live"
     for trial_id, trial in expected.items():
         row = adaptive_rows[trial_id]
         if any(
@@ -122,6 +127,34 @@ def analyze_adaptive_run(
                 spec.id.value for spec in CONFIGURATIONS
             }:
                 trace_errors.append(trial_id)
+            if live_monitor:
+                monitoring = attempt.get("monitoring")
+                if not isinstance(monitoring, dict) or not monitoring.get(
+                    "sampled_at_utc"
+                ):
+                    trace_errors.append(trial_id)
+                    continue
+                if monitoring.get("error") is not None and not trial["warmup"]:
+                    probe_failures += 1
+                chosen = attempt["decision"].get("selected_configuration_id")
+                if chosen in {
+                    "cloud/raw_image",
+                    "distributed/projected/synchronous",
+                } and (
+                    not monitoring.get("remote_ready")
+                    or monitoring.get("health_ready") is not True
+                    or monitoring.get("age_ms", float("inf"))
+                    > plan["monitor_config"]["max_age_ms"]
+                ):
+                    trace_errors.append(trial_id)
+                budget = monitoring.get("edge_memory_budget_mib")
+                required = monitoring.get("edge_required_peak_mib")
+                if (
+                    chosen in {"edge/full", "distributed/projected/synchronous"}
+                    and budget is not None
+                    and (required is None or required > budget)
+                ):
+                    trace_errors.append(trial_id)
         if attempts and (
             abs(
                 row.get("selection_overhead_ms", -1)
@@ -145,6 +178,14 @@ def analyze_adaptive_run(
             continue
         if trial["warmup"]:
             continue
+        if live_monitor:
+            monitor_ms = float(row.get("monitor_overhead_ms", -1))
+            if monitor_ms < 0 or monitor_ms > row["observed_end_to_end_ms"]:
+                trace_errors.append(trial_id)
+            else:
+                monitor_overheads.append(monitor_ms)
+                monitor_fractions.append(monitor_ms / row["observed_end_to_end_ms"])
+            passive_updates += row.get("passive_updated") is True
         selected_counts[selected] += 1
         spec = next(
             (item for item in CONFIGURATIONS if item.id.value == selected), None
@@ -222,6 +263,14 @@ def analyze_adaptive_run(
         "wire_bytes_mean_by_configuration": {
             key: mean(values) if values else None for key, values in wire_bytes.items()
         },
+        "monitor_overhead_ms_median": (
+            median(monitor_overheads) if monitor_overheads else None
+        ),
+        "monitor_overhead_fraction_median": (
+            median(monitor_fractions) if monitor_fractions else None
+        ),
+        "monitor_probe_failures": probe_failures if live_monitor else None,
+        "passive_updates": passive_updates if live_monitor else None,
         "same_placement_token_mismatches": token_mismatches,
         "placement_mismatch_trials": placement_mismatches,
         "unavailable_control_trials": missing_controls,

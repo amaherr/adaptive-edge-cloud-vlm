@@ -10,6 +10,7 @@ import pytest
 from adaptive_vlm.artifacts import create_run_manifest
 from adaptive_vlm.benchmark.adaptive_analysis import analyze_adaptive_run
 from adaptive_vlm.benchmark.adaptive_runner import run_adaptive_benchmark
+from adaptive_vlm.benchmark.monitor_eval import analyze_monitor_run
 from adaptive_vlm.benchmark.runner import run_benchmark
 from adaptive_vlm.config import (
     ExecutionMode,
@@ -20,7 +21,7 @@ from adaptive_vlm.contracts import InferenceRequest, InferenceResult
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.execution.base import ExecutionPolicy
 from adaptive_vlm.execution.remote import RemoteCapabilities
-from adaptive_vlm.scheduler.adaptive import execute_adaptive_request
+from adaptive_vlm.scheduler.adaptive import RegistrySnapshot, execute_adaptive_request
 from adaptive_vlm.scheduler.configuration import (
     CONFIGURATIONS,
     CapabilityRegistry,
@@ -175,6 +176,43 @@ def test_no_feasible_candidate_is_explicit() -> None:
     assert not any(policy.calls for policy in policies.values())
 
 
+def test_live_monitor_failure_excludes_remote_and_unknown_memory() -> None:
+    policies = _policies()
+    registry = CapabilityRegistry(
+        policies=policies,
+        expected_model_fingerprint=FINGERPRINT,
+        remote=None,
+        remote_error="health_probe_failed",
+        edge_memory_budget_mib=500.0,
+        edge_required_peak_mib=None,
+    )
+    monitoring = {
+        "sampled_at_utc": "2026-10-26T00:00:00Z",
+        "age_ms": 0.0,
+        "sampling_overhead_ms": 0.1,
+        "health_ready": None,
+        "remote_ready": False,
+        "error": "health_probe_failed",
+    }
+    outcome = execute_adaptive_request(
+        request=InferenceRequest(
+            "case", ROOT / "tests/fixtures/moondream_smoke.ppm", "describe"
+        ),
+        task=_task(),
+        state=_state(),
+        placement_hashes={spec.id: "placement" for spec in CONFIGURATIONS},
+        healthy={spec.id: True for spec in CONFIGURATIONS},
+        constraints=SelectionConstraints(edge_memory_budget_mib=500.0),
+        predictor=cast(Predictor, FakePredictor()),
+        registry_provider=lambda: RegistrySnapshot(registry, monitoring),
+    )
+    assert outcome.result is None
+    assert outcome.attempts[0]["status"] == "no_feasible_candidate"
+    assert outcome.monitor_overhead_ms == 0.1
+    assert outcome.attempts[0]["monitoring"] == monitoring
+    assert not any(policy.calls for policy in policies.values())
+
+
 def test_mixed_run_matches_fixed_controls(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -286,6 +324,42 @@ def test_mixed_run_matches_fixed_controls(
         resume=True,
     )
     assert resumed["measured_attempts"] == 12
+    live_dir = tmp_path / "live"
+    live_monitoring = {
+        "sampled_at_utc": "2026-10-26T00:00:00Z",
+        "age_ms": 0.0,
+        "sampling_overhead_ms": 0.0001,
+        "health_ready": True,
+        "remote_ready": True,
+        "error": None,
+        "edge_memory_budget_mib": None,
+        "edge_required_peak_mib": None,
+    }
+    run_adaptive_benchmark(
+        config=config,
+        manifest=manifest,
+        calibration=calibration,
+        replay=replay,
+        replay_sha256="b" * 64,
+        registry_provider=lambda: RegistrySnapshot(
+            _registry(policies, fingerprint), live_monitoring
+        ),
+        task_builder=lambda _item: _task(),
+        run_manifest=create_run_manifest(
+            config, placement_environment, dataset_manifest_sha256=manifest.sha256
+        ),
+        run_dir=live_dir,
+        warmups=1,
+        repetitions=1,
+        activation="diagnostic_unpassed_gates",
+        monitor_config={"mode": "live", "max_age_ms": 100.0},
+        passive_observer=lambda metrics: "request_wire_bytes" in metrics,
+    )
+    monitor_report = analyze_monitor_run(live_dir)
+    assert monitor_report["local_live_monitor_gate_passed"]
+    assert monitor_report["monitor_samples_recorded"] == 13
+    assert monitor_report["passive_updates"] == 8
+    assert analyze_adaptive_run(live_dir, fixed_dirs)["g5_local_gate_passed"]
     raw = adaptive_dir / "requests.jsonl"
     rows = [json.loads(line) for line in raw.read_text().splitlines()]
     selected = rows[1]["selected_configuration_id"]

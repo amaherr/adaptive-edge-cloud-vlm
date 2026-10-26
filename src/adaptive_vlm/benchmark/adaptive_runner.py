@@ -24,7 +24,7 @@ from adaptive_vlm.benchmark.runner import (
 from adaptive_vlm.config import ExperimentConfig, model_contract_fingerprint
 from adaptive_vlm.contracts import RunManifest
 from adaptive_vlm.data.manifest import FrozenManifest, RequestItem
-from adaptive_vlm.scheduler.adaptive import execute_adaptive_request
+from adaptive_vlm.scheduler.adaptive import RegistrySnapshot, execute_adaptive_request
 from adaptive_vlm.scheduler.configuration import (
     CONFIGURATIONS,
     CapabilityRegistry,
@@ -39,7 +39,8 @@ from adaptive_vlm.scheduler.predictor import (
 from adaptive_vlm.scheduler.selector import SelectionConstraints
 
 TaskBuilder = Callable[[RequestItem], PredictionTask]
-RegistryProvider = Callable[[], CapabilityRegistry]
+RegistryProvider = Callable[[], CapabilityRegistry | RegistrySnapshot]
+PassiveObserver = Callable[[Mapping[str, Any]], bool]
 
 
 def load_adaptive_replay(
@@ -158,6 +159,8 @@ def run_adaptive_benchmark(
     repetitions: int,
     activation: str,
     resume: bool = False,
+    monitor_config: Mapping[str, Any] | None = None,
+    passive_observer: PassiveObserver | None = None,
 ) -> dict[str, Any]:
     """Record exactly one terminal row per scheduled trial, including failures."""
     if manifest.revision != config.dataset.revision:
@@ -182,6 +185,8 @@ def run_adaptive_benchmark(
         "activation": activation,
         "schedule": [trial.to_dict() for trial in schedule],
     }
+    if monitor_config is not None:
+        plan["monitor_config"] = dict(monitor_config)
     plan_hash = canonical_sha256(plan)
     plan["plan_sha256"] = plan_hash
     if resume:
@@ -299,11 +304,22 @@ def run_adaptive_benchmark(
                 ),
                 selection_overhead_ms=executed.selection_overhead_ms,
                 retry_overhead_ms=executed.retry_overhead_ms,
+                monitor_overhead_ms=executed.monitor_overhead_ms,
             )
             if executed.result is None:
                 error = executed.error or RuntimeError("adaptive request failed")
                 raise error
             result = executed.result
+            if passive_observer is not None:
+                passive_started = perf_counter_ns()
+                try:
+                    row["passive_updated"] = passive_observer(result.metrics)
+                except Exception as exc:
+                    row["passive_updated"] = False
+                    row["passive_update_error"] = f"{type(exc).__name__}: {exc}"
+                row["passive_update_overhead_ms"] = (
+                    perf_counter_ns() - passive_started
+                ) / 1_000_000
             row.update(
                 status="ok",
                 output_text=result.output_text,
@@ -342,6 +358,14 @@ def run_adaptive_benchmark(
             Counter(row["selected_configuration_id"] for row in successful)
         ),
         "retry_count": sum(len(row["attempts"]) > 1 for row in measured),
+        "monitor_overhead_ms_median": median(
+            row["monitor_overhead_ms"]
+            for row in measured
+            if "monitor_overhead_ms" in row
+        )
+        if any("monitor_overhead_ms" in row for row in measured)
+        else None,
+        "passive_updates": sum(row.get("passive_updated") is True for row in measured),
         "selection_overhead_ms_median": median(
             row["selection_overhead_ms"]
             for row in measured

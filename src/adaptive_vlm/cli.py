@@ -16,6 +16,8 @@ from adaptive_vlm.benchmark.adaptive_runner import (
     run_adaptive_benchmark,
 )
 from adaptive_vlm.benchmark.compare import compare_runs
+from adaptive_vlm.benchmark.monitor_eval import analyze_monitor_run
+from adaptive_vlm.benchmark.network_trace import run_network_trace
 from adaptive_vlm.benchmark.oracle import run_oracle_evaluation
 from adaptive_vlm.benchmark.predictor_eval import run_predictor_evaluation
 from adaptive_vlm.benchmark.profile import build_profile
@@ -41,8 +43,10 @@ from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
+from adaptive_vlm.scheduler.adaptive import RegistrySnapshot
 from adaptive_vlm.scheduler.configuration import CapabilityRegistry, ConfigurationId
 from adaptive_vlm.scheduler.dispatch import ConfigurationDispatcher
+from adaptive_vlm.scheduler.monitor import LiveMonitor, MonitorConfig
 from adaptive_vlm.scheduler.predictor import Calibration, PredictionTask
 from adaptive_vlm.scheduler.state import SystemState, TaskState
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
@@ -83,6 +87,13 @@ def build_parser() -> argparse.ArgumentParser:
     oracle_parser.add_argument("--predictions", required=True, type=Path)
     oracle_parser.add_argument("--specification", required=True, type=Path)
     oracle_parser.add_argument("--output-dir", required=True, type=Path)
+
+    trace_parser = subcommands.add_parser(
+        "replay-network-trace", help="Replay frozen network conditions through selector"
+    )
+    trace_parser.add_argument("--calibration", required=True, type=Path)
+    trace_parser.add_argument("--trace", required=True, type=Path)
+    trace_parser.add_argument("--output-dir", required=True, type=Path)
 
     benchmark_parser = subcommands.add_parser(
         "benchmark", help="Run a resumable edge, cloud, or distributed campaign"
@@ -226,6 +237,13 @@ def build_parser() -> argparse.ArgumentParser:
     adaptive_benchmark.add_argument("--text-device", default="cpu")
     adaptive_benchmark.add_argument("--cloud-device", default="cpu")
     adaptive_benchmark.add_argument("--edge-required-peak-mib", type=float)
+    adaptive_benchmark.add_argument(
+        "--monitor-mode", choices=("replay", "live"), default="replay"
+    )
+    adaptive_benchmark.add_argument("--probe-interval-ms", type=float, default=0.0)
+    adaptive_benchmark.add_argument("--probe-max-age-ms", type=float, default=5_000.0)
+    adaptive_benchmark.add_argument("--probe-timeout-ms", type=float, default=2_000.0)
+    adaptive_benchmark.add_argument("--passive-alpha", type=float, default=0.25)
     adaptive_benchmark.add_argument("--warmups", type=int, default=0)
     adaptive_benchmark.add_argument("--repetitions", type=int, default=1)
     adaptive_benchmark.add_argument("--predictor-evaluation", type=Path)
@@ -243,6 +261,12 @@ def build_parser() -> argparse.ArgumentParser:
     adaptive_analysis.add_argument("adaptive_run_dir", type=Path)
     adaptive_analysis.add_argument("fixed_run_dirs", nargs=3, type=Path)
     adaptive_analysis.add_argument("--output", type=Path)
+
+    monitor_analysis = subcommands.add_parser(
+        "analyze-monitor", help="Audit live probe provenance and decision safety"
+    )
+    monitor_analysis.add_argument("run_dir", type=Path)
+    monitor_analysis.add_argument("--output", type=Path)
 
     cloud_parser = subcommands.add_parser(
         "cloud-infer", help="Send one raw image request to a cloud server"
@@ -346,6 +370,19 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
             )
             return 0
+        if args.command == "replay-network-trace":
+            print(
+                json.dumps(
+                    run_network_trace(
+                        calibration_path=args.calibration,
+                        trace_path=args.trace,
+                        output_dir=args.output_dir,
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
         if args.command == "benchmark":
             return _benchmark(args)
         if args.command == "import-vqa-v2":
@@ -418,6 +455,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                     analyze_adaptive_run(
                         args.adaptive_run_dir, args.fixed_run_dirs, output=args.output
                     ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if args.command == "analyze-monitor":
+            print(
+                json.dumps(
+                    analyze_monitor_run(args.run_dir, output=args.output),
                     indent=2,
                     sort_keys=True,
                 )
@@ -633,18 +679,47 @@ def _adaptive_benchmark(args: argparse.Namespace) -> int:
         config.model.revision,
         model_contract_fingerprint(config.model),
     )
+    monitor = None
+    if args.monitor_mode == "live":
+        if config.cloud.status == "pending":
+            raise ConfigError("live monitor requires declared cloud hardware")
+        monitor = LiveMonitor(
+            config.transport,
+            model,
+            MonitorConfig(
+                sampling_interval_ms=args.probe_interval_ms,
+                max_age_ms=args.probe_max_age_ms,
+                probe_timeout_ms=args.probe_timeout_ms,
+                passive_alpha=args.passive_alpha,
+            ),
+        )
 
-    def registry_provider() -> CapabilityRegistry:
+    def registry_provider() -> CapabilityRegistry | RegistrySnapshot:
         remote = None
         remote_error = None
-        if config.cloud.status == "pending":
+        monitoring = None
+        if monitor is not None:
+            sample = monitor.sample()
+            remote = sample.remote
+            remote_error = sample.error or (
+                "remote_unavailable" if remote is None else None
+            )
+            monitoring = sample.to_dict()
+            monitoring["edge_memory_budget_mib"] = replay.get("edge_memory_budget_mib")
+            monitoring["edge_required_peak_mib"] = args.edge_required_peak_mib
+            monitoring["edge_memory_source"] = (
+                "declared_measured_peak"
+                if args.edge_required_peak_mib is not None
+                else "unknown"
+            )
+        elif config.cloud.status == "pending":
             remote_error = "cloud_hardware_pending"
         else:
             try:
                 remote = check_remote_capabilities(config.transport, model)
             except (OSError, RuntimeError, ValueError) as exc:
                 remote_error = f"{type(exc).__name__}: {exc}"
-        return CapabilityRegistry(
+        registry = CapabilityRegistry(
             policies=policies,
             expected_model_fingerprint=model.fingerprint,
             remote=remote,
@@ -652,6 +727,11 @@ def _adaptive_benchmark(args: argparse.Namespace) -> int:
             edge_resident_memory_mib=_current_rss_mib(),
             edge_required_peak_mib=args.edge_required_peak_mib,
             edge_memory_budget_mib=replay.get("edge_memory_budget_mib"),
+        )
+        return (
+            RegistrySnapshot(registry, monitoring)
+            if monitoring is not None
+            else registry
         )
 
     def task_builder(item: RequestItem) -> PredictionTask:
@@ -680,6 +760,11 @@ def _adaptive_benchmark(args: argparse.Namespace) -> int:
     environment["adaptive_replay_sha256"] = replay_hash
     environment["calibration_id"] = calibration.calibration_id
     environment["activation"] = activation
+    monitor_config = (
+        {"mode": "live", **monitor.config.to_dict()} if monitor is not None else None
+    )
+    if monitor_config is not None:
+        environment["monitoring"] = monitor_config
     run_manifest = create_run_manifest(
         config, environment, dataset_manifest_sha256=manifest.sha256
     )
@@ -698,6 +783,8 @@ def _adaptive_benchmark(args: argparse.Namespace) -> int:
             repetitions=args.repetitions,
             activation=activation,
             resume=args.resume,
+            monitor_config=monitor_config,
+            passive_observer=monitor.observe_send if monitor is not None else None,
         )
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
