@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from dataclasses import asdict, dataclass
@@ -98,6 +99,35 @@ class NetworkFit:
     rtt_min_ms: float | None
     rtt_max_ms: float | None
 
+    def __post_init__(self) -> None:
+        if self.kind not in {"none", "loopback", "controlled"}:
+            raise ValueError("unsupported network fit kind")
+        for value in (self.transport_ms, self.intercept_ms, self.rtt_coefficient):
+            if not math.isfinite(value):
+                raise ValueError("network fit coefficients must be finite")
+        if self.transport_ms < 0 or self.rtt_coefficient < 0:
+            raise ValueError("network fit has a negative duration or RTT coefficient")
+        if self.kind == "loopback" and (not self.source or not self.bucket_id):
+            raise ValueError("loopback fit requires source and bucket")
+        if self.kind == "controlled":
+            ranges = (
+                (self.uplink_min_bps, self.uplink_max_bps),
+                (self.downlink_min_bps, self.downlink_max_bps),
+                (self.rtt_min_ms, self.rtt_max_ms),
+            )
+            if any(
+                low is None
+                or high is None
+                or not math.isfinite(low)
+                or not math.isfinite(high)
+                or low < 0
+                or low > high
+                for low, high in ranges
+            ):
+                raise ValueError("controlled network fit has invalid coverage bounds")
+            if self.uplink_min_bps == 0 or self.downlink_min_bps == 0:
+                raise ValueError("controlled network bandwidth must be positive")
+
 
 @dataclass(frozen=True)
 class CandidateFit:
@@ -129,6 +159,57 @@ class CandidateFit:
     interval_half_width_ms: float
     network: NetworkFit
 
+    def __post_init__(self) -> None:
+        if not self.configuration_id or not self.placement_profile_sha256:
+            raise ValueError("candidate fit identifiers must be non-empty")
+        if self.sample_count < 1 or self.requested_max_new_tokens < 1:
+            raise ValueError("candidate fit needs samples and a generation budget")
+        ranges = (
+            (self.image_bytes_min, self.image_bytes_max),
+            (self.image_width_min, self.image_width_max),
+            (self.image_height_min, self.image_height_max),
+            (self.prompt_tokens_min, self.prompt_tokens_max),
+        )
+        if any(low <= 0 or high < low for low, high in ranges):
+            raise ValueError("candidate fit has invalid task coverage bounds")
+        durations = (
+            self.edge_compute_ms,
+            self.client_preprocess_ms,
+            self.serialization_ms,
+            self.server_fixed_ms,
+            self.decode_ms_per_token,
+            self.client_residual_ms,
+            self.constant_median_ms,
+            self.interval_half_width_ms,
+        )
+        if any(not math.isfinite(value) for value in durations):
+            raise ValueError("candidate fit durations must be finite")
+        nonnegative = (
+            self.edge_compute_ms,
+            self.client_preprocess_ms,
+            self.serialization_ms,
+            self.server_fixed_ms,
+            self.decode_ms_per_token,
+            self.constant_median_ms,
+            self.interval_half_width_ms,
+        )
+        if any(value < 0 for value in nonnegative):
+            raise ValueError("candidate fit has a negative compute duration")
+        sizes = (
+            self.request_payload_bytes,
+            self.request_framing_bytes,
+            self.response_wire_bytes,
+        )
+        if any(not math.isfinite(value) or value < 0 for value in sizes):
+            raise ValueError("candidate fit byte sizes must be finite and non-negative")
+        if not 0 <= self.expected_output_tokens <= self.requested_max_new_tokens:
+            raise ValueError("fitted output estimate exceeds generation budget")
+        if self.edge_memory_requirement_mib is not None and (
+            not math.isfinite(self.edge_memory_requirement_mib)
+            or self.edge_memory_requirement_mib <= 0
+        ):
+            raise ValueError("edge memory requirement must be positive when known")
+
 
 @dataclass(frozen=True)
 class Calibration:
@@ -151,6 +232,15 @@ class Calibration:
     def from_dict(cls, value: dict[str, Any]) -> Calibration:
         if value.get("schema_version") != 1:
             raise ValueError("unsupported calibration schema")
+        expected_id = hashlib.sha256(
+            json.dumps(
+                {key: item for key, item in value.items() if key != "calibration_id"},
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest()
+        if value.get("calibration_id") != expected_id:
+            raise ValueError("calibration content hash differs from identifier")
         candidates = {
             name: CandidateFit(**{**raw, "network": NetworkFit(**raw["network"])})
             for name, raw in value["candidates"].items()

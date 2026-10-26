@@ -14,6 +14,7 @@ from adaptive_vlm.config import ExecutionMode, load_experiment_config
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.execution.base import ExecutionPolicy
+from adaptive_vlm.scheduler.predictor import Calibration
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -199,6 +200,10 @@ def test_predictor_fit_holds_out_requests_and_preserves_failures(
         profile_path=profile_path, split_path=split_path, output_dir=output_dir
     )
     calibration = json.loads((output_dir / "calibration.json").read_text())
+    assert (
+        Calibration.load(output_dir / "calibration.json").calibration_id
+        == calibration["calibration_id"]
+    )
     assert set(calibration["training_request_ids"]).isdisjoint(
         calibration["holdout_request_ids"]
     )

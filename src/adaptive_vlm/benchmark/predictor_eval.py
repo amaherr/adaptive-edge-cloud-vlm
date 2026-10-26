@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
+from dataclasses import asdict
 from pathlib import Path
 from statistics import mean, median
 from typing import Any
@@ -134,8 +135,8 @@ def evaluate_calibration(
         if row["status"] == "ok":
             task, state = task_and_state_from_row(row)
             prediction = predictor.predict(spec, state, task)
-            task_snapshot = task.__dict__.copy()
-            state_snapshot = state.__dict__.copy()
+            task_snapshot = asdict(task)
+            state_snapshot = asdict(state)
         else:
             prediction = predictor._invalid(spec.id.value, "failed_trial")
             task_snapshot = None
