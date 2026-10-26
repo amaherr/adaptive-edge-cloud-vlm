@@ -77,22 +77,26 @@ class CapabilityRegistry:
         remote: RemoteCapabilities | None,
         remote_error: str | None = None,
         edge_resident_memory_mib: float | None = None,
+        edge_required_peak_mib: float | None = None,
         edge_memory_budget_mib: float | None = None,
     ) -> None:
         if len(expected_model_fingerprint) != 64:
             raise ValueError("model fingerprint must be a SHA-256 digest")
         if remote is not None and remote_error is not None:
             raise ValueError("remote result and error are mutually exclusive")
-        for value in (edge_resident_memory_mib, edge_memory_budget_mib):
+        for value in (
+            edge_resident_memory_mib,
+            edge_required_peak_mib,
+            edge_memory_budget_mib,
+        ):
             if value is not None and (not math.isfinite(value) or value < 0):
                 raise ValueError("memory values must be finite and non-negative")
-        if edge_memory_budget_mib is not None and edge_resident_memory_mib is None:
-            raise ValueError("memory budget needs measured resident memory")
         self.policies = dict(policies)
         self.expected_model_fingerprint = expected_model_fingerprint
         self.remote = remote
         self.remote_error = remote_error
         self.edge_resident_memory_mib = edge_resident_memory_mib
+        self.edge_required_peak_mib = edge_required_peak_mib
         self.edge_memory_budget_mib = edge_memory_budget_mib
 
     def status(self, spec: ConfigurationSpec) -> CapabilityStatus:
@@ -101,10 +105,13 @@ class CapabilityRegistry:
             return CapabilityStatus(spec.id, False, "policy_not_loaded")
         if policy.mode is not spec.mode:
             return CapabilityStatus(spec.id, False, "policy_mode_mismatch")
-        if (self.edge_memory_budget_mib is not None
-                and self.edge_resident_memory_mib is not None
-                and self.edge_resident_memory_mib > self.edge_memory_budget_mib):
-            return CapabilityStatus(spec.id, False, "edge_memory_budget_exceeded")
+        if self.edge_memory_budget_mib is not None:
+            if self.edge_required_peak_mib is None:
+                return CapabilityStatus(
+                    spec.id, False, "edge_memory_requirement_unknown"
+                )
+            if self.edge_required_peak_mib > self.edge_memory_budget_mib:
+                return CapabilityStatus(spec.id, False, "edge_memory_budget_exceeded")
         if spec.remote_path is not None:
             if self.remote is None:
                 return CapabilityStatus(

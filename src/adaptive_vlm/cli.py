@@ -170,6 +170,7 @@ def build_parser() -> argparse.ArgumentParser:
     adaptive_parser.add_argument("--uplink-mbps", type=float)
     adaptive_parser.add_argument("--rtt-ms", type=float)
     adaptive_parser.add_argument("--edge-memory-budget-mib", type=float)
+    adaptive_parser.add_argument("--edge-required-peak-mib", type=float)
     adaptive_parser.add_argument("--expected-output-tokens", type=int)
     adaptive_parser.add_argument("--offline", action="store_true")
     adaptive_parser.add_argument("--output-dir", type=Path)
@@ -433,6 +434,12 @@ def _current_rss_mib() -> float | None:
 
 def _adaptive_infer(args: argparse.Namespace) -> int:
     config = load_experiment_config(args.config)
+    if (args.edge_memory_budget_mib is not None
+            and args.edge_required_peak_mib is None):
+        raise ConfigError(
+            "--edge-memory-budget-mib requires --edge-required-peak-mib "
+            "from a measured profile"
+        )
     if (args.expected_output_tokens is not None
             and args.expected_output_tokens > config.model.max_new_tokens):
         raise ConfigError("expected output exceeds pinned max_new_tokens")
@@ -476,6 +483,7 @@ def _adaptive_infer(args: argparse.Namespace) -> int:
         remote=remote,
         remote_error=remote_error,
         edge_resident_memory_mib=resident_memory,
+        edge_required_peak_mib=args.edge_required_peak_mib,
         edge_memory_budget_mib=state.edge_memory_budget_mib,
     )
     request = InferenceRequest(
@@ -502,6 +510,7 @@ def _adaptive_infer(args: argparse.Namespace) -> int:
         "vision_device": args.vision_device,
         "text_device": args.text_device,
         "edge_resident_memory_mib": resident_memory,
+        "edge_required_peak_mib": args.edge_required_peak_mib,
         "remote": f"{config.transport.host}:{config.transport.port}",
     }
     manifest = create_run_manifest(config, environment)

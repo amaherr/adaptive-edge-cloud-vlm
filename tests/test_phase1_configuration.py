@@ -143,6 +143,7 @@ def test_registry_routes_exactly_one_loaded_policy(tmp_path: Path) -> None:
         expected_model_fingerprint=FINGERPRINT,
         remote=REMOTE,
         edge_resident_memory_mib=500,
+        edge_required_peak_mib=550,
         edge_memory_budget_mib=600,
     )
     assert all(status.available for status in registry.statuses())
@@ -187,9 +188,19 @@ def test_registry_excludes_missing_path_model_and_memory(tmp_path: Path) -> None
         expected_model_fingerprint=FINGERPRINT,
         remote=REMOTE,
         edge_resident_memory_mib=700,
+        edge_required_peak_mib=700,
         edge_memory_budget_mib=600,
     )
     assert all(not status.available for status in low_memory.statuses())
+    unknown_memory = CapabilityRegistry(
+        policies=policies,
+        expected_model_fingerprint=FINGERPRINT,
+        remote=REMOTE,
+        edge_resident_memory_mib=500,
+        edge_memory_budget_mib=600,
+    )
+    assert all(status.reason == "edge_memory_requirement_unknown"
+               for status in unknown_memory.statuses())
     offline = CapabilityRegistry(
         policies=policies,
         expected_model_fingerprint=FINGERPRINT,
@@ -228,7 +239,8 @@ def test_adaptive_infer_writes_decision_and_request(
         str(ROOT / "configs/experiments/chunk6_local_campaign.yaml"),
         "--configuration-id", ConfigurationId.CLOUD_RAW_IMAGE.value,
         "--image", str(image), "--prompt", "Describe",
-        "--edge-memory-budget-mib", "600", "--output-dir", str(tmp_path / "runs"),
+        "--edge-memory-budget-mib", "600", "--edge-required-peak-mib", "550",
+        "--output-dir", str(tmp_path / "runs"),
     ])
     assert exit_code == 0
     output = json.loads(capsys.readouterr().out)
@@ -238,6 +250,25 @@ def test_adaptive_infer_writes_decision_and_request(
     run_directory = next((tmp_path / "runs").iterdir())
     assert (run_directory / "decision.json").is_file()
     assert (run_directory / "request.json").is_file()
+
+
+def test_adaptive_infer_requires_peak_estimate_before_loading(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    def must_not_load(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError("memory preflight should run before model loading")
+
+    monkeypatch.setattr("adaptive_vlm.cli.load_phase1_policies", must_not_load)
+    code = main([
+        "adaptive-infer", "--config",
+        str(ROOT / "configs/experiments/chunk6_local_campaign.yaml"),
+        "--configuration-id", ConfigurationId.EDGE_FULL.value,
+        "--image", str(ROOT / "tests/fixtures/moondream_smoke.ppm"),
+        "--prompt", "Describe", "--edge-memory-budget-mib", "600",
+    ])
+    assert code == 2
+    assert "requires --edge-required-peak-mib" in capsys.readouterr().err
 
 
 def test_phase1_loader_shares_one_resident_full_adapter(
