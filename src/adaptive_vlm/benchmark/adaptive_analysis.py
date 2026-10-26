@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from collections import Counter
 from pathlib import Path
+from statistics import mean, median
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
@@ -78,6 +79,10 @@ def analyze_adaptive_run(
     missing_controls: list[str] = []
     wire_errors: list[str] = []
     trace_errors: list[str] = []
+    latencies: list[float] = []
+    selection_overheads: list[float] = []
+    wire_bytes: dict[str, list[int]] = {spec.id.value: [] for spec in CONFIGURATIONS}
+    retry_count = 0
     for trial_id, trial in expected.items():
         row = adaptive_rows[trial_id]
         if any(
@@ -97,10 +102,34 @@ def analyze_adaptive_run(
             raise ValueError(f"adaptive trial provenance mismatch: {trial_id}")
         attempts = row.get("attempts", [])
         selected = row.get("selected_configuration_id")
-        if len(attempts) not in {1, 2} or (len(attempts) == 2 and (
-            attempts[0].get("retry_reason") != "connection_failed_before_send"
-            or attempts[0].get("status") != "failed"
-        )):
+        if not trial["warmup"]:
+            retry_count += len(attempts) > 1
+        if len(attempts) not in {1, 2} or (
+            len(attempts) == 2
+            and (
+                attempts[0].get("retry_reason") != "connection_failed_before_send"
+                or attempts[0].get("status") != "failed"
+                or attempts[0].get("attempt_index") != 0
+                or attempts[1].get("attempt_index") != 1
+                or attempts[0]["decision"]["selected_configuration_id"]
+                == attempts[1]["decision"]["selected_configuration_id"]
+            )
+        ):
+            trace_errors.append(trial_id)
+        for attempt in attempts:
+            candidates = attempt.get("decision", {}).get("candidates", [])
+            if {candidate.get("configuration_id") for candidate in candidates} != {
+                spec.id.value for spec in CONFIGURATIONS
+            }:
+                trace_errors.append(trial_id)
+        if attempts and (
+            abs(
+                row.get("selection_overhead_ms", -1)
+                - sum(attempt.get("selection_overhead_ms", 0) for attempt in attempts)
+            )
+            > 0.001
+            or row["observed_end_to_end_ms"] < row.get("selection_overhead_ms", 0)
+        ):
             trace_errors.append(trial_id)
         if (
             attempts
@@ -123,6 +152,18 @@ def analyze_adaptive_run(
         if spec is None:
             trace_errors.append(trial_id)
             continue
+        selected_candidate = next(
+            (
+                candidate
+                for candidate in attempts[-1]["decision"]["candidates"]
+                if candidate["configuration_id"] == selected
+            ),
+            None,
+        )
+        if selected_candidate is None or not selected_candidate["eligible"]:
+            trace_errors.append(trial_id)
+        latencies.append(float(row["observed_end_to_end_ms"]))
+        selection_overheads.append(float(row["selection_overhead_ms"]))
         _control_plan, control_rows, control_manifest = fixed[spec.mode.value]
         control = control_rows[trial_id]
         if control["status"] != "ok":
@@ -146,6 +187,8 @@ def analyze_adaptive_run(
         metrics = row["metrics"]
         request_bytes = metrics.get("request_wire_bytes", 0)
         response_bytes = metrics.get("response_wire_bytes", 0)
+        if isinstance(request_bytes, int) and isinstance(response_bytes, int):
+            wire_bytes[selected].append(request_bytes + response_bytes)
         if spec.mode.value == "edge":
             if request_bytes or response_bytes:
                 wire_errors.append(trial_id)
@@ -171,6 +214,14 @@ def analyze_adaptive_run(
         "measured_trials": measured_count,
         "measured_failures": failures,
         "selected_counts": dict(selected_counts),
+        "retry_count": retry_count,
+        "latency_ms_median_success": median(latencies) if latencies else None,
+        "selection_overhead_ms_median": (
+            median(selection_overheads) if selection_overheads else None
+        ),
+        "wire_bytes_mean_by_configuration": {
+            key: mean(values) if values else None for key, values in wire_bytes.items()
+        },
         "same_placement_token_mismatches": token_mismatches,
         "placement_mismatch_trials": placement_mismatches,
         "unavailable_control_trials": missing_controls,

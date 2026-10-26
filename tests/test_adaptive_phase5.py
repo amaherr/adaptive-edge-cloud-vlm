@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, cast
@@ -285,3 +286,13 @@ def test_mixed_run_matches_fixed_controls(
         resume=True,
     )
     assert resumed["measured_attempts"] == 12
+    raw = adaptive_dir / "requests.jsonl"
+    rows = [json.loads(line) for line in raw.read_text().splitlines()]
+    selected = rows[1]["selected_configuration_id"]
+    for candidate in rows[1]["attempts"][-1]["decision"]["candidates"]:
+        if candidate["configuration_id"] == selected:
+            candidate["eligible"] = False
+    raw.write_text("".join(json.dumps(row) + "\n" for row in rows))
+    tampered = analyze_adaptive_run(adaptive_dir, fixed_dirs)
+    assert not tampered["g5_local_gate_passed"]
+    assert rows[1]["trial_id"] in tampered["decision_trace_errors"]

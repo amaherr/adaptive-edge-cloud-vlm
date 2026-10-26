@@ -122,6 +122,8 @@ def load_adaptive_replay(
         quality_floor=replay.get("quality_floor"),
         edge_memory_budget_mib=replay.get("edge_memory_budget_mib"),
     )
+    if replay.get("quality_floor") is not None:
+        raise ValueError("Phase 5 has no validated predecision quality scores")
     return replay, hashlib.sha256(content).hexdigest()
 
 

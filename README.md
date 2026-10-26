@@ -292,6 +292,24 @@ Evaluate the pure selector on the frozen local Phase 3 predictions and matched o
 
 Read `evaluation.json` for regret, top-choice agreement, uncertainty, exclusions, and gate flags. `decisions.jsonl` preserves each candidate prediction and reason beside the retrospective measured oracle. The [Phase 4 handoff](docs/phase4_handoff.md) gives the local result and second-machine steps; the [selector contract](docs/phase4_selector_contract.md) defines eligibility and pairing. The local G4 performance gate remains open and automatic selection is inactive.
 
+### Phase 5 adaptive diagnostic run
+
+With the pinned Moondream cache, start `adaptive-server` as in the [Phase 5 handoff](docs/phase5_handoff.md), then run the frozen local mixed-choice campaign:
+
+~~~bash
+.venv-model/bin/adaptive-vlm adaptive-benchmark \
+  --config configs/experiments/chunk6_local_campaign.yaml \
+  --manifest data/manifests/correctness.jsonl \
+  --calibration artifacts/phase3/2026-10-26/clean-1/calibration.json \
+  --replay configs/adaptive/phase5_local_replay.json \
+  --run-dir artifacts/example-adaptive \
+  --artifact-manifest configs/model/moondream2_artifact.yaml \
+  --cache-dir .model-cache --offline \
+  --warmups 1 --repetitions 1 --diagnostic-allow-unpassed-gates
+~~~
+
+The diagnostic flag explicitly permits the current failed G3/open G4 fit for an integration check; it does not approve performance selection. `requests.jsonl` contains every candidate prediction, decision, actual result, overhead and any retry. Use `analyze-adaptive` with matching edge/cloud/distributed fixed controls, as described in the [execution contract](docs/phase5_execution_contract.md). The command requires a resident full edge adapter for exact prompt-token counting.
+
 ### Import a VQA validation subset
 
 The repository does not download or redistribute the VQA questions, answers, or COCO images. Once the official VQA v2 val2014 JSON files and images are available locally, freeze a deterministic subset:
@@ -339,6 +357,8 @@ Run `adaptive-vlm --help` or `adaptive-vlm COMMAND --help` for machine-readable,
 | `profile-runs` | Completed matching `RUN_DIR` paths | `--specification PATH --output-dir PATH`; validates raw trials, hashes and coverage and writes versioned profile rows. |
 | `calibrate-predictor` | `--profile PATH --split PATH --output-dir PATH` | Fits only frozen training rows and writes a calibration, held-out evaluation and per-trial predictions. |
 | `evaluate-selector` | `--predictions PATH --specification PATH --output-dir PATH` | Checks a frozen predictions hash and writes offline decisions plus matched measured-oracle metrics. |
+| `adaptive-benchmark` | `--config PATH --manifest PATH --calibration PATH --replay PATH --run-dir PATH --artifact-manifest PATH` | Runs a resumable mixed-choice campaign; requires passing G3/G4 reports or explicit `--diagnostic-allow-unpassed-gates`. |
+| `analyze-adaptive` | `ADAPTIVE_RUN_DIR EDGE_DIR CLOUD_DIR DISTRIBUTED_DIR` | Matches each choice to a fixed control and audits tokens, placement, wire bytes, and decisions. |
 | `import-vqa-v2` | `--questions PATH --annotations PATH --images-dir PATH --output PATH --revision LABEL` | `--count N` (100), `--seed N` (42). |
 
 `--config` references an experiment YAML, not a model YAML. `--artifact-manifest` references [the pinned artifact manifest](configs/model/moondream2_artifact.yaml); it is distinct from the request `--manifest` used by `benchmark`. `--device` places the cloud server's model/text stage; `--vision-device` and `--text-device` name edge-side placements. `--offline` forbids model downloads and is appropriate only after the cache is populated. `--bind-host` controls the listening interface, while `transport.host` in the config is the client-reachable address. `-v` adds detail; core phase milestones and benchmark trials are already visible by default.
@@ -367,7 +387,9 @@ The [Phase 2 handoff](docs/phase2_handoff.md) documents per-stage timing and exa
 
 The [Phase 3 handoff](docs/phase3_handoff.md) records the frozen local predictor fit. On two held-out requests, per-configuration median latency APE was 2.87–4.89%, but the predictor's fastest-choice ranking was 0/2 versus 2/2 for the constant-median baseline. The local G3 ranking target failed; a controlled-network holdout and physical-host validation remain unavailable.
 
-The [Phase 4 handoff](docs/phase4_handoff.md) records the pure selector and offline measured oracle. The two local paired requests produced 1.90% median regret but 0/2 observed top-choice agreement. This is a diagnostic replay of the already inspected Phase 3 holdout; full G4 and automatic adaptive execution remain pending physical controlled conditions and a passing new G3 fit.
+The [Phase 4 handoff](docs/phase4_handoff.md) records the pure selector and offline measured oracle. The two local paired requests produced 1.90% median regret but 0/2 observed top-choice agreement. This is a diagnostic replay of the already inspected Phase 3 holdout; full G4 and validated automatic selection remain pending physical controlled conditions and a passing new G3 fit.
+
+The [Phase 5 handoff](docs/phase5_handoff.md) records a real 12-request mixed-choice local Moondream run: 12/12 successful, four selections per configuration, zero same-placement token mismatches or wire/trace errors, and a passing **local G5 integration gate**. The choices were forced by declared replay health exclusions; G3/G4 and physical performance claims remain open.
 
 On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 12-request synthetic manifest with one excluded warm-up per policy. All three modes completed 12/12 measured requests, and the local `artifacts/chunk6/correctness-comparison.json` audit reported **12/12 identical token sequences and decoded texts**, zero failures, and a fixture exact-match score of 3/9 scored prompts in each policy. G1 projected-feature equivalence and G2 tensor serialization checks also passed in earlier focused tests. A fake-adapter 100-request fixture run completed 100/100 measured attempts after 10 warm-ups.
 
@@ -383,7 +405,7 @@ Generated `artifacts/`, `.model-cache/`, and `data/raw/` are ignored by Git. Pre
 
 ## Next research steps
 
-The next research milestone is to complete controlled Phase 2–3 profiling on a separate cloud host, with a fresh predeclared request and network holdout, then revise and retest the predictor's ranking. Evaluate the existing Phase 4 selector on that physical holdout before Phase 5 adaptive execution. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
+The next research milestone is to complete controlled Phase 2–3 profiling on a separate cloud host, with a fresh predeclared request and network holdout, then revise and retest the predictor's ranking. Evaluate the Phase 4 selector on that physical holdout and rerun the existing Phase 5 adaptive path with matching fixed controls before enabling validated automatic selection. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
 
 ## Technology and repository layout
 
