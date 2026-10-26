@@ -253,6 +253,19 @@ Choose **fresh** run directories; an existing directory is refused unless `--res
 
 For a fast 100-request storage/scheduling run without Moondream, use `chunk6_fake_benchmark.yaml`, `--mode edge`, `--manifest data/manifests/benchmark_fixture.jsonl`, `--warmups 10`, and `--repetitions 1`. That fixture has no task-quality references.
 
+### Phase 2 profiling
+
+The fixed-policy benchmark now records trial start time, exact model prompt-token count, prompt prefill/decode durations, transport subintervals, response bytes, and memory readings. After three completed runs with the same frozen schedule, build a validated profile:
+
+~~~bash
+.venv/bin/adaptive-vlm profile-runs \
+  artifacts/example-edge artifacts/example-cloud artifacts/example-distributed \
+  --specification configs/profiles/phase2_local_fixture.json \
+  --output-dir artifacts/example-profile
+~~~
+
+Inspect `artifacts/example-profile/summary.json` for coverage/failures and `profile.jsonl` for each warmup, measured success, and failure. The [schema note](docs/phase2_profile_schema.md) defines timing boundaries, null reasons, residuals, and units. The [split inspection](docs/phase2_split_feasibility.md) documents candidate graph boundaries that remain inactive. The supplied specification labels the local loopback network as uncontrolled; it cannot support physical-network crossover claims.
+
 ### Import a VQA validation subset
 
 The repository does not download or redistribute the VQA questions, answers, or COCO images. Once the official VQA v2 val2014 JSON files and images are available locally, freeze a deterministic subset:
@@ -297,6 +310,7 @@ Run `adaptive-vlm --help` or `adaptive-vlm COMMAND --help` for machine-readable,
 | `distributed-infer` | `--config PATH --artifact-manifest PATH --image PATH --prompt TEXT` | `--cache-dir` (`.model-cache`), `--request-id` (`distributed-0001`), `--vision-device` (`cpu`), `--pipeline` (`synchronous` or `prompt_first`), `--offline`, `--output-dir PATH`, `-v/--verbose`. |
 | `benchmark` | `--config PATH --mode edge|cloud|distributed --run-dir PATH` | `--manifest PATH` (config dataset path), `--artifact-manifest PATH` (required for real edge/distributed), `--cache-dir` (`.model-cache`), `--vision-device` (`cpu`), `--text-device` (`cpu`), `--offline`, `--warmups N` and `--repetitions N` (config values), `--pipeline` (`synchronous` or `prompt_first`), `--resume`, `-v/--verbose`. |
 | `compare-runs` | At least two `RUN_DIR` paths | `--output PATH` saves comparison JSON; comparison is always printed. |
+| `profile-runs` | Completed matching `RUN_DIR` paths | `--specification PATH --output-dir PATH`; validates raw trials, hashes and coverage and writes versioned profile rows. |
 | `import-vqa-v2` | `--questions PATH --annotations PATH --images-dir PATH --output PATH --revision LABEL` | `--count N` (100), `--seed N` (42). |
 
 `--config` references an experiment YAML, not a model YAML. `--artifact-manifest` references [the pinned artifact manifest](configs/model/moondream2_artifact.yaml); it is distinct from the request `--manifest` used by `benchmark`. `--device` places the cloud server's model/text stage; `--vision-device` and `--text-device` name edge-side placements. `--offline` forbids model downloads and is appropriate only after the cache is populated. `--bind-host` controls the listening interface, while `transport.host` in the config is the client-reachable address. `-v` adds detail; core phase milestones and benchmark trials are already visible by default.

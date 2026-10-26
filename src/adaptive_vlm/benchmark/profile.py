@@ -100,6 +100,14 @@ def build_profile(
     network = spec["network_state"]
     if not isinstance(network.get("controlled"), bool):
         raise ValueError("network_state.controlled must be boolean")
+    if network["controlled"]:
+        for name in ("uplink_bps", "downlink_bps", "rtt_ms"):
+            value = network.get(name)
+            if not isinstance(value, (int, float)) or value <= 0:
+                raise ValueError(f"controlled network requires positive {name}")
+        evidence = network.get("measurement_evidence_sha256")
+        if not isinstance(evidence, str) or len(evidence) != 64:
+            raise ValueError("controlled network requires measurement evidence hash")
     if not network["controlled"] and any(
         network.get(name) is not None
         for name in ("uplink_bps", "downlink_bps", "rtt_ms")
@@ -149,6 +157,10 @@ def build_profile(
                 raise ValueError(f"image hash mismatch: {row['trial_id']}")
             metrics = row.get("metrics", {})
             success = row["status"] == "ok"
+            if not isinstance(row.get("started_at_utc"), str) or not row[
+                "started_at_utc"
+            ].endswith("Z"):
+                raise ValueError(f"missing trial timestamp: {row['trial_id']}")
             if success and not isinstance(metrics, dict):
                 raise ValueError(f"missing metrics: {row['trial_id']}")
             required = (
@@ -217,6 +229,12 @@ def build_profile(
             ):
                 raise ValueError(f"projected tensor payload differs: {row['trial_id']}")
             token_ids = row.get("output_token_ids", [])
+            if (
+                success
+                and config["model"]["adapter"] == "moondream2"
+                and (_metric(metrics, "output_tokens", remote=remote) != len(token_ids))
+            ):
+                raise ValueError(f"output token count differs: {row['trial_id']}")
             token_hash = (
                 hashlib.sha256(
                     json.dumps(token_ids, separators=(",", ":")).encode()
@@ -354,6 +372,21 @@ def build_profile(
                 else:
                     reason = "metric_unavailable"
                 missing[name] = reason
+            if success:
+                missing["failure_reason"] = "successful_trial"
+            else:
+                missing["output_token_hash"] = "failed_trial"
+            if row.get("quality_score") is None:
+                missing["quality_score"] = (
+                    "failed_trial" if not success else "unscored_task"
+                )
+            for name in ("uplink_bps", "downlink_bps", "rtt_ms"):
+                if network.get(name) is None:
+                    missing[f"network_state.{name}"] = (
+                        "uncontrolled_network"
+                        if not network["controlled"]
+                        else "measurement_unavailable"
+                    )
             rows_out.append(
                 {
                     "schema_version": 1,
@@ -405,6 +438,47 @@ def build_profile(
         }
         for key, statuses in counts.items()
     }
+    by_trial: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows_out:
+        if not row["warmup"]:
+            by_trial[row["trial_id"]].append(row)
+    complete_triplets = [
+        trio
+        for trio in by_trial.values()
+        if len(trio) == 3 and all(row["status"] == "ok" for row in trio)
+    ]
+    prompt_tokens_equal = all(
+        len({row["fields"]["prompt_tokens"] for row in trio}) == 1
+        for trio in complete_triplets
+    )
+    output_tokens_equal = all(
+        len({row["output_token_hash"] for row in trio}) == 1
+        for trio in complete_triplets
+    )
+    negative_transport_residuals = sum(
+        row["fields"]["transport_residual_ms"] is not None
+        and row["fields"]["transport_residual_ms"] < 0
+        for row in rows_out
+    )
+    negative_stage_residuals = sum(
+        row["fields"]["stage_residual_ms"] is not None
+        and row["fields"]["stage_residual_ms"] < 0
+        for row in rows_out
+    )
+    local_passed = (
+        len(coverage) == 3
+        and all(value["covered"] for value in coverage.values())
+        and len(complete_triplets) >= 10
+        and prompt_tokens_equal
+        and output_tokens_equal
+        and negative_transport_residuals == 0
+        and negative_stage_residuals == 0
+        and all(
+            row["fields"]["stage_residual_ms"] is not None
+            for row in rows_out
+            if row["status"] == "ok"
+        )
+    )
     summary = {
         "schema_version": 1,
         "campaign_id": spec["campaign_id"],
@@ -416,22 +490,14 @@ def build_profile(
             measure_call(lambda: None).elapsed_ms for _ in range(1000)
         ),
         "warmup_rows": sum(bool(row["warmup"]) for row in rows_out),
+        "complete_successful_triplets": len(complete_triplets),
+        "complete_triplets_prompt_tokens_equal": prompt_tokens_equal,
+        "complete_triplets_output_tokens_equal": output_tokens_equal,
         "coverage": coverage,
-        "local_gate_passed": len(coverage) == 3
-        and all(value["covered"] for value in coverage.values())
-        and all(
-            row["fields"]["stage_residual_ms"] is not None
-            for row in rows_out
-            if row["status"] == "ok"
-        ),
-        "controlled_network_gate_passed": bool(network["controlled"])
-        and len(coverage) == 3
-        and all(value["covered"] for value in coverage.values()),
-        "negative_transport_residuals": sum(
-            row["fields"]["transport_residual_ms"] is not None
-            and row["fields"]["transport_residual_ms"] < 0
-            for row in rows_out
-        ),
+        "local_gate_passed": local_passed,
+        "controlled_network_gate_passed": bool(network["controlled"]) and local_passed,
+        "negative_transport_residuals": negative_transport_residuals,
+        "negative_stage_residuals": negative_stage_residuals,
     }
     output_dir.mkdir(parents=True)
     (output_dir / "profile.jsonl").write_text(

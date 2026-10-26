@@ -2,6 +2,7 @@
   "schema_version": 1,
   "campaign_id": "phase2-local-fixture-v1",
   "host_pair_id": "wsl-single-host-cpu-loopback",
+  "cloud_device": "cpu",
   "task_bucket": "correctness-fixtures-all-prompts-32-token-budget",
   "requested_max_new_tokens": 32,
   "network_state": {
