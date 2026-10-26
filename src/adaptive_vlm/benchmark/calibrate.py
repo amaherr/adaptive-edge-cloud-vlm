@@ -136,6 +136,9 @@ def _network_fit(rows: list[dict[str, Any]], mode: str) -> NetworkFit:
             None,
             None,
         )
+    sources = {state["source"] for state in states}
+    if len(sources) != 1:
+        raise ValueError("controlled calibration mixes network state sources")
     corrected: list[tuple[float, float]] = []
     for row, state in zip(rows, states, strict=True):
         up = _number(state["uplink_bps"], "uplink_bps")
@@ -162,7 +165,7 @@ def _network_fit(rows: list[dict[str, Any]], mode: str) -> NetworkFit:
     intercept = median(value - rtt_coefficient * rtt for rtt, value in corrected)
     return NetworkFit(
         "controlled",
-        None,
+        next(iter(sources)),
         None,
         0.0,
         intercept,

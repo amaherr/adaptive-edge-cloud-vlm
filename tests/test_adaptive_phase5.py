@@ -335,6 +335,14 @@ def test_mixed_run_matches_fixed_controls(
         "edge_memory_budget_mib": None,
         "edge_required_peak_mib": None,
     }
+    live_monitor_config = {
+        "mode": "live",
+        "max_age_ms": 100.0,
+        "passive_min_bytes": 4096,
+        "passive_min_bps": 100000.0,
+        "passive_max_bps": 10000000000.0,
+        "passive_alpha": 0.25,
+    }
     run_adaptive_benchmark(
         config=config,
         manifest=manifest,
@@ -352,7 +360,7 @@ def test_mixed_run_matches_fixed_controls(
         warmups=1,
         repetitions=1,
         activation="diagnostic_unpassed_gates",
-        monitor_config={"mode": "live", "max_age_ms": 100.0},
+        monitor_config=live_monitor_config,
         passive_observer=lambda metrics: "request_wire_bytes" in metrics,
     )
     monitor_report = analyze_monitor_run(live_dir)
@@ -360,6 +368,29 @@ def test_mixed_run_matches_fixed_controls(
     assert monitor_report["monitor_samples_recorded"] == 13
     assert monitor_report["passive_updates"] == 8
     assert analyze_adaptive_run(live_dir, fixed_dirs)["g5_local_gate_passed"]
+    restored_metrics: list[dict[str, Any]] = []
+    run_adaptive_benchmark(
+        config=config,
+        manifest=manifest,
+        calibration=calibration,
+        replay=replay,
+        replay_sha256="b" * 64,
+        registry_provider=lambda: RegistrySnapshot(
+            _registry(policies, fingerprint), live_monitoring
+        ),
+        task_builder=lambda _item: _task(),
+        run_manifest=create_run_manifest(
+            config, placement_environment, dataset_manifest_sha256=manifest.sha256
+        ),
+        run_dir=live_dir,
+        warmups=1,
+        repetitions=1,
+        activation="diagnostic_unpassed_gates",
+        monitor_config=live_monitor_config,
+        passive_observer=lambda metrics: restored_metrics.append(dict(metrics)) or True,
+        resume=True,
+    )
+    assert len(restored_metrics) == 9  # Warmup plus eight remote measured rows.
     raw = adaptive_dir / "requests.jsonl"
     rows = [json.loads(line) for line in raw.read_text().splitlines()]
     selected = rows[1]["selected_configuration_id"]

@@ -228,6 +228,13 @@ def run_adaptive_benchmark(
         ):
             raise ValueError("saved adaptive trial differs from plan")
         completed.add(trial.trial_id)
+    if resume and passive_observer is not None:
+        for saved_row in rows:
+            if (
+                saved_row.get("status") == "ok"
+                and saved_row.get("passive_updated") is True
+            ):
+                passive_observer(saved_row["metrics"])
     items = {item.request_id: item for item in manifest.items}
     predictor = Predictor(calibration)
     placements = {

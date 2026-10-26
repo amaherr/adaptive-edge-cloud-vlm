@@ -384,6 +384,8 @@ class Predictor:
                 return self._invalid(identifier, "network_out_of_coverage")
             transport = network.transport_ms
         elif network.kind == "controlled":
+            if network.source is not None and state.network_source != network.source:
+                return self._invalid(identifier, "network_source_mismatch")
             values = (state.uplink_bps, state.downlink_bps, state.rtt_ms)
             if any(value is None for value in values):
                 return self._invalid(identifier, "network_state_missing")

@@ -310,6 +310,19 @@ With the pinned Moondream cache, start `adaptive-server` as in the [Phase 5 hand
 
 The diagnostic flag explicitly permits the current failed G3/open G4 fit for an integration check; it does not approve performance selection. `requests.jsonl` contains every candidate prediction, decision, actual result, overhead and any retry. Use `analyze-adaptive` with matching edge/cloud/distributed fixed controls, as described in the [execution contract](docs/phase5_execution_contract.md). The command requires a resident full edge adapter for exact prompt-token counting.
 
+### Phase 6 network trace and live monitor
+
+Replay the [synthetic controlled trace](configs/network_traces/phase6_synthetic_trace.json) through the predictor and selector without loading a model:
+
+~~~bash
+.venv/bin/adaptive-vlm replay-network-trace \
+  --calibration configs/network_traces/phase6_synthetic_calibration.json \
+  --trace configs/network_traces/phase6_synthetic_trace.json \
+  --output-dir artifacts/example-network-trace
+~~~
+
+For a real diagnostic, add `--monitor-mode live --probe-timeout-ms 2000 --probe-max-age-ms 5000` to `adaptive-benchmark`, then run `analyze-monitor RUN_DIR --output RUN_DIR/monitor_analysis.json`. The [Phase 6 handoff](docs/phase6_handoff.md) gives the complete local commands and second-machine setup; the [monitor contract](docs/phase6_monitor_contract.md) defines probe age, failure behavior and passive-rate limits. Health-probe round trip and socket-send rate are recorded as distinct application observations and are not fed to the current loopback predictor.
+
 ### Import a VQA validation subset
 
 The repository does not download or redistribute the VQA questions, answers, or COCO images. Once the official VQA v2 val2014 JSON files and images are available locally, freeze a deterministic subset:
@@ -359,6 +372,8 @@ Run `adaptive-vlm --help` or `adaptive-vlm COMMAND --help` for machine-readable,
 | `evaluate-selector` | `--predictions PATH --specification PATH --output-dir PATH` | Checks a frozen predictions hash and writes offline decisions plus matched measured-oracle metrics. |
 | `adaptive-benchmark` | `--config PATH --manifest PATH --calibration PATH --replay PATH --run-dir PATH --artifact-manifest PATH` | Runs a resumable mixed-choice campaign; requires passing G3/G4 reports or explicit `--diagnostic-allow-unpassed-gates`. |
 | `analyze-adaptive` | `ADAPTIVE_RUN_DIR EDGE_DIR CLOUD_DIR DISTRIBUTED_DIR` | Matches each choice to a fixed control and audits tokens, placement, wire bytes, and decisions. |
+| `replay-network-trace` | `--calibration PATH --trace PATH --output-dir PATH` | Replays frozen bandwidth/RTT/health states through the predictor and selector; reports switches and safety. |
+| `analyze-monitor` | `RUN_DIR --output PATH` | Audits live probe timestamps, age, fail-closed decisions, passive updates, and monitor overhead. |
 | `import-vqa-v2` | `--questions PATH --annotations PATH --images-dir PATH --output PATH --revision LABEL` | `--count N` (100), `--seed N` (42). |
 
 `--config` references an experiment YAML, not a model YAML. `--artifact-manifest` references [the pinned artifact manifest](configs/model/moondream2_artifact.yaml); it is distinct from the request `--manifest` used by `benchmark`. `--device` places the cloud server's model/text stage; `--vision-device` and `--text-device` name edge-side placements. `--offline` forbids model downloads and is appropriate only after the cache is populated. `--bind-host` controls the listening interface, while `transport.host` in the config is the client-reachable address. `-v` adds detail; core phase milestones and benchmark trials are already visible by default.
@@ -391,6 +406,8 @@ The [Phase 4 handoff](docs/phase4_handoff.md) records the pure selector and offl
 
 The [Phase 5 handoff](docs/phase5_handoff.md) records a real 12-request mixed-choice local Moondream run: 12/12 successful, four selections per configuration, zero same-placement token mismatches or wire/trace errors, and a passing **local G5 integration gate**. The choices were forced by declared replay health exclusions; G3/G4 and physical performance claims remain open.
 
+The [Phase 6 handoff](docs/phase6_handoff.md) records a nine-sample synthetic controlled trace with the expected edge-to-split crossover and zero noisy-segment switches after warmup. A three-request local Moondream run recorded live bounded health probes beside every decision; its monitor audit found no unsafe selections and median probe cost of 1.51 ms. Physical network, free GPU memory, and cloud load remain unmeasured.
+
 On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 12-request synthetic manifest with one excluded warm-up per policy. All three modes completed 12/12 measured requests, and the local `artifacts/chunk6/correctness-comparison.json` audit reported **12/12 identical token sequences and decoded texts**, zero failures, and a fixture exact-match score of 3/9 scored prompts in each policy. G1 projected-feature equivalence and G2 tensor serialization checks also passed in earlier focused tests. A fake-adapter 100-request fixture run completed 100/100 measured attempts after 10 warm-ups.
 
 | Policy | Median observed request time | Mean application wire bytes | Fixture score |
@@ -405,7 +422,7 @@ Generated `artifacts/`, `.model-cache/`, and `data/raw/` are ignored by Git. Pre
 
 ## Next research steps
 
-The next research milestone is to complete controlled Phase 2–3 profiling on a separate cloud host, with a fresh predeclared request and network holdout, then revise and retest the predictor's ranking. Evaluate the Phase 4 selector on that physical holdout and rerun the existing Phase 5 adaptive path with matching fixed controls before enabling validated automatic selection. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
+The next research milestone is to complete controlled Phase 2–3 profiling on a separate cloud host, with a fresh predeclared request and network holdout, then revise and retest the predictor's ranking. Evaluate the Phase 4 selector and Phase 6 monitor on that physical holdout, and rerun the Phase 5 adaptive path with matching fixed controls before enabling validated automatic selection. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
 
 ## Technology and repository layout
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from itertools import pairwise
 from pathlib import Path
 from statistics import median
@@ -32,6 +33,7 @@ def analyze_monitor_run(run_dir: Path, *, output: Path | None = None) -> dict[st
     fractions: list[float] = []
     probe_errors = 0
     passive_updates = 0
+    passive_estimate: float | None = None
     selected: list[str] = []
     timestamps = 0
     for row in rows:
@@ -102,6 +104,27 @@ def analyze_monitor_run(run_dir: Path, *, output: Path | None = None) -> dict[st
             overhead_ms.append(float(monitor_total))
             fractions.append(float(monitor_total / observed))
         passive_updates += row.get("passive_updated") is True
+        if row.get("passive_updated") is True:
+            wire_bytes = row.get("metrics", {}).get("request_wire_bytes")
+            send_ms = row.get("metrics", {}).get("network_send_ms")
+            if (
+                isinstance(wire_bytes, int)
+                and wire_bytes >= monitor_config["passive_min_bytes"]
+                and isinstance(send_ms, (int, float))
+                and math.isfinite(send_ms)
+                and send_ms > 0
+            ):
+                raw_bps = 8_000 * wire_bytes / send_ms
+                bounded = min(
+                    monitor_config["passive_max_bps"],
+                    max(monitor_config["passive_min_bps"], raw_bps),
+                )
+                alpha = monitor_config["passive_alpha"]
+                passive_estimate = (
+                    bounded
+                    if passive_estimate is None
+                    else alpha * bounded + (1 - alpha) * passive_estimate
+                )
     switches = sum(left != right for left, right in pairwise(selected))
     report = {
         "schema_version": 1,
@@ -112,8 +135,11 @@ def analyze_monitor_run(run_dir: Path, *, output: Path | None = None) -> dict[st
         "probe_errors": probe_errors,
         "passive_updates": passive_updates,
         "monitor_overhead_ms_median": median(overhead_ms) if overhead_ms else None,
+        "monitor_overhead_ms_max": max(overhead_ms) if overhead_ms else None,
         "monitor_overhead_fraction_median": median(fractions) if fractions else None,
         "switches_between_successful_measured_trials": switches,
+        "final_passive_uplink_application_bps": passive_estimate,
+        "passive_measurement_scope": "socket_send_duration_not_link_goodput",
         "model_load_cost_ms": 0.0,
         "model_load_cost_basis": "resident_policies_loaded_before_schedule",
         "unsafe_selections": sorted(set(unsafe)),

@@ -158,6 +158,10 @@ def test_fingerprint_task_network_and_memory_exclusions() -> None:
         cloud.predict(CLOUD, _state(uplink_bps=20_000_000), TASK).reason
         == "network_out_of_coverage"
     )
+    source_bound = _predictor(_fit(replace(_controlled(), source="measured")))
+    assert (
+        source_bound.predict(CLOUD, _state(), TASK).reason == "network_source_mismatch"
+    )
 
     edge_network = replace(_controlled(), kind="none")
     unknown = _predictor(_fit(edge_network, configuration_id=EDGE.id.value))
@@ -232,6 +236,7 @@ def test_controlled_transport_fit_uses_both_transfer_directions() -> None:
             {
                 "network_state": {
                     "controlled": True,
+                    "source": "controlled-fixture",
                     "uplink_bps": up,
                     "downlink_bps": down,
                     "rtt_ms": rtt,
@@ -245,5 +250,6 @@ def test_controlled_transport_fit_uses_both_transfer_directions() -> None:
         )
     fit = _network_fit(rows, "cloud")
     assert fit.kind == "controlled"
+    assert fit.source == "controlled-fixture"
     assert fit.intercept_ms == pytest.approx(3.0)
     assert fit.rtt_coefficient == pytest.approx(0.5)
