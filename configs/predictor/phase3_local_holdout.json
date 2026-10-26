@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "campaign_id": "phase3-local-fixture-v1",
+  "source_profile_sha256": "2a009d880b9c861ee5eedd8d1a60d982d59e91fbd359397d22f0274d1356e054",
+  "training_request_ids": [
+    "correctness-001",
+    "correctness-002",
+    "correctness-003",
+    "correctness-004",
+    "correctness-005",
+    "correctness-006",
+    "correctness-007",
+    "correctness-008",
+    "correctness-009",
+    "correctness-010"
+  ],
+  "holdout_request_ids": ["correctness-011", "correctness-012"],
+  "holdout_network_bucket_ids": [],
+  "minimum_training_rows_per_configuration": 10,
+  "interval_absolute_error_quantile": 0.9,
+  "edge_memory_headroom_fraction": 0.2,
+  "expected_output_estimator": "training_median",
+  "target_median_ape": 0.15,
+  "target_p90_ape": 0.3
+}
