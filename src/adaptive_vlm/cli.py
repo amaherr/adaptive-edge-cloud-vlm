@@ -11,6 +11,7 @@ from time import perf_counter
 
 from adaptive_vlm.artifacts import create_run_manifest, write_json_atomic
 from adaptive_vlm.benchmark.compare import compare_runs
+from adaptive_vlm.benchmark.predictor_eval import run_predictor_evaluation
 from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.benchmark.runner import run_benchmark
 from adaptive_vlm.config import (
@@ -59,6 +60,14 @@ def build_parser() -> argparse.ArgumentParser:
     profile_parser.add_argument("run_dirs", nargs="+", type=Path)
     profile_parser.add_argument("--specification", required=True, type=Path)
     profile_parser.add_argument("--output-dir", required=True, type=Path)
+
+    predictor_parser = subcommands.add_parser(
+        "calibrate-predictor",
+        help="Fit and evaluate a predictor on frozen profile holdouts",
+    )
+    predictor_parser.add_argument("--profile", required=True, type=Path)
+    predictor_parser.add_argument("--split", required=True, type=Path)
+    predictor_parser.add_argument("--output-dir", required=True, type=Path)
 
     benchmark_parser = subcommands.add_parser(
         "benchmark", help="Run a resumable edge, cloud, or distributed campaign"
@@ -255,6 +264,19 @@ def main(argv: Sequence[str] | None = None) -> int:
                     build_profile(
                         run_dirs=args.run_dirs,
                         specification=args.specification,
+                        output_dir=args.output_dir,
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if args.command == "calibrate-predictor":
+            print(
+                json.dumps(
+                    run_predictor_evaluation(
+                        profile_path=args.profile,
+                        split_path=args.split,
                         output_dir=args.output_dir,
                     ),
                     indent=2,

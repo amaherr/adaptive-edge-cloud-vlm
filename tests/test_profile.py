@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
 from adaptive_vlm.artifacts import create_run_manifest
+from adaptive_vlm.benchmark.predictor_eval import run_predictor_evaluation
 from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.benchmark.runner import run_benchmark
 from adaptive_vlm.config import ExecutionMode, load_experiment_config
@@ -166,3 +168,53 @@ def test_controlled_network_requires_hashed_evidence(tmp_path: Path) -> None:
         build_profile(
             run_dirs=dirs, specification=path, output_dir=tmp_path / "profile"
         )
+
+
+def test_predictor_fit_holds_out_requests_and_preserves_failures(
+    tmp_path: Path,
+) -> None:
+    dirs, specification = _campaign(tmp_path)
+    profile_dir = tmp_path / "profile"
+    build_profile(run_dirs=dirs, specification=specification, output_dir=profile_dir)
+    profile_path = profile_dir / "profile.jsonl"
+    split = {
+        "schema_version": 1,
+        "campaign_id": "test-predictor",
+        "source_profile_sha256": hashlib.sha256(profile_path.read_bytes()).hexdigest(),
+        "training_request_ids": [
+            f"correctness-{number:03d}" for number in range(1, 11)
+        ],
+        "holdout_request_ids": ["correctness-011", "correctness-012"],
+        "holdout_network_bucket_ids": [],
+        "minimum_training_rows_per_configuration": 10,
+        "interval_absolute_error_quantile": 0.9,
+        "edge_memory_headroom_fraction": 0.2,
+        "target_median_ape": 0.15,
+        "target_p90_ape": 0.3,
+    }
+    split_path = tmp_path / "split.json"
+    split_path.write_text(json.dumps(split))
+    output_dir = tmp_path / "fit"
+    report = run_predictor_evaluation(
+        profile_path=profile_path, split_path=split_path, output_dir=output_dir
+    )
+    calibration = json.loads((output_dir / "calibration.json").read_text())
+    assert set(calibration["training_request_ids"]).isdisjoint(
+        calibration["holdout_request_ids"]
+    )
+    assert all(
+        candidate["sample_count"] == 10
+        for candidate in calibration["candidates"].values()
+    )
+    evaluated = [
+        json.loads(line)
+        for line in (output_dir / "predictions.jsonl").read_text().splitlines()
+    ]
+    assert len(evaluated) == 6
+    assert all(
+        row["task_state_before_output"]["expected_output_tokens"] is None
+        for row in evaluated
+        if row["status"] == "ok"
+    )
+    assert sum(row["status"] != "ok" for row in evaluated) == 1
+    assert not report["full_g3_gate_evaluable"]
