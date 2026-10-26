@@ -159,6 +159,7 @@ def test_registry_routes_exactly_one_loaded_policy(tmp_path: Path) -> None:
     assert outcome.decision.configuration_id is ConfigurationId.DISTRIBUTED_PROJECTED
     assert [policy.calls for policy in policies.values()] == [[], [], ["one"]]
     assert outcome.decision.to_dict()["system_state"]["uplink_bps"] == 10_000_000
+    assert outcome.selection_overhead_ms >= 0
 
 
 def test_registry_excludes_missing_path_model_and_memory(tmp_path: Path) -> None:

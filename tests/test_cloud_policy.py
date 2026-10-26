@@ -125,6 +125,16 @@ def test_cloud_policy_returns_output_and_communication_metrics(
     assert result.metrics["response_wire_bytes"] > 0
     assert result.metrics["image_bytes"] == len(b"image bytes")
     assert result.metrics["server_model_output_tokens"] == 8
+    assert result.metrics["server_request_wire_bytes"] == result.metrics[
+        "request_wire_bytes"
+    ]
+    assert result.metrics["network_round_trip_ms"] >= sum(
+        result.metrics[name]
+        for name in ("network_connect_ms", "network_send_ms", "network_receive_ms")
+    )
+    assert result.metrics["client_end_to_end_ms"] >= result.metrics[
+        "network_round_trip_ms"
+    ] + result.metrics["image_read_ms"]
 
 
 def test_cloud_policy_surfaces_structured_remote_error(

@@ -154,6 +154,13 @@ def test_synchronous_distributed_policy_sends_projected_tensor_only(
     assert result.metrics["total_request_wire_bytes"] == result.metrics[
         "request_wire_bytes"
     ]
+    assert result.metrics["server_request_wire_bytes"] == result.metrics[
+        "request_wire_bytes"
+    ]
+    assert result.metrics["network_round_trip_ms"] >= sum(
+        result.metrics[name]
+        for name in ("network_connect_ms", "network_send_ms", "network_receive_ms")
+    )
 
 
 def test_distributed_policy_accepts_resident_full_or_vision_adapter() -> None:
