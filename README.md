@@ -2,7 +2,7 @@
 
 Research prototype for distributing inference from a single pretrained vision–language model (VLM) between an edge device and a cloud machine. The project aims to select an internal execution configuration per image-and-text request using network conditions, available compute and memory, and request characteristics. The intended outcome is lower end-to-end latency and communication cost without changing the model's answer quality or exceeding edge resources.
 
-The adaptive selector is **not implemented yet**. The current, reproducible foundation is a fixed three-policy baseline: all-edge, all-cloud, and edge vision/projector with cloud language generation. Keeping the same pinned model, preprocessing, prompt, precision, and greedy decoding across policies makes later adaptive decisions measurable rather than conflating them with model changes.
+The **automatic** adaptive selector is not implemented yet. The current, reproducible foundation has three fixed policies: all-edge, all-cloud, and edge vision/projector with cloud language generation. Phase 1 adds a manual configuration dispatcher and a server that can serve both remote paths without a restart. Keeping the same pinned model, preprocessing, prompt, precision, and greedy decoding across policies makes later adaptive decisions measurable rather than conflating them with model changes.
 
 ## Contents
 
@@ -18,7 +18,7 @@ The adaptive selector is **not implemented yet**. The current, reproducible foun
 
 ## Project architecture and scope
 
-The envisioned runtime accepts an image and a prompt, observes the current edge, network, and cloud state, then selects a feasible placement of the **same** VLM. A future controller will compare predicted end-to-end latency and transfer cost while enforcing edge memory and task-quality constraints. Benchmark observations will inform its decisions. The fixed policies and their instrumentation exist today; the selector, live resource/network sensing, prediction, and policy switching are future work.
+The envisioned runtime accepts an image and a prompt, observes the current edge, network, and cloud state, then selects a feasible placement of the **same** VLM. A future controller will compare predicted end-to-end latency and transfer cost while enforcing edge memory and task-quality constraints. Benchmark observations will inform its decisions. The fixed policies, manual dispatch, and dual-path server exist today; automatic selection, live resource/network sensing, and prediction remain future work.
 
 ~~~mermaid
 flowchart LR
@@ -290,7 +290,9 @@ Run `adaptive-vlm --help` or `adaptive-vlm COMMAND --help` for machine-readable,
 | `fake-infer` | `--config PATH --image PATH --prompt TEXT` | `--request-id` (`smoke-0001`), `--output-dir PATH`, `-v/--verbose`. |
 | `edge-infer` | `--config PATH --artifact-manifest PATH --image PATH --prompt TEXT` | `--cache-dir` (`.model-cache`), `--request-id` (`edge-0001`), `--vision-device` (`cpu`), `--text-device` (`cpu`), `--offline`, `--output-dir PATH`, `-v/--verbose`. |
 | `cloud-server` | `--config PATH` | `--artifact-manifest PATH` (required for Moondream, not fake), `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST` (otherwise config host), `-v/--verbose`. |
+| `adaptive-server` | `--config PATH --artifact-manifest PATH` | Loads one full Moondream model for raw-image and projected-tensor requests. `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST`, `-v/--verbose`. |
 | `cloud-infer` | `--config PATH --image PATH --prompt TEXT` | `--request-id` (`cloud-0001`), `--output-dir PATH`, `-v/--verbose`. |
+| `adaptive-infer` | `--config PATH --configuration-id ID --image PATH --prompt TEXT` | Manual Phase 1 selection among `edge/full`, `cloud/raw_image`, and `distributed/projected/synchronous`; see the [Phase 1 handoff](docs/phase1_handoff.md) for edge component, memory, network-state and artifact options. |
 | `distributed-server` | `--config PATH --artifact-manifest PATH` | `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST`, `-v/--verbose`. |
 | `distributed-infer` | `--config PATH --artifact-manifest PATH --image PATH --prompt TEXT` | `--cache-dir` (`.model-cache`), `--request-id` (`distributed-0001`), `--vision-device` (`cpu`), `--pipeline` (`synchronous` or `prompt_first`), `--offline`, `--output-dir PATH`, `-v/--verbose`. |
 | `benchmark` | `--config PATH --mode edge|cloud|distributed --run-dir PATH` | `--manifest PATH` (config dataset path), `--artifact-manifest PATH` (required for real edge/distributed), `--cache-dir` (`.model-cache`), `--vision-device` (`cpu`), `--text-device` (`cpu`), `--offline`, `--warmups N` and `--repetitions N` (config values), `--pipeline` (`synchronous` or `prompt_first`), `--resume`, `-v/--verbose`. |
@@ -317,6 +319,8 @@ The actual cloud host, real-link G4 correctness, network-condition campaign, and
 
 The [Phase 0 handoff](docs/phase0_handoff.md) records a fresh three-policy localhost CPU correctness campaign, its input hashes, passing gates, reproducible runner, and local artifact paths. All 12 measured requests passed in each policy and the comparison found 12/12 matching token sequences. The separate physical cloud host is still unavailable, so the physical-host gate remains pending. These are correctness observations, not controlled performance estimates.
 
+The [Phase 1 handoff](docs/phase1_handoff.md) records a resident three-policy localhost campaign through the new manual dispatcher and dual-path server. All 36 request/configuration results completed, all 12 request triples matched, and each matched the Phase 0 edge tokens. The report includes the observed client and server memory footprint; it is not a dynamic scheduling or physical-host performance result.
+
 On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 12-request synthetic manifest with one excluded warm-up per policy. All three modes completed 12/12 measured requests, and the local `artifacts/chunk6/correctness-comparison.json` audit reported **12/12 identical token sequences and decoded texts**, zero failures, and a fixture exact-match score of 3/9 scored prompts in each policy. G1 projected-feature equivalence and G2 tensor serialization checks also passed in earlier focused tests. A fake-adapter 100-request fixture run completed 100/100 measured attempts after 10 warm-ups.
 
 | Policy | Median observed request time | Mean application wire bytes | Fixture score |
@@ -331,7 +335,7 @@ Generated `artifacts/`, `.model-cache/`, and `data/raw/` are ignored by Git. Pre
 
 ## Next research steps
 
-The next experimental milestone is to run the same pinned requests on two physical hosts, record both hardware inventories and measured network conditions, and repeat each policy under controlled bandwidth/latency settings. A local VQA v2 validation subset and the official evaluator are also needed to report task quality beyond synthetic fixtures. Once these baselines are reliable, the planned adaptive phase adds resource and request sensing, estimates latency and transfer cost for each feasible configuration, selects a policy per request, and evaluates that selector against the three fixed-policy controls. None of these steps is included in the current results.
+The next implementation milestone is Phase 2 profiling: record component timings, transfer sizes, and conservative memory peaks for each configuration across controlled task and network conditions. A separate cloud host is still needed for physical deployment validation and network-performance claims. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures. Prediction and automatic selection remain later phases.
 
 ## Technology and repository layout
 
@@ -354,6 +358,7 @@ data/manifests/                    Frozen synthetic correctness and benchmark re
 src/adaptive_vlm/cli.py            Public commands and policy/server wiring
 src/adaptive_vlm/models/moondream.py  Pinned full, vision-only, and text-only adapter
 src/adaptive_vlm/execution/        Edge, cloud, and distributed execution policies
+src/adaptive_vlm/scheduler/        Phase 1 configuration, state, capability, and manual decision contracts
 src/adaptive_vlm/transport/        Framing, checksum, tensor payload, client, server
 src/adaptive_vlm/benchmark/        Scheduling, raw-result recording, summaries, comparison
 src/adaptive_vlm/data/             Manifest validation and VQA v2 subset importer
