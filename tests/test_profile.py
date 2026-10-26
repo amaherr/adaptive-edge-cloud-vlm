@@ -131,3 +131,13 @@ def test_profile_rejects_tampered_wire_bytes(tmp_path: Path) -> None:
         build_profile(
             run_dirs=dirs, specification=spec, output_dir=tmp_path / "profile"
         )
+
+
+def test_profile_rejects_incomplete_schedule(tmp_path: Path) -> None:
+    dirs, spec = _campaign(tmp_path)
+    path = dirs[0] / "requests.jsonl"
+    path.write_text("\n".join(path.read_text().splitlines()[:-1]) + "\n")
+    with pytest.raises(ValueError, match="missing trials"):
+        build_profile(
+            run_dirs=dirs, specification=spec, output_dir=tmp_path / "profile"
+        )

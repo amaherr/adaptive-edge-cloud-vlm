@@ -8,6 +8,7 @@ from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from statistics import median
+from time import perf_counter_ns
 from typing import Any, cast
 
 from adaptive_vlm.artifacts import write_json_atomic
@@ -36,6 +37,25 @@ def _digest(value: Mapping[str, Any]) -> str:
 
 def _metric(metrics: Mapping[str, Any], name: str, *, remote: bool) -> Any:
     return metrics.get(f"server_model_{name}" if remote else name)
+
+
+def _measurement_call_overhead_ms() -> float:
+    """Estimate CPU wrapper overhead against the same no-op without a wrapper."""
+
+    bare: list[float] = []
+    wrapped: list[float] = []
+
+    def noop() -> None:
+        return None
+
+    for _ in range(1000):
+        started = perf_counter_ns()
+        noop()
+        bare.append((perf_counter_ns() - started) / 1_000_000)
+        started = perf_counter_ns()
+        measure_call(noop)
+        wrapped.append((perf_counter_ns() - started) / 1_000_000)
+    return median(wrapped) - median(bare)
 
 
 def _read_run(
@@ -500,9 +520,7 @@ def build_profile(
         "dataset_manifest_sha256": frozen.sha256,
         "model_contract_sha256": reference["model_contract_sha256"],
         "row_count": len(rows_out),
-        "measurement_call_overhead_ms_median_cpu": median(
-            measure_call(lambda: None).elapsed_ms for _ in range(1000)
-        ),
+        "measurement_call_overhead_ms_median_cpu": _measurement_call_overhead_ms(),
         "warmup_rows": sum(bool(row["warmup"]) for row in rows_out),
         "complete_successful_triplets": len(complete_triplets),
         "complete_triplets_prompt_tokens_equal": prompt_tokens_equal,
