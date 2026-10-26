@@ -464,6 +464,7 @@ configs/hardware/                  Edge, localhost cloud, and pending cloud inve
 configs/experiments/               Runnable smoke, local, shared benchmark, and templates
 data/manifests/                    Frozen synthetic correctness and benchmark requests
 src/adaptive_vlm/cli.py            Public commands and policy/server wiring
+src/adaptive_vlm/commands/        Extracted CLI orchestration (adaptive benchmark first)
 src/adaptive_vlm/models/moondream.py  Pinned full, vision-only, and text-only adapter
 src/adaptive_vlm/execution/        Edge, cloud, and distributed execution policies
 src/adaptive_vlm/scheduler/        Phase 1 configuration, state, capability, and manual decision contracts

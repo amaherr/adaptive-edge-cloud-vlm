@@ -31,6 +31,40 @@ def test_config_validate_prints_resolved_config(
     assert json.loads(captured.out)["mode"] == "edge"
 
 
+def test_adaptive_benchmark_routes_to_command_module(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    received: list[object] = []
+
+    def run_command(args: object, *, rss_reader: object) -> int:
+        received.extend((args, rss_reader))
+        return 0
+
+    monkeypatch.setattr("adaptive_vlm.cli.run_adaptive_benchmark_command", run_command)
+    assert (
+        main(
+            [
+                "adaptive-benchmark",
+                "--config",
+                "config.yaml",
+                "--manifest",
+                "tasks.jsonl",
+                "--calibration",
+                "fit.json",
+                "--replay",
+                "replay.json",
+                "--run-dir",
+                "run",
+                "--artifact-manifest",
+                "model.yaml",
+            ]
+        )
+        == 0
+    )
+    assert received[0].config == Path("config.yaml")
+    assert callable(received[1])
+
+
 def test_fake_infer_writes_artifacts(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -204,9 +238,7 @@ def test_cloud_server_starts_fake_adapter(
     assert "Cloud server ready" in captured.err
     assert "Waiting for requests" in captured.err
     assert ready["ready"] is True
-    config = load_experiment_config(
-        ROOT / "configs/experiments/chunk4_fake_cloud.yaml"
-    )
+    config = load_experiment_config(ROOT / "configs/experiments/chunk4_fake_cloud.yaml")
     assert ready["model_artifact_sha256"] == FakeModelAdapter().metadata.fingerprint
     assert ready["model_contract_fingerprint"] == model_contract_fingerprint(
         config.model
@@ -399,4 +431,3 @@ def test_distributed_commands_reject_pending_cloud(
 
     assert exit_code == 2
     assert "pending" in capsys.readouterr().err
-
