@@ -214,6 +214,14 @@ def build_profile(
             if (
                 success
                 and remote
+                and metrics.get("server_request_wire_bytes") != request_wire
+            ):
+                raise ValueError(
+                    f"client/server request wire bytes differ: {row['trial_id']}"
+                )
+            if (
+                success
+                and remote
                 and metrics.get("total_wire_bytes") is not None
                 and metrics["total_wire_bytes"]
                 != cast(int, request_wire) + cast(int, response_wire)

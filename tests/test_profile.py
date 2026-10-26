@@ -45,6 +45,7 @@ class ProfileFixturePolicy(ExecutionPolicy):
                 "network_round_trip_ms": 0.000002,
                 "server_total_ms": 0.000001,
                 "request_wire_bytes": 3_000_000,
+                "server_request_wire_bytes": 3_000_000,
                 "response_wire_bytes": 30,
             }
             if self.mode is ExecutionMode.CLOUD:
