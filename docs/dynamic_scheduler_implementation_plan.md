@@ -1,6 +1,6 @@
 # Dynamic VLM configuration scheduler: implementation plan
 
-Status: implementation plan, based on the repository as inspected on 2026-10-25 and the supplied `dynamic_vlm_configuration_framework.md`. G0-local, G1-local, and the narrow G2 local-profile check passed on 2026-10-26; controlled-network and physical-host G2 work is pending. See the [Phase 0 handoff](phase0_handoff.md), [Phase 1 handoff](phase1_handoff.md), and [Phase 2 handoff](phase2_handoff.md). The gates below are proposed acceptance criteria for this phase; record any threshold changes **before** running the final evaluation.
+Status: implementation plan, based on the repository as inspected on 2026-10-25 and the supplied `dynamic_vlm_configuration_framework.md`. G0-local, G1-local, and the narrow G2 local-profile check passed on 2026-10-26. The Phase 3 predictor and local holdout evaluation are implemented; the local G3 ranking target failed, and the controlled-network/physical-host G2–G3 work is pending. See the [Phase 0 handoff](phase0_handoff.md), [Phase 1 handoff](phase1_handoff.md), [Phase 2 handoff](phase2_handoff.md), and [Phase 3 handoff](phase3_handoff.md). The gates below are proposed acceptance criteria for this phase; record any threshold changes **before** running the final evaluation.
 
 ## 1. Baseline audit and scope
 
@@ -103,6 +103,8 @@ Each gate is checked in order. A failed gate produces an artifact explaining the
 **Work.** Implement the component model above using profile medians or a small regression, with explicit host-pair and model fingerprint matching. Compare against a constant-policy median predictor. Hold out whole request IDs and at least one network-condition block from fitting; test interpolation and unseen conditions separately. Report median and 90th-percentile absolute percentage error, signed bias, interval coverage and ranking accuracy per candidate/task/network bucket. Avoid percentage error for near-zero components; evaluate total latency where denominators are meaningful. Include real serialization cost and response transfer, which the source framework formula omits.
 
 **Gate G3.** On a predeclared held-out **in-distribution** set, target total-latency median APE ≤15% and p90 APE ≤30%, with no worse ranking accuracy than the constant-median baseline. These are proposed engineering targets, not a claim that hardware noise will meet them; if they fail, collect data or revise the model and rerun a fresh holdout. Out-of-coverage inputs are flagged and trigger a documented safe fallback. Predictor unit tests verify units, monotonicity of transfer time with bandwidth, deterministic outputs, missing-state handling and memory exclusion.
+
+**Current check:** the [frozen local request holdout](phase3_handoff.md) meets the total-latency APE thresholds but selects the fastest configuration in 0/2 paired cases, versus 2/2 for the constant-median baseline. Its ranking target therefore fails. The one uncontrolled loopback bucket cannot supply a network-block holdout, so full G3 is unevaluable. Keep the predictor diagnostic and do not activate automatic performance selection from this fit.
 
 ### Phase 4 — Establish independent offline oracle and scheduler V1
 

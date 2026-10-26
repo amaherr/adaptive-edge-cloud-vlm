@@ -266,6 +266,19 @@ The fixed-policy benchmark now records trial start time, exact model prompt-toke
 
 Inspect `artifacts/example-profile/summary.json` for coverage/failures and `profile.jsonl` for each warmup, measured success, and failure. The [schema note](docs/phase2_profile_schema.md) defines timing boundaries, null reasons, residuals, and units. The [split inspection](docs/phase2_split_feasibility.md) documents candidate graph boundaries that remain inactive. The supplied specification labels the local loopback network as uncontrolled; it cannot support physical-network crossover claims.
 
+### Phase 3 predictor calibration
+
+Fit the component predictor and evaluate the frozen request holdout from the Phase 2 local profile:
+
+~~~bash
+.venv/bin/adaptive-vlm calibrate-predictor \
+  --profile artifacts/phase2/2026-10-26/local-1/profile/profile.jsonl \
+  --split configs/predictor/phase3_local_holdout.json \
+  --output-dir artifacts/example-predictor
+~~~
+
+Read `evaluation.json` for per-candidate error, interval coverage, ranking against the constant-median baseline, and gate flags. `calibration.json` contains the fitted components and coverage bounds; `predictions.jsonl` keeps each held-out task snapshot and prediction. The [Phase 3 handoff](docs/phase3_handoff.md) reports the local gate miss and the [predictor contract](docs/phase3_predictor_schema.md) defines units and out-of-coverage behavior. This calibration is diagnostic and is not connected to automatic execution.
+
 ### Import a VQA validation subset
 
 The repository does not download or redistribute the VQA questions, answers, or COCO images. Once the official VQA v2 val2014 JSON files and images are available locally, freeze a deterministic subset:
@@ -311,6 +324,7 @@ Run `adaptive-vlm --help` or `adaptive-vlm COMMAND --help` for machine-readable,
 | `benchmark` | `--config PATH --mode edge|cloud|distributed --run-dir PATH` | `--manifest PATH` (config dataset path), `--artifact-manifest PATH` (required for real edge/distributed), `--cache-dir` (`.model-cache`), `--vision-device` (`cpu`), `--text-device` (`cpu`), `--offline`, `--warmups N` and `--repetitions N` (config values), `--pipeline` (`synchronous` or `prompt_first`), `--resume`, `-v/--verbose`. |
 | `compare-runs` | At least two `RUN_DIR` paths | `--output PATH` saves comparison JSON; comparison is always printed. |
 | `profile-runs` | Completed matching `RUN_DIR` paths | `--specification PATH --output-dir PATH`; validates raw trials, hashes and coverage and writes versioned profile rows. |
+| `calibrate-predictor` | `--profile PATH --split PATH --output-dir PATH` | Fits only frozen training rows and writes a calibration, held-out evaluation and per-trial predictions. |
 | `import-vqa-v2` | `--questions PATH --annotations PATH --images-dir PATH --output PATH --revision LABEL` | `--count N` (100), `--seed N` (42). |
 
 `--config` references an experiment YAML, not a model YAML. `--artifact-manifest` references [the pinned artifact manifest](configs/model/moondream2_artifact.yaml); it is distinct from the request `--manifest` used by `benchmark`. `--device` places the cloud server's model/text stage; `--vision-device` and `--text-device` name edge-side placements. `--offline` forbids model downloads and is appropriate only after the cache is populated. `--bind-host` controls the listening interface, while `transport.host` in the config is the client-reachable address. `-v` adds detail; core phase milestones and benchmark trials are already visible by default.
@@ -337,6 +351,8 @@ The [Phase 1 handoff](docs/phase1_handoff.md) records a resident three-policy lo
 
 The [Phase 2 handoff](docs/phase2_handoff.md) documents per-stage timing and exact-byte instrumentation, the validated profile command, and a fresh local Moondream campaign. The local profile has 12/12 measured successes per configuration, 12/12 matching token triples, and zero negative accounting residuals. Its declared loopback condition is uncontrolled; the physical-host and controlled-network G2 checks remain pending.
 
+The [Phase 3 handoff](docs/phase3_handoff.md) records the frozen local predictor fit. On two held-out requests, per-configuration median latency APE was 2.87–4.89%, but the predictor's fastest-choice ranking was 0/2 versus 2/2 for the constant-median baseline. The local G3 ranking target failed; a controlled-network holdout and physical-host validation remain unavailable.
+
 On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 12-request synthetic manifest with one excluded warm-up per policy. All three modes completed 12/12 measured requests, and the local `artifacts/chunk6/correctness-comparison.json` audit reported **12/12 identical token sequences and decoded texts**, zero failures, and a fixture exact-match score of 3/9 scored prompts in each policy. G1 projected-feature equivalence and G2 tensor serialization checks also passed in earlier focused tests. A fake-adapter 100-request fixture run completed 100/100 measured attempts after 10 warm-ups.
 
 | Policy | Median observed request time | Mean application wire bytes | Fixture score |
@@ -351,7 +367,7 @@ Generated `artifacts/`, `.model-cache/`, and `data/raw/` are ignored by Git. Pre
 
 ## Next research steps
 
-The next implementation milestone is Phase 2 profiling: record component timings, transfer sizes, and conservative memory peaks for each configuration across controlled task and network conditions. A separate cloud host is still needed for physical deployment validation and network-performance claims. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures. Prediction and automatic selection remain later phases.
+The next research milestone is to complete controlled Phase 2–3 profiling on a separate cloud host, with a fresh predeclared request and network holdout, then revise and retest the predictor's ranking before automatic selection. Phase 4 selector logic can be implemented with synthetic fixtures while these performance gates remain open. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
 
 ## Technology and repository layout
 

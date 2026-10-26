@@ -16,6 +16,7 @@ from adaptive_vlm.benchmark.calibrate import (
     percentile,
     task_and_state_from_row,
 )
+from adaptive_vlm.environment import collect_environment
 from adaptive_vlm.scheduler.configuration import CONFIGURATIONS
 from adaptive_vlm.scheduler.predictor import Calibration, Predictor
 
@@ -248,6 +249,7 @@ def run_predictor_evaluation(
     output_dir.mkdir(parents=True)
     write_json_atomic(output_dir / "calibration.json", calibration.to_dict())
     write_json_atomic(output_dir / "evaluation.json", report)
+    write_json_atomic(output_dir / "environment.json", collect_environment())
     (output_dir / "predictions.jsonl").write_text(
         "".join(json.dumps(row, sort_keys=True) + "\n" for row in evaluated),
         encoding="utf-8",

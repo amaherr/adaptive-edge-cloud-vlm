@@ -88,6 +88,12 @@ def load_profile_and_split(
         row = json.loads(line)
         if not isinstance(row, dict) or row.get("schema_version") != 1:
             raise ValueError(f"invalid profile row {number}")
+        if (
+            row.get("status") == "ok"
+            and _number(row.get("observed_end_to_end_ms"), "observed_end_to_end_ms")
+            <= 0
+        ):
+            raise ValueError(f"non-positive successful latency in profile row {number}")
         rows.append(row)
     if not rows:
         raise ValueError("profile has no rows")

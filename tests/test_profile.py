@@ -200,6 +200,7 @@ def test_predictor_fit_holds_out_requests_and_preserves_failures(
         profile_path=profile_path, split_path=split_path, output_dir=output_dir
     )
     calibration = json.loads((output_dir / "calibration.json").read_text())
+    assert (output_dir / "environment.json").is_file()
     assert (
         Calibration.load(output_dir / "calibration.json").calibration_id
         == calibration["calibration_id"]
