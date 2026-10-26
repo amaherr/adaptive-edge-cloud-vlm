@@ -26,6 +26,42 @@ class HealthStatus:
     model_fingerprint: str
 
 
+@dataclass(frozen=True)
+class RemoteCapabilities:
+    ready: bool
+    model_fingerprint: str
+    paths: frozenset[str]
+
+
+def check_remote_capabilities(
+    transport: TransportConfig, model: ModelMetadata
+) -> RemoteCapabilities:
+    request_id = f"capabilities-{uuid.uuid4().hex}"
+    exchange = exchange_frame(
+        transport,
+        Frame(
+            version=transport.protocol_version,
+            message_type=MessageType.CAPABILITY_REQUEST,
+            request_id=request_id,
+            metadata={},
+        ),
+    )
+    response = exchange.response
+    validate_response(response, request_id)
+    if response.message_type is not MessageType.CAPABILITY_RESPONSE:
+        raise ProtocolError("server returned a non-capability response")
+    fingerprint = cast(str, response.metadata["model_fingerprint"])
+    if fingerprint != model.fingerprint:
+        raise ProtocolError(
+            "server capabilities reported a different model fingerprint"
+        )
+    return RemoteCapabilities(
+        ready=cast(bool, response.metadata["ready"]),
+        model_fingerprint=fingerprint,
+        paths=frozenset(cast(list[str], response.metadata["paths"])),
+    )
+
+
 def check_remote_health(
     transport: TransportConfig, model: ModelMetadata
 ) -> HealthStatus:

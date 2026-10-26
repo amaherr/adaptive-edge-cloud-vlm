@@ -31,6 +31,8 @@ _HEADER_KEYS = {
 class MessageType(StrEnum):
     HEALTH_REQUEST = "health_request"
     HEALTH_RESPONSE = "health_response"
+    CAPABILITY_REQUEST = "capability_request"
+    CAPABILITY_RESPONSE = "capability_response"
     INFERENCE_REQUEST = "inference_request"
     INFERENCE_RESPONSE = "inference_response"
     PROMPT_REQUEST = "prompt_request"
@@ -223,6 +225,19 @@ def _validate_message(frame: Frame) -> None:
         _require_keys(metadata, {"ready", "model_fingerprint"})
         _require_type(metadata, "ready", bool)
         _require_fingerprint(metadata)
+        _require_empty_payload(frame)
+    elif frame.message_type is MessageType.CAPABILITY_REQUEST:
+        _require_keys(metadata, set())
+        _require_empty_payload(frame)
+    elif frame.message_type is MessageType.CAPABILITY_RESPONSE:
+        _require_keys(metadata, {"ready", "model_fingerprint", "paths"})
+        _require_type(metadata, "ready", bool)
+        _require_fingerprint(metadata)
+        paths = _require_type(metadata, "paths", list)
+        allowed = {"raw_image", "projected_synchronous", "projected_prompt_first"}
+        if not paths or any(not isinstance(path, str) or path not in allowed
+                            for path in paths) or len(paths) != len(set(paths)):
+            raise ProtocolError("capability paths are invalid")
         _require_empty_payload(frame)
     elif frame.message_type is MessageType.INFERENCE_REQUEST:
         _require_keys(metadata, {"prompt", "model_fingerprint", "image_suffix"})

@@ -12,6 +12,8 @@ from adaptive_vlm.contracts import InferenceRequest, InferenceResult, MetricValu
 from adaptive_vlm.execution.base import ExecutionPolicy
 from adaptive_vlm.execution.remote import (
     HealthStatus,
+    RemoteCapabilities,
+    check_remote_capabilities,
     check_remote_health,
     parse_inference_response,
     validate_response,
@@ -42,8 +44,8 @@ class DistributedExecutionPolicy(ExecutionPolicy):
         tensor_serializer: TensorSerializer = TensorPayload.from_torch,
         pipeline: str = "synchronous",
     ) -> None:
-        if encoder.component_role != "vision":
-            raise ValueError("distributed edge adapter must retain only vision")
+        if encoder.component_role not in {"vision", "full"}:
+            raise ValueError("distributed edge adapter must retain vision")
         if pipeline not in {"synchronous", "prompt_first"}:
             raise ValueError(f"unsupported distributed pipeline: {pipeline}")
         self._encoder = encoder
@@ -58,6 +60,9 @@ class DistributedExecutionPolicy(ExecutionPolicy):
 
     def health(self) -> HealthStatus:
         return check_remote_health(self._transport, self._model)
+
+    def capabilities(self) -> RemoteCapabilities:
+        return check_remote_capabilities(self._transport, self._model)
 
     def infer(self, request: InferenceRequest) -> InferenceResult:
         started_ns = perf_counter_ns()

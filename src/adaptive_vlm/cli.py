@@ -23,14 +23,19 @@ from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.data.vqa_import import import_vqa_v2
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.environment import collect_environment
+from adaptive_vlm.execution.adaptive import load_phase1_policies
 from adaptive_vlm.execution.base import ExecutionPolicy
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.execution.distributed import DistributedExecutionPolicy
 from adaptive_vlm.execution.local import LocalExecutionPolicy
+from adaptive_vlm.execution.remote import check_remote_capabilities
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
+from adaptive_vlm.scheduler.configuration import CapabilityRegistry, ConfigurationId
+from adaptive_vlm.scheduler.dispatch import ConfigurationDispatcher
+from adaptive_vlm.scheduler.state import SystemState, TaskState
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
 
@@ -134,6 +139,41 @@ def build_parser() -> argparse.ArgumentParser:
     server_parser.add_argument("--offline", action="store_true")
     server_parser.add_argument("--bind-host")
     server_parser.add_argument("-v", "--verbose", action="store_true")
+
+    adaptive_server = subcommands.add_parser(
+        "adaptive-server", help="Serve raw images and projected tensors together"
+    )
+    adaptive_server.add_argument("--config", required=True, type=Path)
+    adaptive_server.add_argument("--artifact-manifest", required=True, type=Path)
+    adaptive_server.add_argument("--cache-dir", default=Path(".model-cache"), type=Path)
+    adaptive_server.add_argument("--device", default="cpu")
+    adaptive_server.add_argument("--offline", action="store_true")
+    adaptive_server.add_argument("--bind-host")
+    adaptive_server.add_argument("-v", "--verbose", action="store_true")
+
+    adaptive_parser = subcommands.add_parser(
+        "adaptive-infer", help="Manually route one request through a loaded policy"
+    )
+    adaptive_parser.add_argument("--config", required=True, type=Path)
+    adaptive_parser.add_argument("--configuration-id", required=True,
+                                 choices=tuple(item.value for item in ConfigurationId))
+    adaptive_parser.add_argument("--artifact-manifest", type=Path)
+    adaptive_parser.add_argument("--cache-dir", default=Path(".model-cache"), type=Path)
+    adaptive_parser.add_argument("--image", required=True, type=Path)
+    adaptive_parser.add_argument("--prompt", required=True)
+    adaptive_parser.add_argument("--request-id", default="adaptive-0001")
+    adaptive_parser.add_argument("--vision-device", default="cpu")
+    adaptive_parser.add_argument("--text-device", default="cpu")
+    adaptive_parser.add_argument(
+        "--edge-components", choices=("full", "vision", "none"), default="full"
+    )
+    adaptive_parser.add_argument("--uplink-mbps", type=float)
+    adaptive_parser.add_argument("--rtt-ms", type=float)
+    adaptive_parser.add_argument("--edge-memory-budget-mib", type=float)
+    adaptive_parser.add_argument("--expected-output-tokens", type=int)
+    adaptive_parser.add_argument("--offline", action="store_true")
+    adaptive_parser.add_argument("--output-dir", type=Path)
+    adaptive_parser.add_argument("-v", "--verbose", action="store_true")
 
     cloud_parser = subcommands.add_parser(
         "cloud-infer", help="Send one raw image request to a cloud server"
@@ -244,6 +284,19 @@ def main(argv: Sequence[str] | None = None) -> int:
                 bind_host=args.bind_host,
                 verbose=args.verbose,
             )
+        if args.command == "adaptive-server":
+            return _cloud_server(
+                config_path=args.config,
+                artifact_manifest=args.artifact_manifest,
+                cache_dir=args.cache_dir,
+                device=args.device,
+                offline=args.offline,
+                bind_host=args.bind_host,
+                verbose=args.verbose,
+                dual_paths=True,
+            )
+        if args.command == "adaptive-infer":
+            return _adaptive_infer(args)
         if args.command == "cloud-infer":
             return _cloud_infer(
                 config_path=args.config,
@@ -365,6 +418,107 @@ def _benchmark(args: argparse.Namespace) -> int:
         pipeline=args.pipeline, resume=args.resume,
     )
     print(json.dumps(summary, indent=2, sort_keys=True))
+    return 0
+
+
+def _current_rss_mib() -> float | None:
+    status = Path("/proc/self/status")
+    if not status.is_file():
+        return None
+    for line in status.read_text(encoding="utf-8").splitlines():
+        if line.startswith("VmRSS:"):
+            return int(line.split()[1]) / 1024
+    return None
+
+
+def _adaptive_infer(args: argparse.Namespace) -> int:
+    config = load_experiment_config(args.config)
+    if (args.expected_output_tokens is not None
+            and args.expected_output_tokens > config.model.max_new_tokens):
+        raise ConfigError("expected output exceeds pinned max_new_tokens")
+    state = SystemState(
+        source="manual",
+        uplink_bps=(args.uplink_mbps * 1_000_000
+                    if args.uplink_mbps is not None else None),
+        rtt_ms=args.rtt_ms,
+        edge_memory_budget_mib=args.edge_memory_budget_mib,
+    )
+    seeded = seed_everything(config.runtime.seed)
+    progress = ProgressReporter(args.verbose)
+    with progress.phase("Loading resident edge policy components"):
+        policies = load_phase1_policies(
+            config,
+            artifact_manifest=args.artifact_manifest,
+            cache_dir=args.cache_dir,
+            offline=args.offline,
+            vision_device=args.vision_device,
+            text_device=args.text_device,
+            edge_components=args.edge_components,
+        )
+    model = ModelMetadata(
+        config.model.model_id,
+        config.model.revision,
+        model_contract_fingerprint(config.model),
+    )
+    remote = None
+    remote_error = None
+    if config.cloud.status == "pending":
+        remote_error = "cloud_hardware_pending"
+    else:
+        try:
+            remote = check_remote_capabilities(config.transport, model)
+        except (OSError, RuntimeError, ValueError) as exc:
+            remote_error = f"{type(exc).__name__}: {exc}"
+    resident_memory = _current_rss_mib()
+    registry = CapabilityRegistry(
+        policies=policies,
+        expected_model_fingerprint=model.fingerprint,
+        remote=remote,
+        remote_error=remote_error,
+        edge_resident_memory_mib=resident_memory,
+        edge_memory_budget_mib=state.edge_memory_budget_mib,
+    )
+    request = InferenceRequest(
+        request_id=args.request_id,
+        image_path=args.image.resolve(),
+        prompt=args.prompt,
+    )
+    task = TaskState.from_request(
+        request, expected_output_tokens=args.expected_output_tokens
+    )
+    configuration_id = ConfigurationId(args.configuration_id)
+    with progress.phase(f"Running {configuration_id.value} for {request.request_id}"):
+        dispatched = ConfigurationDispatcher(registry).infer(
+            request,
+            configuration_id=configuration_id,
+            system_state=state,
+            task_state=task,
+        )
+    environment = collect_environment()
+    environment["seeded_providers"] = list(seeded)
+    environment["execution_placement"] = {
+        "configuration_id": configuration_id.value,
+        "edge_components": args.edge_components,
+        "vision_device": args.vision_device,
+        "text_device": args.text_device,
+        "edge_resident_memory_mib": resident_memory,
+        "remote": f"{config.transport.host}:{config.transport.port}",
+    }
+    manifest = create_run_manifest(config, environment)
+    record = RequestRecord.from_result(
+        run_id=manifest.run_id,
+        mode=registry.policy_for(configuration_id).mode,
+        result=dispatched.result,
+    )
+    output = {"decision": dispatched.decision.to_dict(),
+              "request": record.to_dict()}
+    if args.output_dir is not None:
+        run_directory = args.output_dir / manifest.run_id
+        write_json_atomic(run_directory / "run_manifest.json", manifest.to_dict())
+        write_json_atomic(run_directory / "decision.json", output["decision"])
+        write_json_atomic(run_directory / "request.json", output["request"])
+        progress.info(f"Saved adaptive artifacts to {run_directory}")
+    print(json.dumps(output, indent=2, sort_keys=True))
     return 0
 
 
@@ -517,11 +671,14 @@ def _cloud_server(
     offline: bool,
     bind_host: str | None,
     verbose: bool,
+    dual_paths: bool = False,
 ) -> int:
     progress = ProgressReporter(verbose)
     progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
     config = load_experiment_config(config_path)
     _validate_cloud_config(config.mode, config.cloud.status)
+    if dual_paths and config.model.adapter != "moondream2":
+        raise ConfigError("adaptive-server requires the Moondream2 adapter")
     seeded = seed_everything(config.runtime.seed)
     load_started = perf_counter()
     inference_function: Callable[[InferenceRequest], InferenceResult]
@@ -557,12 +714,24 @@ def _cloud_server(
     contract_fingerprint = model_contract_fingerprint(config.model)
     progress.detail(f"Model contract fingerprint: {contract_fingerprint}")
 
-    processor = CloudRequestProcessor(
-        protocol_version=config.transport.protocol_version,
-        model_fingerprint=contract_fingerprint,
-        inference_function=inference_function,
-        event_callback=progress.info,
-    )
+    if dual_paths:
+        processor = CloudRequestProcessor(
+            protocol_version=config.transport.protocol_version,
+            model_fingerprint=contract_fingerprint,
+            inference_function=inference_function,
+            tensor_inference_function=moondream_adapter.generate_from_payload,
+            prompt_prepare_function=moondream_adapter.prepare_prompt,
+            prepared_tensor_inference_function=moondream_adapter.generate_from_payload,
+            pending_timeout_seconds=config.transport.timeout_seconds,
+            event_callback=progress.info,
+        )
+    else:
+        processor = CloudRequestProcessor(
+            protocol_version=config.transport.protocol_version,
+            model_fingerprint=contract_fingerprint,
+            inference_function=inference_function,
+            event_callback=progress.info,
+        )
     server = CloudServer(
         host=bind_host or config.transport.host,
         port=config.transport.port,
@@ -582,6 +751,7 @@ def _cloud_server(
                 "model_contract_fingerprint": contract_fingerprint,
                 "model_load_ms": model_load_ms,
                 "seeded_providers": list(seeded),
+                "supported_paths": list(processor.supported_paths),
             },
             sort_keys=True,
         ),

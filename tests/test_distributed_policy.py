@@ -156,11 +156,19 @@ def test_synchronous_distributed_policy_sends_projected_tensor_only(
     ]
 
 
-def test_distributed_policy_requires_vision_only_adapter() -> None:
+def test_distributed_policy_accepts_resident_full_or_vision_adapter() -> None:
     encoder = _FakeEncoder()
     encoder.component_role = "full"
+    policy = DistributedExecutionPolicy(
+        encoder=encoder,
+        transport=_transport(),
+        model=MODEL,
+        tensor_serializer=_serializer,
+    )
+    assert policy.mode is ExecutionMode.DISTRIBUTED
 
-    with pytest.raises(ValueError, match="only vision"):
+    encoder.component_role = "text"
+    with pytest.raises(ValueError, match="retain vision"):
         DistributedExecutionPolicy(
             encoder=encoder,
             transport=_transport(),

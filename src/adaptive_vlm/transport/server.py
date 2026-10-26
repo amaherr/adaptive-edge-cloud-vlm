@@ -91,6 +91,14 @@ class CloudRequestProcessor:
         self._tensor_inference_function = tensor_inference_function
         self._prompt_prepare_function = prompt_prepare_function
         self._prepared_tensor_inference_function = prepared_tensor_inference_function
+        paths: list[str] = []
+        if inference_function is not None:
+            paths.append("raw_image")
+        if tensor_inference_function is not None:
+            paths.append("projected_synchronous")
+        if prepared_tensor_inference_function is not None:
+            paths.append("projected_prompt_first")
+        self.supported_paths = tuple(paths)
         self._pending_timeout_seconds = pending_timeout_seconds
         self._max_pending_requests = max_pending_requests
         self._clock = clock
@@ -141,6 +149,17 @@ class CloudRequestProcessor:
                 metadata={
                     "ready": True,
                     "model_fingerprint": self.model_fingerprint,
+                },
+            )
+        if frame.message_type is MessageType.CAPABILITY_REQUEST:
+            return Frame(
+                version=self.protocol_version,
+                message_type=MessageType.CAPABILITY_RESPONSE,
+                request_id=frame.request_id,
+                metadata={
+                    "ready": True,
+                    "model_fingerprint": self.model_fingerprint,
+                    "paths": list(self.supported_paths),
                 },
             )
         if frame.message_type not in {
