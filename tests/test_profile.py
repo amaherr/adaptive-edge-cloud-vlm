@@ -112,6 +112,7 @@ def test_profile_validates_and_retains_failures(tmp_path: Path) -> None:
         if row["configuration_id"] == "cloud/raw_image" and row["status"] == "ok"
     )
     assert cloud["fields"]["request_wire_bytes"] == 3_000_000
+    assert len(cloud["run_manifest_sha256"]) == 64
     assert cloud["fields"]["transport_residual_ms"] == pytest.approx(0.000001)
     assert cloud["fields"]["prompt_tokens"] == 12
     with pytest.raises(FileExistsError):

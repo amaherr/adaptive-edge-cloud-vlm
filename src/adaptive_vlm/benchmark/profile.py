@@ -404,6 +404,12 @@ def build_profile(
                     "request_id": row["request_id"],
                     "configuration_id": configuration_id,
                     "run_id": row["run_id"],
+                    "run_manifest_sha256": _digest(run_manifest),
+                    "git_commit": run_manifest.get("git_commit"),
+                    "git_dirty": run_manifest.get("git_dirty"),
+                    "dependency_lock_sha256": run_manifest.get(
+                        "dependency_lock_sha256"
+                    ),
                     "plan_sha256": row["plan_sha256"],
                     "config_sha256": row["config_sha256"],
                     "model_contract_sha256": row["model_contract_sha256"],
