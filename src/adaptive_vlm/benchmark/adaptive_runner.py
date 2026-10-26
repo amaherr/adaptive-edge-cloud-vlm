@@ -96,6 +96,16 @@ def load_adaptive_replay(
         fit.task_bucket for fit in calibration.candidates.values()
     }:
         raise ValueError("replay task bucket has no calibration")
+    task_types = {item.task_type for item in manifest.items}
+    if len(task_types) != 1:
+        raise ValueError("one adaptive campaign must have one task type")
+    if "task_type" in replay and replay["task_type"] not in task_types:
+        raise ValueError("replay task type differs from frozen manifest")
+    if (
+        manifest.source == "vqa-v2-val2014"
+        and replay.get("task_type") != "vqa_short_answer"
+    ):
+        raise ValueError("VQA replay must declare vqa_short_answer task type")
     default = replay.get("default_network_state")
     if not isinstance(default, dict):
         raise ValueError("adaptive replay needs default network state")
@@ -270,6 +280,7 @@ def run_adaptive_benchmark(
             "mode": "adaptive",
             "image_sha256": item.image_sha256,
             "scoring": item.scoring,
+            "task_type": item.task_type,
             "activation": activation,
             "attempts": [],
         }

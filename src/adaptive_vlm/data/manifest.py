@@ -37,6 +37,16 @@ class RequestItem:
     source: str
     revision: str
 
+    @property
+    def task_type(self) -> str:
+        """Classify only from frozen input metadata, before inference."""
+
+        if self.source == "vqa-v2-val2014" and self.scoring == "vqa_consensus":
+            return "vqa_short_answer"
+        if self.scoring == "exact_match":
+            return "labeled_short_answer"
+        return "unscored_prompt"
+
     def to_request(self) -> InferenceRequest:
         return InferenceRequest(self.request_id, self.image_path, self.prompt)
 

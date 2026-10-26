@@ -22,6 +22,11 @@ from adaptive_vlm.benchmark.oracle import run_oracle_evaluation
 from adaptive_vlm.benchmark.predictor_eval import run_predictor_evaluation
 from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.benchmark.runner import run_benchmark
+from adaptive_vlm.benchmark.thesis_eval import analyze_thesis_campaign
+from adaptive_vlm.benchmark.vqa_export import (
+    export_vqa_predictions,
+    prepare_vqa_eval_subset,
+)
 from adaptive_vlm.config import (
     ConfigError,
     ExecutionMode,
@@ -262,6 +267,30 @@ def build_parser() -> argparse.ArgumentParser:
     adaptive_analysis.add_argument("fixed_run_dirs", nargs=3, type=Path)
     adaptive_analysis.add_argument("--output", type=Path)
 
+    thesis_analysis = subcommands.add_parser(
+        "analyze-thesis", help="Produce a split-safe paired scheduler evaluation"
+    )
+    thesis_analysis.add_argument("--specification", required=True, type=Path)
+    thesis_analysis.add_argument("--adaptive-run", required=True, type=Path)
+    thesis_analysis.add_argument("--fixed-runs", nargs=3, required=True, type=Path)
+    thesis_analysis.add_argument("--output-dir", required=True, type=Path)
+
+    vqa_export = subcommands.add_parser(
+        "export-vqa-predictions", help="Export complete official-format VQA answers"
+    )
+    vqa_export.add_argument("--manifest", required=True, type=Path)
+    vqa_export.add_argument("--run-dir", required=True, type=Path)
+    vqa_export.add_argument("--output", required=True, type=Path)
+    vqa_export.add_argument("--repetition", type=int, default=0)
+
+    vqa_subset = subcommands.add_parser(
+        "prepare-vqa-eval-subset", help="Match official VQA labels to frozen IDs"
+    )
+    vqa_subset.add_argument("--manifest", required=True, type=Path)
+    vqa_subset.add_argument("--questions", required=True, type=Path)
+    vqa_subset.add_argument("--annotations", required=True, type=Path)
+    vqa_subset.add_argument("--output-dir", required=True, type=Path)
+
     monitor_analysis = subcommands.add_parser(
         "analyze-monitor", help="Audit live probe provenance and decision safety"
     )
@@ -454,6 +483,48 @@ def main(argv: Sequence[str] | None = None) -> int:
                 json.dumps(
                     analyze_adaptive_run(
                         args.adaptive_run_dir, args.fixed_run_dirs, output=args.output
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if args.command == "analyze-thesis":
+            print(
+                json.dumps(
+                    analyze_thesis_campaign(
+                        args.specification,
+                        args.adaptive_run,
+                        args.fixed_runs,
+                        output_dir=args.output_dir,
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if args.command == "export-vqa-predictions":
+            print(
+                json.dumps(
+                    export_vqa_predictions(
+                        args.manifest,
+                        args.run_dir,
+                        args.output,
+                        repetition=args.repetition,
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if args.command == "prepare-vqa-eval-subset":
+            print(
+                json.dumps(
+                    prepare_vqa_eval_subset(
+                        args.manifest,
+                        args.questions,
+                        args.annotations,
+                        args.output_dir,
                     ),
                     indent=2,
                     sort_keys=True,
