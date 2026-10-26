@@ -35,8 +35,8 @@ trap stop_server EXIT
 wait_for_server() {
   local log_file=$1
   local attempt
-  for ((attempt = 0; attempt < 180; attempt++)); do
-    if grep -q '"ready": true' "$log_file"; then
+  for ((attempt = 0; attempt < 600; attempt++)); do
+    if [[ -f "$log_file" ]] && grep -q '"ready": true' "$log_file"; then
       return 0
     fi
     if ! kill -0 "$server_pid" 2>/dev/null; then
@@ -47,7 +47,7 @@ wait_for_server() {
     sleep 1
   done
   cat "$log_file" >&2
-  echo "Server did not become ready within 180 seconds" >&2
+  echo "Server did not become ready within 600 seconds" >&2
   return 1
 }
 
