@@ -10,6 +10,11 @@ from pathlib import Path
 from time import perf_counter
 
 from adaptive_vlm.artifacts import create_run_manifest, write_json_atomic
+from adaptive_vlm.benchmark.adaptive_analysis import analyze_adaptive_run
+from adaptive_vlm.benchmark.adaptive_runner import (
+    load_adaptive_replay,
+    run_adaptive_benchmark,
+)
 from adaptive_vlm.benchmark.compare import compare_runs
 from adaptive_vlm.benchmark.oracle import run_oracle_evaluation
 from adaptive_vlm.benchmark.predictor_eval import run_predictor_evaluation
@@ -22,7 +27,7 @@ from adaptive_vlm.config import (
     model_contract_fingerprint,
 )
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult, RequestRecord
-from adaptive_vlm.data.manifest import load_frozen_manifest
+from adaptive_vlm.data.manifest import RequestItem, load_frozen_manifest
 from adaptive_vlm.data.vqa_import import import_vqa_v2
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.environment import collect_environment
@@ -38,6 +43,7 @@ from adaptive_vlm.models.moondream import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.scheduler.configuration import CapabilityRegistry, ConfigurationId
 from adaptive_vlm.scheduler.dispatch import ConfigurationDispatcher
+from adaptive_vlm.scheduler.predictor import Calibration, PredictionTask
 from adaptive_vlm.scheduler.state import SystemState, TaskState
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
@@ -203,6 +209,40 @@ def build_parser() -> argparse.ArgumentParser:
     adaptive_parser.add_argument("--offline", action="store_true")
     adaptive_parser.add_argument("--output-dir", type=Path)
     adaptive_parser.add_argument("-v", "--verbose", action="store_true")
+
+    adaptive_benchmark = subcommands.add_parser(
+        "adaptive-benchmark", help="Run a frozen mixed-choice adaptive campaign"
+    )
+    adaptive_benchmark.add_argument("--config", required=True, type=Path)
+    adaptive_benchmark.add_argument("--manifest", required=True, type=Path)
+    adaptive_benchmark.add_argument("--calibration", required=True, type=Path)
+    adaptive_benchmark.add_argument("--replay", required=True, type=Path)
+    adaptive_benchmark.add_argument("--run-dir", required=True, type=Path)
+    adaptive_benchmark.add_argument("--artifact-manifest", required=True, type=Path)
+    adaptive_benchmark.add_argument(
+        "--cache-dir", type=Path, default=Path(".model-cache")
+    )
+    adaptive_benchmark.add_argument("--vision-device", default="cpu")
+    adaptive_benchmark.add_argument("--text-device", default="cpu")
+    adaptive_benchmark.add_argument("--cloud-device", default="cpu")
+    adaptive_benchmark.add_argument("--edge-required-peak-mib", type=float)
+    adaptive_benchmark.add_argument("--warmups", type=int, default=0)
+    adaptive_benchmark.add_argument("--repetitions", type=int, default=1)
+    adaptive_benchmark.add_argument("--predictor-evaluation", type=Path)
+    adaptive_benchmark.add_argument("--selector-evaluation", type=Path)
+    adaptive_benchmark.add_argument(
+        "--diagnostic-allow-unpassed-gates", action="store_true"
+    )
+    adaptive_benchmark.add_argument("--resume", action="store_true")
+    adaptive_benchmark.add_argument("--offline", action="store_true")
+    adaptive_benchmark.add_argument("-v", "--verbose", action="store_true")
+
+    adaptive_analysis = subcommands.add_parser(
+        "analyze-adaptive", help="Compare a mixed adaptive run with fixed controls"
+    )
+    adaptive_analysis.add_argument("adaptive_run_dir", type=Path)
+    adaptive_analysis.add_argument("fixed_run_dirs", nargs=3, type=Path)
+    adaptive_analysis.add_argument("--output", type=Path)
 
     cloud_parser = subcommands.add_parser(
         "cloud-infer", help="Send one raw image request to a cloud server"
@@ -370,6 +410,19 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         if args.command == "adaptive-infer":
             return _adaptive_infer(args)
+        if args.command == "adaptive-benchmark":
+            return _adaptive_benchmark(args)
+        if args.command == "analyze-adaptive":
+            print(
+                json.dumps(
+                    analyze_adaptive_run(
+                        args.adaptive_run_dir, args.fixed_run_dirs, output=args.output
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
         if args.command == "cloud-infer":
             return _cloud_infer(
                 config_path=args.config,
@@ -519,6 +572,135 @@ def _current_rss_mib() -> float | None:
         if line.startswith("VmRSS:"):
             return int(line.split()[1]) / 1024
     return None
+
+
+def _adaptive_benchmark(args: argparse.Namespace) -> int:
+    config = load_experiment_config(args.config)
+    manifest = load_frozen_manifest(
+        args.manifest, expected_revision=config.dataset.revision
+    )
+    calibration = Calibration.load(args.calibration)
+    replay, replay_hash = load_adaptive_replay(
+        args.replay,
+        manifest=manifest,
+        calibration=calibration,
+        config=config,
+        vision_device=args.vision_device,
+        text_device=args.text_device,
+        cloud_device=args.cloud_device,
+    )
+    if (
+        replay.get("edge_memory_budget_mib") is not None
+        and args.edge_required_peak_mib is None
+    ):
+        raise ConfigError("replay memory budget requires --edge-required-peak-mib")
+    if config.model.adapter != "moondream2":
+        raise ConfigError("adaptive benchmark requires the pinned Moondream2 adapter")
+    if args.diagnostic_allow_unpassed_gates:
+        activation = "diagnostic_unpassed_gates"
+    else:
+        if args.predictor_evaluation is None or args.selector_evaluation is None:
+            raise ConfigError(
+                "adaptive benchmark requires both gate reports or the diagnostic flag"
+            )
+        predictor_gate = json.loads(args.predictor_evaluation.read_text())
+        selector_gate = json.loads(args.selector_evaluation.read_text())
+        if (
+            not predictor_gate.get("full_g3_gate_passed")
+            or not selector_gate.get("full_g4_gate_passed")
+            or predictor_gate.get("calibration_id") != calibration.calibration_id
+            or selector_gate.get("calibration_id") != calibration.calibration_id
+        ):
+            raise ConfigError("G3 and G4 reports do not approve this calibration")
+        activation = "validated_g3_g4"
+    progress = ProgressReporter(args.verbose)
+    seeded = seed_everything(config.runtime.seed)
+    with progress.phase("Loading resident adaptive policies"):
+        policies = load_phase1_policies(
+            config,
+            artifact_manifest=args.artifact_manifest,
+            cache_dir=args.cache_dir,
+            offline=args.offline,
+            vision_device=args.vision_device,
+            text_device=args.text_device,
+            edge_components="full",
+        )
+    edge_policy = policies.get(ConfigurationId.EDGE_FULL)
+    if not isinstance(edge_policy, LocalExecutionPolicy):
+        raise ConfigError("adaptive benchmark needs a resident full edge adapter")
+    model = ModelMetadata(
+        config.model.model_id,
+        config.model.revision,
+        model_contract_fingerprint(config.model),
+    )
+
+    def registry_provider() -> CapabilityRegistry:
+        remote = None
+        remote_error = None
+        if config.cloud.status == "pending":
+            remote_error = "cloud_hardware_pending"
+        else:
+            try:
+                remote = check_remote_capabilities(config.transport, model)
+            except (OSError, RuntimeError, ValueError) as exc:
+                remote_error = f"{type(exc).__name__}: {exc}"
+        return CapabilityRegistry(
+            policies=policies,
+            expected_model_fingerprint=model.fingerprint,
+            remote=remote,
+            remote_error=remote_error,
+            edge_resident_memory_mib=_current_rss_mib(),
+            edge_required_peak_mib=args.edge_required_peak_mib,
+            edge_memory_budget_mib=replay.get("edge_memory_budget_mib"),
+        )
+
+    def task_builder(item: RequestItem) -> PredictionTask:
+        from PIL import Image  # type: ignore[import-not-found]
+
+        with Image.open(item.image_path) as image:
+            width, height = image.size
+        return PredictionTask(
+            task_bucket=replay["task_bucket"],
+            image_bytes=item.image_path.stat().st_size,
+            image_width=width,
+            image_height=height,
+            prompt_tokens=edge_policy.prompt_token_count(item.prompt),
+            requested_max_new_tokens=config.model.max_new_tokens,
+        )
+
+    environment = collect_environment()
+    environment["seeded_providers"] = list(seeded)
+    environment["execution_placement"] = {
+        "mode": "adaptive",
+        "vision_device": args.vision_device,
+        "text_device": args.text_device,
+        "cloud_device": args.cloud_device,
+        "remote": f"{config.transport.host}:{config.transport.port}",
+    }
+    environment["adaptive_replay_sha256"] = replay_hash
+    environment["calibration_id"] = calibration.calibration_id
+    environment["activation"] = activation
+    run_manifest = create_run_manifest(
+        config, environment, dataset_manifest_sha256=manifest.sha256
+    )
+    with progress.phase("Running adaptive benchmark"):
+        summary = run_adaptive_benchmark(
+            config=config,
+            manifest=manifest,
+            calibration=calibration,
+            replay=replay,
+            replay_sha256=replay_hash,
+            registry_provider=registry_provider,
+            task_builder=task_builder,
+            run_manifest=run_manifest,
+            run_dir=args.run_dir,
+            warmups=args.warmups,
+            repetitions=args.repetitions,
+            activation=activation,
+            resume=args.resume,
+        )
+    print(json.dumps(summary, indent=2, sort_keys=True))
+    return 0
 
 
 def _adaptive_infer(args: argparse.Namespace) -> int:

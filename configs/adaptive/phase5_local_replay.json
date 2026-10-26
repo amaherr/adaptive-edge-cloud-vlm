@@ -1,0 +1,94 @@
+{
+  "calibration_id": "2917acf00f8df890e474d4e5d9c0f9ca66555631a298d004702539f5a85b208d",
+  "campaign_id": "phase5-local-diagnostic-v1",
+  "dataset_manifest_sha256": "c5bc9df4a010dcefbcbb7fd60c9dd1e47dc0e0cf798acff579a1a004006ce8d1",
+  "default_network_state": {
+    "bucket_id": "loopback-uncontrolled",
+    "downlink_bps": null,
+    "rtt_ms": null,
+    "source": "localhost_uncontrolled",
+    "uplink_bps": null
+  },
+  "edge_memory_budget_mib": null,
+  "host_pair_id": "wsl-single-host-cpu-loopback",
+  "model_contract_sha256": "e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1",
+  "placement_profiles": {
+    "cloud/raw_image": {
+      "mode": "cloud",
+      "pipeline": "synchronous",
+      "remote": "127.0.0.1:5050",
+      "text_device": "cpu",
+      "vision_device": "cpu"
+    },
+    "distributed/projected/synchronous": {
+      "mode": "distributed",
+      "pipeline": "synchronous",
+      "remote": "127.0.0.1:5050",
+      "text_device": "cpu",
+      "vision_device": "cpu"
+    },
+    "edge/full": {
+      "mode": "edge",
+      "pipeline": "synchronous",
+      "remote": "127.0.0.1:5050",
+      "text_device": "cpu",
+      "vision_device": "cpu"
+    }
+  },
+  "quality_floor": null,
+  "schema_version": 1,
+  "sla_ms": null,
+  "source_profile_sha256": "2a009d880b9c861ee5eedd8d1a60d982d59e91fbd359397d22f0274d1356e054",
+  "task_bucket": "correctness-fixtures-all-prompts-32-token-budget",
+  "trial_network_states": {},
+  "unhealthy_by_request": {
+    "correctness-001": [
+      "edge/full",
+      "distributed/projected/synchronous"
+    ],
+    "correctness-002": [
+      "edge/full",
+      "distributed/projected/synchronous"
+    ],
+    "correctness-003": [
+      "edge/full",
+      "distributed/projected/synchronous"
+    ],
+    "correctness-004": [
+      "edge/full",
+      "distributed/projected/synchronous"
+    ],
+    "correctness-005": [
+      "cloud/raw_image",
+      "distributed/projected/synchronous"
+    ],
+    "correctness-006": [
+      "cloud/raw_image",
+      "distributed/projected/synchronous"
+    ],
+    "correctness-007": [
+      "cloud/raw_image",
+      "distributed/projected/synchronous"
+    ],
+    "correctness-008": [
+      "cloud/raw_image",
+      "distributed/projected/synchronous"
+    ],
+    "correctness-009": [
+      "edge/full",
+      "cloud/raw_image"
+    ],
+    "correctness-010": [
+      "edge/full",
+      "cloud/raw_image"
+    ],
+    "correctness-011": [
+      "edge/full",
+      "cloud/raw_image"
+    ],
+    "correctness-012": [
+      "edge/full",
+      "cloud/raw_image"
+    ]
+  }
+}

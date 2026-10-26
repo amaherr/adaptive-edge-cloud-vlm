@@ -10,6 +10,10 @@ from adaptive_vlm.config import TransportConfig
 from adaptive_vlm.transport.protocol import Frame, receive_frame, send_frame
 
 
+class PreInferenceConnectionError(ConnectionError):
+    """The TCP connection failed before request bytes could be sent."""
+
+
 @dataclass(frozen=True)
 class ExchangeResult:
     response: Frame
@@ -22,10 +26,13 @@ class ExchangeResult:
 
 def exchange_frame(transport: TransportConfig, frame: Frame) -> ExchangeResult:
     connect_started_ns = perf_counter_ns()
-    connection = socket.create_connection(
-        (transport.host, transport.port),
-        timeout=transport.timeout_seconds,
-    )
+    try:
+        connection = socket.create_connection(
+            (transport.host, transport.port),
+            timeout=transport.timeout_seconds,
+        )
+    except OSError as exc:
+        raise PreInferenceConnectionError(str(exc)) from exc
     connect_ms = (perf_counter_ns() - connect_started_ns) / 1_000_000
     try:
         connection.settimeout(transport.timeout_seconds)

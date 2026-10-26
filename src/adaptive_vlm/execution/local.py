@@ -18,3 +18,10 @@ class LocalExecutionPolicy(ExecutionPolicy):
 
     def infer(self, request: InferenceRequest) -> InferenceResult:
         return self._adapter.generate(request)
+
+    def prompt_token_count(self, prompt: str) -> int:
+        """Count the pinned query tokens before choosing an execution policy."""
+        prepare = getattr(self._adapter, "prepare_prompt", None)
+        if not callable(prepare):
+            raise ValueError("resident adapter cannot count exact prompt tokens")
+        return len(prepare(prompt))
