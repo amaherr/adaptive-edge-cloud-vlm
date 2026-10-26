@@ -461,6 +461,7 @@ def build_profile(
                     "measured_at_utc": row.get("started_at_utc"),
                     "trial_id": row["trial_id"],
                     "request_id": row["request_id"],
+                    "repetition": row["repetition"],
                     "configuration_id": configuration_id,
                     "run_id": row["run_id"],
                     "run_manifest_sha256": _digest(run_manifest),

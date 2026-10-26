@@ -11,6 +11,7 @@ from time import perf_counter
 
 from adaptive_vlm.artifacts import create_run_manifest, write_json_atomic
 from adaptive_vlm.benchmark.compare import compare_runs
+from adaptive_vlm.benchmark.oracle import run_oracle_evaluation
 from adaptive_vlm.benchmark.predictor_eval import run_predictor_evaluation
 from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.benchmark.runner import run_benchmark
@@ -68,6 +69,14 @@ def build_parser() -> argparse.ArgumentParser:
     predictor_parser.add_argument("--profile", required=True, type=Path)
     predictor_parser.add_argument("--split", required=True, type=Path)
     predictor_parser.add_argument("--output-dir", required=True, type=Path)
+
+    oracle_parser = subcommands.add_parser(
+        "evaluate-selector",
+        help="Evaluate a frozen selector against matched observations",
+    )
+    oracle_parser.add_argument("--predictions", required=True, type=Path)
+    oracle_parser.add_argument("--specification", required=True, type=Path)
+    oracle_parser.add_argument("--output-dir", required=True, type=Path)
 
     benchmark_parser = subcommands.add_parser(
         "benchmark", help="Run a resumable edge, cloud, or distributed campaign"
@@ -277,6 +286,19 @@ def main(argv: Sequence[str] | None = None) -> int:
                     run_predictor_evaluation(
                         profile_path=args.profile,
                         split_path=args.split,
+                        output_dir=args.output_dir,
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if args.command == "evaluate-selector":
+            print(
+                json.dumps(
+                    run_oracle_evaluation(
+                        predictions_path=args.predictions,
+                        specification_path=args.specification,
                         output_dir=args.output_dir,
                     ),
                     indent=2,

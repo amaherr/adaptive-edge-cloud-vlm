@@ -148,6 +148,7 @@ def evaluate_calibration(
                 "section": section,
                 "request_id": row["request_id"],
                 "trial_id": row["trial_id"],
+                "condition_block_id": str(row.get("repetition", 0)),
                 "configuration_id": spec.id.value,
                 "network_bucket_id": row["network_state"]["bucket_id"],
                 "task_bucket": row["task_bucket"],

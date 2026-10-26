@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "campaign_id": "phase4-local-diagnostic-v1",
+  "evidence_scope": "single-host-uncontrolled-loopback-diagnostic",
+  "predictions_sha256": "a4abe75aa6704d735b5d35081e78bab500fa03bea561b0219e4b2960f899bc42",
+  "calibration_id": "2917acf00f8df890e474d4e5d9c0f9ca66555631a298d004702539f5a85b208d",
+  "sections": ["request_holdout"],
+  "holdout_request_ids": ["correctness-011", "correctness-012"],
+  "sla_ms": null,
+  "quality_floor": null,
+  "edge_memory_budget_mib": null,
+  "availability": {
+    "edge/full": {"available": true, "reason": null, "healthy": true},
+    "cloud/raw_image": {"available": true, "reason": null, "healthy": true},
+    "distributed/projected/synchronous": {"available": true, "reason": null, "healthy": true}
+  },
+  "seed": 42,
+  "bootstrap_resamples": 2000
+}
