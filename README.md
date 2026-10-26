@@ -2,7 +2,7 @@
 
 Research prototype for distributing inference from a single pretrained vision–language model (VLM) between an edge device and a cloud machine. The project aims to select an internal execution configuration per image-and-text request using network conditions, available compute and memory, and request characteristics. The intended outcome is lower end-to-end latency and communication cost without changing the model's answer quality or exceeding edge resources.
 
-The **automatic** adaptive selector is not implemented yet. The current, reproducible foundation has three fixed policies: all-edge, all-cloud, and edge vision/projector with cloud language generation. Phase 1 adds a manual configuration dispatcher and a server that can serve both remote paths without a restart. Keeping the same pinned model, preprocessing, prompt, precision, and greedy decoding across policies makes later adaptive decisions measurable rather than conflating them with model changes.
+The project implements three fixed policies, a manual dispatcher, a predictor and selector, mixed adaptive execution, bounded live health sensing, and a paired evaluation pipeline. The local CPU/loopback campaigns validate integration and exact output equivalence. The local predictor missed its fastest-choice ranking target, and no separate cloud host or official VQA data has been validated, so automatic performance and public-dataset accuracy claims remain open. The pinned model, preprocessing, precision and greedy decoding are shared across placements.
 
 ## Contents
 
@@ -18,22 +18,22 @@ The **automatic** adaptive selector is not implemented yet. The current, reprodu
 
 ## Project architecture and scope
 
-The envisioned runtime accepts an image and a prompt, observes the current edge, network, and cloud state, then selects a feasible placement of the **same** VLM. A future controller will compare predicted end-to-end latency and transfer cost while enforcing edge memory and task-quality constraints. Benchmark observations will inform its decisions. The fixed policies, manual dispatch, and dual-path server exist today; automatic selection, live resource/network sensing, and prediction remain future work.
+The runtime accepts an image and prompt, derives task features before inference, observes a replayed or bounded live health state, and selects a feasible placement of the same VLM. The current predictor and selector execute in diagnostic campaigns; validated automatic performance selection awaits a fresh physical-host calibration and passing G3/G4 gates. Memory budgets use a declared measured peak, while physical goodput and free GPU memory require separate measurements.
 
 ~~~mermaid
 flowchart LR
-    R["Image + prompt"] --> S["Adaptive selector<br/>(planned)"]
-    T["Network, edge/cloud load,<br/>request features (planned)"] -.-> S
+    R["Image + prompt"] --> S["Adaptive selector<br/>(diagnostic)"]
+    T["Replay/live health +<br/>pre-inference features"] -.-> S
     S --> E["All edge<br/>(implemented)"]
     S --> C["All cloud<br/>(implemented)"]
     S --> D["Edge vision + cloud LLM<br/>(implemented)"]
     E --> O["Answer + timings + resource/byte records"]
     C --> O
     D --> O
-    O -. "future feedback" .-> S
+    O -. "bounded health update" .-> S
 ~~~
 
-The initial research question is whether dynamic selection among these internal configurations improves latency and communication efficiency under changing conditions. This repository does **not** yet contain a dynamic scheduler, compression, quantization, multi-node orchestration, network shaping, or a completed physical edge–cloud experiment.
+The research question is whether dynamic selection among these configurations improves latency and communication efficiency under changing conditions. The scheduler exists as a research implementation; controlled physical edge–cloud evaluation, official VQA scoring, and a validated improvement claim remain pending.
 
 ## Current implementation and methodology
 
@@ -76,7 +76,7 @@ The protocol uses versioned, length-prefixed frames with bounded JSON metadata, 
 - Each run writes `plan.json`, `run_manifest.json`, fsynced `requests.jsonl`, and `summary.json` to its unique run directory. The run manifest includes resolved config, dataset/dependency hashes, Git state, host/Python/GPU inventory, and seed. Raw rows include config/model/dataset/image hashes, output tokens, timings, bytes, status, and any error.
 - The runner preserves failed and out-of-memory attempts in the denominator, but excludes their latency from successful-latency summaries. Summaries provide median, p95, IQR, mean, failure rate, wire bytes where relevant, and scored-task counts. `--resume` accepts only the original plan and skips already recorded trials.
 - `compare-runs` verifies provenance and compares **every measured request/repetition pair** across policies. It reports exact-token and decoded-text mismatches, first divergent token, failures, and per-policy task scores.
-- Per-request metrics include client-observed end-to-end time, available vision/projector/prefill/generation stage times, process RSS/CUDA memory, and exact application-layer wire bytes. Progress/readiness messages and structured records are available; **continuous telemetry and adaptive monitoring are not yet implemented**. Application bytes and localhost timings are not physical link throughput or one-way delay.
+- Per-request metrics include client-observed end-to-end time, available vision/projector/prefill/generation stage times, process RSS/CUDA memory, and exact application-layer wire bytes. The adaptive path also records bounded live health/capability probes and selection overhead. Application bytes, socket-send rate, and localhost timings are not physical link throughput or one-way delay.
 
 The synthetic fixture quality score is case-insensitive exact match after trimming whitespace. It is only a correctness diagnostic. The VQA importer accepts local VQA v2 validation files and preserves ten annotator answers, but the runner's VQA consensus normalization is provisional: use the [official VQA evaluation procedure](https://visualqa.org/evaluation.html) before reporting public-dataset accuracy.
 
@@ -277,7 +277,7 @@ Fit the component predictor and evaluate the frozen request holdout from the Pha
   --output-dir artifacts/example-predictor
 ~~~
 
-Read `evaluation.json` for per-candidate error, interval coverage, ranking against the constant-median baseline, and gate flags. `calibration.json` contains the fitted components and coverage bounds; `predictions.jsonl` keeps each held-out task snapshot and prediction. The [Phase 3 handoff](docs/phase3_handoff.md) reports the local gate miss and the [predictor contract](docs/phase3_predictor_schema.md) defines units and out-of-coverage behavior. This calibration is diagnostic and is not connected to automatic execution.
+Read `evaluation.json` for per-candidate error, interval coverage, ranking against the constant-median baseline, and gate flags. `calibration.json` contains the fitted components and coverage bounds; `predictions.jsonl` keeps each held-out task snapshot and prediction. The [Phase 3 handoff](docs/phase3_handoff.md) reports the local gate miss and the [predictor contract](docs/phase3_predictor_schema.md) defines units and out-of-coverage behavior. This calibration is used only by explicitly flagged diagnostic adaptive runs.
 
 ### Phase 4 offline selector and oracle
 
@@ -290,7 +290,7 @@ Evaluate the pure selector on the frozen local Phase 3 predictions and matched o
   --output-dir artifacts/example-selector
 ~~~
 
-Read `evaluation.json` for regret, top-choice agreement, uncertainty, exclusions, and gate flags. `decisions.jsonl` preserves each candidate prediction and reason beside the retrospective measured oracle. The [Phase 4 handoff](docs/phase4_handoff.md) gives the local result and second-machine steps; the [selector contract](docs/phase4_selector_contract.md) defines eligibility and pairing. The local G4 performance gate remains open and automatic selection is inactive.
+Read `evaluation.json` for regret, top-choice agreement, uncertainty, exclusions, and gate flags. `decisions.jsonl` preserves each candidate prediction and reason beside the retrospective measured oracle. The [Phase 4 handoff](docs/phase4_handoff.md) gives the local result and second-machine steps; the [selector contract](docs/phase4_selector_contract.md) defines eligibility and pairing. The local G4 performance gate remains open; the adaptive command requires a diagnostic override until G3/G4 pass.
 
 ### Phase 5 adaptive diagnostic run
 
@@ -338,6 +338,24 @@ The repository does not download or redistribute the VQA questions, answers, or 
 
 Set a copied experiment YAML's `dataset.manifest_path` and `dataset.revision` to the new file and exact revision. The importer samples paired question/annotation IDs with a seed, stores ten human answers and image hashes, and refuses to overwrite an existing manifest. See the [official VQA data format](https://visualqa.org/download.html). Before thesis-quality claims, run the official evaluator: the in-run VQA consensus score lacks full official answer normalization.
 
+### Phase 7 paired evaluation
+
+The frozen [Phase 7 protocol](docs/phase7_evaluation_protocol.md) defines the split, metrics, confidence intervals and open gates. Reproduce the local descriptive report from the archived Phase 2 and Phase 5 runs:
+
+~~~bash
+.venv/bin/adaptive-vlm analyze-thesis \
+  --specification configs/evaluation/phase7_local_diagnostic.json \
+  --adaptive-run artifacts/phase5/2026-10-26/local-1 \
+  --fixed-runs artifacts/phase2/2026-10-26/local-1/edge \
+    artifacts/phase2/2026-10-26/local-1/cloud \
+    artifacts/phase2/2026-10-26/local-1/distributed \
+  --output-dir artifacts/phase7-reproduction
+~~~
+
+`report.json` contains validation-only best-static choice, paired latency/SLA intervals, failure counts, bytes, prediction error and measured-oracle regret. `paired_trials.jsonl` keeps the request-level evidence. Each input file and the frozen specification is hashed. This 2-request local holdout was already inspected, so its intervals are descriptive, not independent evidence. The [Phase 7 handoff](docs/phase7_handoff.md) explains the second-machine campaign.
+
+For VQA, run `prepare-vqa-eval-subset` with the imported manifest and original official question/annotation JSONs, then `export-vqa-predictions` for each policy run and repetition. Feed those files to `scripts/run_official_vqa_eval.py` with a pinned checkout of the [official VQA evaluator](https://github.com/GT-Vision-Lab/VQA/tree/master/PythonEvaluationTools). The upstream source uses Python 2 syntax, so run the adapter in a compatible Python 2 environment. The exporter includes failed requests as empty answers and writes a hash/provenance sidecar. The official loader requires predictions for exactly the annotation IDs, which is why the subset command is needed. Record the upstream commit and the adapter's hashed evaluation output with the campaign. The repository does not claim official accuracy until that evaluation has run.
+
 ### Validation and helper scripts
 
 ~~~bash
@@ -375,6 +393,9 @@ Run `adaptive-vlm --help` or `adaptive-vlm COMMAND --help` for machine-readable,
 | `replay-network-trace` | `--calibration PATH --trace PATH --output-dir PATH` | Replays frozen bandwidth/RTT/health states through the predictor and selector; reports switches and safety. |
 | `analyze-monitor` | `RUN_DIR --output PATH` | Audits live probe timestamps, age, fail-closed decisions, passive updates, and monitor overhead. |
 | `import-vqa-v2` | `--questions PATH --annotations PATH --images-dir PATH --output PATH --revision LABEL` | `--count N` (100), `--seed N` (42). |
+| `analyze-thesis` | `--specification PATH --adaptive-run DIR --fixed-runs EDGE_DIR CLOUD_DIR DISTRIBUTED_DIR --output-dir DIR` | Split-safe paired analysis with raw trial table and input hashes. |
+| `prepare-vqa-eval-subset` | `--manifest PATH --questions PATH --annotations PATH --output-dir DIR` | Writes official-schema question/annotation files for exactly the frozen IDs. |
+| `export-vqa-predictions` | `--manifest PATH --run-dir DIR --output PATH` | `--repetition N` (0); writes official-format answers and provenance. |
 
 `--config` references an experiment YAML, not a model YAML. `--artifact-manifest` references [the pinned artifact manifest](configs/model/moondream2_artifact.yaml); it is distinct from the request `--manifest` used by `benchmark`. `--device` places the cloud server's model/text stage; `--vision-device` and `--text-device` name edge-side placements. `--offline` forbids model downloads and is appropriate only after the cache is populated. `--bind-host` controls the listening interface, while `transport.host` in the config is the client-reachable address. `-v` adds detail; core phase milestones and benchmark trials are already visible by default.
 
@@ -416,7 +437,7 @@ On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 
 | All cloud, localhost CPU | 35.1 s | 1,580 bytes | 3/9 |
 | Distributed synchronous, localhost CPU | 30.9 s | 2,987,580 bytes | 3/9 |
 
-These are **one-sweep correctness observations**, not controlled latency estimates or evidence that distributed execution is faster. The runs were sequential, not interleaved across policies or subject to verified network conditions. The full model did not reliably load on this machine's 4 GiB GPU, so CPU all-edge is the feasibility reference; CUDA vision plus CPU text is an experimental mixed-device placement. Synthetic fixtures are not a recognized VQA benchmark. Physical-host correctness, official VQA accuracy, continuous resource sensing, adaptive placement, and controlled network experiments remain to be done.
+These are **one-sweep correctness observations**, not controlled latency estimates or evidence that distributed execution is faster. The runs were sequential, not interleaved across policies or subject to verified network conditions. The full model did not reliably load on this machine's 4 GiB GPU, so CPU all-edge is the feasibility reference; CUDA vision plus CPU text is an experimental mixed-device placement. Synthetic fixtures are not a recognized VQA benchmark. Physical-host correctness, official VQA accuracy, measured edge-memory capacity, and controlled network experiments remain to be done.
 
 Generated `artifacts/`, `.model-cache/`, and `data/raw/` are ignored by Git. Preserve and archive raw results separately before moving machines; the README and committed manifests alone do not include the experimental JSONL rows. Project source, config, tests, and this README remain version-controlled.
 

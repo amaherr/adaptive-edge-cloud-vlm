@@ -114,25 +114,43 @@ def _paired_interval(
     resamples: int,
     confidence: float,
 ) -> dict[str, Any]:
-    clusters: dict[str, list[float]] = defaultdict(list)
+    clusters: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
     for row in paired:
         value = row.get(field)
         if value is not None:
-            clusters[row["request_id"]].append(float(value))
-    ids = sorted(clusters)
-    values = [value for group in clusters.values() for value in group]
+            block_id = str(row.get("network_block_id") or "unrecorded")
+            clusters[block_id][row["request_id"]].append(float(value))
+    blocks = sorted(clusters)
+    request_ids = {request_id for group in clusters.values() for request_id in group}
+    values = [
+        value
+        for group in clusters.values()
+        for trials in group.values()
+        for value in trials
+    ]
     if not values:
-        return {"paired_trials": 0, "request_clusters": 0, "mean": None, "ci": None}
+        return {
+            "paired_trials": 0,
+            "request_clusters": 0,
+            "network_blocks": 0,
+            "mean": None,
+            "ci": None,
+        }
     rng = random.Random(seed)
     samples: list[float] = []
     for _ in range(resamples):
-        selected = [rng.choice(ids) for _ in ids]
-        replicate = [value for request_id in selected for value in clusters[request_id]]
+        replicate: list[float] = []
+        for block_id in (rng.choice(blocks) for _ in blocks):
+            group = clusters[block_id]
+            ids = sorted(group)
+            for request_id in (rng.choice(ids) for _ in ids):
+                replicate.extend(group[request_id])
         samples.append(mean(replicate))
     alpha = (1 - confidence) / 2
     return {
         "paired_trials": len(values),
-        "request_clusters": len(ids),
+        "request_clusters": len(request_ids),
+        "network_blocks": len(blocks),
         "mean": mean(values),
         "ci": [_percentile(samples, alpha), _percentile(samples, 1 - alpha)],
     }
@@ -183,6 +201,8 @@ def analyze_thesis_campaign(
         & set(spec["evaluation_network_block_ids"])
     ):
         raise ValueError("training/validation/evaluation split is empty or leaks")
+    if spec["design"] == "prospective" and training & validation:
+        raise ValueError("prospective training and validation request IDs overlap")
     sla = float(spec["sla_ms"])
     confidence = float(spec["confidence_level"])
     resamples = spec["bootstrap_resamples"]
@@ -279,6 +299,12 @@ def analyze_thesis_campaign(
                 or latency < 0
             ):
                 raise ValueError(f"{mode} trial has invalid latency: {trial_id}")
+            if row["status"] == "ok" and not isinstance(
+                row.get("output_token_ids"), list
+            ):
+                raise ValueError(
+                    f"{mode} successful trial lacks output tokens: {trial_id}"
+                )
     validation_trials = sorted(
         trial_id
         for trial_id, trial in measured.items()
@@ -289,6 +315,22 @@ def analyze_thesis_campaign(
         for trial_id, trial in measured.items()
         if trial["request_id"] in evaluation
     )
+    if spec["design"] == "prospective":
+        if (
+            not spec["validation_network_block_ids"]
+            or not spec["evaluation_network_block_ids"]
+        ):
+            raise ValueError("prospective campaign needs held-out network blocks")
+        for trial_ids, field in (
+            (validation_trials, "validation_network_block_ids"),
+            (evaluation_trials, "evaluation_network_block_ids"),
+        ):
+            observed_blocks = {
+                adaptive_rows[trial_id].get("system_state", {}).get("network_bucket_id")
+                for trial_id in trial_ids
+            }
+            if observed_blocks != set(spec[field]):
+                raise ValueError(f"observed network blocks differ from {field}")
     best_static = _static_choice(rows, validation_trials, sla)
     trial_table: list[dict[str, Any]] = []
     for trial_id in evaluation_trials:
@@ -372,6 +414,17 @@ def analyze_thesis_campaign(
             "median_ape": median(errors) if errors else None,
             "p90_ape": _percentile(errors, 0.9),
         }
+    fixed_token_equality_trials = 0
+    fixed_token_mismatch_trials: list[str] = []
+    for trial_id in evaluation_trials:
+        fixed_rows = [rows[mode][trial_id] for mode in MODES]
+        if all(row["status"] == "ok" for row in fixed_rows):
+            fixed_token_equality_trials += 1
+            if any(
+                row.get("output_token_ids") != fixed_rows[0].get("output_token_ids")
+                for row in fixed_rows[1:]
+            ):
+                fixed_token_mismatch_trials.append(trial_id)
     report: dict[str, Any] = {
         "schema_version": 1,
         "campaign_id": spec["campaign_id"],
@@ -396,6 +449,9 @@ def analyze_thesis_campaign(
         "validation_request_count": len(validation),
         "evaluation_request_count": len(evaluation),
         "evaluation_trials": len(evaluation_trials),
+        "evaluation_network_block_counts": dict(
+            Counter(row["network_block_id"] for row in trial_table)
+        ),
         "best_static_validation_choice": best_static,
         "validation_fixed": {
             mode: _summary([rows[mode][trial] for trial in validation_trials], sla)
@@ -421,11 +477,13 @@ def analyze_thesis_campaign(
         ),
         "oracle_coverage": sum(row["oracle_mode"] is not None for row in trial_table),
         "prediction_error_against_fixed_controls": prediction_error,
+        "fixed_token_equality_trials": fixed_token_equality_trials,
+        "fixed_token_mismatch_trials": fixed_token_mismatch_trials,
         "bootstrap": {
             "seed": seed,
             "resamples": resamples,
             "confidence_level": confidence,
-            "cluster": "request_id",
+            "cluster": "network_block_then_request_id",
         },
         "adaptive_audit": audit,
         "official_vqa_accuracy": None,

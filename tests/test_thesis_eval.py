@@ -89,6 +89,7 @@ def _campaign(tmp_path: Path) -> tuple[Path, Path, list[Path]]:
                     "dataset_manifest_sha256": "a" * 64,
                     "model_contract_sha256": "b" * 64,
                     "status": status,
+                    "output_token_ids": [1] if status == "ok" else [],
                     "observed_end_to_end_ms": durations[i],
                     "metrics": {"request_wire_bytes": 0, "response_wire_bytes": 0},
                     "selected_configuration_id": "edge/full"
