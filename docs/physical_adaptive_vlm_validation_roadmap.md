@@ -1,6 +1,6 @@
 # Physical Adaptive VLM Validation Roadmap
 
-**Implementation checkpoint (2026-10-27):** Phase A1 passes with 185 tests, Ruff, mypy, and 80.54% local coverage under the unchanged 80% threshold. [GitHub CI passed](https://github.com/amaherr/adaptive-edge-cloud-vlm/actions/runs/40403349052) on the A1 head. The [A1 handoff](phase_a1_handoff.md) records the replay regression fix and the first CLI extraction. Phase A2 freezes the source in the [Physical Experiment Baseline v1](physical_experiment_baseline_v1.md) commit and tag after its own CI run passes; physical-host work has not started.
+**Implementation checkpoint (2026-10-27):** Phase A1 passes with 185 tests, Ruff, mypy, and 80.54% local coverage under the unchanged 80% threshold. Phase A2 froze commit `867f11d68882faae63b83a823489f36d5d57e519` as the pushed, CI-green `physical-experiment-baseline-v1` tag. The [A1 handoff](phase_a1_handoff.md), [baseline record](physical_experiment_baseline_v1.md) and [A2 handoff](phase_a2_handoff.md) provide checks and checkout steps. Physical-host work has not started.
 
 Since access to the second machine is imminent, the project should now move from **framework-development mode** to **physical experimental-validation mode**.
 
