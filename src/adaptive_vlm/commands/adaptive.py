@@ -5,8 +5,9 @@ from __future__ import annotations
 import argparse
 import json
 from collections.abc import Callable
+from pathlib import Path
 
-from adaptive_vlm.artifacts import create_run_manifest
+from adaptive_vlm.artifacts import create_run_manifest, write_json_atomic
 from adaptive_vlm.benchmark.adaptive_runner import (
     load_adaptive_replay,
     run_adaptive_benchmark,
@@ -16,6 +17,7 @@ from adaptive_vlm.config import (
     load_experiment_config,
     model_contract_fingerprint,
 )
+from adaptive_vlm.contracts import InferenceRequest, RequestRecord
 from adaptive_vlm.data.manifest import RequestItem, load_frozen_manifest
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.environment import collect_environment
@@ -26,8 +28,10 @@ from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.scheduler.adaptive import RegistrySnapshot
 from adaptive_vlm.scheduler.configuration import CapabilityRegistry, ConfigurationId
+from adaptive_vlm.scheduler.dispatch import ConfigurationDispatcher
 from adaptive_vlm.scheduler.monitor import LiveMonitor, MonitorConfig
 from adaptive_vlm.scheduler.predictor import Calibration, PredictionTask
+from adaptive_vlm.scheduler.state import SystemState, TaskState
 
 
 def run_adaptive_benchmark_command(
@@ -199,4 +203,120 @@ def run_adaptive_benchmark_command(
             passive_observer=monitor.observe_send if monitor is not None else None,
         )
     print(json.dumps(summary, indent=2, sort_keys=True))
+    return 0
+
+
+def current_rss_mib() -> float | None:
+    status = Path("/proc/self/status")
+    if not status.is_file():
+        return None
+    for line in status.read_text(encoding="utf-8").splitlines():
+        if line.startswith("VmRSS:"):
+            return int(line.split()[1]) / 1024
+    return None
+
+
+def run_adaptive_infer_command(args: argparse.Namespace) -> int:
+    config = load_experiment_config(args.config)
+    if args.edge_memory_budget_mib is not None and args.edge_required_peak_mib is None:
+        raise ConfigError(
+            "--edge-memory-budget-mib requires --edge-required-peak-mib "
+            "from a measured profile"
+        )
+    if (
+        args.expected_output_tokens is not None
+        and args.expected_output_tokens > config.model.max_new_tokens
+    ):
+        raise ConfigError("expected output exceeds pinned max_new_tokens")
+    state = SystemState(
+        source="manual",
+        uplink_bps=(
+            args.uplink_mbps * 1_000_000 if args.uplink_mbps is not None else None
+        ),
+        rtt_ms=args.rtt_ms,
+        edge_memory_budget_mib=args.edge_memory_budget_mib,
+    )
+    seeded = seed_everything(config.runtime.seed)
+    progress = ProgressReporter(args.verbose)
+    with progress.phase("Loading resident edge policy components"):
+        policies = load_phase1_policies(
+            config,
+            artifact_manifest=args.artifact_manifest,
+            cache_dir=args.cache_dir,
+            offline=args.offline,
+            vision_device=args.vision_device,
+            text_device=args.text_device,
+            edge_components=args.edge_components,
+        )
+    model = ModelMetadata(
+        config.model.model_id,
+        config.model.revision,
+        model_contract_fingerprint(config.model),
+    )
+    remote = None
+    remote_error = None
+    if config.cloud.status == "pending":
+        remote_error = "cloud_hardware_pending"
+    else:
+        try:
+            remote = check_remote_capabilities(config.transport, model)
+        except (OSError, RuntimeError, ValueError) as exc:
+            remote_error = f"{type(exc).__name__}: {exc}"
+    resident_memory = current_rss_mib()
+    registry = CapabilityRegistry(
+        policies=policies,
+        expected_model_fingerprint=model.fingerprint,
+        remote=remote,
+        remote_error=remote_error,
+        edge_resident_memory_mib=resident_memory,
+        edge_required_peak_mib=args.edge_required_peak_mib,
+        edge_memory_budget_mib=state.edge_memory_budget_mib,
+    )
+    request = InferenceRequest(
+        request_id=args.request_id,
+        image_path=args.image.resolve(),
+        prompt=args.prompt,
+    )
+    task = TaskState.from_request(
+        request, expected_output_tokens=args.expected_output_tokens
+    )
+    configuration_id = ConfigurationId(args.configuration_id)
+    with progress.phase(f"Running {configuration_id.value} for {request.request_id}"):
+        dispatched = ConfigurationDispatcher(registry).infer(
+            request,
+            configuration_id=configuration_id,
+            system_state=state,
+            task_state=task,
+        )
+    environment = collect_environment()
+    environment["seeded_providers"] = list(seeded)
+    environment["execution_placement"] = {
+        "configuration_id": configuration_id.value,
+        "edge_components": args.edge_components,
+        "vision_device": args.vision_device,
+        "text_device": args.text_device,
+        "edge_resident_memory_mib": resident_memory,
+        "edge_required_peak_mib": args.edge_required_peak_mib,
+        "remote": f"{config.transport.host}:{config.transport.port}",
+    }
+    manifest = create_run_manifest(config, environment)
+    record = RequestRecord.from_result(
+        run_id=manifest.run_id,
+        mode=registry.policy_for(configuration_id).mode,
+        result=dispatched.result,
+    )
+    output = {
+        "decision": {
+            **dispatched.decision.to_dict(),
+            "selection_overhead_ms": dispatched.selection_overhead_ms,
+        },
+        "request": record.to_dict(),
+    }
+    if args.output_dir is not None:
+        run_directory = args.output_dir / manifest.run_id
+        write_json_atomic(run_directory / "run_manifest.json", manifest.to_dict())
+        write_json_atomic(run_directory / "decision.json", output["decision"])
+        write_json_atomic(run_directory / "request.json", output["request"])
+        progress.info(f"Saved adaptive artifacts to {run_directory}")
+    print(json.dumps(output, indent=2, sort_keys=True))
     return 0

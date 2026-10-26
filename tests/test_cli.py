@@ -40,7 +40,9 @@ def test_adaptive_benchmark_routes_to_command_module(
         received.extend((args, rss_reader))
         return 0
 
-    monkeypatch.setattr("adaptive_vlm.cli.run_adaptive_benchmark_command", run_command)
+    monkeypatch.setattr(
+        "adaptive_vlm.commands.adaptive.run_adaptive_benchmark_command", run_command
+    )
     assert (
         main(
             [
@@ -174,7 +176,9 @@ def test_cloud_infer_uses_remote_policy_and_writes_artifacts(
         def infer(self, request: object) -> object:
             return adapter.generate(request)  # type: ignore[arg-type]
 
-    monkeypatch.setattr("adaptive_vlm.cli.CloudExecutionPolicy", StubCloudPolicy)
+    monkeypatch.setattr(
+        "adaptive_vlm.commands.infer.CloudExecutionPolicy", StubCloudPolicy
+    )
     exit_code = main(
         [
             "cloud-infer",
@@ -223,7 +227,7 @@ def test_cloud_server_starts_fake_adapter(
         def shutdown(self) -> None:
             self.stopped = True
 
-    monkeypatch.setattr("adaptive_vlm.cli.CloudServer", StubServer)
+    monkeypatch.setattr("adaptive_vlm.commands.server.CloudServer", StubServer)
     exit_code = main(
         [
             "cloud-server",
@@ -328,7 +332,7 @@ def test_distributed_server_loads_only_text_stage(
         return StubTextAdapter()
 
     monkeypatch.setattr(MoondreamAdapter, "from_pretrained", fake_loader)
-    monkeypatch.setattr("adaptive_vlm.cli.CloudServer", StubServer)
+    monkeypatch.setattr("adaptive_vlm.commands.server.CloudServer", StubServer)
 
     exit_code = main(
         [
@@ -378,7 +382,7 @@ def test_distributed_infer_uses_vision_stage_and_writes_artifacts(
 
     monkeypatch.setattr(MoondreamAdapter, "from_pretrained", fake_loader)
     monkeypatch.setattr(
-        "adaptive_vlm.cli.DistributedExecutionPolicy", StubDistributedPolicy
+        "adaptive_vlm.commands.infer.DistributedExecutionPolicy", StubDistributedPolicy
     )
 
     exit_code = main(

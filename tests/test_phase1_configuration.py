@@ -63,9 +63,7 @@ class _Policy(ExecutionPolicy):
 
 
 def _policies() -> dict[ConfigurationId, ExecutionPolicy]:
-    return {
-        spec.id: _Policy(spec.mode) for spec in CONFIGURATIONS
-    }
+    return {spec.id: _Policy(spec.mode) for spec in CONFIGURATIONS}
 
 
 def _received(frame: Frame) -> ReceivedFrame:
@@ -89,25 +87,52 @@ def test_dual_server_reports_paths_and_routes_both_requests() -> None:
         inference_function=image_infer,
         tensor_inference_function=tensor_infer,
     )
-    capabilities = processor.handle(_received(Frame(
-        1, MessageType.CAPABILITY_REQUEST, "caps", {},
-    )))
-    assert capabilities.metadata["paths"] == [
-        "raw_image", "projected_synchronous"
-    ]
-    image_result = processor.handle(_received(Frame(
-        1, MessageType.INFERENCE_REQUEST, "image", {
-            "prompt": "Describe", "model_fingerprint": FINGERPRINT,
-            "image_suffix": ".png",
-        }, b"image bytes",
-    )))
-    tensor_result = processor.handle(_received(Frame(
-        1, MessageType.TENSOR_REQUEST, "tensor", {
-            "prompt": "Describe", "model_fingerprint": FINGERPRINT,
-            "shape": [1], "dtype": "float32", "byte_order": "little",
-            "layout": "contiguous", "nbytes": 4, "pipeline": "synchronous",
-        }, bytes(4),
-    )))
+    capabilities = processor.handle(
+        _received(
+            Frame(
+                1,
+                MessageType.CAPABILITY_REQUEST,
+                "caps",
+                {},
+            )
+        )
+    )
+    assert capabilities.metadata["paths"] == ["raw_image", "projected_synchronous"]
+    image_result = processor.handle(
+        _received(
+            Frame(
+                1,
+                MessageType.INFERENCE_REQUEST,
+                "image",
+                {
+                    "prompt": "Describe",
+                    "model_fingerprint": FINGERPRINT,
+                    "image_suffix": ".png",
+                },
+                b"image bytes",
+            )
+        )
+    )
+    tensor_result = processor.handle(
+        _received(
+            Frame(
+                1,
+                MessageType.TENSOR_REQUEST,
+                "tensor",
+                {
+                    "prompt": "Describe",
+                    "model_fingerprint": FINGERPRINT,
+                    "shape": [1],
+                    "dtype": "float32",
+                    "byte_order": "little",
+                    "layout": "contiguous",
+                    "nbytes": 4,
+                    "pipeline": "synchronous",
+                },
+                bytes(4),
+            )
+        )
+    )
     assert calls == ["image", "tensor"]
     assert image_result.metadata["output_token_ids"] == [7]
     assert tensor_result.metadata["output_token_ids"] == [7]
@@ -200,8 +225,10 @@ def test_registry_excludes_missing_path_model_and_memory(tmp_path: Path) -> None
         edge_resident_memory_mib=500,
         edge_memory_budget_mib=600,
     )
-    assert all(status.reason == "edge_memory_requirement_unknown"
-               for status in unknown_memory.statuses())
+    assert all(
+        status.reason == "edge_memory_requirement_unknown"
+        for status in unknown_memory.statuses()
+    )
     offline = CapabilityRegistry(
         policies=policies,
         expected_model_fingerprint=FINGERPRINT,
@@ -223,26 +250,39 @@ def test_adaptive_infer_writes_decision_and_request(
     config = load_experiment_config(
         ROOT / "configs/experiments/chunk6_local_campaign.yaml"
     )
-    remote = RemoteCapabilities(True, model_contract_fingerprint(config.model),
-                                REMOTE.paths)
-    monkeypatch.setattr(
-        "adaptive_vlm.cli.load_phase1_policies", lambda *_args, **_kwargs: policies
+    remote = RemoteCapabilities(
+        True, model_contract_fingerprint(config.model), REMOTE.paths
     )
     monkeypatch.setattr(
-        "adaptive_vlm.cli.check_remote_capabilities",
+        "adaptive_vlm.commands.adaptive.load_phase1_policies",
+        lambda *_args, **_kwargs: policies,
+    )
+    monkeypatch.setattr(
+        "adaptive_vlm.commands.adaptive.check_remote_capabilities",
         lambda *_args, **_kwargs: remote,
     )
-    monkeypatch.setattr("adaptive_vlm.cli._current_rss_mib", lambda: 500.0)
+    monkeypatch.setattr("adaptive_vlm.commands.adaptive.current_rss_mib", lambda: 500.0)
     image = tmp_path / "image.png"
     image.write_bytes(b"image")
-    exit_code = main([
-        "adaptive-infer", "--config",
-        str(ROOT / "configs/experiments/chunk6_local_campaign.yaml"),
-        "--configuration-id", ConfigurationId.CLOUD_RAW_IMAGE.value,
-        "--image", str(image), "--prompt", "Describe",
-        "--edge-memory-budget-mib", "600", "--edge-required-peak-mib", "550",
-        "--output-dir", str(tmp_path / "runs"),
-    ])
+    exit_code = main(
+        [
+            "adaptive-infer",
+            "--config",
+            str(ROOT / "configs/experiments/chunk6_local_campaign.yaml"),
+            "--configuration-id",
+            ConfigurationId.CLOUD_RAW_IMAGE.value,
+            "--image",
+            str(image),
+            "--prompt",
+            "Describe",
+            "--edge-memory-budget-mib",
+            "600",
+            "--edge-required-peak-mib",
+            "550",
+            "--output-dir",
+            str(tmp_path / "runs"),
+        ]
+    )
     assert exit_code == 0
     output = json.loads(capsys.readouterr().out)
     assert output["decision"]["configuration_id"] == "cloud/raw_image"
@@ -260,14 +300,24 @@ def test_adaptive_infer_requires_peak_estimate_before_loading(
     def must_not_load(*_args: object, **_kwargs: object) -> object:
         raise AssertionError("memory preflight should run before model loading")
 
-    monkeypatch.setattr("adaptive_vlm.cli.load_phase1_policies", must_not_load)
-    code = main([
-        "adaptive-infer", "--config",
-        str(ROOT / "configs/experiments/chunk6_local_campaign.yaml"),
-        "--configuration-id", ConfigurationId.EDGE_FULL.value,
-        "--image", str(ROOT / "tests/fixtures/moondream_smoke.ppm"),
-        "--prompt", "Describe", "--edge-memory-budget-mib", "600",
-    ])
+    monkeypatch.setattr(
+        "adaptive_vlm.commands.adaptive.load_phase1_policies", must_not_load
+    )
+    code = main(
+        [
+            "adaptive-infer",
+            "--config",
+            str(ROOT / "configs/experiments/chunk6_local_campaign.yaml"),
+            "--configuration-id",
+            ConfigurationId.EDGE_FULL.value,
+            "--image",
+            str(ROOT / "tests/fixtures/moondream_smoke.ppm"),
+            "--prompt",
+            "Describe",
+            "--edge-memory-budget-mib",
+            "600",
+        ]
+    )
     assert code == 2
     assert "requires --edge-required-peak-mib" in capsys.readouterr().err
 
@@ -321,8 +371,9 @@ def test_adaptive_server_exposes_all_paths(
             return (1,)
 
     class Server:
-        def __init__(self, *, host: str, port: int,
-                     processor: CloudRequestProcessor, **_: object) -> None:
+        def __init__(
+            self, *, host: str, port: int, processor: CloudRequestProcessor, **_: object
+        ) -> None:
             self.host = host
             self.port = port
             processors.append(processor)
@@ -336,17 +387,26 @@ def test_adaptive_server_exposes_all_paths(
         def shutdown(self) -> None:
             pass
 
-    monkeypatch.setattr(MoondreamAdapter, "from_pretrained",
-                        lambda *_args, **_kwargs: Adapter())
-    monkeypatch.setattr("adaptive_vlm.cli.CloudServer", Server)
-    assert main([
-        "adaptive-server", "--config",
-        str(ROOT / "configs/experiments/chunk4_local_cloud.yaml"),
-        "--artifact-manifest",
-        str(ROOT / "configs/model/moondream2_artifact.yaml"),
-    ]) == 0
+    monkeypatch.setattr(
+        MoondreamAdapter, "from_pretrained", lambda *_args, **_kwargs: Adapter()
+    )
+    monkeypatch.setattr("adaptive_vlm.commands.server.CloudServer", Server)
+    assert (
+        main(
+            [
+                "adaptive-server",
+                "--config",
+                str(ROOT / "configs/experiments/chunk4_local_cloud.yaml"),
+                "--artifact-manifest",
+                str(ROOT / "configs/model/moondream2_artifact.yaml"),
+            ]
+        )
+        == 0
+    )
     ready = json.loads(capsys.readouterr().out)
     assert ready["supported_paths"] == [
-        "raw_image", "projected_synchronous", "projected_prompt_first"
+        "raw_image",
+        "projected_synchronous",
+        "projected_prompt_first",
     ]
     assert processors[0].supported_paths == tuple(ready["supported_paths"])
