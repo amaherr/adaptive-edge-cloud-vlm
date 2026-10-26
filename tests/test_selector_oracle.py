@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from adaptive_vlm.benchmark.oracle import evaluate_oracle, run_oracle_evaluation
+from adaptive_vlm.benchmark.predictor_eval import _rank_accuracy
 from adaptive_vlm.scheduler.configuration import CONFIGURATIONS, CapabilityStatus
 from adaptive_vlm.scheduler.predictor import Prediction
 from adaptive_vlm.scheduler.selector import (
@@ -143,6 +144,7 @@ def _specification() -> dict[str, object]:
         "schema_version": 1,
         "calibration_id": "fit-1",
         "evidence_scope": "synthetic",
+        "safety_evidence_verified": False,
         "sections": ["request_holdout"],
         "holdout_request_ids": ["a", "b"],
         "sla_ms": 25.0,
@@ -172,6 +174,7 @@ def _rows() -> list[dict[str, object]]:
                     "condition_block_id": "0",
                     "configuration_id": spec.id.value,
                     "prediction": _prediction(spec.id.value, prediction).to_dict(),
+                    "baseline_ms": prediction,
                     "observed_ms": observation,
                     "status": "ok",
                 }
@@ -226,6 +229,39 @@ def test_repeated_condition_oracle_uncertainty() -> None:
     report, _ = evaluate_oracle(rows + repeated, _specification())
     assert report["paired_blocks"] == 3
     assert report["repeated_condition_oracle_uncertainty"][0]["blocks"] == 2
+
+
+def test_predictor_ranking_counts_repetition_blocks() -> None:
+    rows = _rows()
+    repeated = [
+        dict(row, condition_block_id="1")
+        for row in rows
+        if row["request_id"] == "a"
+    ]
+    result = _rank_accuracy(rows + repeated)
+    assert result["paired_conditions"] == 3
+
+
+def test_full_gate_requires_physical_blocks_and_safety_evidence() -> None:
+    rows = [
+        dict(row, section="network_holdout", condition_block_id=str(block))
+        for block in range(10)
+        for row in _rows()
+        if row["request_id"] == "a"
+    ]
+    specification = dict(
+        _specification(),
+        evidence_scope="physical-controlled",
+        sections=["network_holdout"],
+        holdout_request_ids=["a"],
+    )
+    report, _ = evaluate_oracle(rows, specification)
+    assert not report["full_g4_gate_evaluable"]
+    specification["safety_evidence_verified"] = True
+    report, _ = evaluate_oracle(rows, specification)
+    assert report["full_g4_gate_evaluable"]
+    assert report["full_g4_gate_passed"]
+    assert not report["automatic_activation_allowed"]
 
 
 def test_frozen_hash_rejects_changed_predictions(tmp_path: Path) -> None:

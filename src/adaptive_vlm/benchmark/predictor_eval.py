@@ -66,10 +66,15 @@ def _scores(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def _rank_accuracy(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
         grouped[
-            (row["request_id"], row["network_bucket_id"], row["task_bucket"])
+            (
+                row["request_id"],
+                row["network_bucket_id"],
+                row["task_bucket"],
+                str(row.get("condition_block_id", "0")),
+            )
         ].append(row)
     oracle_matches = 0
     constant_matches = 0

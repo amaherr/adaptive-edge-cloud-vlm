@@ -44,6 +44,8 @@ def evaluate_oracle(
     """Compare precomputed decisions with matched outcomes from every safe candidate."""
     if specification.get("schema_version") != 1:
         raise ValueError("unsupported oracle specification")
+    if not isinstance(specification.get("safety_evidence_verified"), bool):
+        raise ValueError("oracle specification needs a safety evidence flag")
     sections = specification["sections"]
     request_ids = specification["holdout_request_ids"]
     if not sections or not request_ids or len(request_ids) != len(set(request_ids)):
@@ -258,6 +260,7 @@ def evaluate_oracle(
         "local_regret_target_met": bool(paired) and median(regrets_fraction) <= 0.10,
         "full_g4_gate_evaluable": (
             specification["evidence_scope"] == "physical-controlled"
+            and specification["safety_evidence_verified"]
             and len(paired) >= 10
             and len(records) == len(paired)
             and any(item["section"] == "network_holdout" for item in paired)
