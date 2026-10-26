@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "campaign_id": "phase7-local-retrospective-v1",
+  "design": "retrospective_diagnostic",
+  "dataset_manifest_sha256": "c5bc9df4a010dcefbcbb7fd60c9dd1e47dc0e0cf798acff579a1a004006ce8d1",
+  "model_contract_sha256": "e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1",
+  "calibration_id": "2917acf00f8df890e474d4e5d9c0f9ca66555631a298d004702539f5a85b208d",
+  "predictor_training_request_ids": ["correctness-001", "correctness-002", "correctness-003", "correctness-004", "correctness-005", "correctness-006", "correctness-007", "correctness-008", "correctness-009", "correctness-010"],
+  "validation_request_ids": ["correctness-001", "correctness-002", "correctness-003", "correctness-004", "correctness-005", "correctness-006", "correctness-007", "correctness-008", "correctness-009", "correctness-010"],
+  "evaluation_request_ids": ["correctness-011", "correctness-012"],
+  "validation_network_block_ids": [],
+  "evaluation_network_block_ids": [],
+  "sla_ms": 60000,
+  "bootstrap_seed": 1707,
+  "bootstrap_resamples": 2000,
+  "confidence_level": 0.95,
+  "task_type": "synthetic_descriptive_32_token",
+  "network_regime": "uncontrolled_loopback"
+}
