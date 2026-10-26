@@ -8,6 +8,7 @@ import random
 from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter_ns
 from typing import Any
@@ -72,8 +73,10 @@ def _quality(item: RequestItem, answer: str) -> float | None:
         )
     # This is a provisional consensus score, not the official VQA normalization.
     references = [ref.strip().casefold() for ref in item.references]
-    return sum(min(1.0, (references.count(normalized) - int(ref == normalized)) / 3)
-               for ref in references) / len(references)
+    return sum(
+        min(1.0, (references.count(normalized) - int(ref == normalized)) / 3)
+        for ref in references
+    ) / len(references)
 
 
 def _status(exc: Exception) -> InferenceStatus:
@@ -166,8 +169,10 @@ def run_benchmark(
         saved_run_manifest = json.loads(
             (run_dir / "run_manifest.json").read_text(encoding="utf-8")
         )
-        if (saved_run_manifest.get("dataset_manifest_sha256") != manifest.sha256
-            or saved_run_manifest.get("config") != config.to_dict()):
+        if (
+            saved_run_manifest.get("dataset_manifest_sha256") != manifest.sha256
+            or saved_run_manifest.get("config") != config.to_dict()
+        ):
             raise ValueError("cannot resume: run manifest differs")
         run_id = str(saved_run_manifest["run_id"])
     else:
@@ -186,15 +191,17 @@ def run_benchmark(
         if trial_id not in expected or trial_id in completed:
             raise ValueError(f"unknown or duplicate trial in raw results: {trial_id}")
         trial = expected[trial_id]
-        if (existing_row.get("request_id") != trial.request_id
+        if (
+            existing_row.get("request_id") != trial.request_id
             or existing_row.get("warmup") != trial.warmup
             or existing_row.get("repetition") != trial.repetition
             or existing_row.get("plan_sha256") != plan_hash
             or existing_row.get("run_id") != run_id
             or existing_row.get("config_sha256") != plan["config_sha256"]
-            or existing_row.get("model_contract_sha256") !=
-            plan["model_contract_sha256"]
-            or existing_row.get("dataset_manifest_sha256") != manifest.sha256):
+            or existing_row.get("model_contract_sha256")
+            != plan["model_contract_sha256"]
+            or existing_row.get("dataset_manifest_sha256") != manifest.sha256
+        ):
             raise ValueError(f"raw result does not match plan: {trial_id}")
         completed.add(trial_id)
 
@@ -205,11 +212,15 @@ def run_benchmark(
         item = items[trial.request_id]
         print(
             f"[{position}/{len(schedule)}] {policy.mode.value} "
-            f"{trial.trial_id} {trial.request_id}", flush=True
+            f"{trial.trial_id} {trial.request_id}",
+            flush=True,
         )
         started = perf_counter_ns()
         row: dict[str, Any] = {
             **trial.to_dict(),
+            "started_at_utc": datetime.now(UTC)
+            .isoformat()
+            .replace("+00:00", "Z"),
             "plan_sha256": plan_hash,
             "config_sha256": plan["config_sha256"],
             "model_contract_sha256": plan["model_contract_sha256"],
@@ -249,16 +260,21 @@ def run_benchmark(
 
 
 def summarize(
-    rows: Sequence[Mapping[str, Any]], manifest: FrozenManifest,
-    mode: ExecutionMode, plan_hash: str,
+    rows: Sequence[Mapping[str, Any]],
+    manifest: FrozenManifest,
+    mode: ExecutionMode,
+    plan_hash: str,
 ) -> dict[str, Any]:
     """Summarize measured attempts only, retaining failures in the denominator."""
 
     measured = [row for row in rows if not row["warmup"]]
     successful = [row for row in measured if row["status"] == "ok"]
     latency = sorted(float(row["observed_end_to_end_ms"]) for row in successful)
-    quality = [float(row["quality_score"]) for row in successful
-               if row["quality_score"] is not None]
+    quality = [
+        float(row["quality_score"])
+        for row in successful
+        if row["quality_score"] is not None
+    ]
     wire_bytes: list[int] = []
     for row in successful:
         metrics = row["metrics"]
@@ -266,8 +282,7 @@ def summarize(
             wire_bytes.append(int(metrics["total_wire_bytes"]))
         elif "request_wire_bytes" in metrics and "response_wire_bytes" in metrics:
             wire_bytes.append(
-                int(metrics["request_wire_bytes"])
-                + int(metrics["response_wire_bytes"])
+                int(metrics["request_wire_bytes"]) + int(metrics["response_wire_bytes"])
             )
     status_counts = dict(Counter(str(row["status"]) for row in measured))
     return {
@@ -286,12 +301,12 @@ def summarize(
         "latency_ms_mean_success": sum(latency) / len(latency) if latency else None,
         "latency_ms_median_success": (
             (latency[(len(latency) - 1) // 2] + latency[len(latency) // 2]) / 2
-            if latency else None
+            if latency
+            else None
         ),
         "latency_ms_p95_success": _percentile(latency, 0.95) if latency else None,
         "latency_ms_iqr_success": (
-            _percentile(latency, 0.75) - _percentile(latency, 0.25)
-            if latency else None
+            _percentile(latency, 0.75) - _percentile(latency, 0.25) if latency else None
         ),
         "wire_bytes_mean_success": (
             sum(wire_bytes) / len(wire_bytes) if wire_bytes else None

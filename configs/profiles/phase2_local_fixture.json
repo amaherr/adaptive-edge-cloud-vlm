@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "campaign_id": "phase2-local-fixture-v1",
+  "host_pair_id": "wsl-single-host-cpu-loopback",
+  "task_bucket": "correctness-fixtures-all-prompts-32-token-budget",
+  "requested_max_new_tokens": 32,
+  "network_state": {
+    "bucket_id": "loopback-uncontrolled",
+    "source": "localhost_uncontrolled",
+    "controlled": false,
+    "uplink_bps": null,
+    "downlink_bps": null,
+    "rtt_ms": null
+  }
+}

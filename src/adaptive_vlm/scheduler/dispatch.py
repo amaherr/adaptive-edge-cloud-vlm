@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from time import perf_counter_ns
 from typing import Any
 
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
@@ -34,6 +35,7 @@ class ConfigurationDecision:
 class DispatchResult:
     decision: ConfigurationDecision
     result: InferenceResult
+    selection_overhead_ms: float = 0.0
 
 
 class ConfigurationDispatcher:
@@ -48,6 +50,7 @@ class ConfigurationDispatcher:
         system_state: SystemState,
         task_state: TaskState,
     ) -> DispatchResult:
+        started_ns = perf_counter_ns()
         policy = self.registry.policy_for(configuration_id)
         decision = ConfigurationDecision(
             configuration_id=configuration_id,
@@ -57,4 +60,9 @@ class ConfigurationDispatcher:
             task_state=task_state,
             capabilities=tuple(status.to_dict() for status in self.registry.statuses()),
         )
-        return DispatchResult(decision=decision, result=policy.infer(request))
+        overhead_ms = (perf_counter_ns() - started_ns) / 1_000_000
+        return DispatchResult(
+            decision=decision,
+            result=policy.infer(request),
+            selection_overhead_ms=overhead_ms,
+        )

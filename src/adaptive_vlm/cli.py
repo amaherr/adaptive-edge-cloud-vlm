@@ -11,6 +11,7 @@ from time import perf_counter
 
 from adaptive_vlm.artifacts import create_run_manifest, write_json_atomic
 from adaptive_vlm.benchmark.compare import compare_runs
+from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.benchmark.runner import run_benchmark
 from adaptive_vlm.config import (
     ConfigError,
@@ -52,6 +53,13 @@ def build_parser() -> argparse.ArgumentParser:
     compare_parser.add_argument("run_dirs", nargs="+", type=Path)
     compare_parser.add_argument("--output", type=Path)
 
+    profile_parser = subcommands.add_parser(
+        "profile-runs", help="Validate benchmark runs and emit Phase 2 profile rows"
+    )
+    profile_parser.add_argument("run_dirs", nargs="+", type=Path)
+    profile_parser.add_argument("--specification", required=True, type=Path)
+    profile_parser.add_argument("--output-dir", required=True, type=Path)
+
     benchmark_parser = subcommands.add_parser(
         "benchmark", help="Run a resumable edge, cloud, or distributed campaign"
     )
@@ -71,7 +79,8 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_parser.add_argument("--warmups", type=int)
     benchmark_parser.add_argument("--repetitions", type=int)
     benchmark_parser.add_argument(
-        "--pipeline", choices=("synchronous", "prompt_first"),
+        "--pipeline",
+        choices=("synchronous", "prompt_first"),
         default="synchronous",
     )
     benchmark_parser.add_argument("--resume", action="store_true")
@@ -89,9 +98,7 @@ def build_parser() -> argparse.ArgumentParser:
     import_parser.add_argument("--revision", required=True)
 
     config_parser = subcommands.add_parser("config", help="Configuration tools")
-    config_commands = config_parser.add_subparsers(
-        dest="config_command", required=True
-    )
+    config_commands = config_parser.add_subparsers(dest="config_command", required=True)
     validate_parser = config_commands.add_parser(
         "validate", help="Validate and print a resolved experiment config"
     )
@@ -155,8 +162,11 @@ def build_parser() -> argparse.ArgumentParser:
         "adaptive-infer", help="Manually route one request through a loaded policy"
     )
     adaptive_parser.add_argument("--config", required=True, type=Path)
-    adaptive_parser.add_argument("--configuration-id", required=True,
-                                 choices=tuple(item.value for item in ConfigurationId))
+    adaptive_parser.add_argument(
+        "--configuration-id",
+        required=True,
+        choices=tuple(item.value for item in ConfigurationId),
+    )
     adaptive_parser.add_argument("--artifact-manifest", type=Path)
     adaptive_parser.add_argument("--cache-dir", default=Path(".model-cache"), type=Path)
     adaptive_parser.add_argument("--image", required=True, type=Path)
@@ -231,8 +241,26 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         if args.command == "compare-runs":
-            print(json.dumps(compare_runs(args.run_dirs, output=args.output),
-                             indent=2, sort_keys=True))
+            print(
+                json.dumps(
+                    compare_runs(args.run_dirs, output=args.output),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if args.command == "profile-runs":
+            print(
+                json.dumps(
+                    build_profile(
+                        run_dirs=args.run_dirs,
+                        specification=args.specification,
+                        output_dir=args.output_dir,
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
             return 0
         if args.command == "benchmark":
             return _benchmark(args)
@@ -366,7 +394,9 @@ def _benchmark(args: argparse.Namespace) -> int:
 
         lock_sha256 = sha256_file(lock_path)
     run_manifest = create_run_manifest(
-        config, environment, dataset_manifest_sha256=manifest.sha256,
+        config,
+        environment,
+        dataset_manifest_sha256=manifest.sha256,
         dependency_lock_sha256=lock_sha256,
     )
     model = ModelMetadata(
@@ -383,9 +413,11 @@ def _benchmark(args: argparse.Namespace) -> int:
                 raise ConfigError("Moondream benchmark requires --artifact-manifest")
             with progress.phase("Loading verified full model"):
                 adapter = MoondreamAdapter.from_pretrained(
-                    config.model, cache_dir=args.cache_dir,
+                    config.model,
+                    cache_dir=args.cache_dir,
                     artifact_manifest=args.artifact_manifest,
-                    vision_device=args.vision_device, text_device=args.text_device,
+                    vision_device=args.vision_device,
+                    text_device=args.text_device,
                     offline=args.offline,
                 )
             policy = LocalExecutionPolicy(adapter)
@@ -396,13 +428,18 @@ def _benchmark(args: argparse.Namespace) -> int:
             raise ConfigError("distributed benchmark requires --artifact-manifest")
         with progress.phase("Loading verified vision stage"):
             encoder = MoondreamAdapter.from_pretrained(
-                config.model, cache_dir=args.cache_dir,
+                config.model,
+                cache_dir=args.cache_dir,
                 artifact_manifest=args.artifact_manifest,
-                vision_device=args.vision_device, text_device="cpu",
-                offline=args.offline, components="vision",
+                vision_device=args.vision_device,
+                text_device="cpu",
+                offline=args.offline,
+                components="vision",
             )
         policy = DistributedExecutionPolicy(
-            encoder=encoder, transport=config.transport, model=model,
+            encoder=encoder,
+            transport=config.transport,
+            model=model,
             pipeline=args.pipeline,
         )
     if isinstance(policy, (CloudExecutionPolicy, DistributedExecutionPolicy)):
@@ -410,13 +447,21 @@ def _benchmark(args: argparse.Namespace) -> int:
             if not policy.health().ready:
                 raise RuntimeError("remote server is not ready")
     summary = run_benchmark(
-        config=config, manifest=manifest, policy=policy,
-        run_manifest=run_manifest, run_dir=args.run_dir,
-        warmups=(args.warmups if args.warmups is not None
-                 else config.runtime.warmup_requests),
-        repetitions=(args.repetitions if args.repetitions is not None
-                     else config.runtime.measured_repetitions),
-        pipeline=args.pipeline, resume=args.resume,
+        config=config,
+        manifest=manifest,
+        policy=policy,
+        run_manifest=run_manifest,
+        run_dir=args.run_dir,
+        warmups=(
+            args.warmups if args.warmups is not None else config.runtime.warmup_requests
+        ),
+        repetitions=(
+            args.repetitions
+            if args.repetitions is not None
+            else config.runtime.measured_repetitions
+        ),
+        pipeline=args.pipeline,
+        resume=args.resume,
     )
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
@@ -434,19 +479,21 @@ def _current_rss_mib() -> float | None:
 
 def _adaptive_infer(args: argparse.Namespace) -> int:
     config = load_experiment_config(args.config)
-    if (args.edge_memory_budget_mib is not None
-            and args.edge_required_peak_mib is None):
+    if args.edge_memory_budget_mib is not None and args.edge_required_peak_mib is None:
         raise ConfigError(
             "--edge-memory-budget-mib requires --edge-required-peak-mib "
             "from a measured profile"
         )
-    if (args.expected_output_tokens is not None
-            and args.expected_output_tokens > config.model.max_new_tokens):
+    if (
+        args.expected_output_tokens is not None
+        and args.expected_output_tokens > config.model.max_new_tokens
+    ):
         raise ConfigError("expected output exceeds pinned max_new_tokens")
     state = SystemState(
         source="manual",
-        uplink_bps=(args.uplink_mbps * 1_000_000
-                    if args.uplink_mbps is not None else None),
+        uplink_bps=(
+            args.uplink_mbps * 1_000_000 if args.uplink_mbps is not None else None
+        ),
         rtt_ms=args.rtt_ms,
         edge_memory_budget_mib=args.edge_memory_budget_mib,
     )
@@ -519,8 +566,13 @@ def _adaptive_infer(args: argparse.Namespace) -> int:
         mode=registry.policy_for(configuration_id).mode,
         result=dispatched.result,
     )
-    output = {"decision": dispatched.decision.to_dict(),
-              "request": record.to_dict()}
+    output = {
+        "decision": {
+            **dispatched.decision.to_dict(),
+            "selection_overhead_ms": dispatched.selection_overhead_ms,
+        },
+        "request": record.to_dict(),
+    }
     if args.output_dir is not None:
         run_directory = args.output_dir / manifest.run_id
         write_json_atomic(run_directory / "run_manifest.json", manifest.to_dict())
@@ -1016,9 +1068,7 @@ def _validate_cloud_config(mode: ExecutionMode, cloud_status: str) -> None:
     if mode is not ExecutionMode.CLOUD:
         raise ConfigError("cloud commands require a cloud experiment configuration")
     if cloud_status == "pending":
-        raise ConfigError(
-            "cloud hardware is pending; declare or verify it before use"
-        )
+        raise ConfigError("cloud hardware is pending; declare or verify it before use")
 
 
 def _validate_distributed_config(mode: ExecutionMode, cloud_status: str) -> None:
@@ -1034,4 +1084,3 @@ def _validate_distributed_config(mode: ExecutionMode, cloud_status: str) -> None
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

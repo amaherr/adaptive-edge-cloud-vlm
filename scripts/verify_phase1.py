@@ -129,17 +129,19 @@ def main() -> int:
                 "decision": dispatched.decision.to_dict(),
                 "result": dispatched.result.to_dict(),
                 "observed_dispatch_ms": (perf_counter() - started) * 1000,
+                "selection_overhead_ms": dispatched.selection_overhead_ms,
                 "client_rss_mib_after": _rss_mib(),
             }
             request_rows.append(row)
             rows.append(row)
-            print(f"{request.request_id} {spec.id.value}: "
-                  f"{len(dispatched.result.output_token_ids)} tokens", flush=True)
-        token_sequences = [row["result"]["output_token_ids"]
-                           for row in request_rows]
+            print(
+                f"{request.request_id} {spec.id.value}: "
+                f"{len(dispatched.result.output_token_ids)} tokens",
+                flush=True,
+            )
+        token_sequences = [row["result"]["output_token_ids"] for row in request_rows]
         texts = [row["result"]["output_text"] for row in request_rows]
-        all_equal &= (len(set(map(tuple, token_sequences))) == 1
-                      and len(set(texts)) == 1)
+        all_equal &= len(set(map(tuple, token_sequences))) == 1 and len(set(texts)) == 1
         if baseline_tokens:
             all_match_baseline &= (
                 token_sequences[0] == baseline_tokens[request.request_id]
@@ -160,14 +162,20 @@ def main() -> int:
     write_json_atomic(args.output_dir / "phase1_smoke.json", report)
     if not all_equal or not all_match_baseline:
         raise RuntimeError("Phase 1 outputs differ; inspect phase1_smoke.json")
-    print(json.dumps({
-        "complete_and_equal": True,
-        "matches_baseline_edge": report["matches_baseline_edge"],
-        "request_count": len(requests),
-        "edge_model_load_ms": load_ms,
-        "edge_resident_rss_mib": resident_rss_mib,
-        "output_dir": str(args.output_dir),
-    }, indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "complete_and_equal": True,
+                "matches_baseline_edge": report["matches_baseline_edge"],
+                "request_count": len(requests),
+                "edge_model_load_ms": load_ms,
+                "edge_resident_rss_mib": resident_rss_mib,
+                "output_dir": str(args.output_dir),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0
 
 
