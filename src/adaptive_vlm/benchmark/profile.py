@@ -361,6 +361,10 @@ def build_profile(
                     reason = "fixed_policy_benchmark_no_scheduler"
                 elif name == "server_receive_queue_ms":
                     reason = "sequential_server_queue_not_observable"
+                elif name.startswith("cloud_") and mode == "edge":
+                    reason = "no_cloud_execution"
+                elif name.startswith("edge_") and mode == "cloud":
+                    reason = "no_edge_model_execution"
                 elif "peak_" in name and (
                     (
                         name.startswith("edge_")
@@ -369,10 +373,6 @@ def build_profile(
                     or (name.startswith("cloud_") and spec.get("cloud_device") == "cpu")
                 ):
                     reason = "cpu_placement_no_cuda_peak"
-                elif name.startswith("cloud_") and mode == "edge":
-                    reason = "no_cloud_execution"
-                elif name.startswith("edge_") and mode == "cloud":
-                    reason = "no_edge_model_execution"
                 elif (
                     name
                     in {
@@ -408,6 +408,7 @@ def build_profile(
                 missing["quality_score"] = (
                     "failed_trial" if not success else "unscored_task"
                 )
+            missing["task_type"] = "not_recorded_in_frozen_manifest"
             for name in ("uplink_bps", "downlink_bps", "rtt_ms"):
                 if network.get(name) is None:
                     missing[f"network_state.{name}"] = (
@@ -438,7 +439,8 @@ def build_profile(
                     "placement_profile": placement,
                     "network_state": network,
                     "task_bucket": spec["task_bucket"],
-                    "task_type": item.scoring,
+                    "task_type": None,
+                    "scoring_method": item.scoring,
                     "requested_max_new_tokens": 32,
                     "warmup": row["warmup"],
                     "status": row["status"],

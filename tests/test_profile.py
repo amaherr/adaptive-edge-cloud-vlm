@@ -115,6 +115,8 @@ def test_profile_validates_and_retains_failures(tmp_path: Path) -> None:
     assert len(cloud["run_manifest_sha256"]) == 64
     assert cloud["fields"]["transport_residual_ms"] == pytest.approx(0.000001)
     assert cloud["fields"]["prompt_tokens"] == 12
+    assert cloud["task_type"] is None
+    assert cloud["null_reasons"]["task_type"] == "not_recorded_in_frozen_manifest"
     with pytest.raises(FileExistsError):
         build_profile(
             run_dirs=dirs, specification=spec, output_dir=tmp_path / "profile"
