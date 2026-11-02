@@ -57,3 +57,13 @@ At `rate 10mbit delay 2500us` on both WSL egress queues, receiver goodput was 9.
 ## N8 diagnostic block
 
 At `rate 10mbit delay 25ms` on both WSL egress queues, receiver goodput was 9.32 Mbit/s edge-to-cloud and 9.83 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 52.457 ms median and 53.185 ms p95 over 10 post-warmup samples. The 50 ms grid value denotes added round-trip delay. The summary is `artifacts/network/physical-v1/N8.json`. The queues then advanced to N9.
+
+## N9 diagnostic block
+
+At `rate 10mbit delay 50ms` on both WSL egress queues, receiver goodput was 9.34 Mbit/s edge-to-cloud and 9.70 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 101.727 ms median and 102.479 ms p95 over 10 post-warmup samples. The 100 ms grid value denotes added round-trip delay. The summary is `artifacts/network/physical-v1/N9.json`. The queues then returned to N3 settings for a repeatability check.
+
+## Repeatability and queue restoration
+
+The N3 repeat, after N9, received 9.46 Mbit/s edge-to-cloud and 9.83 Mbit/s cloud-to-edge, with zero sender retransmissions. Its echo median was 22.639 ms and p95 was 22.862 ms. Compared with the first N3 run, forward receiver goodput differed by 0.05 Mbit/s (0.5%), reverse goodput was unchanged at the reported precision, and median RTT differed by 0.699 ms (3.0%). This representative repeat supports using the first network grid as controlled conditions; it does not establish long-duration or day-to-day stability.
+
+After the repeat, both WSL `eth0` root queues were restored to `mq`. An unshaped 20-sample echo run measured 1.635 ms median and 2.086 ms p95 RTT. Raw results are in `artifacts/network/physical-v1/N3_repeat.json` and `unshaped_echo.json`. The nine block records and repeat are indexed in `artifacts/network/physical-v1/summary.csv` (all ignored by Git). Every shaped `iperf3` sender reported zero TCP retransmissions; no separate packet-loss impairment was configured. The independent measurements cover both directions and full-path echo RTT for all nine declared blocks. This closes the initial P5 network grid gate for the current physical path, with the stated short-run repeatability limit.
