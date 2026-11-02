@@ -49,3 +49,11 @@ At `rate 50mbit delay 10ms` on both WSL egress queues, receiver goodput was 47.1
 ## N6 diagnostic block
 
 At `rate 100mbit delay 10ms` on both WSL egress queues, receiver goodput was 94.4 Mbit/s edge-to-cloud and 99.1 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 22.608 ms median and 23.942 ms p95 over 10 post-warmup samples; one sample reached 29.621 ms. The summary is `artifacts/network/physical-v1/N6.json`. N6 meets its diagnostic bandwidth and RTT targets; the queues then advanced to N7.
+
+## N7 diagnostic block
+
+At `rate 10mbit delay 2500us` on both WSL egress queues, receiver goodput was 9.46 Mbit/s edge-to-cloud and 9.83 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 7.228 ms median and 7.388 ms p95 over 10 post-warmup samples. The 5 ms grid value denotes added round-trip delay; physical and forwarding latency remain present. The summary is `artifacts/network/physical-v1/N7.json`. The queues then advanced to N8.
+
+## N8 diagnostic block
+
+At `rate 10mbit delay 25ms` on both WSL egress queues, receiver goodput was 9.32 Mbit/s edge-to-cloud and 9.83 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 52.457 ms median and 53.185 ms p95 over 10 post-warmup samples. The 50 ms grid value denotes added round-trip delay. The summary is `artifacts/network/physical-v1/N8.json`. The queues then advanced to N9.
