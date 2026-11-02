@@ -22,6 +22,10 @@ The model contract fingerprint is `e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538
 
 The cloud CPU generated the same `correctness-001` token sequence in five consecutive runs. All five matched both archived cloud GPU paths and differed from the archived edge CPU path. The initial single CPU run matched as well. This disproves the simple explanation that CPU placement alone causes the difference. The result is consistent with a host-specific backend, software, or CPU behavior, but the cause is not yet isolated.
 
+Both hosts report the same package versions: PyTorch `2.7.1+cu128`, Transformers `4.52.4`, tokenizers `0.21.4`, Pillow `11.2.1`, and NumPy `2.4.6`.
+
+A further diagnostic sent the edge CPU's projected BF16 tensor to a temporary cloud CPU text server, using the same smoke image and prompt. The 32 generated tokens matched the cloud CPU and GPU results exactly and differed from edge-local CPU `edge/full` at token 20. The raw edge output is archived at `artifacts/phase1/cpu-reference-v1/split_edge_vision_cloud_cpu.txt`. This narrows the mismatch to edge-local text inference or another host-specific runtime effect after the projection boundary. The cloud GPU server was restored after this diagnostic.
+
 ## Gate decision and next checks
 
-P1 remains **open**. The transport/decomposition result is exact for the 12 archived requests, but cross-host token equality fails for one request. Collect edge package versions and repeat `correctness-001` on the edge CPU several times. Compare preprocessing and projected tensor bytes across hosts if versions and repeatability do not explain the mismatch. Do not change the frozen model contract or relax the correctness gate based on this diagnostic result.
+P1 remains **open**. The transport/decomposition result is exact for the 12 archived requests, but cross-host token equality fails for one request. Repeat `correctness-001` on the edge CPU several times and inspect edge-local text operations or CPU backend settings. Compare projected tensor bytes across hosts if needed. Do not change the frozen model contract or relax the correctness gate based on this diagnostic result.
