@@ -1,10 +1,10 @@
 # Physical network measurement checkpoint v1
 
-The cloud inference server remains on TCP 5050. An independent `iperf3` 3.16 server listens on cloud WSL TCP 5051. After the cloud switched to Ethernet, Windows portproxy forwards `192.168.8.74:5050` and `192.168.8.74:5051` to the WSL server at `172.23.49.189`; the old Wi-Fi listeners were removed. Both Windows Public firewall rules restrict inbound traffic to the edge Windows Wi-Fi address `192.168.8.71`. Local cloud connection tests passed; they are not physical throughput measurements.
+The cloud inference server remains on TCP 5050. An independent `iperf3` 3.16 server listens on cloud WSL TCP 5051, and a TCP echo server listens on 5052. After the cloud switched to Ethernet, Windows portproxy forwards these ports at `192.168.8.74` to cloud WSL at `172.23.49.189`; the old Wi-Fi listeners were removed. Windows Public firewall rules restrict all three inbound ports to the edge Windows Wi-Fi address `192.168.8.71`. Local cloud connection tests passed; they are not physical throughput measurements.
 
-Before every physical network block, verify the cloud and edge Wi-Fi addresses and the WSL portproxy target. Record independent edge-to-cloud and cloud-to-edge `iperf3` goodput, RTT, configured shaping, timestamps, and Git/model/dataset provenance. Do not infer achieved bandwidth from `tc` settings or application socket timing. No traffic shaping has been applied yet.
+Before every physical network block, verify the cloud Ethernet and edge Wi-Fi addresses and the WSL portproxy target. Record independent edge-to-cloud and cloud-to-edge `iperf3` goodput, RTT, configured shaping, timestamps, and Git/model/dataset provenance. Do not infer achieved bandwidth from `tc` settings or application socket timing.
 
-The first unshaped edge-to-cloud check used `iperf3 -c 192.168.8.70 -p 5051 -t 5` from edge WSL on the Wi-Fi path. New checks must use the Ethernet address `192.168.8.74`; the reverse check uses `-R`. Use the frozen block grid in the physical validation roadmap only after the edge interface, available shaping tools, and baseline physical path have been verified.
+The first unshaped edge-to-cloud check used `iperf3 -c 192.168.8.70 -p 5051 -t 5` from edge WSL on the Wi-Fi path. Current checks use the Ethernet address `192.168.8.74`; the reverse check uses `-R`. The edge interface, shaping tools, and baseline physical path were verified before starting the frozen block grid.
 
 ## Initial unshaped observations
 
@@ -41,3 +41,11 @@ At `rate 10mbit delay 10ms` on both WSL egress queues, receiver goodput was 9.41
 ## N4 diagnostic block
 
 At `rate 25mbit delay 10ms` on both WSL egress queues, receiver goodput was 23.6 Mbit/s edge-to-cloud and 24.4 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 22.438 ms median and 22.553 ms p95 over 10 post-warmup samples. The summary is `artifacts/network/physical-v1/N4.json`. N4 meets its diagnostic bandwidth and RTT targets; the queues then advanced to N5.
+
+## N5 diagnostic block
+
+At `rate 50mbit delay 10ms` on both WSL egress queues, receiver goodput was 47.1 Mbit/s edge-to-cloud and 49.2 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 22.644 ms median and 22.906 ms p95 over 10 post-warmup samples. The summary is `artifacts/network/physical-v1/N5.json`. N5 meets its diagnostic bandwidth and RTT targets; the queues then advanced to N6.
+
+## N6 diagnostic block
+
+At `rate 100mbit delay 10ms` on both WSL egress queues, receiver goodput was 94.4 Mbit/s edge-to-cloud and 99.1 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 22.608 ms median and 23.942 ms p95 over 10 post-warmup samples; one sample reached 29.621 ms. The summary is `artifacts/network/physical-v1/N6.json`. N6 meets its diagnostic bandwidth and RTT targets; the queues then advanced to N7.
