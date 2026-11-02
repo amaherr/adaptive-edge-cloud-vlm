@@ -29,3 +29,15 @@ Both WSL hosts applied `tc qdisc replace dev eth0 root netem delay 10ms rate 2mb
 The independent echo probe is `scripts/tcp_rtt_probe.py`. It now has a dedicated cloud Ethernet listener on TCP 5052, forwarded to WSL and restricted by Windows Public firewall to the edge IP. `iperf3` remains on TCP 5051. This permits concurrent rate and RTT validation for later blocks. N1 is a validated diagnostic block; repeat blocks and the full declared network grid are still pending.
 
 A second N1 echo set on dedicated port 5052 returned 23.386 ms median and 23.896 ms p95 over 10 post-warmup samples, closely matching the first set on port 5051. Both qdiscs were removed afterward and verified to return to `mq`.
+
+## N2 diagnostic block
+
+Both WSL egress queues were set to `rate 5mbit delay 10ms`. Independent `iperf3` receiver goodput was 4.76 Mbit/s edge-to-cloud and 4.98 Mbit/s cloud-to-edge, with zero sender retransmissions. The dedicated echo probe measured 23.735 ms median and 24.835 ms p95 over 10 post-warmup samples. The machine-readable summary is `artifacts/network/physical-v1/N2.json`. N2 meets its diagnostic bandwidth and RTT targets; the edge and cloud queues then advanced to N3.
+
+## N3 diagnostic block
+
+At `rate 10mbit delay 10ms` on both WSL egress queues, receiver goodput was 9.41 Mbit/s edge-to-cloud and 9.83 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 23.338 ms median and 23.685 ms p95 over 10 post-warmup samples. The summary is `artifacts/network/physical-v1/N3.json`. N3 meets its diagnostic bandwidth and RTT targets; the queues then advanced to N4.
+
+## N4 diagnostic block
+
+At `rate 25mbit delay 10ms` on both WSL egress queues, receiver goodput was 23.6 Mbit/s edge-to-cloud and 24.4 Mbit/s cloud-to-edge, with zero sender retransmissions. The echo probe measured 22.438 ms median and 22.553 ms p95 over 10 post-warmup samples. The summary is `artifacts/network/physical-v1/N4.json`. N4 meets its diagnostic bandwidth and RTT targets; the queues then advanced to N5.
