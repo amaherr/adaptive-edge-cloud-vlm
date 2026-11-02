@@ -2,7 +2,7 @@
 
 Research prototype for distributing inference from a single pretrained vision–language model (VLM) between an edge device and a cloud machine. The project aims to select an internal execution configuration per image-and-text request using network conditions, available compute and memory, and request characteristics. The intended outcome is lower end-to-end latency and communication cost without changing the model's answer quality or exceeding edge resources.
 
-The project implements three fixed policies, a manual dispatcher, a predictor and selector, mixed adaptive execution, bounded live health sensing, and a paired evaluation pipeline. The local CPU/loopback campaigns validate integration and exact output equivalence. The local predictor missed its fastest-choice ranking target, and no separate cloud host or official VQA data has been validated, so automatic performance and public-dataset accuracy claims remain open. The pinned model, preprocessing, precision and greedy decoding are shared across placements.
+The project implements three fixed policies, a manual dispatcher, a predictor and selector, mixed adaptive execution, bounded live health sensing, and a paired evaluation pipeline. The local CPU/loopback campaigns validate integration. A separate physical edge/cloud pair has now completed a clean 12-request GPU placement campaign with exact output equivalence. The local predictor missed its fastest-choice ranking target, and controlled physical profiling and official VQA data remain open, so automatic performance and public-dataset accuracy claims remain open. The pinned model, preprocessing, precision and greedy decoding are shared across placements.
 
 ## Contents
 
@@ -18,7 +18,7 @@ The project implements three fixed policies, a manual dispatcher, a predictor an
 
 ## Project architecture and scope
 
-The runtime accepts an image and prompt, derives task features before inference, observes a replayed or bounded live health state, and selects a feasible placement of the same VLM. The current predictor and selector execute in diagnostic campaigns; validated automatic performance selection awaits a fresh physical-host calibration and passing G3/G4 gates. Memory budgets use a declared measured peak, while physical goodput and free GPU memory require separate measurements.
+The runtime accepts an image and prompt, derives task features before inference, observes a replayed or bounded live health state, and selects a feasible placement of the same VLM. The current predictor and selector execute in diagnostic campaigns; validated automatic performance selection awaits a fresh physical-host calibration and passing G3/G4 gates. Memory peaks and idle GPU headroom have been measured on both hosts; independently verified network blocks remain open.
 
 ~~~mermaid
 flowchart LR
@@ -439,13 +439,13 @@ On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 
 | All cloud, localhost CPU | 35.1 s | 1,580 bytes | 3/9 |
 | Distributed synchronous, localhost CPU | 30.9 s | 2,987,580 bytes | 3/9 |
 
-These are **one-sweep correctness observations**, not controlled latency estimates or evidence that distributed execution is faster. The runs were sequential, not interleaved across policies or subject to verified network conditions. The full model did not reliably load on this machine's 4 GiB GPU, so CPU all-edge is the feasibility reference; CUDA vision plus CPU text is an experimental mixed-device placement. Synthetic fixtures are not a recognized VQA benchmark. Physical-host correctness, official VQA accuracy, measured edge-memory capacity, and controlled network experiments remain to be done.
+These are **one-sweep correctness observations**, not controlled latency estimates or evidence that distributed execution is faster. The runs were sequential, not interleaved across policies or subject to verified network conditions. Later physical testing on the RTX 3050 edge and RTX 2070 SUPER cloud completed a clean 12-request GPU campaign with 12/12 exact token agreement across all three paths; see the [physical placement checkpoint](docs/physical_edge_placement_v1.md). The edge full-model peak reserved memory was 4,238 MiB against 4,096 MiB reported VRAM, so its feasibility under competing load remains conditional; see the [memory checkpoint](docs/physical_memory_feasibility_v1.md). Synthetic fixtures are not a recognized VQA benchmark. Official VQA accuracy and controlled network experiments remain to be done.
 
 Generated `artifacts/`, `.model-cache/`, and `data/raw/` are ignored by Git. Preserve and archive raw results separately before moving machines; the README and committed manifests alone do not include the experimental JSONL rows. Project source, config, tests, and this README remain version-controlled.
 
 ## Next research steps
 
-The next research milestone is to complete controlled Phase 2–3 profiling on a separate cloud host, with a fresh predeclared request and network holdout, then revise and retest the predictor's ranking. Evaluate the Phase 4 selector and Phase 6 monitor on that physical holdout, and rerun the Phase 5 adaptive path with matching fixed controls before enabling validated automatic selection. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
+The next research milestone is to verify independently measured and controlled physical network states, freeze a real VQA request/network split, and run repeated paired profiling on the existing edge/cloud host pair. Fit and validate a fresh physical predictor and selector against held-out blocks before enabling automatic performance claims. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
 
 ## Technology and repository layout
 
