@@ -3,7 +3,7 @@
 ## Hosts and contract
 
 - Edge: Windows Wi-Fi `192.168.8.71`, WSL project at `/mnt/d/Programming/adaptive-edge-cloud-vlm`.
-- Cloud: Windows Wi-Fi `192.168.8.70`, WSL server on TCP 5050 through Windows portproxy.
+- Cloud at the first campaign: Windows Wi-Fi `192.168.8.70`, WSL server on TCP 5050 through Windows portproxy. The later Ethernet connection uses `192.168.8.74`; the experiment transport config and portproxy were updated for subsequent runs.
 - Both repositories were at Git commit `ee29a81` for the first physical requests.
 - The cloud Windows Public firewall permits inbound TCP 5050 only from `192.168.8.71`.
 - Model artifact SHA-256: `70a7d94c0c8349eb58ed2d9e636ef2d0916960f321ecabeac6354b8ba3d7403f`.
