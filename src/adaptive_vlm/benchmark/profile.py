@@ -446,7 +446,9 @@ def build_profile(
                 missing["quality_score"] = (
                     "failed_trial" if not success else "unscored_task"
                 )
-            missing["task_type"] = "not_recorded_in_frozen_manifest"
+            task_type = item.task_type if item.source == "vqa-v2-val2014" else None
+            if task_type is None:
+                missing["task_type"] = "not_recorded_in_frozen_manifest"
             for name in ("uplink_bps", "downlink_bps", "rtt_ms"):
                 if network.get(name) is None:
                     missing[f"network_state.{name}"] = (
@@ -478,7 +480,7 @@ def build_profile(
                     "placement_profile": placement,
                     "network_state": network,
                     "task_bucket": spec["task_bucket"],
-                    "task_type": None,
+                    "task_type": task_type,
                     "scoring_method": item.scoring,
                     "requested_max_new_tokens": 32,
                     "warmup": row["warmup"],

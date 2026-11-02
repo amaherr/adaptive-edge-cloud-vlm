@@ -1,0 +1,18 @@
+# Physical fixed-policy profiling campaign v1
+
+Phase 7 uses the [frozen physical VQA manifest and split](physical_dataset_protocol_v1.md) and the [measured nine-block network grid](physical_network_measurement_v1.md). The edge orchestrates all three fixed placements using `scripts/run_physical_profile_block.py`; the cloud keeps the RTX 2070 SUPER GPU server on TCP 5050 and the independent `iperf3` and echo probes on 5051/5052. The edge runs full and vision-only stages on its RTX 3050 GPU. The full edge model succeeded on one real 427×640 COCO image in 17.5 seconds, with 4,450 MiB peak reserved memory reported despite a 4,096 MiB device. Treat edge/full as conditional: record OOM and other failures, and never drop them from denominators.
+
+The frozen block settings are in `configs/profiles/physical_network_blocks_v1.json`. For each block, apply its rate and egress delay to **both** WSL `eth0` queues. Each host contributes one egress delay, so the configured round-trip addition is twice the per-host delay. Cloud shaping is applied by the cloud agent; edge shaping is applied with `sudo tc qdisc replace dev eth0 root netem delay <delay> rate <rate>mbit`. The edge runner checks its qdisc and measures both directions with `iperf3` plus full-path TCP echo before inference. It repeats those measurements after all three placements. It rejects a rate outside 80–120% of target or a median RTT outside the declared tolerance. Independent measurements and raw output are retained in each block directory.
+
+For a shaped block such as N1, run on edge WSL after the cloud agent confirms the matching cloud queue:
+
+```bash
+sudo tc qdisc replace dev eth0 root netem delay 10ms rate 2mbit
+.venv-model/bin/python scripts/run_physical_profile_block.py --block N1
+```
+
+The runner requires a clean Git checkout and exact frozen dataset and model hashes. It uses one warmup and three measured repetitions per policy for all 100 requests. The request schedule is seeded and shared across policies. Policy order rotates through six permutations across the nine network blocks; each placement runs in a separate process so its GPU allocation is released before the next placement. This controls order drift at the block level; it does not interleave placements per request. The runner supports resuming an incomplete block without changing its Git/data plan. It samples edge GPU utilization and free/used VRAM with `nvidia-smi` during the policy runs.
+
+Each block produces `plan.json`, `environment.json`, `network_pre.json`, `network_post.json`, `network_evidence.json`, three policy run directories, their logs, `edge_gpu_samples.csv`, `profile/profile.jsonl`, `profile/summary.json`, and `validation_report.json` under `artifacts/phase2/physical-v1/N*`. The profile converter validates the seeded schedules, model/data/config hashes, token counts, byte accounting, residuals, and hashed independent network evidence. VQA rows now carry `task_type=vqa_short_answer`. The in-run VQA quality score is provisional until the official evaluator is run. All raw artifacts are ignored by Git and must be archived separately.
+
+The declared full development matrix is 9 network blocks × 100 requests × 3 placements × 3 repetitions = 8,100 measured attempts, plus 27 warmups. A representative edge/full real-image attempt took 17.5 seconds, so this is a long campaign. Do not mark Physical G2/P7 complete until every block has complete, validated rows, failure accounting, cloud and edge memory evidence, and a reviewed aggregate report. After the last block, remove both temporary qdiscs with `sudo tc qdisc del dev eth0 root` on edge and `tc qdisc del dev eth0 root` on cloud, then verify each shows `qdisc mq`.
