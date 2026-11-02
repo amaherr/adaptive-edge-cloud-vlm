@@ -1,0 +1,15 @@
+host_id: cloud-physical-v1
+role: cloud
+status: verified
+operating_system: Ubuntu 24.04 on WSL 2 (Windows 10 Pro 10.0.19045)
+cpu: Intel Core i7-10700 CPU @ 2.90GHz
+ram_gib: 15.48
+gpu: NVIDIA GeForce RTX 2070 SUPER
+gpu_vram_mib: 8192
+notes: >-
+  Physical host has 32 GiB RAM; WSL currently exposes 15.48 GiB.
+  Windows NVIDIA driver 610.60, compute capability 7.5.
+  CUDA driver initialization detects one GPU through WSL /dev/dxg when run
+  outside the sandbox. PyTorch 2.7.1+cu128 completes a BF16 matrix operation
+  using emulation (no native BF16 support). WSL nvidia-smi and NVML device
+  counting crash, so the local GPU launcher uses CUDA runtime enumeration.

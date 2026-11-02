@@ -158,6 +158,8 @@ activemq-data/
 .envrc
 .venv
 /.venv-model/
+/.python/
+/.uv-cache/
 /.model-cache/
 env/
 venv/
