@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -54,9 +55,14 @@ def test_import_vqa_subset_is_deterministic_and_refuses_overwrite(
             == 2
         )
     assert first.read_bytes() == second.read_bytes()
+    first_row = json.loads(first.read_text(encoding="utf-8").splitlines()[0])
+    assert first_row["image_path"].startswith("images/")
     manifest = load_frozen_manifest(first, expected_revision="vqa-v2-val2014-test")
     assert len(manifest.items) == 2
     assert all(len(item.references) == 10 for item in manifest.items)
+    relocated = tmp_path.parent / f"{tmp_path.name}-relocated"
+    shutil.copytree(tmp_path, relocated)
+    assert len(load_frozen_manifest(relocated / first.name).items) == 2
     with pytest.raises(FileExistsError):
         import_vqa_v2(
             questions,

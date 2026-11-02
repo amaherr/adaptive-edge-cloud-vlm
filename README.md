@@ -325,7 +325,7 @@ For a real diagnostic, add `--monitor-mode live --probe-timeout-ms 2000 --probe-
 
 ### Import a VQA validation subset
 
-The repository does not download or redistribute the VQA questions, answers, or COCO images. Once the official VQA v2 val2014 JSON files and images are available locally, freeze a deterministic subset:
+The repository does not redistribute VQA questions, answers, or COCO images. Once the official VQA v2 val2014 JSON files and images are available locally, freeze a deterministic subset:
 
 ~~~bash
 .venv/bin/adaptive-vlm import-vqa-v2 \
@@ -337,6 +337,8 @@ The repository does not download or redistribute the VQA questions, answers, or 
 ~~~
 
 Set a copied experiment YAML's `dataset.manifest_path` and `dataset.revision` to the new file and exact revision. The importer samples paired question/annotation IDs with a seed, stores ten human answers and image hashes, and refuses to overwrite an existing manifest. See the [official VQA data format](https://visualqa.org/download.html). Before thesis-quality claims, run the official evaluator: the in-run VQA consensus score lacks full official answer normalization.
+
+The physical v1 campaign already freezes 100 official validation requests in `data/manifests/physical_vqa_v1.jsonl`, with a disjoint split in `configs/evaluation/physical_vqa_split_v1.json` and experiment config `configs/experiments/physical_vqa_v1.yaml`. Its [dataset protocol](docs/physical_dataset_protocol_v1.md) records source hashes and edge setup. `scripts/fetch_vqa_subset_images.py` fetches only the seeded image subset from the official COCO bucket; source files remain ignored under `data/raw/`.
 
 ### Phase 7 paired evaluation
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import random
 from pathlib import Path
 from typing import Any
@@ -67,7 +68,9 @@ def import_vqa_v2(
         rows.append(
             {
                 "request_id": f"vqa-v2-val2014-{question_id}",
-                "image_path": str(image.resolve(strict=True)),
+                "image_path": os.path.relpath(
+                    image.resolve(strict=True), output_path.parent.resolve()
+                ),
                 "image_sha256": _sha256_file(image),
                 "prompt": question["question"],
                 "references": answers,
