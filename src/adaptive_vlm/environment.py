@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import platform
 import socket
@@ -36,6 +37,14 @@ def collect_environment(workdir: str | Path | None = None) -> dict[str, Any]:
         },
         "gpu": _nvidia_gpu(),
         "git": _git_state(working_directory),
+        "container": {
+            "declared_image_reference": os.environ.get("APP_IMAGE"),
+            "build": (
+                json.loads(Path("/usr/local/share/adaptive-vlm-build.json").read_text())
+                if Path("/usr/local/share/adaptive-vlm-build.json").is_file()
+                else None
+            ),
+        },
     }
 
 
@@ -134,4 +143,3 @@ def _parse_int(value: str) -> int | None:
         return int(value)
     except ValueError:
         return None
-

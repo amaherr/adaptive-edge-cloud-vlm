@@ -3,10 +3,10 @@
 Build context is the repository root: `docker build -f container/Dockerfile .`.
 Dockerfile-specific ignore rules exclude Git, credentials, caches, images and
 results. A reviewed linux/amd64 Python 3.11 base **must** be supplied as
-`--build-arg BASE_IMAGE=repository@sha256:...`. It must contain iperf3, setuptools
-and wheel; Python's pinned torch wheels supply CUDA 12.8 user-space libraries.
-No invented or untested base digest is committed. Archive the selected base
-manifest, OS packages and GPU compatibility evidence before freezing the build.
+`--build-arg BASE_IMAGE=repository@sha256:...`. The Dockerfile defaults to a resolved official Python 3.11 amd64 digest, installs
+iperf3 and pinned build tools, and records OS packages. PyTorch wheels supply
+CUDA 12.8 user libraries. The image build and GPU compatibility remain unverified.
+Archive package/wheel artifacts and the final manifest before campaign freeze.
 
 Supply GIT_SHA from `git rev-parse HEAD`, MODEL_CONTRACT_SHA from SHA256 of
 `configs/model/moondream2.yaml`, and LOCK_SHA from the existing model lockfile.
@@ -33,10 +33,11 @@ failure; independently verify both ports before profiling.
 
 `container/cloud-vlm.service` manages cloud Compose; install it under systemd and
 set its EnvironmentFile with nonsecret paths/digest only. The host watchdog stops
-this unit. The edge service remains a diagnostic CLI until the resumable cloud
-runner is implemented; do not schedule a long experiment through it yet.
-Containers receive SIGTERM with a 120-second grace period, but durable application
-checkpoint handling must be added with the later checkpoint manager.
+this unit. The edge service invokes the existing fixed-policy benchmark with explicit
+manifest, placement and run ID. See cloud_acceptance_v1.md for lifecycle limits.
+The S3-resumable multi-placement cloud scheduler remains a later phase.
+Containers receive SIGTERM with a 180-second grace period. Fixed-policy SIGTERM handling now persists the active
+attempt before stopping; S3 checkpoint handling remains a later phase.
 
 Preflight requires nvidia-smi on host and container, CUDA BF16 matrix operation,
 verified model load, full edge inference, isolated vision inference and all three

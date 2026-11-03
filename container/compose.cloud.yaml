@@ -1,6 +1,9 @@
 services:
   inference:
     image: ${APP_IMAGE:?Set the shared ECR repository@sha256 digest}
+    environment:
+      ADAPTIVE_VLM_HEARTBEAT: /artifacts/job.heartbeat
+      APP_IMAGE: ${APP_IMAGE:?Set shared immutable digest}
     network_mode: host
     user: "10001:10001"
     read_only: true
@@ -8,7 +11,7 @@ services:
     security_opt: [no-new-privileges:true]
     tmpfs: [/tmp]
     init: true
-    stop_grace_period: 120s
+    stop_grace_period: 180s
     volumes:
       - ${MODEL_DIR:?Set persistent model directory}:/models
       - ${DATA_DIR:?Set frozen dataset directory}:/app/data:ro
@@ -35,6 +38,9 @@ services:
       retries: 3
   iperf:
     image: ${APP_IMAGE:?Set the shared ECR repository@sha256 digest}
+    environment:
+      ADAPTIVE_VLM_HEARTBEAT: /artifacts/job.heartbeat
+      APP_IMAGE: ${APP_IMAGE:?Set shared immutable digest}
     network_mode: host
     user: "10001:10001"
     read_only: true
@@ -42,7 +48,7 @@ services:
     security_opt: [no-new-privileges:true]
     tmpfs: [/tmp]
     init: true
-    stop_grace_period: 120s
+    stop_grace_period: 180s
     volumes:
       - ${MODEL_DIR:?Set persistent model directory}:/models
       - ${DATA_DIR:?Set frozen dataset directory}:/app/data:ro
@@ -57,6 +63,9 @@ services:
     restart: unless-stopped
   echo:
     image: ${APP_IMAGE:?Set the shared ECR repository@sha256 digest}
+    environment:
+      ADAPTIVE_VLM_HEARTBEAT: /artifacts/job.heartbeat
+      APP_IMAGE: ${APP_IMAGE:?Set shared immutable digest}
     network_mode: host
     user: "10001:10001"
     read_only: true
@@ -64,7 +73,7 @@ services:
     security_opt: [no-new-privileges:true]
     tmpfs: [/tmp]
     init: true
-    stop_grace_period: 120s
+    stop_grace_period: 180s
     volumes:
       - ${MODEL_DIR:?Set persistent model directory}:/models
       - ${DATA_DIR:?Set frozen dataset directory}:/app/data:ro

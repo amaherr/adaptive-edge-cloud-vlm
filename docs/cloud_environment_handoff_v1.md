@@ -16,9 +16,9 @@ locked distribution versions after installation.
 
 The physical runner is tied to physical network evidence and local orchestration.
 It must not simply be renamed and advertised as a cloud runner. Cloud scheduling,
-per-attempt journal durability, S3 immutable commits, SIGTERM checkpoint handling,
-and recovery remain subsequent work. The edge Compose service currently exposes
-the CLI for diagnostics; it does not run the final campaign.
+S3 immutable commits, S3-aware SIGTERM checkpoint handling,
+and recovery remain subsequent work. The edge Compose service runs an existing
+fixed-policy benchmark; it does not run the final S3-checkpointed campaign.
 
 Retain all 100 original requests and images, 60/20/20 request assignments,
 training blocks N1/N3/N5/N6/N8, validation N2/N7 and evaluation N4/N9. SLA is
@@ -59,17 +59,17 @@ partition and contention confounders. Network emulation is not real 5G.
    enable_compute true only after the preceding acceptance checks. Review/apply
    a new plan. Export outputs to ignored `artifacts/infra/terraform_outputs.json`.
 6. The encrypted data EBS volumes survive instance replacement and are protected
-   against Terraform destroy. Identify by volume ID/NVMe serial, format only a
-   confirmed EMPTY volume, mount persistently, and prepare directories owned by
-   UID/GID 10001. No automatic formatting is attempted. Confirm mounts before
-   starting Compose; otherwise paths can silently land on the root disk.
+   against Terraform destroy. The cloud-init helper identifies the exact volume by its NVMe serial,
+   waits for attachment, initializes only a signature-free device, refuses
+   unexpected filesystems and creates UID/GID 10001 directories. Validate this
+   behavior on AWS. Compose prestart checks refuse an unmounted data path.
 7. Build/push once and deploy by digest per the container runtime contract.
    Validate route/interface, GPU BF16, model hashes and all three inference paths
    on both nodes. Record image digest and deployment outputs together.
 
 ## Cost guard and remaining gates
 
-Host watchdog checks uptime and `/var/lib/adaptive-vlm/job.heartbeat` every minute;
+Host watchdog checks uptime and `/srv/adaptive-vlm/artifacts/job.heartbeat` every minute;
 update heartbeat only while a controlled job is active (on BOTH nodes). It stops
 `cloud-vlm.service` and powers down at runtime/idle ceiling. EC2 shutdown must
 retain default stop behavior. Test with short limits in a disposable environment.
@@ -78,10 +78,10 @@ manager is not yet implemented. Do not claim Gate R0. Budget notifications are
 not an immediate spending cap. Reboot resets the per-boot runtime ceiling;
 this is not a cumulative campaign spending limit.
 
-CloudWatch currently provisions host status alarms and a retained log group;
-log shipping and application checkpoint/GPU/storage metrics are pending the
-runner/agent integration. Do not claim a working heartbeat alarm or idle metric
-on the strength of a provisioned log group. No full campaign before these controls
+CloudWatch now configures host status/idle/storage/missing-telemetry alarms,
+GPU utilization publishing and agent log shipping. Delivery is still untested.
+Checkpoint metrics remain pending the checkpoint manager. Do not claim live
+telemetry success on the strength of configuration alone. No full campaign before these controls
 and checkpoint crash/restore tests pass.
 
 Terraform protects state, artifacts, ECR and data EBS with prevent_destroy.
@@ -134,3 +134,6 @@ window when no longer needed. Stopping EC2 does not stop endpoint billing.
 The user clarified $20 is a monthly alert threshold; report deployment cost
 before creating paid resources. AWS authentication currently fails with
 InvalidClientTokenId and Docker Desktop WSL integration needs enabling.
+
+See cloud_acceptance_v1.md for the current per-gate evidence checklist and
+updated build, runtime, shaping and remaining-access requirements.

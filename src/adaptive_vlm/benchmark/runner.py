@@ -157,6 +157,9 @@ def run_benchmark(
         "pipeline": pipeline,
         "schedule": [trial.to_dict() for trial in schedule],
     }
+    container = run_manifest.environment.get("container")
+    if isinstance(container, Mapping) and any(container.values()):
+        plan["container"] = dict(container)
     plan_hash = hashlib.sha256(
         json.dumps(plan, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
@@ -233,6 +236,8 @@ def run_benchmark(
             "image_sha256": item.image_sha256,
             "scoring": item.scoring,
         }
+        if "container" in plan:
+            row["container"] = plan["container"]
         try:
             result = policy.infer(item.to_request())
             if result.request_id != item.request_id:

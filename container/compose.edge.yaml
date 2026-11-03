@@ -1,6 +1,9 @@
 services:
   benchmark:
     image: ${APP_IMAGE:?Set the shared ECR repository@sha256 digest}
+    environment:
+      ADAPTIVE_VLM_HEARTBEAT: /artifacts/job.heartbeat
+      APP_IMAGE: ${APP_IMAGE:?Set shared immutable digest}
     network_mode: host
     user: "10001:10001"
     read_only: true
@@ -8,7 +11,7 @@ services:
     security_opt: [no-new-privileges:true]
     tmpfs: [/tmp]
     init: true
-    stop_grace_period: 120s
+    stop_grace_period: 180s
     volumes:
       - ${MODEL_DIR:?Set persistent model directory}:/models
       - ${DATA_DIR:?Set frozen dataset directory}:/app/data:ro
@@ -25,5 +28,23 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    command: ["--help"]
+    command:
+      - benchmark
+      - --config
+      - configs/experiments/cloud_vqa_v1.yaml
+      - --mode
+      - ${PLACEMENT:-edge}
+      - --manifest
+      - ${MANIFEST_PATH:?Set verified smoke or campaign manifest path inside container}
+      - --run-dir
+      - /artifacts/${RUN_ID:?Set a unique run ID}
+      - --artifact-manifest
+      - configs/model/moondream2_artifact.yaml
+      - --cache-dir
+      - /models
+      - --vision-device
+      - cuda:0
+      - --text-device
+      - cuda:0
+      - --offline
     restart: "no"

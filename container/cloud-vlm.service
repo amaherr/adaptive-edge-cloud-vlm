@@ -2,11 +2,13 @@
 Description=Cloud VLM Compose services
 Requires=docker.service
 After=docker.service network-online.target
+RequiresMountsFor=/srv/adaptive-vlm
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/adaptive-edge-cloud-vlm
 EnvironmentFile=/etc/adaptive-vlm/runtime.env
+ExecStartPre=/usr/bin/python3 scripts/validate_cloud_runtime.py --role cloud
 ExecStart=/usr/bin/docker compose -f container/compose.cloud.yaml up -d --wait
 ExecStop=/usr/bin/docker compose -f container/compose.cloud.yaml stop --timeout 120
 TimeoutStopSec=150

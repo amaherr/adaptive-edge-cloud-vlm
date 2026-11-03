@@ -167,3 +167,39 @@ def test_orderly_stop_preserves_active_trial_and_resumes(tmp_path: Path) -> None
         for line in (tmp_path / "stopped/requests.jsonl").read_text().splitlines()
     ]
     assert len({row["trial_id"] for row in rows}) == 4
+
+
+def test_container_digest_recorded_per_trial_and_enforced_on_resume(
+    tmp_path: Path,
+) -> None:
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"
+    )
+    manifest = load_frozen_manifest(_manifest(tmp_path))
+    container = {
+        "declared_image_reference": "repo@sha256:" + "a" * 64,
+        "build": {"git_commit": "b" * 40},
+    }
+    kwargs = dict(
+        config=config,
+        manifest=manifest,
+        policy=IntermittentPolicy(),
+        run_manifest=create_run_manifest(
+            config, {"container": container}, dataset_manifest_sha256=manifest.sha256
+        ),
+        run_dir=tmp_path / "container",
+        warmups=0,
+        repetitions=1,
+        pipeline="synchronous",
+    )
+    run_benchmark(**kwargs)
+    row = json.loads(
+        (tmp_path / "container/requests.jsonl").read_text().splitlines()[0]
+    )
+    assert row["container"] == container
+    changed = {**container, "declared_image_reference": "repo@sha256:" + "c" * 64}
+    kwargs["run_manifest"] = create_run_manifest(
+        config, {"container": changed}, dataset_manifest_sha256=manifest.sha256
+    )
+    with pytest.raises(ValueError, match="plan, config, or dataset differs"):
+        run_benchmark(**kwargs, resume=True)
