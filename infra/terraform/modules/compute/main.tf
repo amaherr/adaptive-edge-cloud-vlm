@@ -49,7 +49,7 @@ resource "aws_instance" "node" {
     volume_type = "gp3"
     volume_size = 40
   }
-  user_data = templatefile("${path.module}/../../../cloud-init/${each.key}.yaml", { max_seconds = ceil(var.max_hours * 3600), idle_seconds = ceil(var.idle_minutes * 60) })
+  user_data = local.cloud_init[each.key]
   tags      = { Role = each.key }
   lifecycle {
     precondition {
@@ -66,3 +66,10 @@ resource "aws_volume_attachment" "data" {
 }
 output "instance_ids" { value = { for k, v in aws_instance.node : k => v.id } }
 output "volume_ids" { value = { for k, v in aws_ebs_volume.data : k => v.id } }
+
+variable "region" { type = string }
+
+locals {
+  cloud_init = { for role in keys(local.nodes) : role => templatefile("${path.module}/../../../cloud-init/${role}.yaml", { max_seconds = ceil(var.max_hours * 3600), idle_seconds = ceil(var.idle_minutes * 60), data_volume_id = aws_ebs_volume.data[role].id, mount_script = file("${path.module}/../../../runtime/mount-data.sh"), metrics_script = file("${path.module}/../../../runtime/publish-metrics.sh"), region = var.region, role = role }) }
+}
+output "rendered_cloud_init" { value = local.cloud_init }

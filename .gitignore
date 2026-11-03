@@ -238,3 +238,5 @@ __marimo__/
 *.key
 backend.hcl
 crash.log
+# Local nonsecret AWS profile bridge and deployment settings
+/infra/local/

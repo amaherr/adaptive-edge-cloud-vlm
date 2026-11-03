@@ -30,3 +30,24 @@ run "foundation_has_no_hourly_endpoints" {
     error_message = "Foundation must not create hourly endpoints by default."
   }
 }
+
+run "approved_pair_plan" {
+  command = plan
+  variables {
+    enable_compute           = true
+    enable_private_endpoints = true
+    launch_approved          = true
+  }
+  assert {
+    condition     = length(module.compute.instance_ids) == 2 && module.network.interface_endpoint_count == 7
+    error_message = "Approved deployment requires exactly two nodes and seven private endpoints."
+  }
+}
+run "runtime_templates_render" {
+  command = plan
+  module { source = "./tests/runtime_template" }
+  assert {
+    condition     = alltrue([for role, value in output.cloud_init : length(yamldecode(value).write_files) >= 8])
+    error_message = "Both runtime templates must render as valid cloud-init YAML."
+  }
+}

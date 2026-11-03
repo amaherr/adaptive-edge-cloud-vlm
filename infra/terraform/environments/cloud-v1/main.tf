@@ -25,6 +25,7 @@ module "budgets" {
 }
 module "compute" {
   source          = "../../modules/compute"
+  region          = var.region
   enabled         = var.enable_compute
   approved        = var.launch_approved
   subnet_id       = module.network.subnet_id
@@ -38,9 +39,10 @@ module "compute" {
   depends_on      = [module.budgets]
 }
 module "observability" {
-  source    = "../../modules/observability"
-  instances = module.compute.instance_ids
-  email     = var.notification_email
+  source       = "../../modules/observability"
+  instances    = module.compute.instance_ids
+  idle_minutes = var.idle_timeout_minutes
+  email        = var.notification_email
 }
 output "deployment" {
   value = { instances = module.compute.instance_ids, data_volumes = module.compute.volume_ids, availability_zone = var.availability_zone, vpc_id = module.network.vpc_id, subnet_id = module.network.subnet_id, bucket = module.storage.bucket_arn, ecr = module.storage.ecr_url }

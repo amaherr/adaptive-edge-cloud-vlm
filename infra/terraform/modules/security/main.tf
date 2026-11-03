@@ -47,6 +47,8 @@ resource "aws_iam_role_policy" "app" {
   for_each = aws_iam_role.node
   role     = each.value.id
   policy = jsonencode({ Version = "2012-10-17", Statement = [
+    { Effect = "Allow", Action = ["cloudwatch:PutMetricData"], Resource = "*", Condition = { StringEquals = { "cloudwatch:namespace" = "AdaptiveVLM/CloudV1" } } },
+    { Effect = "Allow", Action = ["logs:CreateLogStream", "logs:PutLogEvents", "logs:DescribeLogStreams"], Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/adaptive-vlm/cloud-v1:*" },
     { Effect = "Allow", Action = ["ecr:GetAuthorizationToken"], Resource = "*" },
     { Effect = "Allow", Action = ["ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer", "ecr:BatchCheckLayerAvailability"], Resource = var.ecr_arn },
     { Effect = "Allow", Action = ["s3:ListBucket"], Resource = var.bucket_arn, Condition = { StringLike = { "s3:prefix" = ["cloud-v1/*"] } } },
@@ -60,3 +62,5 @@ resource "aws_iam_instance_profile" "node" {
 }
 output "groups" { value = { for k, v in aws_security_group.node : k => v.id } }
 output "profiles" { value = { for k, v in aws_iam_instance_profile.node : k => v.name } }
+
+data "aws_caller_identity" "current" {}

@@ -2,13 +2,40 @@
 # Requires a reviewed, pinned AMI with GRID (edge), Docker Compose, NVIDIA
 # Container Toolkit, SSM agent, iperf3, iproute2 already installed. No internet route.
 write_files:
+  - path: /usr/local/sbin/cloud-vlm-metrics
+    permissions: '0755'
+    content: |
+      ${indent(6, metrics_script)}
+  - path: /etc/systemd/system/cloud-vlm-metrics.service
+    content: |
+      [Unit]
+      Description=Publish host activity, disk and GPU metrics
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/sbin/cloud-vlm-metrics ${region} ${role}
+  - path: /etc/systemd/system/cloud-vlm-metrics.timer
+    content: |
+      [Unit]
+      Description=Cloud VLM metric heartbeat
+      [Timer]
+      OnBootSec=120
+      OnUnitActiveSec=60
+      [Install]
+      WantedBy=timers.target
+  - path: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    content: |
+      {"agent":{"region":"${region}"},"logs":{"logs_collected":{"files":{"collect_list":[{"file_path":"/var/log/cloud-init-output.log","log_group_name":"/adaptive-vlm/cloud-v1","log_stream_name":"${role}/{instance_id}/bootstrap"},{"file_path":"/var/lib/docker/containers/*/*-json.log","log_group_name":"/adaptive-vlm/cloud-v1","log_stream_name":"${role}/{instance_id}/containers"}]}}}}
+  - path: /usr/local/sbin/cloud-vlm-mount-data
+    permissions: '0755'
+    content: |
+      ${indent(6, mount_script)}
   - path: /usr/local/sbin/cloud-vlm-watchdog
     permissions: '0755'
     content: |
       #!/bin/bash
       set -eu
       uptime_seconds=$(cut -d. -f1 /proc/uptime)
-      heartbeat=/var/lib/adaptive-vlm/job.heartbeat
+      heartbeat=/srv/adaptive-vlm/artifacts/job.heartbeat
       idle=${idle_seconds}
       if [ -f "$heartbeat" ]; then
         idle=$(( $(date +%s) - $(stat -c %Y "$heartbeat") ))
@@ -35,9 +62,12 @@ write_files:
       [Install]
       WantedBy=timers.target
 runcmd:
+  - [bash, /usr/local/sbin/cloud-vlm-mount-data, "${data_volume_id}"]
   - [mkdir, -p, /var/lib/adaptive-vlm]
   - [systemctl, daemon-reload]
   - [systemctl, enable, --now, cloud-vlm-watchdog.timer]
   - [nvidia-smi]
   - [nvidia-ctk, runtime, configure, --runtime=docker]
   - [systemctl, restart, docker]
+  - [systemctl, enable, --now, cloud-vlm-metrics.timer]
+  - [/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl, -a, fetch-config, -m, ec2, -s, -c, 'file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json']
