@@ -1,0 +1,12 @@
+# Copy to ignored terraform.tfvars; choose actual verified values.
+region = "REQUIRED"
+availability_zone = "REQUIRED"
+artifact_bucket_name = "REQUIRED-GLOBALLY-UNIQUE"
+notification_email = "REQUIRED"
+monthly_budget_usd = 0 # REQUIRED: positive user-chosen amount
+experiment_max_runtime_hours = 2
+idle_timeout_minutes = 15
+edge_ami_id = "REQUIRED-GRID-VERIFIED-AMI"
+cloud_ami_id = "REQUIRED-VERIFIED-AMI"
+enable_compute = false
+launch_approved = false

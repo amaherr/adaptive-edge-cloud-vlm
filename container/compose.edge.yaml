@@ -1,0 +1,29 @@
+services:
+  benchmark:
+    image: ${APP_IMAGE:?Set the shared ECR repository@sha256 digest}
+    network_mode: host
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    init: true
+    stop_grace_period: 120s
+    volumes:
+      - ${MODEL_DIR:?Set persistent model directory}:/models
+      - ${DATA_DIR:?Set frozen dataset directory}:/app/data:ro
+      - ${ARTIFACT_DIR:?Set persistent artifact directory}:/artifacts
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: ["--help"]
+    restart: "no"

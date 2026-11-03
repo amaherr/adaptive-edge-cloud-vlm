@@ -226,3 +226,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Cloud infrastructure secrets, local state and plans
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+*.pem
+*.key
+backend.hcl
+crash.log

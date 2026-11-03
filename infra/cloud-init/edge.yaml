@@ -1,0 +1,43 @@
+#cloud-config
+# Requires a reviewed, pinned AMI with GRID (edge), Docker Compose, NVIDIA
+# Container Toolkit, SSM agent, iperf3, iproute2 already installed. No internet route.
+write_files:
+  - path: /usr/local/sbin/cloud-vlm-watchdog
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      set -eu
+      uptime_seconds=$(cut -d. -f1 /proc/uptime)
+      heartbeat=/var/lib/adaptive-vlm/job.heartbeat
+      idle=${idle_seconds}
+      if [ -f "$heartbeat" ]; then
+        idle=$(( $(date +%s) - $(stat -c %Y "$heartbeat") ))
+      fi
+      if [ "$uptime_seconds" -ge ${max_seconds} ] || { [ "$uptime_seconds" -ge ${idle_seconds} ] && [ "$idle" -ge ${idle_seconds} ]; }; then
+        logger -t cloud-vlm-watchdog 'Runtime/idle ceiling: stopping services; preserve EBS; checkpoint durability NOT guaranteed'
+        systemctl stop cloud-vlm.service || true
+        shutdown -h now
+      fi
+  - path: /etc/systemd/system/cloud-vlm-watchdog.service
+    content: |
+      [Unit]
+      Description=Cloud VLM cost guard
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/sbin/cloud-vlm-watchdog
+  - path: /etc/systemd/system/cloud-vlm-watchdog.timer
+    content: |
+      [Unit]
+      Description=Check cloud VLM runtime each minute
+      [Timer]
+      OnBootSec=60
+      OnUnitActiveSec=60
+      [Install]
+      WantedBy=timers.target
+runcmd:
+  - [mkdir, -p, /var/lib/adaptive-vlm]
+  - [systemctl, daemon-reload]
+  - [systemctl, enable, --now, cloud-vlm-watchdog.timer]
+  - [nvidia-smi]
+  - [nvidia-ctk, runtime, configure, --runtime=docker]
+  - [systemctl, restart, docker]

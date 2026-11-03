@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "campaign_id": "cloud-vqa-v1",
+  "environment_id": "aws-cloud-emulation-v1",
+  "baseline_git_sha": "22567a67b2b2a1a828a4a7d2d61e0e0c277cc36f",
+  "measured_attempts": 8100,
+  "warmups": 27,
+  "files": {
+    "configs/model/moondream2.yaml": "831f7255a11c5be66816e821497e2f54cb1c114ca34bfe8e043c5f95174f2d09",
+    "configs/model/moondream2_artifact.yaml": "369640ff5a46c7f11c6b3f20a22f780d9ae4501e34db80fe2eaa11263df3a650",
+    "requirements/model-cu128.lock": "96d07ba6bb6310b29d259c64652de18f4c5f72f2f0629a17844d09ffacedffbd",
+    "data/manifests/physical_vqa_v1.jsonl": "4e62826280e49359e8cf98d85154000c1583d63474be83a2e9a429da9bde72c9",
+    "configs/evaluation/physical_vqa_split_v1.json": "608e06c06e3916b79e33eda400f324a6bc9d2db73ccc6549fa1214277945e3cc",
+    "configs/profiles/physical_network_blocks_v1.json": "a2818dc67744b7e196a25b061f2ef908fc9ad5d5424659800efdf7f83b87b16c",
+    "configs/evaluation/cloud_vqa_split_v1.json": "a42d042eb0aace02a25d13ea325fd63073b93d768bd8a242e1b20ec53eda460c",
+    "configs/profiles/cloud_network_blocks_v1.json": "a4da4603af07cd15e2516bfa98c581e675587d092458b129e7607e82cb6f5c49",
+    "configs/experiments/cloud_vqa_v1.yaml": "0c04facd6b3e8206e107781aab8d659e68381226d224e0eb0f0be286d955e20d",
+    "configs/hardware/cloud_g6_2xlarge_v1.yaml": "2f45a86f024b3769359b474abb1c1ce9e803b1fc441823ccc483de0e4559e9ef",
+    "configs/hardware/edge_cloud_g6f_2xlarge_v1.yaml": "1a8c8f920b34c472f47b508470e62a4ff6ae5492de2c798fee17df7c69ee455e"
+  }
+}

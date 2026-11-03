@@ -1,0 +1,9 @@
+host_id: cloud-cloud-emulation-v1
+role: cloud
+status: declared
+operating_system: Linux (AMI and driver verification pending)
+cpu: AWS g6.2xlarge (8 vCPU)
+ram_gib: 32
+gpu: NVIDIA L4 full GPU
+gpu_vram_mib: 24576
+notes: Advertised capacity only; measured inventory and BF16 feasibility required.

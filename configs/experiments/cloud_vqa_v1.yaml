@@ -1,0 +1,19 @@
+schema_version: 1
+name: cloud-vqa-v1
+mode: cloud
+model_config: ../model/moondream2.yaml
+edge_hardware_config: ../hardware/edge_cloud_g6f_2xlarge_v1.yaml
+cloud_hardware_config: ../hardware/cloud_g6_2xlarge_v1.yaml
+dataset:
+  manifest_path: ../../data/manifests/physical_vqa_v1.jsonl
+  revision: vqa-v2-val2014-physical-v1
+runtime:
+  seed: 42
+  warmup_requests: 1
+  measured_repetitions: 3
+transport:
+  host: 10.42.1.20
+  port: 5050
+  timeout_seconds: 120.0
+  protocol_version: 1
+artifacts_dir: ../../artifacts

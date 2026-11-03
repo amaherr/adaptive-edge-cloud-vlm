@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloud VLM Compose services
+Requires=docker.service
+After=docker.service network-online.target
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/adaptive-edge-cloud-vlm
+EnvironmentFile=/etc/adaptive-vlm/runtime.env
+ExecStart=/usr/bin/docker compose -f container/compose.cloud.yaml up -d --wait
+ExecStop=/usr/bin/docker compose -f container/compose.cloud.yaml stop --timeout 120
+TimeoutStopSec=150
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "cloud_host": "10.42.1.20",
+  "edge_interface": "REQUIRES_ROUTE_VERIFICATION",
+  "iperf_port": 5051,
+  "echo_port": 5052,
+  "unshaped_echo_median_ms": null,
+  "policy_order_seed": 1707,
+  "blocks": {
+    "N1": {
+      "rate_mbps": 2,
+      "egress_delay_ms": 10
+    },
+    "N2": {
+      "rate_mbps": 5,
+      "egress_delay_ms": 10
+    },
+    "N3": {
+      "rate_mbps": 10,
+      "egress_delay_ms": 10
+    },
+    "N4": {
+      "rate_mbps": 25,
+      "egress_delay_ms": 10
+    },
+    "N5": {
+      "rate_mbps": 50,
+      "egress_delay_ms": 10
+    },
+    "N6": {
+      "rate_mbps": 100,
+      "egress_delay_ms": 10
+    },
+    "N7": {
+      "rate_mbps": 10,
+      "egress_delay_ms": 2.5
+    },
+    "N8": {
+      "rate_mbps": 10,
+      "egress_delay_ms": 25
+    },
+    "N9": {
+      "rate_mbps": 10,
+      "egress_delay_ms": 50
+    }
+  }
+}

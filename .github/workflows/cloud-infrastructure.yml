@@ -1,0 +1,21 @@
+name: Cloud infrastructure
+on:
+  pull_request:
+    paths: ['infra/**', 'container/**', 'configs/**', 'scripts/verify_cloud_baseline.py', '.github/workflows/cloud-infrastructure.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+      - run: terraform fmt -check -recursive infra/terraform
+      - run: terraform -chdir=infra/terraform/bootstrap init -backend=false -lockfile=readonly
+      - run: terraform -chdir=infra/terraform/bootstrap validate
+      - run: terraform -chdir=infra/terraform/environments/cloud-v1 init -backend=false -lockfile=readonly
+      - run: terraform -chdir=infra/terraform/environments/cloud-v1 validate
+      - run: terraform -chdir=infra/terraform/environments/cloud-v1 test
