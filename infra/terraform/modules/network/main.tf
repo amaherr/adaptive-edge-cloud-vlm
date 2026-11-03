@@ -1,5 +1,6 @@
 variable "region" { type = string }
 variable "az" { type = string }
+variable "enable_private_endpoints" { type = bool }
 resource "aws_vpc" "this" {
   cidr_block           = "10.42.0.0/16"
   enable_dns_hostnames = true
@@ -32,7 +33,7 @@ resource "aws_security_group" "endpoints" {
   }
 }
 resource "aws_vpc_endpoint" "services" {
-  for_each            = toset(["ssm", "ssmmessages", "ec2messages", "ecr.api", "ecr.dkr", "logs", "monitoring"])
+  for_each            = var.enable_private_endpoints ? toset(["ssm", "ssmmessages", "ec2messages", "ecr.api", "ecr.dkr", "logs", "monitoring"]) : toset([])
   vpc_id              = aws_vpc.this.id
   service_name        = "com.amazonaws.${var.region}.${each.key}"
   vpc_endpoint_type   = "Interface"
@@ -42,3 +43,5 @@ resource "aws_vpc_endpoint" "services" {
 }
 output "vpc_id" { value = aws_vpc.this.id }
 output "subnet_id" { value = aws_subnet.this.id }
+
+output "interface_endpoint_count" { value = length(aws_vpc_endpoint.services) }

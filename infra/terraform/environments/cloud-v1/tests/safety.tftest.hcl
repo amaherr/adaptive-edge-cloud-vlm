@@ -20,5 +20,13 @@ run "foundation_has_no_gpu" {
 run "launch_requires_approval" {
   command = plan
   variables { enable_compute = true }
-  expect_failures = [var.launch_approved]
+  expect_failures = [var.launch_approved, var.enable_private_endpoints]
+}
+
+run "foundation_has_no_hourly_endpoints" {
+  command = plan
+  assert {
+    condition     = module.network.interface_endpoint_count == 0
+    error_message = "Foundation must not create hourly endpoints by default."
+  }
 }

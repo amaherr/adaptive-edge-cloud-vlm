@@ -122,5 +122,15 @@ Initial region recommendation: us-east-1, subject to current same-AZ offerings,
 quota and price checks. AWS lists G6f availability in Northern Virginia:
 https://aws.amazon.com/about-aws/whats-new/2025/07/amazon-ec2-g6f-instances-fractional-gpus/
 The supplied notification email is stored only in ignored local tfvars;
-monthly budget remains unset (zero deliberately fails validation).
+monthly budget is now $20 (user-selected alert threshold).
 Both bootstrap and experiment Terraform provider validation passed.
+
+## Foundation cost correction
+
+Interface endpoints are now disabled by default through
+`enable_private_endpoints=false`. GPU launch requires them explicitly enabled.
+They must be included in the reviewed cost estimate and removed after the test
+window when no longer needed. Stopping EC2 does not stop endpoint billing.
+The user clarified $20 is a monthly alert threshold; report deployment cost
+before creating paid resources. AWS authentication currently fails with
+InvalidClientTokenId and Docker Desktop WSL integration needs enabling.

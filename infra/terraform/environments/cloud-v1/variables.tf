@@ -24,3 +24,13 @@ variable "data_volume_gib" {
   type    = number
   default = 150
 }
+
+variable "enable_private_endpoints" {
+  description = "Billable hourly endpoints; enable only for a reviewed deployment window."
+  type        = bool
+  default     = false
+  validation {
+    condition     = !var.enable_compute || var.enable_private_endpoints
+    error_message = "Private GPU nodes require SSM/ECR/logging endpoints."
+  }
+}

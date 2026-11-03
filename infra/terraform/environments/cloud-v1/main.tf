@@ -3,9 +3,10 @@ provider "aws" {
   default_tags { tags = { Project = "adaptive-edge-cloud-vlm", Campaign = "cloud-v1", ManagedBy = "Terraform" } }
 }
 module "network" {
-  source = "../../modules/network"
-  region = var.region
-  az     = var.availability_zone
+  source                   = "../../modules/network"
+  region                   = var.region
+  az                       = var.availability_zone
+  enable_private_endpoints = var.enable_private_endpoints
 }
 module "storage" {
   source      = "../../modules/storage"
