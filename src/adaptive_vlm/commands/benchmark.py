@@ -25,6 +25,7 @@ from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
+from adaptive_vlm.shutdown import graceful_sigterm
 
 
 def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
@@ -108,22 +109,26 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
         with progress.phase("Checking remote model contract"):
             if not policy.health().ready:
                 raise RuntimeError("remote server is not ready")
-    summary = run_benchmark(
-        config=config,
-        manifest=manifest,
-        policy=policy,
-        run_manifest=run_manifest,
-        run_dir=args.run_dir,
-        warmups=(
-            args.warmups if args.warmups is not None else config.runtime.warmup_requests
-        ),
-        repetitions=(
-            args.repetitions
-            if args.repetitions is not None
-            else config.runtime.measured_repetitions
-        ),
-        pipeline=args.pipeline,
-        resume=args.resume,
-    )
+    with graceful_sigterm() as stop:
+        summary = run_benchmark(
+            config=config,
+            manifest=manifest,
+            policy=policy,
+            run_manifest=run_manifest,
+            run_dir=args.run_dir,
+            warmups=(
+                args.warmups
+                if args.warmups is not None
+                else config.runtime.warmup_requests
+            ),
+            repetitions=(
+                args.repetitions
+                if args.repetitions is not None
+                else config.runtime.measured_repetitions
+            ),
+            pipeline=args.pipeline,
+            resume=args.resume,
+            stop_requested=stop.is_set,
+        )
     print(json.dumps(summary, indent=2, sort_keys=True))
-    return 0
+    return 143 if summary["execution_state"] == "interrupted" else 0

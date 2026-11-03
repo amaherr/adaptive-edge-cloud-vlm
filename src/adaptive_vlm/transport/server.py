@@ -12,6 +12,7 @@ from pathlib import Path
 from time import monotonic, perf_counter_ns
 from typing import Literal, cast
 
+from adaptive_vlm.activity import mark_activity
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
 from adaptive_vlm.transport.protocol import (
     DEFAULT_MAX_HEADER_BYTES,
@@ -182,15 +183,19 @@ class CloudRequestProcessor:
             )
 
         if (
-            frame.message_type is MessageType.INFERENCE_REQUEST
-            and self._inference_function is None
-        ) or (
-            frame.message_type is MessageType.TENSOR_REQUEST
-            and self._tensor_inference_function is None
-            and self._prepared_tensor_inference_function is None
-        ) or (
-            frame.message_type is MessageType.PROMPT_REQUEST
-            and self._prompt_prepare_function is None
+            (
+                frame.message_type is MessageType.INFERENCE_REQUEST
+                and self._inference_function is None
+            )
+            or (
+                frame.message_type is MessageType.TENSOR_REQUEST
+                and self._tensor_inference_function is None
+                and self._prepared_tensor_inference_function is None
+            )
+            or (
+                frame.message_type is MessageType.PROMPT_REQUEST
+                and self._prompt_prepare_function is None
+            )
         ):
             self._increment("rejected")
             return self._error(
@@ -199,6 +204,7 @@ class CloudRequestProcessor:
                 message=f"server is not configured for {frame.message_type.value}",
             )
 
+        mark_activity()
         try:
             action = (
                 "preparing prompt"
@@ -223,6 +229,9 @@ class CloudRequestProcessor:
                 code="model_error",
                 message=f"{type(exc).__name__}: {str(exc)[:1900]}",
             )
+
+        finally:
+            mark_activity()
 
     def _run_image_inference(self, received: ReceivedFrame) -> Frame:
         frame = received.frame
@@ -257,9 +266,7 @@ class CloudRequestProcessor:
             request_id=frame.request_id,
             prompt=cast(str, metadata["prompt"]),
             tensor=tensor,
-            pipeline=cast(
-                Literal["synchronous", "prompt_first"], metadata["pipeline"]
-            ),
+            pipeline=cast(Literal["synchronous", "prompt_first"], metadata["pipeline"]),
         )
         started_ns = perf_counter_ns()
         if request.pipeline == "synchronous":

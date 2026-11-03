@@ -6,13 +6,14 @@ import hashlib
 import json
 import random
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter_ns
 from typing import Any
 
+from adaptive_vlm.activity import mark_activity
 from adaptive_vlm.artifacts import append_jsonl, write_json_atomic
 from adaptive_vlm.config import (
     ExecutionMode,
@@ -135,6 +136,7 @@ def run_benchmark(
     repetitions: int,
     pipeline: str,
     resume: bool = False,
+    stop_requested: Callable[[], bool] | None = None,
 ) -> dict[str, Any]:
     """Execute one policy and persist each attempt before advancing."""
 
@@ -207,6 +209,8 @@ def run_benchmark(
 
     items = {item.request_id: item for item in manifest.items}
     for position, trial in enumerate(schedule, 1):
+        if stop_requested is not None and stop_requested():
+            break
         if trial.trial_id in completed:
             continue
         item = items[trial.request_id]
@@ -215,12 +219,11 @@ def run_benchmark(
             f"{trial.trial_id} {trial.request_id}",
             flush=True,
         )
+        mark_activity()
         started = perf_counter_ns()
         row: dict[str, Any] = {
             **trial.to_dict(),
-            "started_at_utc": datetime.now(UTC)
-            .isoformat()
-            .replace("+00:00", "Z"),
+            "started_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             "plan_sha256": plan_hash,
             "config_sha256": plan["config_sha256"],
             "model_contract_sha256": plan["model_contract_sha256"],
@@ -253,8 +256,13 @@ def run_benchmark(
             )
         row["observed_end_to_end_ms"] = (perf_counter_ns() - started) / 1_000_000
         append_jsonl(raw_path, row)
+        mark_activity()
         rows.append(row)
     summary = summarize(rows, manifest, policy.mode, plan_hash)
+    summary["execution_state"] = (
+        "complete" if len(rows) == len(schedule) else "interrupted"
+    )
+    summary["planned_attempts"] = len(schedule)
     write_json_atomic(run_dir / "summary.json", summary)
     return summary
 

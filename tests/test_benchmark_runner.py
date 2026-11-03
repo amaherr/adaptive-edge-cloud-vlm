@@ -134,3 +134,36 @@ def test_resume_rejects_mismatched_plan(tmp_path: Path) -> None:
     run_benchmark(**kwargs)
     with pytest.raises(ValueError, match="plan"):
         run_benchmark(**{**kwargs, "repetitions": 2}, resume=True)
+
+
+def test_orderly_stop_preserves_active_trial_and_resumes(tmp_path: Path) -> None:
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"
+    )
+    manifest = load_frozen_manifest(_manifest(tmp_path))
+    policy = IntermittentPolicy()
+    kwargs = dict(
+        config=config,
+        manifest=manifest,
+        policy=policy,
+        run_manifest=create_run_manifest(
+            config, {}, dataset_manifest_sha256=manifest.sha256
+        ),
+        run_dir=tmp_path / "stopped",
+        warmups=0,
+        repetitions=2,
+        pipeline="synchronous",
+    )
+    stopped = run_benchmark(**kwargs, stop_requested=lambda: policy.calls >= 1)
+    assert stopped["execution_state"] == "interrupted"
+    assert stopped["measured_attempts"] == 1
+    assert stopped["planned_attempts"] == 4
+    resumed = run_benchmark(**kwargs, resume=True)
+    assert resumed["execution_state"] == "complete"
+    assert resumed["measured_attempts"] == 4
+    assert policy.calls == 4
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "stopped/requests.jsonl").read_text().splitlines()
+    ]
+    assert len({row["trial_id"] for row in rows}) == 4
