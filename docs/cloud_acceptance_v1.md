@@ -3,7 +3,8 @@
 An implementation, mocked plan or YAML parse is not a passed deployment gate.
 Store real evidence under ignored artifacts/infra and archive it privately to S3.
 Live foundation evidence is recorded in cloud_execution_2026-11-05.md.
-GPU-dependent T0/D0 acceptance remains open while the applied quota is zero.
+GPU-dependent T0/D0 acceptance remains open: AWS declined the increase and
+the applied quota is zero. The ECR image is published; an appeal is required.
 
 | Gate item | Current evidence | Still required |
 |---|---|---|
@@ -12,7 +13,7 @@ GPU-dependent T0/D0 acceptance remains open while the applied quota is zero.
 | T0 provisioning | Foundation deployed; paired AZ offerings verified; clean plan | AWS quota approval, baked/tested AMI and reviewed paired-node apply |
 | T0 operations | Mount, telemetry, log agent and stop code | Confirm mounted EBS IDs, received logs/metrics, idle/max-runtime stop tests and no unintended drift |
 | T0 teardown | Retained-state migration, reviewed disposable destroy plan, S3 receipt restore | Repeat the plan with actual GPU nodes before final T0 acceptance |
-| D0 image | Successful pinned build, installed-lock check and offline CPU smoke | ECR digest publication and identical digest deployed on both GPU nodes |
+| D0 image | Successful pinned build, installed-lock check and offline CPU smoke | Published ECR digest recorded; deploy and verify it on both GPU nodes after quota approval |
 | D0 GPU | Diagnostic script and pinned model | GRID/driver inventory, BF16 on both nodes, full edge and isolated vision feasibility |
 | D0 correctness | Existing CPU suite; diagnostic smoke script | Actual 36 GPU attempts on 12 training requests, exact text/token outputs across all three placements |
 | D0 timing | No cloud evidence | Host/container correctness comparison; declared numerical tolerances where applicable; separate orchestration overhead measurement |
@@ -36,7 +37,9 @@ without writing keys to the repository. Fresh CLI login is currently required.
 Enable Docker Desktop WSL integration, then run the build script from a clean
 commit: `python scripts/build_cloud_image.py`. It resolves the base from the
 Dockerfile, supplies provenance hashes, builds Linux/amd64 and records the local
-image config digest. That digest is not an ECR deployment manifest digest.
+image ID and optional descriptor. Docker's image-ID semantics vary by image
+store: Docker 29 reports the OCI index ID here, while older stores often report
+the config ID. Always verify and deploy the explicit registry manifest reference.
 Push to the Terraform ECR repository using temporary builder credentials, then
 retrieve the ECR manifest digest. Use exactly that reference as APP_IMAGE on
 both nodes. Never treat a tag or a self-reported environment variable as proof:

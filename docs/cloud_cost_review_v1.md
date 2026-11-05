@@ -8,7 +8,7 @@ interface endpoints at $0.01/endpoint-hour. Raw pricing products are archived
 under ignored artifacts/infra. These confirm the arithmetic below; they still
 exclude ancillary services, image preparation and taxes. No GPU resources have
 been launched. The applied G/VT quota is currently zero; a Terraform-managed
-request for 16 vCPUs is pending AWS approval.
+request for 16 vCPUs was declined; an appeal is being prepared.
 
 ## Storage revision before first GPU deployment
 
@@ -72,3 +72,9 @@ different measurements. Registry-reported image bytes will be used for ECR
 billing estimates after publication; do not label Docker's figure as unpacked
 filesystem size. ECR's published storage example is $0.10/GB-month, before any
 account-specific allowance (https://aws.amazon.com/ecr/pricing/).
+
+
+The published registry image is 4,032,453,520 bytes, giving approximately
+$0.40/month at the published $0.10/GB-month storage example rate before
+allowances. No free credits are assumed by the cost model. GPU execution,
+data EBS and hourly endpoints remain disabled after the quota refusal.

@@ -52,8 +52,8 @@ interface, tc behavior or achieved bandwidth/RTT; measure from the final image.
 
 ## Startup cache verification
 
-Model inputs under /models are now mounted read-only. Only /models/huggingface
-is overlaid with the writable persistent artifacts/runtime-cache/hf directory.
+Model inputs under /models are now mounted read-only. Only /models/modules
+is overlaid with the writable persistent artifacts/runtime-cache/modules directory.
 CUDA, Triton, Torch and XDG caches also live under artifacts/runtime-cache.
 The volume helper creates those directories as UID/GID 10001, including the
 nested mount target, and is idempotent on an already mounted data volume.

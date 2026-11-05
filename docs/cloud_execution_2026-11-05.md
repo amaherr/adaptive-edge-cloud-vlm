@@ -10,13 +10,15 @@ GPU-dependent acceptance is blocked by AWS's applied regional quota of zero.
 - Current AWS Price List products confirm $0.475/hour edge, $0.9776/hour cloud,
   $0.08/GB-month gp3, and $0.01/interface-endpoint-hour.
 - Terraform submitted a request for 16 On-Demand G/VT vCPUs. A successful quota
-  request apply is not an approved quota. AWS reports the request pending.
+  request apply is not an approved quota. AWS initially reported the request pending, then declined it. The user
+  supplied the refusal and an appeal with academic details is now required.
 - Terraform created the protected state bucket and 32 foundation resources:
   private VPC/subnet/routes/S3 gateway, instance roles/security groups, private
   versioned artifact bucket, immutable ECR, logs, SNS and the $20 monthly budget.
   Four budget notifications cover actual 50/80/100% and forecast 100%.
 - The user confirmed the SNS email subscription; AWS lists a real subscription
-  ARN and accepted a delivery-test publication. The user confirmed receiving\n  the test email, completing the delivery check.
+  ARN and accepted a delivery-test publication. The user confirmed receiving
+  the test email, completing the delivery check.
 - S3 backend lock contention was tested with two Terraform operations: the
   second was rejected while the first held the lock, then the lock was released.
 - The initial live drift check caught mixed inline/standalone egress ownership.
@@ -85,3 +87,43 @@ bind mounts: all 20 model artifacts and all 100 original images. New unit tests
 reject changed weights, tokenizer and executable model code. Mutable runtime
 caches are separated from read-only source inputs. These checks do not stand in
 for the remaining AWS GPU tests.
+
+
+## Publication and quota decision update
+
+The verified image is now published in private ECR. Its immutable OCI index
+digest is sha256:5d8fed3269723419654ef3778ed360fd1c727e8303a8b9b22f87718d9b2a4634;
+the full private reference is in artifacts/infra/image-deployment.json.
+Registry size is 4,032,453,520 bytes. Temporary ECR login credentials were removed
+after publication. The user confirmed receipt of the notification test.
+
+AWS declined the 16-vCPU increase, citing gradual usage ramp-up and billing risk.
+Ohio, Oregon and Frankfurt were also checked and each applied G/VT quota is zero.
+No alternative hardware or CPU-only setup is being substituted for the required
+GPU pair. The appeal draft in ignored artifacts/infra now includes the university, exact
+thesis title and expected January 2027 completion supplied by the user. It is
+ready for the user to review and submit through the existing support case. It asks
+for 16 vCPUs, with an optional staged 8-vCPU initial preflight. Eight alone would
+not pass the final two-node gate.
+
+Offline dynamic model-class import and tokenizer resolution also passed inside
+the shared image. This diagnostic loaded no model weights and allocated no GPU.
+It used a memory cap and the local nonroot cache-owner UID, so it does not prove
+the deployed UID 10001 cache permissions or GPU feasibility. Both remain live
+AWS acceptance items.
+
+
+## Image security scan and provenance limits
+
+The ECR scan of the Linux/amd64 child manifest completed with 10 HIGH, 13 MEDIUM
+and 3 LOW findings; no CRITICAL findings were reported. The HIGH findings concern
+Debian zlib, apt, util-linux, glibc and sqlite3 packages. This is a completed scan,
+not a clean security result. Preserve its raw findings and review distribution
+fix availability before GPU deployment. Any rebuilt image needs a new immutable
+digest and repeated validation; do not silently change the frozen Python lock.
+
+The original build receipt used the misleading key local_image_config_digest
+for Docker's image ID. Docker 29 returned an OCI index ID in this build. Keep the
+original receipt unchanged and use a separate publication verification receipt
+for the index, Linux/amd64 child manifest and child configuration digest. New
+build reports use local_image_id and local_descriptor instead.

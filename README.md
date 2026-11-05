@@ -2,10 +2,29 @@
 
 Research prototype for distributing inference from a single pretrained vision–language model (VLM) between an edge device and a cloud machine. The project aims to select an internal execution configuration per image-and-text request using network conditions, available compute and memory, and request characteristics. The intended outcome is lower end-to-end latency and communication cost without changing the model's answer quality or exceeding edge resources.
 
-The project implements three fixed policies, a manual dispatcher, a predictor and selector, mixed adaptive execution, bounded live health sensing, and a paired evaluation pipeline. The local CPU/loopback campaigns validate integration. A separate physical edge/cloud pair has now completed a clean 12-request GPU placement campaign with exact output equivalence. The local predictor missed its fastest-choice ranking target, and controlled physical profiling and official VQA data remain open, so automatic performance and public-dataset accuracy claims remain open. The pinned model, preprocessing, precision and greedy decoding are shared across placements.
+The project implements three fixed policies, a manual dispatcher, a predictor and selector, mixed adaptive execution, bounded live health sensing, and a paired evaluation pipeline. The local CPU/loopback campaigns validate integration. A separate physical edge/cloud pair has now completed a clean 12-request GPU placement campaign with exact output equivalence. The local predictor missed its fastest-choice ranking target, and controlled-network profiling and official VQA scoring remain open, so automatic performance and public-dataset accuracy claims remain open. The pinned model, preprocessing, precision and greedy decoding are shared across placements.
+
+## Cloud infrastructure and acceptance
+
+Remaining thesis work targets independently provisioned AWS virtual-edge and
+cloud VMs, one immutable application image, controlled network emulation and
+S3-backed recoverable experiments. This is cloud-hosted edge emulation; physical
+device validation is optional future work. Existing physical results remain
+historical evidence for their original environments.
+
+The current foundation is deployed and its retained storage/budget state is
+separate from disposable compute. GPU-dependent phases 1A/T0 and 1B/D0 remain
+open because AWS declined the regional quota request; an appeal is being prepared. See the
+[live execution record](docs/cloud_execution_2026-11-05.md),
+[acceptance checklist](docs/cloud_acceptance_v1.md), and
+[deployment/retention order](infra/terraform/environments/cloud-retained/README.md).
+The [migration roadmap](docs/Gate2_Cloud_Migration_Roadmap_v2.md) is the current
+execution plan. The preliminary [cost review](docs/cloud_cost_review_v1.md)
+will be followed by a full-project estimate after infrastructure acceptance.
 
 ## Contents
 
+- [Cloud infrastructure and acceptance](#cloud-infrastructure-and-acceptance)
 - [Project architecture and scope](#project-architecture-and-scope)
 - [Current implementation and methodology](#current-implementation-and-methodology)
 - [Setup](#setup)
@@ -18,7 +37,7 @@ The project implements three fixed policies, a manual dispatcher, a predictor an
 
 ## Project architecture and scope
 
-The runtime accepts an image and prompt, derives task features before inference, observes a replayed or bounded live health state, and selects a feasible placement of the same VLM. The current predictor and selector execute in diagnostic campaigns; validated automatic performance selection awaits a fresh physical-host calibration and passing G3/G4 gates. Memory peaks and idle GPU headroom have been measured on both hosts; independently verified network blocks remain open.
+The runtime accepts an image and prompt, derives task features before inference, observes a replayed or bounded live health state, and selects a feasible placement of the same VLM. The current predictor and selector execute in diagnostic campaigns; validated automatic performance selection awaits calibration for the cloud host pair and passing G3/G4 gates. Earlier physical memory measurements remain historical; cloud feasibility and independently verified network blocks remain open.
 
 ~~~mermaid
 flowchart LR
@@ -33,7 +52,7 @@ flowchart LR
     O -. "bounded health update" .-> S
 ~~~
 
-The research question is whether dynamic selection among these configurations improves latency and communication efficiency under changing conditions. The scheduler exists as a research implementation; controlled physical edge–cloud evaluation, official VQA scoring, and a validated improvement claim remain pending.
+The research question is whether dynamic selection among these configurations improves latency and communication efficiency under changing conditions. The scheduler exists as a research implementation; controlled cloud-emulation evaluation, official VQA scoring, and a validated improvement claim remain pending.
 
 ## Current implementation and methodology
 
@@ -405,7 +424,7 @@ The parser and command routing live in `cli.py`; command execution lives in [`co
 
 ## Using a separate cloud PC
 
-The current PC can be the edge and a second Linux/WSL PC can be the cloud once its hardware and network are known. **No separate cloud machine has been validated yet.** These are deployment instructions, not a claim of physical-host results.
+This section preserves the earlier manual physical-PC setup. The current AWS campaign follows the Terraform/shared-image workflow linked above. Historical two-PC evidence is recorded in the physical placement checkpoint; it does not establish cloud acceptance.
 
 1. Check out the same Git commit on both PCs. Install the pinned model environment on the cloud; install it on the edge as well for `edge` and `distributed`. Place and verify the pinned artifact in each host's local cache before using `--offline`. The split loader still needs RAM for a transient full checkpoint on **both** hosts.
 2. Record the cloud PC's actual OS, CPU, RAM, GPU/VRAM, driver, and software in a new `configs/hardware/*.yaml` file with `status: verified`. Do not label [`cloud_pending.yaml`](configs/hardware/cloud_pending.yaml) or [`local_model_cloud.yaml`](configs/hardware/local_model_cloud.yaml) as a physical machine.
@@ -447,7 +466,7 @@ Generated `artifacts/`, `.model-cache/`, and `data/raw/` are ignored by Git. Pre
 
 ## Next research steps
 
-The next research milestone is to verify independently measured and controlled physical network states, freeze a real VQA request/network split, and run repeated paired profiling on the existing edge/cloud host pair. Fit and validate a fresh physical predictor and selector against held-out blocks before enabling automatic performance claims. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
+Complete T0/D0 on the cloud pair, then implement and test S3 checkpoint recovery before the full Gate 2 campaign: 8,100 measured attempts plus 27 planned warmups on the frozen VQA requests and network blocks. Fit a fresh cloud predictor using only training requests/blocks, validate and freeze it before final evaluation, and use official VQA scoring for task-quality claims. The 60/20/20 request split and held-out N4/N9 blocks are retained in the cloud split.
 
 ## Technology and repository layout
 
