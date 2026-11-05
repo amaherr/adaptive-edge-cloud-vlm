@@ -20,10 +20,7 @@ variable "launch_approved" {
   type        = bool
   default     = false
 }
-variable "data_volume_gib" {
-  type    = number
-  default = 150
-}
+variable "state_bucket_name" { type = string }
 
 variable "enable_private_endpoints" {
   description = "Billable hourly endpoints; enable only for a reviewed deployment window."

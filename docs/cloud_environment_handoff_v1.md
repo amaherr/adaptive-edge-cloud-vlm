@@ -2,7 +2,9 @@
 
 Scope: roadmap architecture (phase 0), frozen baseline, Terraform (1A), and
 container contract (1B). Campaign `cloud-vqa-v1`; environment
-`aws-cloud-emulation-v1`. No cloud measurements have been collected.
+`aws-cloud-emulation-v1`. No GPU/cloud inference measurements have been collected. Live foundation
+execution is recorded in cloud_execution_2026-11-05.md; current stack ownership
+and teardown instructions are in infra/terraform/environments/cloud-retained/README.md.
 
 ## Repository analysis
 
@@ -84,12 +86,14 @@ Checkpoint metrics remain pending the checkpoint manager. Do not claim live
 telemetry success on the strength of configuration alone. No full campaign before these controls
 and checkpoint crash/restore tests pass.
 
-Terraform protects state, artifacts, ECR and data EBS with prevent_destroy.
-A full destroy plan will therefore refuse destruction: teardown must explicitly
-retain/remove protected resources from the disposable stack under reviewed state
-migration, never delete thesis evidence merely to make destroy succeed. Verify
-independent S3 restore first. Archive reviewed plans privately; plans/state may
-contain sensitive values. Record emergency stops and reconcile state afterwards.
+Protected artifacts, ECR, budget and data volumes now live in cloud-retained;
+the disposable cloud-v1 stack consumes their outputs. Seven existing resources
+were imported into retained state and forgotten from their old state without
+changing AWS resources. A full disposable destroy plan was reviewed: it excludes
+retained resources and the backend. Do not apply it before required archive and
+restore checks. Destroying the retained stack remains deliberately blocked by
+prevent_destroy on thesis storage/images/volumes. Logs must be archived before
+disposable observability resources are removed.
 
 Gate C0 is locally hash-verified but still needs a committed deployment revision
 and matching clean VM checkouts. T0 and D0 remain OPEN until live plans, alerts,

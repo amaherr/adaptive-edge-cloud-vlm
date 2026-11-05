@@ -49,3 +49,24 @@ Gate D0 complete from CPU-only configuration checks.
 Keep host traffic shaping peer/port-classified to 5050–5052. S3/SSM endpoint
 traffic must bypass shaping. Host networking alone does not prove the selected
 interface, tc behavior or achieved bandwidth/RTT; measure from the final image.
+
+## Startup cache verification
+
+Model inputs under /models are now mounted read-only. Only /models/huggingface
+is overlaid with the writable persistent artifacts/runtime-cache/hf directory.
+CUDA, Triton, Torch and XDG caches also live under artifacts/runtime-cache.
+The volume helper creates those directories as UID/GID 10001, including the
+nested mount target, and is idempotent on an already mounted data volume.
+
+Before service startup, the host's standard-library validation script runs the
+read-only container/verify_cache.py diagnostic inside the same application image.
+It verifies weights, pinned tokenizer and all remote-code files without importing
+or executing the model. The image's baseline verifier then checks all 100 frozen
+dataset images and configuration hashes. Network is disabled for both checks;
+no application packages are installed on the host. Host diagnostic source and
+application-image revisions are separately recorded.
+
+The actual shared image passed these checks through read-only model/data mounts
+on 5 November 2026: 20 model artifacts and 100 images. This is cache/provenance
+evidence, not GPU correctness or AWS persistence evidence. Startup hashing is
+outside measured attempts; systemd allows ten minutes for validation/model load.

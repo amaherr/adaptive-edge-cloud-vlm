@@ -11,3 +11,4 @@ cloud_ami_id = "REQUIRED-VERIFIED-AMI"
 enable_compute = false
 launch_approved = false
 enable_private_endpoints = false
+state_bucket_name = "REQUIRED-BOOTSTRAP-BUCKET"

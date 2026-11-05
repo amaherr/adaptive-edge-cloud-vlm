@@ -5,7 +5,8 @@ variable "az" { type = string }
 variable "amis" { type = map(string) }
 variable "groups" { type = map(string) }
 variable "profiles" { type = map(string) }
-variable "data_volume_gib" { type = number }
+variable "volume_ids" { type = map(string) }
+variable "data_volume_az" { type = string }
 variable "max_hours" {
   type = number
   validation {
@@ -21,15 +22,6 @@ variable "idle_minutes" {
   }
 }
 locals { nodes = var.enabled ? { edge = "g6f.2xlarge", cloud = "g6.2xlarge" } : {} }
-resource "aws_ebs_volume" "data" {
-  for_each          = local.nodes
-  availability_zone = var.az
-  size              = var.data_volume_gib
-  type              = "gp3"
-  encrypted         = true
-  tags              = { Role = each.key }
-  lifecycle { prevent_destroy = true }
-}
 resource "aws_instance" "node" {
   for_each                    = local.nodes
   ami                         = var.amis[each.key]
@@ -53,6 +45,10 @@ resource "aws_instance" "node" {
   tags      = { Role = each.key }
   lifecycle {
     precondition {
+      condition     = var.az == var.data_volume_az && length(var.volume_ids) == 2
+      error_message = "Both retained data volumes must exist in the selected Availability Zone."
+    }
+    precondition {
       condition     = var.approved
       error_message = "Budget/AMI/GRID/price/quota verification required before GPU launch."
     }
@@ -61,15 +57,15 @@ resource "aws_instance" "node" {
 resource "aws_volume_attachment" "data" {
   for_each    = local.nodes
   device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.data[each.key].id
+  volume_id   = var.volume_ids[each.key]
   instance_id = aws_instance.node[each.key].id
 }
 output "instance_ids" { value = { for k, v in aws_instance.node : k => v.id } }
-output "volume_ids" { value = { for k, v in aws_ebs_volume.data : k => v.id } }
+output "volume_ids" { value = var.volume_ids }
 
 variable "region" { type = string }
 
 locals {
-  cloud_init = { for role in keys(local.nodes) : role => templatefile("${path.module}/../../../cloud-init/${role}.yaml", { max_seconds = ceil(var.max_hours * 3600), idle_seconds = ceil(var.idle_minutes * 60), data_volume_id = aws_ebs_volume.data[role].id, mount_script = file("${path.module}/../../../runtime/mount-data.sh"), metrics_script = file("${path.module}/../../../runtime/publish-metrics.sh"), region = var.region, role = role }) }
+  cloud_init = { for role in keys(local.nodes) : role => templatefile("${path.module}/../../../cloud-init/${role}.yaml", { max_seconds = ceil(var.max_hours * 3600), idle_seconds = ceil(var.idle_minutes * 60), data_volume_id = var.volume_ids[role], mount_script = file("${path.module}/../../../runtime/mount-data.sh"), metrics_script = file("${path.module}/../../../runtime/publish-metrics.sh"), region = var.region, role = role }) }
 }
 output "rendered_cloud_init" { value = local.cloud_init }

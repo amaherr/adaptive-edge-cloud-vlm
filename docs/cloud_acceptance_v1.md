@@ -2,16 +2,17 @@
 
 An implementation, mocked plan or YAML parse is not a passed deployment gate.
 Store real evidence under ignored artifacts/infra and archive it privately to S3.
-No live AWS acceptance evidence exists yet.
+Live foundation evidence is recorded in cloud_execution_2026-11-05.md.
+GPU-dependent T0/D0 acceptance remains open while the applied quota is zero.
 
 | Gate item | Current evidence | Still required |
 |---|---|---|
-| T0 remote state | S3 backend/bootstrap configuration, provider validation | Apply bootstrap; demonstrate lock contention, encryption/versioning and protected bootstrap state |
-| T0 cost controls | $20 input; staged endpoints; budgets/watchdog code | Current regional cost quote, budget/SNS confirmation and received test alert before GPU launch |
-| T0 provisioning | Mocked plans; role/SG/volume code | Actual same-AZ offerings/quota; reviewed supported AMIs; reviewed saved plan/apply |
+| T0 remote state | Live encrypted/versioned backends and lock-contention test | Keep bootstrap, quota, retained and disposable states separate |
+| T0 cost controls | Live $20 budget, four notifications, confirmed SNS, published delivery test | Test receipt confirmed; exercise host stop guard |
+| T0 provisioning | Foundation deployed; paired AZ offerings verified; clean plan | AWS quota approval, baked/tested AMI and reviewed paired-node apply |
 | T0 operations | Mount, telemetry, log agent and stop code | Confirm mounted EBS IDs, received logs/metrics, idle/max-runtime stop tests and no unintended drift |
-| T0 teardown | prevent_destroy on retained resources | Reviewed disposable-resource teardown, retained-resource state migration and verified archive restore |
-| D0 image | Resolved official Python 3.11 amd64 digest; build/lock checks | Successful Docker build, package archive/SBOM, ECR push and same manifest digest deployed twice |
+| T0 teardown | Retained-state migration, reviewed disposable destroy plan, S3 receipt restore | Repeat the plan with actual GPU nodes before final T0 acceptance |
+| D0 image | Successful pinned build, installed-lock check and offline CPU smoke | ECR digest publication and identical digest deployed on both GPU nodes |
 | D0 GPU | Diagnostic script and pinned model | GRID/driver inventory, BF16 on both nodes, full edge and isolated vision feasibility |
 | D0 correctness | Existing CPU suite; diagnostic smoke script | Actual 36 GPU attempts on 12 training requests, exact text/token outputs across all three placements |
 | D0 timing | No cloud evidence | Host/container correctness comparison; declared numerical tolerances where applicable; separate orchestration overhead measurement |
@@ -97,25 +98,15 @@ helper's root qdisc and returns to the kernel default; it does not reconstruct
 arbitrary previous custom configurations. Recheck the unshaped baseline after
 reset. Root privilege remains on the host, never in model containers.
 
-## Windows-login / Linux-Terraform credential bridge
+## Native WSL authentication bridge
 
-For Windows `aws login --profile cloud-infrastructure` or the same named Windows
-SSO profile, create ignored `infra/local/aws-config` containing:
-
-```ini
-[profile cloud-terraform]
-region = us-east-1
-credential_process = "/mnt/c/Program Files/Amazon/AWSCLIV2/aws.exe" configure export-credentials --profile cloud-infrastructure --format process
-```
-
-`scripts/terraform_cloud.sh` selects that profile and invokes Linux Terraform.
-Example: `bash scripts/terraform_cloud.sh -chdir=infra/terraform/bootstrap plan`.
-The AWS CLI exports temporary credentials directly to the provider's credential
-process pipe; do not run export-credentials into terminal output or a saved file.
-This avoids depending on the older pinned provider recognizing newer AWS CLI
-login cache formats. It requires working WSL Windows-process interoperability
-and fresh Windows CLI credentials; this bridge has not yet passed a live test.
-The local bridge is prepared in this workspace and contains no credentials.
+The WSL AWS CLI now authenticates with profile cloud-infrastructure. The pinned
+Terraform provider obtains temporary credentials through aws_credential_process.sh,
+which clears the generated bridge config and inherited static credentials before
+resolving the source profile. terraform_cloud.sh generates the ignored bridge
+configuration automatically. No credential JSON is written to the repository.
+Override CLOUD_AWS_SOURCE_PROFILE only when deliberately changing profiles.
+The previous Windows credential-helper path is superseded.
 
 Example diagnostic invocation after image/mount/GPU validation and cloud server
 startup (set the required environment paths first):

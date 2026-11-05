@@ -16,7 +16,7 @@ GPU-dependent acceptance is blocked by AWS's applied regional quota of zero.
   versioned artifact bucket, immutable ECR, logs, SNS and the $20 monthly budget.
   Four budget notifications cover actual 50/80/100% and forecast 100%.
 - The user confirmed the SNS email subscription; AWS lists a real subscription
-  ARN and accepted a delivery-test publication.
+  ARN and accepted a delivery-test publication. The user confirmed receiving\n  the test email, completing the delivery check.
 - S3 backend lock contention was tested with two Terraform operations: the
   second was rejected while the first held the lock, then the lock was released.
 - The initial live drift check caught mixed inline/standalone egress ownership.
@@ -51,6 +51,20 @@ in image-deployment.json before declaring the image available in ECR.
 
 ## Remaining acceptance
 
+Retention was separated after the initial foundation apply. Seven protected
+storage/budget resources were transferred through import and destroy=false
+state removal, with no AWS changes. Future data volumes belong to the retained
+stack, so disposable compute teardown cannot delete them. A full disposable
+destroy plan was reviewed and not applied: 29 current foundation deletions,
+zero retained S3/ECR/budget/EBS/backend deletions. See the retained-stack README.
+Both stacks require clean final plans. The frozen inputs were hash-verified
+again, including every remote-code file, tokenizer and 3.85 GB model weights.
+
+Before any data volumes were created, their default was reduced to 50 GiB per
+node based on the verified 3.7 GiB model cache and 39 MiB image dataset. Revised
+root+data EBS storage is $14.40/month while all four volumes exist; initial
+380 GiB estimates are superseded. Future profiling must still monitor free space.
+
 Wait for the **applied** quota to reach at least 16, then review the host-image
 build window and plan, build/test the private AMI, and freeze its ID and inventory.
 Review/apply the paired-node plan with budget/notification destinations confirmed.
@@ -64,3 +78,10 @@ bachelor project: remaining gates, 8,100-attempt profiling, calibration, final
 evaluation, dynamic traces, ablations, reruns, idle time, storage/AMI/ECR retention,
 monitoring and contingency. Use measured throughput where available and label
 all unmeasured assumptions. The $20/month input is an alert threshold, not a cap.
+
+
+Additional cache checks passed inside the built shared image through read-only
+bind mounts: all 20 model artifacts and all 100 original images. New unit tests
+reject changed weights, tokenizer and executable model code. Mutable runtime
+caches are separated from read-only source inputs. These checks do not stand in
+for the remaining AWS GPU tests.

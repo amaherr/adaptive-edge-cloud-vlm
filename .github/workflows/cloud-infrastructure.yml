@@ -21,6 +21,9 @@ jobs:
       - run: terraform -chdir=infra/terraform/host-image init -backend=false -lockfile=readonly
       - run: terraform -chdir=infra/terraform/host-image validate
       - run: terraform -chdir=infra/terraform/host-image test
+      - run: terraform -chdir=infra/terraform/environments/cloud-retained init -backend=false -lockfile=readonly
+      - run: terraform -chdir=infra/terraform/environments/cloud-retained validate
+      - run: terraform -chdir=infra/terraform/environments/cloud-retained test
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 init -backend=false -lockfile=readonly
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 validate
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 test

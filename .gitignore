@@ -242,3 +242,4 @@ crash.log
 /infra/local/
 /infra/terraform/bootstrap/backend.local.tf
 /infra/terraform/account-preflight/backend.local.tf
+/infra/terraform/environments/cloud-retained/imports.local.tf

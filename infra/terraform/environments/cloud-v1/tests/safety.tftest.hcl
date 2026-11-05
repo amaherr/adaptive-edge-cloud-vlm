@@ -1,5 +1,15 @@
 mock_provider "aws" {}
+override_data {
+  target = data.terraform_remote_state.retained
+  values = { outputs = {
+    bucket_name        = "test-cloud-vlm-artifacts", bucket_arn = "arn:aws:s3:::test-cloud-vlm-artifacts",
+    ecr_arn            = "arn:aws:ecr:us-east-1:123456789012:repository/test", ecr_url = "123456789012.dkr.ecr.us-east-1.amazonaws.com/test",
+    monthly_budget_usd = 50, availability_zone = "us-east-1a",
+    volume_ids         = { edge = "vol-0123456789abcdef0", cloud = "vol-0123456789abcdef1" }
+  } }
+}
 variables {
+  state_bucket_name            = "test-cloud-vlm-state"
   region                       = "us-east-1"
   availability_zone            = "us-east-1a"
   artifact_bucket_name         = "test-cloud-vlm-artifacts"
