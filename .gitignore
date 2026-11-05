@@ -240,3 +240,5 @@ backend.hcl
 crash.log
 # Local nonsecret AWS profile bridge and deployment settings
 /infra/local/
+/infra/terraform/bootstrap/backend.local.tf
+/infra/terraform/account-preflight/backend.local.tf

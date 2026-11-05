@@ -5,13 +5,22 @@ resource "aws_security_group" "node" {
   for_each    = toset(["edge", "cloud"])
   name_prefix = "cloud-v1-${each.key}-"
   vpc_id      = var.vpc_id
-  egress {
-    protocol        = "tcp"
-    from_port       = 443
-    to_port         = 443
-    cidr_blocks     = ["10.42.0.0/16"]
-    prefix_list_ids = [data.aws_prefix_list.s3.id]
-  }
+}
+resource "aws_vpc_security_group_egress_rule" "https_vpc" {
+  for_each          = aws_security_group.node
+  security_group_id = each.value.id
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "10.42.0.0/16"
+}
+resource "aws_vpc_security_group_egress_rule" "https_s3" {
+  for_each          = aws_security_group.node
+  security_group_id = each.value.id
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_id    = data.aws_prefix_list.s3.id
 }
 data "aws_prefix_list" "s3" { name = "com.amazonaws.${data.aws_region.current.name}.s3" }
 data "aws_region" "current" {}

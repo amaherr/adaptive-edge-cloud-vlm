@@ -18,6 +18,9 @@ jobs:
       - run: terraform -chdir=infra/terraform/bootstrap validate
       - run: terraform -chdir=infra/terraform/account-preflight init -backend=false -lockfile=readonly
       - run: terraform -chdir=infra/terraform/account-preflight validate
+      - run: terraform -chdir=infra/terraform/host-image init -backend=false -lockfile=readonly
+      - run: terraform -chdir=infra/terraform/host-image validate
+      - run: terraform -chdir=infra/terraform/host-image test
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 init -backend=false -lockfile=readonly
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 validate
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 test
