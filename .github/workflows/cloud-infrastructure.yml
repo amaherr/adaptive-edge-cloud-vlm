@@ -16,6 +16,8 @@ jobs:
       - run: terraform fmt -check -recursive infra/terraform
       - run: terraform -chdir=infra/terraform/bootstrap init -backend=false -lockfile=readonly
       - run: terraform -chdir=infra/terraform/bootstrap validate
+      - run: terraform -chdir=infra/terraform/account-preflight init -backend=false -lockfile=readonly
+      - run: terraform -chdir=infra/terraform/account-preflight validate
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 init -backend=false -lockfile=readonly
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 validate
       - run: terraform -chdir=infra/terraform/environments/cloud-v1 test

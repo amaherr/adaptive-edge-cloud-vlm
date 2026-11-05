@@ -1,5 +1,15 @@
 # Predeployment cost review (not an AWS quote)
 
+## Live pricing check, 5 November 2026
+
+Read-only AWS Price List API queries in us-east-1 confirmed g6f.2xlarge at
+$0.475/hour, g6.2xlarge at $0.9776/hour, gp3 storage at $0.08/GB-month, and
+interface endpoints at $0.01/endpoint-hour. Raw pricing products are archived
+under ignored artifacts/infra. These confirm the arithmetic below; they still
+exclude ancillary services, image preparation and taxes. No GPU resources have
+been launched. The applied G/VT quota is currently zero; a Terraform-managed
+request for 16 vCPUs is pending AWS approval.
+
 User input: $20/month is an alert threshold, not a hard ceiling. Region candidate
 us-east-1. No paid resources have been created by this migration.
 
