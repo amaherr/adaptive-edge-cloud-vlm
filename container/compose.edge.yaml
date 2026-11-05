@@ -2,6 +2,13 @@ services:
   benchmark:
     image: ${APP_IMAGE:?Set the shared ECR repository@sha256 digest}
     environment:
+      HF_HOME: /models
+      HF_HUB_CACHE: /models/hub
+      HF_MODULES_CACHE: /models/modules
+      XDG_CACHE_HOME: /artifacts/runtime-cache
+      CUDA_CACHE_PATH: /artifacts/runtime-cache/cuda
+      TRITON_CACHE_DIR: /artifacts/runtime-cache/triton
+      TORCH_HOME: /artifacts/runtime-cache/torch
       ADAPTIVE_VLM_HEARTBEAT: /artifacts/job.heartbeat
       APP_IMAGE: ${APP_IMAGE:?Set shared immutable digest}
     network_mode: host
@@ -13,7 +20,8 @@ services:
     init: true
     stop_grace_period: 180s
     volumes:
-      - ${MODEL_DIR:?Set persistent model directory}:/models
+      - ${MODEL_DIR:?Set persistent model directory}:/models:ro
+      - ${ARTIFACT_DIR:?Set persistent artifact directory}/runtime-cache/modules:/models/modules
       - ${DATA_DIR:?Set frozen dataset directory}:/app/data:ro
       - ${ARTIFACT_DIR:?Set persistent artifact directory}:/artifacts
     logging:

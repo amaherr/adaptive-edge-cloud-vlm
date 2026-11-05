@@ -62,11 +62,47 @@ def main() -> None:
     ):
         if not re.fullmatch(r"[0-9a-f]{" + str(length) + "}", labels.get(name, "")):
             raise RuntimeError(f"Missing image provenance label: {name}")
+    cache = Path(checked["ARTIFACT_DIR"]) / "runtime-cache/modules"
+    if not cache.is_dir():
+        raise RuntimeError("Persistent runtime cache directory is missing")
+    verifier = Path(__file__).resolve().parents[1] / "container/verify_cache.py"
+    base_command = [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--entrypoint",
+        "python",
+        "--mount",
+        f"type=bind,src={checked['MODEL_DIR']},dst=/models,readonly",
+        "--mount",
+        f"type=bind,src={checked['DATA_DIR']},dst=/app/data,readonly",
+    ]
+    subprocess.run(
+        [
+            *base_command,
+            "--mount",
+            f"type=bind,src={verifier},dst=/checks/verify_cache.py,readonly",
+            image,
+            "/checks/verify_cache.py",
+        ],
+        check=True,
+    )
+    subprocess.run(
+        [*base_command, image, "scripts/verify_cloud_baseline.py"], check=True
+    )
     print(
         json.dumps(
             {
                 "validated": checked,
-                "image_config_digest": metadata["Id"],
+                "local_image_id": metadata["Id"],
+                "local_descriptor": metadata.get("Descriptor"),
                 "labels": labels,
             },
             indent=2,

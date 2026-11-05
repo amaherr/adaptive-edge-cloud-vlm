@@ -59,9 +59,13 @@ def main() -> None:
     report = {
         "git_commit": commit,
         "tag": tag,
-        "local_image_config_digest": inspection["Id"],
+        "local_image_id": inspection["Id"],
+        "local_descriptor": inspection.get("Descriptor"),
         "labels": inspection["Config"]["Labels"],
-        "note": "Local image ID is not an ECR deployment manifest digest",
+        "note": (
+            "Docker image-ID semantics vary by image store; "
+            "deploy by the verified registry manifest reference"
+        ),
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n")

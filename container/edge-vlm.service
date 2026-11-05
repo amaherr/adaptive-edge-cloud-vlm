@@ -11,5 +11,6 @@ ExecStartPre=/usr/bin/python3 scripts/validate_cloud_runtime.py --role edge
 ExecStart=/usr/bin/docker compose -f container/compose.edge.yaml up --abort-on-container-exit --exit-code-from benchmark
 ExecStop=/usr/bin/docker compose -f container/compose.edge.yaml stop --timeout 180
 TimeoutStopSec=210
+TimeoutStartSec=600
 [Install]
 WantedBy=multi-user.target

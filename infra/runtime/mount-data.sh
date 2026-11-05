@@ -12,8 +12,8 @@ done
 [ -b "$device" ] || { echo 'Expected EBS device did not appear' >&2; exit 1; }
 if mountpoint -q /srv/adaptive-vlm; then
   [ "$(readlink -f "$(findmnt -n -o SOURCE /srv/adaptive-vlm)")" = "$(readlink -f "$device")" ] || exit 1
-  exit 0
 fi
+if ! mountpoint -q /srv/adaptive-vlm; then
 fs_type=$(blkid -o value -s TYPE "$device" || true)
 if [ -z "$fs_type" ]; then
   # Refuse any partition table/signature rather than interpreting it as empty.
@@ -28,6 +28,7 @@ mkdir -p /srv/adaptive-vlm
 entry="UUID=$uuid /srv/adaptive-vlm ext4 defaults,nofail 0 2"
 grep -qF "UUID=$uuid " /etc/fstab || echo "$entry" >> /etc/fstab
 mount /srv/adaptive-vlm
-for directory in models data artifacts; do
+fi
+for directory in models models/modules data artifacts artifacts/runtime-cache/modules artifacts/runtime-cache/cuda artifacts/runtime-cache/triton artifacts/runtime-cache/torch; do
   install -d -o 10001 -g 10001 "/srv/adaptive-vlm/$directory"
 done
