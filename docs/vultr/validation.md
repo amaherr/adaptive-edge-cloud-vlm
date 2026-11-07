@@ -39,3 +39,25 @@ Final P1 module verification:
   1.03 s; full suite also passed with the final implementation.
 - `git diff --check`: passed. Frozen model/data/config and all existing
   Terraform files have no changes relative to the starting commit.
+
+
+## P1 cost review — 7 November 2026
+
+Read-only unauthenticated HTTP GETs fetched public `/v2/plans?type=vcg&per_page=500`
+and `/v2/regions/atl/availability?type=vcg`. Sandbox DNS initially failed; the
+same read-only requests succeeded with network permission escalation. No API
+credential, paid request, provisioning operation or email was used.
+
+Committed raw public evidence:
+`docs/vultr/evidence/public_gpu_catalog_2026-11-07.json`, SHA-256
+`4a51e84dd6c2aa5860427afa5425e78e474da030eeeb8805d11d6b697e4402fc`.
+Source timestamps: 11:40:28/29 UTC. All 3 catalog plans and the empty Atlanta
+availability response were preserved; no pagination next link was present.
+
+Cost arithmetic uses 8,100 measured attempts, a hypothetical $2.142/hour pair,
+30% duration overhead plus four paired hours, $12 contingency and either $7
+hybrid ancillary allowance or $18 one-month Vultr storage. These are explicit
+planning assumptions, not measured GPU performance or an approved quote.
+Arithmetic and input counts were checked with Python Decimal; no software
+implementation changed, so the existing test suite was not rerun for this
+pricing/documentation-only change. `git diff --check` passed.

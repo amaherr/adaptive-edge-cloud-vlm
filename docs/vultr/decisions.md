@@ -59,3 +59,16 @@ The owner selected Atlanta, USA (`atl`). Vultr documents this region code in
 its [official guide](https://docs.vultr.com/how-to-establish-private-connection-between-vultr-regions-using-headscale).
 This preference does not establish GPU inventory, account entitlement, two-node
 concurrency, prices or launch approval. Use `--region atl` for P1 discovery.
+
+## P1 budget and alert destination
+
+The owner targets approximately **$80 total** and selected
+**a.maher1506@gmail.com** for alerts. Treat $80 as a planning limit until a
+concrete launch quote is approved. The owner is setting up API credentials and
+will notify the agent. No email was sent or alert integration activated.
+
+The public 7 November API snapshot contains no Atlanta GPU inventory. Do not
+substitute marketing availability for this response. See the updated
+[cost analysis](cost_estimate.md) for conditional runtime sensitivity, storage
+retention costs, the proposed $5 preflight and proposed alert/teardown thresholds.
+None of those proposed allocations or launches is yet approved.

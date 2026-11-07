@@ -36,10 +36,33 @@ roadmap section 14. No paid launch or 8,100-attempt campaign is authorized.
   `artifacts/vultr/p1/missing-token.json`; no provider request was attempted.
 - Terraform state/plan: none. Docker digest: none selected. Preferred region: Atlanta (`atl`); plan IDs/hourly
   quotes: unknown. GPU entitlement and concurrent two-VM quota: unknown.
-- Cost incurred by these actions: no paid Vultr operations; remaining approved
-  budget: unset. P1: **BLOCKED**. Infrastructure and GPU testing remain NOT RUN.
-- Next exact step: owner supplies account/API setup, budgets and alert
-  destination; run the discovery command in the runbook with a fresh output
+- Cost incurred by these actions: no paid Vultr operations. Owner planning
+  target: approximately $80 total; individual paid launch approval outstanding. P1: **BLOCKED**. Infrastructure and GPU testing remain NOT RUN.
+- Next exact step: owner supplies account/API setup, API credentials; run the discovery command in the runbook with a fresh output
   filename, verify provider GPU access and quote, then review the P1 selection.
 - Final P1 checks: Ruff and mypy passed; full pytest coverage run: 231 passed,
   1 sandbox skip, 81.65% coverage. Gate remains BLOCKED by external prerequisites.
+
+
+## P1 — budget review and public catalog evidence
+
+- Owner planning target: **approximately $80 total**, not a paid launch approval.
+- Alert destination: **a.maher1506@gmail.com**; delivery not configured or tested.
+- Owner is setting up the API key and will notify the agent when ready.
+- Public unauthenticated catalog collected at 11:40 UTC, 7 November 2026:
+  only three L40S plans, with hourly rates $1.671/$3.342/$6.684 and empty
+  locations. Atlanta returned no available GPU plans (including VPC-only).
+  This is not an account entitlement or authenticated capacity check.
+- Evidence: [public API snapshot](evidence/public_gpu_catalog_2026-11-07.json).
+  SHA-256: `4a51e84dd6c2aa5860427afa5425e78e474da030eeeb8805d11d6b697e4402fc`.
+- [Cost estimate](cost_estimate.md): conditional A16/L40S pair at $2.142/hour;
+  5 s mean attempt scenario about $59 with existing S3 allowances versus
+  about $70 with one month of Vultr storage (additional ancillary costs apply).
+  At 10 s mean, about $90/$101 respectively. No Vultr runtime is measured.
+- Proposed, not approved: $5 single-node preflight; cumulative alerts at
+  $40/$60/$72/$80; checkpoint and verified teardown threshold $72.
+- P1 remains **BLOCKED**: authenticated account/GPU verification, actual capacity,
+  hardware fit, concrete quote and explicit preflight launch approval outstanding.
+- Next: after the owner confirms API setup, perform authenticated Atlanta
+  discovery; if still empty, obtain provider guidance before proposing a region
+  change. No paid launch or alert was sent. Terraform/Docker/GPU gates NOT RUN.

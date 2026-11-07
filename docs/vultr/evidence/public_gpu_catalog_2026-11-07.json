@@ -1,0 +1,108 @@
+{
+  "scope": "Public unauthenticated catalog snapshot; not account entitlement or deployment approval",
+  "sources": [
+    {
+      "fetched_at_utc": "2026-11-07T11:40:28.644064+00:00",
+      "source": "https://api.vultr.com/v2/plans?type=vcg&per_page=500",
+      "authenticated": false,
+      "response": {
+        "plans": [
+          {
+            "id": "vcg-l40s-16c-180g-48vram",
+            "vcpu_count": 16,
+            "ram": 184320,
+            "disk": 1200,
+            "disk_type": "CLOUDGPU",
+            "disk_count": 1,
+            "bandwidth": 10240,
+            "monthly_cost": 1122.91,
+            "hourly_cost": 1.671,
+            "monthly_cost_preemptible": 1122.91,
+            "hourly_cost_preemptible": 1.671,
+            "invoice_type": "hourly",
+            "type": "vcg",
+            "locations": [],
+            "cpu_vendor": "Intel",
+            "storage_type": "local_storage",
+            "vcpu_type": "thread",
+            "deploy_ondemand": true,
+            "deploy_preemptible": false,
+            "location_cost": {},
+            "gpu_brand": "NVIDIA",
+            "gpu_vram_gb": 48,
+            "gpu_type": "NVIDIA_L40S",
+            "gpu_count": 1
+          },
+          {
+            "id": "vcg-l40s-32c-375g-96vram",
+            "vcpu_count": 32,
+            "ram": 384000,
+            "disk": 2200,
+            "disk_type": "CLOUDGPU",
+            "disk_count": 1,
+            "bandwidth": 10240,
+            "monthly_cost": 2245.82,
+            "hourly_cost": 3.342,
+            "monthly_cost_preemptible": 2245.82,
+            "hourly_cost_preemptible": 3.342,
+            "invoice_type": "hourly",
+            "type": "vcg",
+            "locations": [],
+            "cpu_vendor": "Intel",
+            "storage_type": "local_storage",
+            "vcpu_type": "thread",
+            "deploy_ondemand": true,
+            "deploy_preemptible": false,
+            "location_cost": {},
+            "gpu_brand": "NVIDIA",
+            "gpu_vram_gb": 96,
+            "gpu_type": "NVIDIA_L40S",
+            "gpu_count": 2
+          },
+          {
+            "id": "vcg-l40s-64c-750g-192vram",
+            "vcpu_count": 64,
+            "ram": 768000,
+            "disk": 2600,
+            "disk_type": "CLOUDGPU",
+            "disk_count": 1,
+            "bandwidth": 15360,
+            "monthly_cost": 4491.65,
+            "hourly_cost": 6.684,
+            "monthly_cost_preemptible": 4491.65,
+            "hourly_cost_preemptible": 6.684,
+            "invoice_type": "hourly",
+            "type": "vcg",
+            "locations": [],
+            "cpu_vendor": "Intel",
+            "storage_type": "local_storage",
+            "vcpu_type": "thread",
+            "deploy_ondemand": true,
+            "deploy_preemptible": false,
+            "location_cost": {},
+            "gpu_brand": "NVIDIA",
+            "gpu_vram_gb": 192,
+            "gpu_type": "NVIDIA_L40S",
+            "gpu_count": 4
+          }
+        ],
+        "meta": {
+          "total": 3,
+          "links": {
+            "next": "",
+            "prev": ""
+          }
+        }
+      }
+    },
+    {
+      "fetched_at_utc": "2026-11-07T11:40:29.107361+00:00",
+      "source": "https://api.vultr.com/v2/regions/atl/availability?type=vcg",
+      "authenticated": false,
+      "response": {
+        "available_plans": [],
+        "available_vpc_only_plans": []
+      }
+    }
+  ]
+}

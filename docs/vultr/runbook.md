@@ -4,7 +4,7 @@
 
 Set `VULTR_API_KEY` in the trusted local secret environment. Never paste the
 value into chat, command arguments, a Terraform variable or tracked files.
-The agent's current environment has no key; a shell opened later may not inherit
+At the initial check the agent's environment had no key; a shell opened later may not inherit
 variables from your separate terminal. You can run the command locally instead.
 
 From the repository root, using a new evidence filename on every invocation:
@@ -38,7 +38,9 @@ not verifiable through account controls; save its nonsecret response as evidence
 1. Billing/API activation and GPU entitlement status; credential setup as above.
 2. Selected region: Atlanta, USA (`atl`). Confirm with the provider that two
    independent GPU VMs can run concurrently there; capacity remains unverified.
-3. Total spend ceiling, smaller single-node preflight budget, alert destination.
+3. Total planning budget: approximately $80; alert destination:
+   `a.maher1506@gmail.com` (recorded, not active). Proposed single-node
+   preflight ceiling: $5, pending explicit approval of a concrete launch.
 4. Checkpoint backend preference: existing AWS S3 or new Vultr object storage.
 5. Before infrastructure: administrative SSH source CIDR/public key, supported
    GPU OS/image, retained registry/storage decisions and remote-state bootstrap.
