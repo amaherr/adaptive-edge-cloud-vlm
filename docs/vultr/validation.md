@@ -87,3 +87,36 @@ pricing/documentation-only change. `git diff --check` passed.
   resources, no GPU and no public inference rule.
 - No GPU/driver/BF16/model/network or real VM-destruction acceptance result is
   claimed by these control/storage tests. Single-node preflight follows.
+
+## Actual preflight and independent stopped-instance teardown
+
+One reviewed Atlanta A16 / Ubuntu 24.04 allocation was created at 12:58:49 UTC.
+All Linux SSH probes timed out; Windows TCP-22 also timed out. Two independent
+public-IP checks matched the configured provider/host SSH source /32. Public
+GitHub SSH was reachable. The owner reported console connection failure. One
+controlled reboot returned HTTP 200; SSH remained inaccessible. No CUDA/driver,
+Docker, real model, throughput or quality result was obtained.
+
+The independent watcher adopted the VM automatically and observed stopped,
+still-billable compute at 13:16:10 UTC. Its hosted job
+`adaptive-vlm-vultr-teardown:d256cf1a-6704-4415-a6ba-0b2a5f79a200` **SUCCEEDED**:
+a deletion-only plan removed the GPU and API verification returned zero campaign
+instances at 13:22:00 UTC. A separate local API check at 13:28:11 UTC agreed.
+The compute lifetime upper bound is 1,391.54 seconds; one-hour-minimum estimate
+$0.471 before extras. Local launch inputs were reset to false.
+
+[Nonsecret destruction summary](evidence/preflight_teardown_2026-11-07.json).
+Observer diagnostics were independently restored from their S3 SHA-256 index
+after the VM was gone; this does not substitute for real GPU benchmark-journal
+resume or full Gate 2 acceptance. Full phase/limitations:
+[preflight record](preflight_2026-11-07.md). No core software changed after the
+last 267-pass/81.64% run; final changes are evidence and operator documentation.
+
+Final closure: **11 observer diagnostic files** were restored after destruction
+from immutable S3 index SHA-256
+`b7bd8c5931a947a0660c3e971af921decafacbd7d93dc5bf823e6342146cbab9`;
+every hash and byte comparison passed. The final GPU Terraform plan with the
+local deploy flag false returned **exit 0 / No changes**. The temporary SSH
+private key/public copy/known-hosts file were removed after independent zero-GPU
+verification. A future retry needs a fresh operator SSH key/reference.
+`main` remains `22567a67`; `cloud-infrastructure` remains `621e5127`.

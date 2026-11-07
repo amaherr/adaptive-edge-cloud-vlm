@@ -10,7 +10,10 @@ The Vultr backup is being developed on `vultr-cloud-backup`. See its
 [status and gates](docs/vultr/status.md),
 [read-only preflight runbook](docs/vultr/runbook.md), and
 [implementation roadmap](docs/Vultr_Cloud_Backup_Agent_Roadmap.md).
-Account/capacity and spending approval remain open; the backup is not yet ready.
+S3 checkpoint recovery and hosted budget/teardown controls are implemented.
+The [single-node preflight](docs/vultr/preflight_2026-11-07.md) was blocked by
+SSH/console access; automatic teardown left zero GPU instances. GPU/model
+acceptance and the full profiling campaign remain open.
 
 Remaining thesis work targets independently provisioned AWS virtual-edge and
 cloud VMs, one immutable application image, controlled network emulation and

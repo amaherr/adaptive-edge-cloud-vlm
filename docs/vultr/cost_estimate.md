@@ -112,7 +112,10 @@ allowance is a planning buffer, not a measured service quote or hard cap.
 - Single-node preflight: **at most $5**, within the $80 total. Use the smallest
   verified model-capable candidate, at $0.471/hour if the quote holds. A proposed
   two-hour initial window is $0.942 compute before rounding/extras; installing
-  or downloading still accrues billable time. No launch has yet occurred.
+  or downloading still accrues billable time. One preflight was launched and
+  automatically destroyed after access failed; its compute estimate is $0.471.
+  See [the preflight record](preflight_2026-11-07.md). Count that cost toward the
+  $5 preflight allowance and the $80 total before any retry.
 - Alerts at **$40/$60/$72/$80**; at **$72**, checkpoint, stop scheduling and
   request Terraform teardown. A session's own $5 ceiling/expiry/idle limit also
   triggers shutdown before the campaign threshold.
