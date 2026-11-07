@@ -24,6 +24,7 @@ from adaptive_vlm.contracts import InferenceStatus, RunManifest
 from adaptive_vlm.data.manifest import FrozenManifest, RequestItem
 from adaptive_vlm.execution.base import ExecutionPolicy
 from adaptive_vlm.execution.remote import RemoteInferenceError
+from adaptive_vlm.ops.checkpoints import CheckpointSession
 from adaptive_vlm.transport.protocol import ProtocolError
 
 
@@ -137,6 +138,7 @@ def run_benchmark(
     pipeline: str,
     resume: bool = False,
     stop_requested: Callable[[], bool] | None = None,
+    checkpoint: CheckpointSession | None = None,
 ) -> dict[str, Any]:
     """Execute one policy and persist each attempt before advancing."""
 
@@ -210,66 +212,78 @@ def run_benchmark(
             raise ValueError(f"raw result does not match plan: {trial_id}")
         completed.add(trial_id)
 
-    items = {item.request_id: item for item in manifest.items}
-    for position, trial in enumerate(schedule, 1):
-        if stop_requested is not None and stop_requested():
-            break
-        if trial.trial_id in completed:
-            continue
-        item = items[trial.request_id]
-        print(
-            f"[{position}/{len(schedule)}] {policy.mode.value} "
-            f"{trial.trial_id} {trial.request_id}",
-            flush=True,
+    if checkpoint is not None:
+        checkpoint.start(run_dir)
+    try:
+        items = {item.request_id: item for item in manifest.items}
+        for position, trial in enumerate(schedule, 1):
+            if stop_requested is not None and stop_requested():
+                break
+            if trial.trial_id in completed:
+                continue
+            if checkpoint is not None:
+                checkpoint.before_attempt()
+            item = items[trial.request_id]
+            print(
+                f"[{position}/{len(schedule)}] {policy.mode.value} "
+                f"{trial.trial_id} {trial.request_id}",
+                flush=True,
+            )
+            mark_activity()
+            started = perf_counter_ns()
+            row: dict[str, Any] = {
+                **trial.to_dict(),
+                "started_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+                "plan_sha256": plan_hash,
+                "config_sha256": plan["config_sha256"],
+                "model_contract_sha256": plan["model_contract_sha256"],
+                "dataset_manifest_sha256": manifest.sha256,
+                "run_id": run_id,
+                "mode": policy.mode.value,
+                "image_sha256": item.image_sha256,
+                "scoring": item.scoring,
+            }
+            if "container" in plan:
+                row["container"] = plan["container"]
+            try:
+                result = policy.infer(item.to_request())
+                if result.request_id != item.request_id:
+                    raise ValueError("policy returned a different request_id")
+                row.update(
+                    status=InferenceStatus.OK.value,
+                    output_text=result.output_text,
+                    output_token_ids=list(result.output_token_ids),
+                    metrics=dict(result.metrics),
+                    quality_score=_quality(item, result.output_text),
+                )
+            except Exception as exc:
+                row.update(
+                    status=_status(exc).value,
+                    output_text=None,
+                    output_token_ids=[],
+                    metrics={},
+                    quality_score=None,
+                    error_type=type(exc).__name__,
+                    error_message=str(exc),
+                )
+            row["observed_end_to_end_ms"] = (perf_counter_ns() - started) / 1_000_000
+            append_jsonl(raw_path, row)
+            mark_activity()
+            rows.append(row)
+            if checkpoint is not None:
+                checkpoint.after_attempt()
+        summary = summarize(rows, manifest, policy.mode, plan_hash)
+        summary["execution_state"] = (
+            "complete" if len(rows) == len(schedule) else "interrupted"
         )
-        mark_activity()
-        started = perf_counter_ns()
-        row: dict[str, Any] = {
-            **trial.to_dict(),
-            "started_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
-            "plan_sha256": plan_hash,
-            "config_sha256": plan["config_sha256"],
-            "model_contract_sha256": plan["model_contract_sha256"],
-            "dataset_manifest_sha256": manifest.sha256,
-            "run_id": run_id,
-            "mode": policy.mode.value,
-            "image_sha256": item.image_sha256,
-            "scoring": item.scoring,
-        }
-        if "container" in plan:
-            row["container"] = plan["container"]
-        try:
-            result = policy.infer(item.to_request())
-            if result.request_id != item.request_id:
-                raise ValueError("policy returned a different request_id")
-            row.update(
-                status=InferenceStatus.OK.value,
-                output_text=result.output_text,
-                output_token_ids=list(result.output_token_ids),
-                metrics=dict(result.metrics),
-                quality_score=_quality(item, result.output_text),
-            )
-        except Exception as exc:
-            row.update(
-                status=_status(exc).value,
-                output_text=None,
-                output_token_ids=[],
-                metrics={},
-                quality_score=None,
-                error_type=type(exc).__name__,
-                error_message=str(exc),
-            )
-        row["observed_end_to_end_ms"] = (perf_counter_ns() - started) / 1_000_000
-        append_jsonl(raw_path, row)
-        mark_activity()
-        rows.append(row)
-    summary = summarize(rows, manifest, policy.mode, plan_hash)
-    summary["execution_state"] = (
-        "complete" if len(rows) == len(schedule) else "interrupted"
-    )
-    summary["planned_attempts"] = len(schedule)
-    write_json_atomic(run_dir / "summary.json", summary)
-    return summary
+        summary["planned_attempts"] = len(schedule)
+        write_json_atomic(run_dir / "summary.json", summary)
+        if checkpoint is not None:
+            checkpoint.finish()
+        return summary
+    finally:
+        if checkpoint is not None:
+            checkpoint.close()
 
 
 def summarize(

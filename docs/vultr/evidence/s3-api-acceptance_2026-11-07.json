@@ -1,0 +1,14 @@
+{
+  "tested_at_utc": "2026-11-07T11:56:38.992257+00:00",
+  "bucket": "adaptive-vlm-artifacts-444704506592-us-east-1",
+  "prefix": "research/adaptive-vlm/vultr-v1/acceptance/56b87c38a4a948a780bfc76ec1deb806",
+  "initial_sha256": "31356f212c1385785a148de28b56ec76c17f6d6d78f6ea237e1236f1ff9e823b",
+  "conditional_create": true,
+  "readback_match": true,
+  "overwrite_refused": true,
+  "stale_cas_refused": true,
+  "valid_cas": true,
+  "stale_delete_refused": true,
+  "valid_delete": true,
+  "note": "Only new acceptance object deleted; versioned bucket retains old versions. No GPU inference."
+}

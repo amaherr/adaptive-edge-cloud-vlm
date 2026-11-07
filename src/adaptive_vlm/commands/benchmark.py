@@ -24,6 +24,8 @@ from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
+from adaptive_vlm.ops.checkpoints import CheckpointSession
+from adaptive_vlm.ops.store import S3Store
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.shutdown import graceful_sigterm
 
@@ -109,6 +111,14 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
         with progress.phase("Checking remote model contract"):
             if not policy.health().ready:
                 raise RuntimeError("remote server is not ready")
+    checkpoint = None
+    if getattr(args, "checkpoint_config", None) is not None:
+        settings = json.loads(args.checkpoint_config.read_text())
+        checkpoint = CheckpointSession(
+            S3Store(settings["bucket"], profile=settings.get("profile")),
+            settings["prefix"],
+            settings["contract"],
+        )
     with graceful_sigterm() as stop:
         summary = run_benchmark(
             config=config,
@@ -129,6 +139,7 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
             pipeline=args.pipeline,
             resume=args.resume,
             stop_requested=stop.is_set,
+            checkpoint=checkpoint,
         )
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 143 if summary["execution_state"] == "interrupted" else 0

@@ -91,6 +91,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="synchronous",
     )
     benchmark_parser.add_argument("--resume", action="store_true")
+    benchmark_parser.add_argument(
+        "--checkpoint-config",
+        type=Path,
+        help="S3 bucket/prefix and frozen campaign contract JSON",
+    )
     benchmark_parser.add_argument("-v", "--verbose", action="store_true")
 
     import_parser = subcommands.add_parser(

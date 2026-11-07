@@ -1,0 +1,9 @@
+{
+  "bucket": "adaptive-vlm-artifacts-444704506592-us-east-1",
+  "byte_matching_restore": true,
+  "existing_resume_unchanged": true,
+  "journal_sha256": "25d77b3a7d724d061165712a666e3a5275c75ba7e35403fb26f42691b0c43633",
+  "kind": "CPU fake-adapter S3 acceptance; synthetic image reference; no GPU/model claim",
+  "measured_diagnostic_rows": 12,
+  "prefix": "research/adaptive-vlm/vultr-v1/acceptance/30657484c7354eee9815cdce49f760f9"
+}

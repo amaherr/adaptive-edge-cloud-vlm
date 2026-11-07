@@ -1,0 +1,134 @@
+{
+  "account_api_access_verified": true,
+  "api_base": "https://api.vultr.com/v2",
+  "availability": {
+    "atl": []
+  },
+  "collected_at_utc": "2026-11-07T11:51:14.332575+00:00",
+  "discovery_status": "COLLECTED",
+  "gate": "BLOCKED",
+  "gpu_plans": [
+    {
+      "available_regions": [],
+      "gpu_type": "NVIDIA_L40S",
+      "gpu_vram": null,
+      "hourly_cost": 1.671,
+      "provider_plan": {
+        "bandwidth": 10240,
+        "cpu_vendor": "Intel",
+        "deploy_ondemand": true,
+        "deploy_preemptible": false,
+        "disk": 1200,
+        "disk_count": 1,
+        "disk_type": "CLOUDGPU",
+        "gpu_brand": "NVIDIA",
+        "gpu_count": 1,
+        "gpu_type": "NVIDIA_L40S",
+        "gpu_vram_gb": 48,
+        "hourly_cost": 1.671,
+        "hourly_cost_preemptible": 1.671,
+        "id": "vcg-l40s-16c-180g-48vram",
+        "invoice_type": "hourly",
+        "location_cost": {},
+        "locations": [],
+        "monthly_cost": 1122.91,
+        "monthly_cost_preemptible": 1122.91,
+        "ram": 184320,
+        "storage_type": "local_storage",
+        "type": "vcg",
+        "vcpu_count": 16,
+        "vcpu_type": "thread"
+      }
+    },
+    {
+      "available_regions": [],
+      "gpu_type": "NVIDIA_L40S",
+      "gpu_vram": null,
+      "hourly_cost": 3.342,
+      "provider_plan": {
+        "bandwidth": 10240,
+        "cpu_vendor": "Intel",
+        "deploy_ondemand": true,
+        "deploy_preemptible": false,
+        "disk": 2200,
+        "disk_count": 1,
+        "disk_type": "CLOUDGPU",
+        "gpu_brand": "NVIDIA",
+        "gpu_count": 2,
+        "gpu_type": "NVIDIA_L40S",
+        "gpu_vram_gb": 96,
+        "hourly_cost": 3.342,
+        "hourly_cost_preemptible": 3.342,
+        "id": "vcg-l40s-32c-375g-96vram",
+        "invoice_type": "hourly",
+        "location_cost": {},
+        "locations": [],
+        "monthly_cost": 2245.82,
+        "monthly_cost_preemptible": 2245.82,
+        "ram": 384000,
+        "storage_type": "local_storage",
+        "type": "vcg",
+        "vcpu_count": 32,
+        "vcpu_type": "thread"
+      }
+    },
+    {
+      "available_regions": [],
+      "gpu_type": "NVIDIA_L40S",
+      "gpu_vram": null,
+      "hourly_cost": 6.684,
+      "provider_plan": {
+        "bandwidth": 15360,
+        "cpu_vendor": "Intel",
+        "deploy_ondemand": true,
+        "deploy_preemptible": false,
+        "disk": 2600,
+        "disk_count": 1,
+        "disk_type": "CLOUDGPU",
+        "gpu_brand": "NVIDIA",
+        "gpu_count": 4,
+        "gpu_type": "NVIDIA_L40S",
+        "gpu_vram_gb": 192,
+        "hourly_cost": 6.684,
+        "hourly_cost_preemptible": 6.684,
+        "id": "vcg-l40s-64c-750g-192vram",
+        "invoice_type": "hourly",
+        "location_cost": {},
+        "locations": [],
+        "monthly_cost": 4491.65,
+        "monthly_cost_preemptible": 4491.65,
+        "ram": 768000,
+        "storage_type": "local_storage",
+        "type": "vcg",
+        "vcpu_count": 64,
+        "vcpu_type": "thread"
+      }
+    }
+  ],
+  "launch_authorized": false,
+  "limitations": [
+    "Catalog stock is not a reservation or two-VM concurrency approval",
+    "GPU entitlement, quotas, OS/VPC support and driver fit need verification",
+    "Null price/GPU fields require a provider quote; no SKU inference used",
+    "Budget and explicit owner launch approval remain required"
+  ],
+  "regions": [
+    {
+      "city": "Atlanta",
+      "connectivity": [
+        "public_ip",
+        "nat_gateway"
+      ],
+      "continent": "North America",
+      "country": "US",
+      "id": "atl",
+      "options": [
+        "ddos_protection",
+        "block_storage_storage_opt",
+        "block_storage_high_perf",
+        "load_balancers",
+        "kubernetes"
+      ]
+    }
+  ]
+}
