@@ -6,6 +6,12 @@ The project implements three fixed policies, a manual dispatcher, a predictor an
 
 ## Cloud infrastructure and acceptance
 
+The Vultr backup is being developed on `vultr-cloud-backup`. See its
+[status and gates](docs/vultr/status.md),
+[read-only preflight runbook](docs/vultr/runbook.md), and
+[implementation roadmap](docs/Vultr_Cloud_Backup_Agent_Roadmap.md).
+Account/capacity and spending approval remain open; the backup is not yet ready.
+
 Remaining thesis work targets independently provisioned AWS virtual-edge and
 cloud VMs, one immutable application image, controlled network emulation and
 S3-backed recoverable experiments. This is cloud-hosted edge emulation; physical
