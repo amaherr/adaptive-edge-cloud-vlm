@@ -72,3 +72,16 @@ substitute marketing availability for this response. See the updated
 [cost analysis](cost_estimate.md) for conditional runtime sensitivity, storage
 retention costs, the proposed $5 preflight and proposed alert/teardown thresholds.
 None of those proposed allocations or launches is yet approved.
+
+## Corrected provider discovery and approved operations
+
+The owner approved reusing S3, the $5 single-node preflight, alert/checkpoint/
+teardown controls and destruction of idle campaign VMs. AWS access was refreshed;
+S3 durability acceptance is recorded in [checkpoints](checkpoints.md).
+
+The owner correctly reported Atlanta GPU availability in the portal. The prior
+`type=vcg` filter was incomplete: A16/A40 `vcg-` SKUs are classified `vdm` by the
+current API. Use all-type discovery with local GPU identification. Public
+all-type listing confirms Atlanta A16 candidates at $0.471/$0.942 per hour;
+exact per-device layout and stronger cloud execution remain unverified. Earlier
+empty filtered evidence is preserved but superseded as a capacity conclusion.

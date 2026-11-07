@@ -124,3 +124,41 @@ def test_successful_catalog_still_does_not_approve_launch(tmp_path, monkeypatch)
     assert report["discovery_status"] == "COLLECTED"
     assert report["gate"] == "BLOCKED"
     assert report["launch_authorized"] is False
+
+
+def test_gpu_sku_with_vdm_type_is_not_lost():
+    class Fake:
+        def get(self, path):
+            return {"account": {}}
+
+        def pages(self, path, key, params=None):
+            if path == "/plans":
+                assert params["type"] == "all"
+                return [
+                    {"id": "vcg-a16-real", "type": "vdm", "hourly_cost": 0.471},
+                    {"id": "vc2-cpu", "type": "vc2", "gpu_brand": "none"},
+                ]
+            if path == "/regions":
+                return [{"id": "atl"}]
+            assert params["type"] == "all"
+            return ["vcg-a16-real"] if key == "available_plans" else []
+
+    result = preflight.collect(Fake(), ["atl"])
+    assert [row["provider_plan"]["id"] for row in result["gpu_plans"]] == [
+        "vcg-a16-real"
+    ]
+    assert result["gpu_plans"][0]["available_regions"] == ["atl"]
+    assert result["gpu_plans"][0]["available_vpc_only_regions"] == []
+
+
+def test_opaque_pagination_cursor_is_supported(monkeypatch):
+    client = preflight.Client("secret")
+
+    def get(path, query):
+        if "cursor" not in query:
+            return {"plans": [1], "meta": {"links": {"next": "opaqueToken123"}}}
+        assert query["cursor"] == "opaqueToken123"
+        return {"plans": [2]}
+
+    monkeypatch.setattr(client, "get", get)
+    assert client.pages("/plans", "plans") == [1, 2]

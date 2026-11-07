@@ -80,7 +80,15 @@ class Client:
                 return rows
             if not isinstance(next_link, str):
                 raise PreflightError("Invalid pagination link")
-            # Extract only a cursor; never send credentials to an API-supplied URL.
+            # The API supports opaque cursor tokens and URL-shaped next links.
+            # Never send credentials to an API-supplied destination.
+            if "://" not in next_link and not next_link.startswith(("/", "?", "#")):
+                cursor = next_link
+                if cursor in seen:
+                    raise PreflightError("Repeated pagination cursor")
+                seen.add(cursor)
+                query["cursor"] = cursor
+                continue
             parts = urlsplit(next_link)
             if (
                 parts.scheme not in ("", "https")
@@ -102,7 +110,9 @@ def collect(client: Client, region_ids: list[str]) -> dict:
     account = client.get("/account")
     if not isinstance(account.get("account"), dict):
         raise PreflightError("Account access was not verified")
-    plans = client.pages("/plans", "plans", {"type": "vcg"})
+    # GPU SKUs prefixed vcg- can have type=vdm (A16/A40), so filtering
+    # by type=vcg hides genuine GPU stock. Discover all types and filter locally.
+    plans = client.pages("/plans", "plans", {"type": "all"})
     regions = client.pages("/regions", "regions")
     if any(
         not isinstance(row, dict) or not isinstance(row.get("id"), str)
@@ -114,17 +124,33 @@ def collect(client: Client, region_ids: list[str]) -> dict:
     if any(region not in regions_by_id for region in selected):
         raise PreflightError("Requested region is absent from provider catalog")
     availability = {}
+    vpc_only_availability = {}
     for region in selected:
         availability[region] = client.pages(
             f"/regions/{quote(region, safe='')}/availability",
             "available_plans",
-            {"type": "vcg"},
+            {"type": "all"},
         )
-        if any(not isinstance(item, str) for item in availability[region]):
+        vpc_only_availability[region] = client.pages(
+            f"/regions/{quote(region, safe='')}/availability",
+            "available_vpc_only_plans",
+            {"type": "all"},
+        )
+        if any(
+            not isinstance(item, str)
+            for item in (availability[region] + vpc_only_availability[region])
+        ):
             raise PreflightError("Availability contains a non-string plan ID")
     gpu_plans = []
     for plan in plans:
-        if plan.get("type") != "vcg" and not plan["id"].startswith("vcg-"):
+        if not (
+            plan.get("type") == "vcg"
+            or plan["id"].startswith("vcg-")
+            or str(plan.get("gpu_brand", "")).lower() in {"nvidia", "amd", "intel"}
+            or str(plan.get("gpu_type", "")).lower()
+            not in {"", "none", "unknown", "n/a", "null"}
+            or plan.get("gpu_vram_gb")
+        ):
             continue
         # Preserve API fields/units. Missing hourly price or GPU identity remains
         # unknown; do not infer VRAM from SKU text or divide monthly prices.
@@ -134,15 +160,21 @@ def collect(client: Client, region_ids: list[str]) -> dict:
                 "available_regions": [
                     r for r in selected if plan["id"] in availability[r]
                 ],
+                "available_vpc_only_regions": [
+                    r for r in selected if plan["id"] in vpc_only_availability[r]
+                ],
                 "hourly_cost": plan.get("hourly_cost"),
                 "gpu_type": plan.get("gpu_type"),
                 "gpu_vram": plan.get("gpu_vram"),
+                "gpu_vram_gb": plan.get("gpu_vram_gb"),
             }
         )
     return {
         "account_api_access_verified": True,
         "regions": [regions_by_id[r] for r in selected],
         "availability": availability,
+        "vpc_only_availability": vpc_only_availability,
+        "plan_filter": "all; GPU detection from fields and SKU family",
         "gpu_plans": gpu_plans,
         "limitations": [
             "Catalog stock is not a reservation or two-VM concurrency approval",
