@@ -1,0 +1,14 @@
+#cloud-config
+# Public network ingress is restricted twice: Vultr firewall and this host rule.
+# No API, AWS, registry credential or model weight belongs in user-data.
+ssh_pwauth: false
+disable_root: false
+package_update: false
+packages: [ufw]
+runcmd:
+  - [ufw, default, deny, incoming]
+  - [ufw, default, allow, outgoing]
+  - [ufw, allow, from, OPERATOR_CIDR, to, any, port, '22', proto, tcp]
+  - [ufw, allow, from, 10.46.0.0/24, to, any, port, '5050:5052', proto, tcp]
+  - [ufw, --force, enable]
+# Deliberately do not reinstall Docker, the kernel, NVIDIA driver or toolkit.

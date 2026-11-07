@@ -1,0 +1,14 @@
+{
+  "kind": "Hosted control-plane acceptance; empty GPU state only",
+  "build_id": "adaptive-vlm-vultr-teardown:f3053dfd-d3a1-4098-ba97-4f31df5d37fd",
+  "worker_status": "SUCCEEDED",
+  "provider_verification": {
+    "remaining_campaign_gpu_ids": [],
+    "verified_at": "2026-11-07T12:40:59.795836+00:00"
+  },
+  "schedule": "rate(5 minutes)",
+  "schedule_enabled": true,
+  "sns_pending_confirmation": false,
+  "sns_delivery_test_message_id": "a3914f74-2d0d-51f7-a2d7-2c1d3171b92b",
+  "note": "First build failed HTTP 401 until owner permitted IPv4 API access. This does not prove real GPU destruction."
+}

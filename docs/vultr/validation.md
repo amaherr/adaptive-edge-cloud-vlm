@@ -61,3 +61,29 @@ planning assumptions, not measured GPU performance or an approved quote.
 Arithmetic and input counts were checked with Python Decimal; no software
 implementation changed, so the existing test suite was not rerun for this
 pricing/documentation-only change. `git diff --check` passed.
+
+## Checkpoint and independent controls implementation
+
+- Full local verification: Ruff/mypy passed; 267 tests passed, one sandbox
+  loopback skip, 81.64% coverage in 38.73 seconds. Raw output:
+  `artifacts/vultr/validation/tests-final.txt`.
+- Terraform 1.10.5 / Vultr 2.33.2 / AWS 5.100.0 schemas validated. Seven mock
+  safety tests passed across foundation, disposable GPU compute and operations.
+- S3 API/CPU fake-adapter live evidence: [checkpoint acceptance](checkpoints.md).
+- Reviewed `control-005.tfplan` created separate operations resources. AWS
+  rejected reserved Lambda concurrency because of the account's minimum
+  unreserved pool; the failed function was replaced through reviewed
+  `control-007.tfplan` using a tested 120-second S3 execution lease instead.
+- The confirmed SNS subscription accepted labelled delivery-test message
+  `a3914f74-2d0d-51f7-a2d7-2c1d3171b92b`. Receipt is not asserted without owner
+  acknowledgement. Manual Lambda invoke returned NO_REGISTERED_SESSION.
+- First hosted empty-state worker applied zero resource changes, then failed
+  Vultr inventory verification with HTTP 401. The owner permitted IPv4 API
+  access. The retry succeeded, including a zero-campaign-GPU API check and
+  durable S3 record. See committed hosted control acceptance summary.
+- `control-008.tfplan` enabled the independent five-minute schedule and added
+  an STS-assumed ECR read-only role. It changed no existing AWS campaign stack.
+- Reviewed `foundation-001.tfplan` applied four isolated Vultr VPC/SSH/firewall
+  resources, no GPU and no public inference rule.
+- No GPU/driver/BF16/model/network or real VM-destruction acceptance result is
+  claimed by these control/storage tests. Single-node preflight follows.

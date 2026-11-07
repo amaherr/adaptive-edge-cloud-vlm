@@ -1,0 +1,23 @@
+name: Vultr infrastructure safety
+on:
+  pull_request:
+    paths: ['infra/terraform/vultr/**', 'infra/runtime/vultr/**', 'scripts/vultr/**', '.github/workflows/vultr-infrastructure.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+      - run: terraform fmt -check -recursive infra/terraform/vultr
+      - name: Validate provider schemas and run mock safety tests without cloud access
+        run: |
+          for directory in foundation environments/gpu operations; do
+            terraform -chdir=infra/terraform/vultr/$directory init -backend=false -lockfile=readonly
+            terraform -chdir=infra/terraform/vultr/$directory validate
+            terraform -chdir=infra/terraform/vultr/$directory test
+          done

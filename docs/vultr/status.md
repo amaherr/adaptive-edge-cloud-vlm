@@ -66,3 +66,36 @@ roadmap section 14. No paid launch or 8,100-attempt campaign is authorized.
 - Next: after the owner confirms API setup, perform authenticated Atlanta
   discovery; if still empty, obtain provider guidance before proposing a region
   change. No paid launch or alert was sent. Terraform/Docker/GPU gates NOT RUN.
+
+## Current — controls deployed; single-node preflight preparation
+
+The owner approved S3 reuse, the $5 single-node preflight, alerts/checkpoints/
+teardown and destruction of idle campaign VMs. Corrected all-type discovery
+finds Atlanta A16 plans at $0.471/$0.942 per hour; the old filtered-empty result
+was a tool bug, not a provider capacity refusal. Ubuntu 24.04 LTS x64 is selected
+for preflight (API OS ID 2284). No GPU has been launched at this checkpoint.
+
+- Commits: `3392b5b` S3 checkpointing; `1c33af1` corrected GPU discovery.
+- Live S3 API and CPU fake-adapter byte-matching restore/resume passed.
+- AWS operations: deployed, five-minute EventBridge schedule **ENABLED**;
+  independent Lambda/S3 execution lease; SNS subscription **confirmed** and
+  labelled test publication accepted; deletion-only CodeBuild worker deployed.
+- Hosted empty-state teardown/API verification: **SUCCEEDED** on retry after
+  owner allowed IPv4 API access. First attempt's HTTP 401 and the initial AWS
+  reserved-concurrency rejection were resolved; neither launched GPUs.
+- Separate state keys: `vultr-v1/operations/terraform.tfstate`,
+  `vultr-v1/foundation/terraform.tfstate`, `vultr-v1/gpu/terraform.tfstate`.
+- Vultr private VPC, dedicated public SSH key and operator-/32 SSH firewall
+  applied from a reviewed plan; no public inference rule.
+- API key: encrypted SSM; absent from Git/Terraform variables and GPU VMs.
+- Tests: Ruff/mypy passed; **267 passed, 1 sandbox skip**, **81.64%** coverage;
+  seven Terraform mock safety tests and all three provider schema checks passed.
+- Spending: no GPU charges yet; small S3/CodeBuild/control usage is incurred
+  within the $7 planning allowance. Exact provider invoice has not been queried.
+- Gate P1: candidate plans/account/OS selection verified; concurrent pair
+  entitlement and per-device layout remain unverified. Single-node preflight is
+  authorized. P2/P3/P5/P10 live GPU acceptance remains **NOT COMPLETE**.
+- Next: finalize the immutable control package, register the approved $5 session
+  before VM creation, review the one-node Terraform plan, inspect actual driver/
+  Docker/GPU, test the immutable application image, then destroy via Terraform
+  and independently verify zero campaign nodes. Full Gate 2 is NOT AUTHORIZED.
