@@ -32,7 +32,8 @@ Latest reproduction on 7 November 2026, UTC:
   remained `ok`. One explicit start attempt returned **HTTP 500 Internal Server
   Error**. No guest logs or GPU inventory could be obtained.
 - We ended the test and used our independent Terraform teardown controls;
-  the final destruction result is recorded in the linked preflight report.
+  deletion verified at **14:20:15 UTC**, with a separate API check confirming
+  zero remaining project GPU instances. All diagnostics were retained in S3.
 
 Earlier instance `70b5a674-f823-47a0-aa85-3dc32d6e5c60`, IP `45.76.63.37`,
 created at **12:58:49** and destruction verified at **13:22:00**, had similar

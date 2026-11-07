@@ -53,8 +53,22 @@ S3 at `research/adaptive-vlm/vultr-v1/control/preflights/preflight-20261107T1406
 and read back/restored byte for byte. These are diagnostics, not a GPU benchmark
 journal or a real-model resume acceptance result.
 
-Final destruction verification and post-destruction restore are recorded below
-once the independent worker completes. Estimated minimum compute for the two
-attempts combined is **$0.942** (2 × $0.471), before tax/transfer and small AWS
-control/probe costs. Provider invoice remains authoritative; the alert total
-includes the separate $7 ancillary planning reserve.
+The independent CodeBuild worker
+`adaptive-vlm-vultr-teardown:a2da548b-59d3-4bdc-a33c-cb8fb2ca8df6` succeeded.
+Deletion-only Terraform teardown verified zero remaining GPUs at
+**14:20:15.007540 UTC**. A separate operator API query confirmed zero project
+GPU instances. Local deploy flag is false; the final Terraform plan reports
+**No changes** against empty GPU state. Temporary SSH private/public key and
+known-host files were removed after the independent zero-inventory check.
+
+After destruction, **28 diagnostic files (22,540 bytes)** were restored into a
+fresh directory and verified byte for byte and by SHA-256. The final evidence
+summary, no-change plan and restore index were separately persisted in retained
+S3 and read back. [Committed outcome evidence](evidence/preflight_retry_2026-11-07.json).
+
+Estimated minimum compute for both attempts combined is **$0.942**
+(2 × $0.471), before tax/transfer and small AWS control/probe costs. The retry
+lifetime through deletion verification was about 13.1 minutes. Provider invoice
+remains authoritative; the alert total includes the separate $7 ancillary
+planning reserve. No paid GPU remains. Independent controls and retained
+S3/ECR/state remain available; the support draft has not been sent.

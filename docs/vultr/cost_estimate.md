@@ -118,12 +118,13 @@ allowance is a planning buffer, not a measured service quote or hard cap.
 - Single-node preflight: **at most $5**, within the $80 total. Use the smallest
   verified model-capable candidate, at $0.471/hour if the quote holds. A proposed
   two-hour initial window is $0.942 compute before rounding/extras; installing
-  or downloading still accrues billable time. One preflight was launched and
-  automatically destroyed after access failed; its compute estimate is $0.471.
-  See [the preflight record](preflight_2026-11-07.md). Count that cost toward the
-  $5 preflight allowance and the $80 total before any retry.
+  or downloading still accrues billable time. Two preflights were launched and
+  automatically destroyed after access failed; their combined compute estimate
+  is $0.942. See the [first record](preflight_2026-11-07.md) and
+  [corrected retry](preflight_retry_2026-11-07.md). Count both costs toward the
+  $5 preflight allowance and the $80 total before any further launch.
 - Alerts at **$40/$60/$72/$80**; at **$72**, checkpoint, stop scheduling and
-  request Terraform teardown. A session's own $5 ceiling/expiry/idle limit also
+  request Terraform teardown. A session's remaining preflight ceiling/expiry/idle limit also
   triggers shutdown before the campaign threshold.
 - A separate AWS control plane enforces expiry/idle checks even when SSH or the
   laptop fails. Confirm SNS email and test the deployed watcher before GPU launch.

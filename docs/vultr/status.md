@@ -78,7 +78,10 @@ independent AWS network. Console also failed over a private browser/hotspot.
 One reboot left the VM stopped; explicit start returned HTTP 500.
 Zero model requests ran. Temporary AWS probe resources and its exact /32
 firewall rule were removed and independently verified absent. The session has
-expired and the watchdog entered teardown grace; final deletion is pending.
+expired and the independent worker succeeded, verifying zero GPUs at
+**14:20:15 UTC**. A separate API inventory confirmed zero. The final GPU
+Terraform plan reports No changes with deploy false. Post-destruction restore
+verified 28 diagnostics (22,540 bytes); temporary SSH material was removed.
 See the [retry record](preflight_retry_2026-11-07.md).
 
 Combined minimum compute estimate: **$0.942**, before tax/transfer and small AWS
@@ -101,7 +104,7 @@ controls/probe costs. The $7 ancillary allowance remains a reserve, not a bill.
 - P10: real off-VM stopped-instance detection and automatic Terraform destruction
   passed without SSH. Full campaign protection/resume acceptance remains open.
 
-Next exact step: verify retry teardown, then escalate guest/console/start failure
+Next exact step: escalate the reproduced guest/console/start failure
 using the updated [support request](atl_preflight_support_request.md), which has
 **not been sent**. Do not start further paid experiments before resolving access.
 Carry both attempts into the $5 preflight limit and $80 campaign ledger;

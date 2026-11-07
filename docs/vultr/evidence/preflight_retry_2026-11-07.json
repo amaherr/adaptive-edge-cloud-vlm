@@ -1,0 +1,21 @@
+{
+  "session_id": "preflight-20261107T140644Z",
+  "instance_id": "532bb8df-50fa-406a-8256-83d996151db3",
+  "outcome": "BLOCKED_CONNECTIVITY",
+  "created_at": "2026-11-07T14:07:09+00:00",
+  "destroyed_at": "2026-11-07T14:20:15.007540+00:00",
+  "remaining_campaign_gpu_ids": [],
+  "single_decode_user_data_match": true,
+  "operator_and_independent_aws_tcp": "timeouts_before_authentication",
+  "owner_console_hotspot_private_browser": "failed to connect to server",
+  "explicit_start_http_status": 500,
+  "gpu_model_requests": 0,
+  "retry_compute_estimate_usd": 0.471,
+  "combined_compute_estimate_usd": 0.942,
+  "cost_caveat": "before tax/transfer and small AWS controls; invoice authoritative",
+  "post_destruction_restored_files": 28,
+  "post_destruction_restored_bytes": 22540,
+  "all_restored_sha256_verified": true,
+  "evidence_prefix": "research/adaptive-vlm/vultr-v1/control/preflights/preflight-20261107T140644Z",
+  "verified_at": "2026-11-07T14:21:12.489157+00:00"
+}

@@ -1,8 +1,9 @@
 # Vultr operator runbook
 
 Current phase: [corrected retry blocked](preflight_retry_2026-11-07.md).
-The control plane is deployed; local launch flag is false. Follow the latest
-record for teardown verification. Escalate with the updated
+The control plane is deployed; local launch flag is false. Independent teardown
+and a separate API inventory verified zero GPUs; the empty-state plan has no
+changes. Escalate with the updated
 [support-request draft](atl_preflight_support_request.md) before more paid work.
 The draft has not been sent.
 

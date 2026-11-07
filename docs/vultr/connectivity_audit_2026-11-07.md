@@ -56,3 +56,9 @@ Only after connectivity works should GPU drivers, BF16 and model fit be tested.
 Changing the Ubuntu image or asking support for host/console logs remains an
 option if the corrected, isolated configuration still fails. No provider fault,
 GPU feasibility or automatic image-driver compatibility is established yet.
+
+Subsequent owner-authorized work: the [corrected retry](preflight_retry_2026-11-07.md)
+verified raw cloud-init delivery but reproduced access failure from operator and
+AWS networks, plus console failure over a hotspot. Explicit start returned HTTP
+500 after reboot left it stopped. Teardown succeeded; zero GPUs remain. The
+recommended next step is now the updated support case.
