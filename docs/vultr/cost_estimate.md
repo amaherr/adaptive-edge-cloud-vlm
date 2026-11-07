@@ -5,6 +5,12 @@ Updated 7 November 2026. Region: Atlanta, USA (`atl`). Alert destination:
 **$5 single-node preflight**, alerts/checkpoints/teardown and destruction of idle
 campaign instances. This does not authorize the full 8,100-attempt campaign.
 
+Two bounded one-node access attempts now have an estimated combined minimum
+GPU cost of **$0.942**, before tax/transfer and small AWS controls/probe costs.
+The corrected retry also failed before any GPU/model execution; no measured
+Vultr throughput is available. See the [retry record](preflight_retry_2026-11-07.md).
+The provider invoice remains authoritative.
+
 ## Corrected GPU discovery and candidate costs
 
 **Correction:** the initial `type=vcg` API query omitted A16/A40 GPU SKUs because

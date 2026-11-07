@@ -35,7 +35,7 @@ AWS callers. The temporary key handoff file was removed.
   (Terraform 1.10.5, Vultr 2.33.2, AWS 5.100.0). Ruff/strict mypy passed;
   **267 passed, 1 sandbox loopback skip**, **81.64%** coverage.
 
-## Actual single-node result and cleanup
+## First single-node result and cleanup
 
 One `vcg-a16-6c-60g-16vram` VM was created from the reviewed plan at
 **12:58:49 UTC**, with independent approval/quote/session registration committed
@@ -70,6 +70,20 @@ Evidence: [preflight record](preflight_2026-11-07.md),
 Raw local output: `artifacts/vultr/`; independent prefix:
 `research/adaptive-vlm/vultr-v1/` in the existing artifact bucket.
 
+## Corrected retry
+
+The owner authorized one corrected retry. Raw cloud-init delivery matched the
+intended minimal script, but SSH still timed out from the operator and an
+independent AWS network. Console also failed over a private browser/hotspot.
+One reboot left the VM stopped; explicit start returned HTTP 500.
+Zero model requests ran. Temporary AWS probe resources and its exact /32
+firewall rule were removed and independently verified absent. The session has
+expired and the watchdog entered teardown grace; final deletion is pending.
+See the [retry record](preflight_retry_2026-11-07.md).
+
+Combined minimum compute estimate: **$0.942**, before tax/transfer and small AWS
+controls/probe costs. The $7 ancillary allowance remains a reserve, not a bill.
+
 ## Remaining gates
 
 - P1/P2: one-node provision/destroy verified; two-node entitlement, supported
@@ -87,9 +101,8 @@ Raw local output: `artifacts/vultr/`; independent prefix:
 - P10: real off-VM stopped-instance detection and automatic Terraform destruction
   passed without SSH. Full campaign protection/resume acceptance remains open.
 
-Next exact step: follow the [connection audit](connectivity_audit_2026-11-07.md).
-It found and corrected double-encoded cloud-init; no corrected VM has been
-tested. Support is an optional parallel escalation using the updated
-[prepared request](atl_preflight_support_request.md), which has **not been sent**.
-Carry this attempt's cost into both the $5 preflight limit and
-$80 campaign ledger; preserve the failed outcome and immutable evidence.
+Next exact step: verify retry teardown, then escalate guest/console/start failure
+using the updated [support request](atl_preflight_support_request.md), which has
+**not been sent**. Do not start further paid experiments before resolving access.
+Carry both attempts into the $5 preflight limit and $80 campaign ledger;
+preserve failed outcomes and immutable evidence.

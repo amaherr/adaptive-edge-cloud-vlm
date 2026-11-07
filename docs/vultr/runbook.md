@@ -1,9 +1,10 @@
 # Vultr operator runbook
 
-Current phase: [single-node preflight blocked; GPU destroyed](preflight_2026-11-07.md).
-The control plane is deployed and no campaign GPU remains. The local launch flag
-is false. Resolve access through the [support-request draft](atl_preflight_support_request.md)
-before repeating paid work. The draft has not been sent.
+Current phase: [corrected retry blocked](preflight_retry_2026-11-07.md).
+The control plane is deployed; local launch flag is false. Follow the latest
+record for teardown verification. Escalate with the updated
+[support-request draft](atl_preflight_support_request.md) before more paid work.
+The draft has not been sent.
 
 ## Credentials and read-only discovery
 
@@ -35,8 +36,8 @@ driver fit or a stock reservation.
 
 ## Approved budget and launch prerequisites
 
-Approximately $80 total; at most $5 for the single-node preflight; one failed
-allocation has an estimated $0.471 compute cost before tax/control overhead.
+Approximately $80 total; at most $5 for the single-node preflight; two failed
+allocations have an estimated $0.942 combined compute cost before tax/control overhead.
 Carry that cost into any retry's remaining preflight allowance and campaign
 ledger. Do not reset cumulative spend or silently launch a second experiment.
 
