@@ -56,3 +56,11 @@ and asks about supported GPU image/network/console behavior and the 32 GB
 plan's per-device topology. It has not been sent; contact with support requires
 the owner's instruction. No further paid experiment should bypass this failed
 access gate or claim CUDA/model/Gate 2 readiness.
+
+## Subsequent connection audit
+
+The [connection audit](connectivity_audit_2026-11-07.md) found and corrected
+double-encoded cloud-init in our Terraform configuration. The first attempt
+therefore did not establish behavior with the intended guest setup. No retry
+has run, and the root cause remains unknown. Support is an available escalation,
+not the only remaining diagnostic path.

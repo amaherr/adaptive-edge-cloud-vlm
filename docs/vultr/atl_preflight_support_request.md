@@ -28,12 +28,20 @@ extended GPU time.
   We could not inspect boot messages, guest firewall, SSH service or GPU driver.
 - One provider API reboot was accepted with HTTP 200. SSH still timed out in
   subsequent probes; final local stop decision was at **13:18:30 UTC**.
-- The independent watchdog subsequently observed the still-billable VM in a
+- The independent watchdog observed the still-billable VM in a
   stopped power state at 13:16:10 UTC after the reboot. No cause is established.
 - No CUDA or model inference was run. No driver/kernel/Docker reinstall was
   attempted. Independent Terraform teardown completed at **13:22:00 UTC**;
   both the hosted worker and a separate operator API check confirmed zero
   remaining campaign instances. All accessible diagnostics were archived.
+
+Our subsequent configuration audit found that Terraform Base64-encoded
+cloud-init even though provider 2.33.2 already does so. We have corrected that
+double encoding, but have not retried a VM. The intended guest firewall setup
+therefore cannot be assumed to have run. Linux and Windows probes also shared
+the same operator network; an independent network has not yet been tested.
+The reboot was not followed by verified return to running before later probes.
+We have not established whether any of these explain the original failure.
 
 Please investigate the host/console path and confirm whether the guest booted
 and received working public networking. Is this Ubuntu OS ID the correct

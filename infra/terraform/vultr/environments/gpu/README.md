@@ -11,6 +11,8 @@ The API key comes from environment via encrypted SSM, using
 `scripts/vultr/terraform.sh`. Never pass it as a Terraform variable. Keep all
 `.tfvars`, plans, state and private keys out of Git. `cloud_init` contains only
 nonsecret firewall/host setup; it must not reinstall vendor GPU tooling blindly.
+Pass plain cloud-init text: provider 2.33.2 performs the API Base64 encoding.
+Encoding it in Terraform as well prevents delivery of the intended cloud-config.
 
 Backend: existing protected state bucket, key `vultr-v1/gpu/terraform.tfstate`,
 region `us-east-1`, S3 lockfile enabled. Networking and retained data/state are

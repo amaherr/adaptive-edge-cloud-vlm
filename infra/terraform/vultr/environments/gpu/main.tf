@@ -51,11 +51,12 @@ resource "vultr_instance" "gpu" {
   label             = "${var.campaign_tag}-${each.key}"
   hostname          = "vlm-${each.key}"
   tags              = [var.campaign_tag, "role-${each.key}", "expires-${replace(var.expires_at, "/[^0-9]/", "")}"]
-  user_data         = var.cloud_init == "" ? null : base64encode(var.cloud_init)
-  backups           = "disabled"
-  enable_ipv6       = false
-  ddos_protection   = false
-  activation_email  = false
+  # Provider v2.33.2 encodes user_data when constructing the API request.
+  user_data        = var.cloud_init == "" ? null : var.cloud_init
+  backups          = "disabled"
+  enable_ipv6      = false
+  ddos_protection  = false
+  activation_email = false
   lifecycle {
     precondition {
       condition     = length(var.launch_approval_id) > 0

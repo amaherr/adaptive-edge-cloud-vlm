@@ -87,8 +87,9 @@ Raw local output: `artifacts/vultr/`; independent prefix:
 - P10: real off-VM stopped-instance detection and automatic Terraform destruction
   passed without SSH. Full campaign protection/resume acceptance remains open.
 
-Next exact step: resolve the guest/console access failure with Vultr using the
-[prepared support request](atl_preflight_support_request.md), which has **not
-been sent**. Recheck the supported GPU image and connectivity before another
-paid attempt. Carry this attempt's cost into both the $5 preflight limit and
+Next exact step: follow the [connection audit](connectivity_audit_2026-11-07.md).
+It found and corrected double-encoded cloud-init; no corrected VM has been
+tested. Support is an optional parallel escalation using the updated
+[prepared request](atl_preflight_support_request.md), which has **not been sent**.
+Carry this attempt's cost into both the $5 preflight limit and
 $80 campaign ledger; preserve the failed outcome and immutable evidence.
