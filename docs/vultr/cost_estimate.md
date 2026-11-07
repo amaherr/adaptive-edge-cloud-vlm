@@ -1,6 +1,7 @@
 # Vultr cost worksheet — P1 BLOCKED
 
-No prices, plan IDs, region or spending limits have been approved. Do not copy
+Preferred region: Atlanta, USA (`atl`), selected by the owner.
+No prices, plan IDs or spending limits have been approved. Do not copy
 marketing prices into a deployment approval. Save a timestamped API report and,
 where fields are missing, obtain a written provider quote.
 
@@ -8,7 +9,7 @@ where fields are missing, obtain a written provider quote.
 | --- | --- |
 | Edge plan / hourly quote | Pending account/API evidence |
 | Cloud plan / hourly quote | Pending account/API evidence |
-| Region / simultaneous GPU entitlement | Pending account/provider verification |
+| Region / simultaneous GPU entitlement | Atlanta (`atl`); GPU entitlement/capacity pending provider verification |
 | Single-edge preflight hours / spend ceiling | Pending owner input |
 | Paired session hours | Pending pilot timings |
 | Object storage / registry / retained state / transfer | Pending backend selection and quote |

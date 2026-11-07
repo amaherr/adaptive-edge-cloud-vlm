@@ -14,7 +14,7 @@ From the repository root, using a new evidence filename on every invocation:
   --output artifacts/vultr/p1/discovery-001.json
 # To limit availability calls after choosing a provider region ID:
 .venv/bin/python scripts/vultr/check_plans.py \
-  --region YOUR_REGION_ID --output artifacts/vultr/p1/discovery-002.json
+  --region atl --output artifacts/vultr/p1/discovery-002.json
 .venv/bin/pytest -q tests/test_vultr_preflight.py
 ```
 
@@ -36,8 +36,8 @@ not verifiable through account controls; save its nonsecret response as evidence
 ## Required owner inputs before P1 can close
 
 1. Billing/API activation and GPU entitlement status; credential setup as above.
-2. Preferred region (or permission to compare all regions), and confirmation
-   that two independent GPU VMs can run concurrently there.
+2. Selected region: Atlanta, USA (`atl`). Confirm with the provider that two
+   independent GPU VMs can run concurrently there; capacity remains unverified.
 3. Total spend ceiling, smaller single-node preflight budget, alert destination.
 4. Checkpoint backend preference: existing AWS S3 or new Vultr object storage.
 5. Before infrastructure: administrative SSH source CIDR/public key, supported

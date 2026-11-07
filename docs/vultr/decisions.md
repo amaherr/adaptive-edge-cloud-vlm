@@ -52,3 +52,10 @@ Keep BF16, greedy decoding, 32 new tokens, the same 100 requests and annotations
 60/20/20 split, N4/N9 final block holdouts, and three fixed policies. A Vultr
 hardware pair starts a new campaign. Gate 2 is 8,100 measured attempts plus
 27 excluded warmups; historical physical results cannot establish Vultr gates.
+
+## P1 region preference
+
+The owner selected Atlanta, USA (`atl`). Vultr documents this region code in
+its [official guide](https://docs.vultr.com/how-to-establish-private-connection-between-vultr-regions-using-headscale).
+This preference does not establish GPU inventory, account entitlement, two-node
+concurrency, prices or launch approval. Use `--region atl` for P1 discovery.

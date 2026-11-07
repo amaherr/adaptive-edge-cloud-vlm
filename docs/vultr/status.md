@@ -18,7 +18,9 @@
 ## Gate sequence
 
 P1 remains **BLOCKED** pending account credentials, GPU entitlement/concurrency,
-region, verified plan/OS compatibility, quotes and owner budget/launch approval.
+verified plan/OS compatibility, quotes and owner budget/launch approval.
+Preferred region: Atlanta, USA (`atl`), selected by the owner; GPU capacity
+and two-VM availability there remain unverified.
 P2–P10 and full Gate 2 are **NOT RUN**. Local preflight tests do not establish
 provider feasibility. Stop at P1 before infrastructure/provisioning work per
 roadmap section 14. No paid launch or 8,100-attempt campaign is authorized.
@@ -32,11 +34,11 @@ roadmap section 14. No paid launch or 8,100-attempt campaign is authorized.
   [validation](validation.md), raw output `artifacts/vultr/p1/tests.txt`.
 - Missing-token check returned 2 and wrote
   `artifacts/vultr/p1/missing-token.json`; no provider request was attempted.
-- Terraform state/plan: none. Docker digest: none selected. Plans/region/hourly
+- Terraform state/plan: none. Docker digest: none selected. Preferred region: Atlanta (`atl`); plan IDs/hourly
   quotes: unknown. GPU entitlement and concurrent two-VM quota: unknown.
 - Cost incurred by these actions: no paid Vultr operations; remaining approved
   budget: unset. P1: **BLOCKED**. Infrastructure and GPU testing remain NOT RUN.
-- Next exact step: owner supplies account/API setup, region, budgets and alert
+- Next exact step: owner supplies account/API setup, budgets and alert
   destination; run the discovery command in the runbook with a fresh output
   filename, verify provider GPU access and quote, then review the P1 selection.
 - Final P1 checks: Ruff and mypy passed; full pytest coverage run: 231 passed,
