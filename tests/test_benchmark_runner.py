@@ -263,3 +263,35 @@ runner.run_benchmark(
     rows = [json.loads(line) for line in path.read_text().splitlines()]
     assert len(rows) == 7
     assert len({row["trial_id"] for row in rows}) == 7
+
+
+def test_resume_rejects_changed_duration_clock(tmp_path: Path) -> None:
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"
+    )
+    manifest = load_frozen_manifest(_manifest(tmp_path))
+    kwargs = dict(
+        config=config,
+        manifest=manifest,
+        policy=IntermittentPolicy(),
+        run_manifest=create_run_manifest(
+            config,
+            {"duration_clock": {"name": "perf_counter"}},
+            dataset_manifest_sha256=manifest.sha256,
+        ),
+        run_dir=tmp_path / "run",
+        warmups=0,
+        repetitions=1,
+        pipeline="synchronous",
+    )
+    run_benchmark(**kwargs)
+    raw = tmp_path / "run/requests.jsonl"
+    original = raw.read_bytes()
+    replacement = create_run_manifest(
+        config,
+        {"duration_clock": {"name": "CLOCK_MONOTONIC_RAW"}},
+        dataset_manifest_sha256=manifest.sha256,
+    )
+    with pytest.raises(ValueError, match="duration clock differs"):
+        run_benchmark(**{**kwargs, "run_manifest": replacement}, resume=True)
+    assert raw.read_bytes() == original

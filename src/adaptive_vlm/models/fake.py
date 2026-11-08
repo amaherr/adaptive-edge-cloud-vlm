@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import hashlib
-from time import perf_counter_ns
 
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
 from adaptive_vlm.models.base import ModelAdapter, ModelMetadata
+from adaptive_vlm.timing import perf_counter_ns
 
 
 class FakeModelAdapter(ModelAdapter):

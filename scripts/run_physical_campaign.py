@@ -30,6 +30,7 @@ from adaptive_vlm.config import load_experiment_config, model_contract_fingerpri
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
+from adaptive_vlm.timing import monotonic
 
 ROOT = Path(__file__).resolve().parents[1]
 MODES = ("edge", "cloud", "distributed")
@@ -294,7 +295,7 @@ class Supervisor:
     def run_child(self, command: list[str], *, stall: bool = False) -> None:
         self.child = subprocess.Popen(command, start_new_session=True)
         last_count = progress(self.output)["measured_attempts"]
-        last_change = time.monotonic()
+        last_change = monotonic()
         started = last_change
         try:
             while True:
@@ -303,7 +304,7 @@ class Supervisor:
                     break
                 except subprocess.TimeoutExpired:
                     self.status("running")
-                    if not stall and time.monotonic() - started > 3600:
+                    if not stall and monotonic() - started > 3600:
                         raise RuntimeError(
                             "preflight child exceeded one hour"
                         ) from None
@@ -314,8 +315,8 @@ class Supervisor:
                         ) from None
                     count = progress(self.output)["measured_attempts"]
                     if count != last_count:
-                        last_count, last_change = count, time.monotonic()
-                    if stall and time.monotonic() - last_change > float(
+                        last_count, last_change = count, monotonic()
+                    if stall and monotonic() - last_change > float(
                         self.settings["stall_seconds"]
                     ):
                         raise RuntimeError(

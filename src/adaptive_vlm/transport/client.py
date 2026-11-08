@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import socket
 from dataclasses import dataclass
-from time import perf_counter_ns
 
 from adaptive_vlm.config import TransportConfig
+from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.protocol import Frame, receive_frame, send_frame
 
 

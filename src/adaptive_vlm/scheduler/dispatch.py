@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from time import perf_counter_ns
 from typing import Any
 
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
 from adaptive_vlm.scheduler.configuration import CapabilityRegistry, ConfigurationId
 from adaptive_vlm.scheduler.state import SystemState, TaskState
+from adaptive_vlm.timing import perf_counter_ns
 
 
 @dataclass(frozen=True)

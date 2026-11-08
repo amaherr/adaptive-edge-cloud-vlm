@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from time import perf_counter
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
@@ -23,6 +22,7 @@ from adaptive_vlm.scheduler.configuration import (
 )
 from adaptive_vlm.scheduler.dispatch import ConfigurationDispatcher
 from adaptive_vlm.scheduler.state import SystemState, TaskState
+from adaptive_vlm.timing import perf_counter
 
 
 def _rss_mib() -> float | None:

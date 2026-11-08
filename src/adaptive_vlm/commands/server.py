@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from pathlib import Path
-from time import perf_counter
 
 from adaptive_vlm.config import (
     ConfigError,
@@ -18,6 +17,7 @@ from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
+from adaptive_vlm.timing import perf_counter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
 

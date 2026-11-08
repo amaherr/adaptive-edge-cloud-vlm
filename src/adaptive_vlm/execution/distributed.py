@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from time import perf_counter_ns
 from typing import Protocol, cast
 
 from adaptive_vlm.config import ExecutionMode, TransportConfig
@@ -20,6 +19,7 @@ from adaptive_vlm.execution.remote import (
 )
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.features import VisionEncoding
+from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.client import exchange_frame
 from adaptive_vlm.transport.protocol import Frame, MessageType, ProtocolError
 from adaptive_vlm.transport.tensors import TensorPayload

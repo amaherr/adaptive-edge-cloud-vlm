@@ -9,10 +9,10 @@ import threading
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from time import monotonic, perf_counter_ns
 from typing import Literal, cast
 
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
+from adaptive_vlm.timing import monotonic, perf_counter_ns
 from adaptive_vlm.transport.protocol import (
     DEFAULT_MAX_HEADER_BYTES,
     DEFAULT_MAX_PAYLOAD_BYTES,

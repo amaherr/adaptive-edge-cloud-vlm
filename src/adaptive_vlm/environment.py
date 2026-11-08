@@ -12,6 +12,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from adaptive_vlm.timing import clock_metadata
+
 
 def collect_environment(workdir: str | Path | None = None) -> dict[str, Any]:
     """Collect non-secret environment metadata for a run manifest."""
@@ -34,6 +36,7 @@ def collect_environment(workdir: str | Path | None = None) -> dict[str, Any]:
             "implementation": platform.python_implementation(),
             "executable": sys.executable,
         },
+        "duration_clock": clock_metadata(),
         "gpu": _nvidia_gpu(),
         "git": _git_state(working_directory),
     }

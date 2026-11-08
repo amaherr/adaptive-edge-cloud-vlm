@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
-from time import perf_counter_ns
 from typing import Any
 
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
@@ -23,6 +22,7 @@ from adaptive_vlm.scheduler.selector import (
     SelectionConstraints,
     select,
 )
+from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.client import PreInferenceConnectionError
 
 

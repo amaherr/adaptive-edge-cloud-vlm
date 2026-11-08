@@ -6,8 +6,9 @@ import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from time import perf_counter
 from typing import TextIO
+
+from adaptive_vlm.timing import perf_counter
 
 
 @dataclass(frozen=True)

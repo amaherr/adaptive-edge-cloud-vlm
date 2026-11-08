@@ -11,7 +11,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from time import perf_counter_ns
 from typing import Any
 
 from adaptive_vlm.artifacts import append_jsonl, write_json_atomic
@@ -24,6 +23,7 @@ from adaptive_vlm.contracts import InferenceStatus, RunManifest
 from adaptive_vlm.data.manifest import FrozenManifest, RequestItem
 from adaptive_vlm.execution.base import ExecutionPolicy
 from adaptive_vlm.execution.remote import RemoteInferenceError
+from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.protocol import ProtocolError
 
 
@@ -197,6 +197,12 @@ def run_benchmark(
             or saved_run_manifest.get("config") != config.to_dict()
         ):
             raise ValueError("cannot resume: run manifest differs")
+        if saved_run_manifest.get("environment", {}).get("duration_clock") != (
+            run_manifest.environment.get("duration_clock")
+        ):
+            raise ValueError(
+                "cannot resume: duration clock differs; use a new run directory"
+            )
         run_id = str(saved_run_manifest["run_id"])
     else:
         if run_dir.exists():

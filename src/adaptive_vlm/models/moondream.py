@@ -8,7 +8,6 @@ import threading
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from time import perf_counter_ns
 from typing import Any, Literal, Self, cast
 
 import yaml
@@ -19,6 +18,7 @@ from adaptive_vlm.measurement import measure_call
 from adaptive_vlm.model_artifact import sha256_file
 from adaptive_vlm.models.base import ModelAdapter, ModelMetadata
 from adaptive_vlm.models.features import ProjectedVisionFeatures, VisionEncoding
+from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.tensors import TensorInferenceRequest
 
 ComponentRole = Literal["full", "vision", "text"]

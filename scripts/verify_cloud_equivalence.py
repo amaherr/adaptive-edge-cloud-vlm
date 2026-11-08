@@ -11,7 +11,6 @@ import traceback
 from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
-from time import perf_counter
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
@@ -26,6 +25,7 @@ from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.moondream import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
+from adaptive_vlm.timing import perf_counter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
 

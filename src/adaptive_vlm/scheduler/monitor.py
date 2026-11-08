@@ -6,7 +6,6 @@ import math
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
-from time import perf_counter_ns
 from typing import Any
 
 from adaptive_vlm.config import TransportConfig
@@ -17,6 +16,7 @@ from adaptive_vlm.execution.remote import (
     check_remote_health,
 )
 from adaptive_vlm.models.base import ModelMetadata
+from adaptive_vlm.timing import perf_counter_ns
 
 HealthProbe = Callable[[TransportConfig, ModelMetadata], HealthStatus]
 CapabilityProbe = Callable[[TransportConfig, ModelMetadata], RemoteCapabilities]

@@ -11,10 +11,10 @@ import sys
 import traceback
 from datetime import UTC, datetime
 from pathlib import Path
-from time import perf_counter
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
+from adaptive_vlm.timing import perf_counter
 
 
 def build_parser() -> argparse.ArgumentParser:

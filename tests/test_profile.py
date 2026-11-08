@@ -224,3 +224,13 @@ def test_predictor_fit_holds_out_requests_and_preserves_failures(
     )
     assert sum(row["status"] != "ok" for row in evaluated) == 1
     assert not report["full_g3_gate_evaluable"]
+
+
+def test_profile_rejects_mixed_duration_clocks(tmp_path: Path) -> None:
+    dirs, spec = _campaign(tmp_path)
+    path = dirs[0] / "run_manifest.json"
+    manifest = json.loads(path.read_text())
+    manifest["environment"]["duration_clock"] = {"name": "CLOCK_MONOTONIC_RAW"}
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="duration clock"):
+        build_profile(run_dirs=dirs, specification=spec, output_dir=tmp_path / "mixed")

@@ -10,7 +10,6 @@ import traceback
 from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
-from time import perf_counter
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
@@ -18,6 +17,7 @@ from adaptive_vlm.config import ExecutionMode, load_experiment_config
 from adaptive_vlm.contracts import InferenceRequest
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.models.moondream import MoondreamAdapter, MoondreamRun
+from adaptive_vlm.timing import perf_counter
 
 
 def build_parser() -> argparse.ArgumentParser:

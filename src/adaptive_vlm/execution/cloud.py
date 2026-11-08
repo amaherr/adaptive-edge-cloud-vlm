@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from time import perf_counter_ns
-
 from adaptive_vlm.config import ExecutionMode, TransportConfig
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult, MetricValue
 from adaptive_vlm.execution.base import ExecutionPolicy
@@ -16,6 +14,7 @@ from adaptive_vlm.execution.remote import (
     parse_inference_response,
 )
 from adaptive_vlm.models.base import ModelMetadata
+from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.client import exchange_frame
 from adaptive_vlm.transport.protocol import Frame, MessageType
 

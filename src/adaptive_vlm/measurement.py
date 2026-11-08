@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from time import perf_counter_ns
 from typing import Generic, TypeVar
+
+from adaptive_vlm.timing import perf_counter_ns
 
 T = TypeVar("T")
 

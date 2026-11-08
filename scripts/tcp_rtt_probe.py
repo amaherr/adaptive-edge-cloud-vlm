@@ -8,7 +8,8 @@ import socket
 import statistics
 from contextlib import suppress
 from datetime import UTC, datetime
-from time import perf_counter_ns
+
+from adaptive_vlm.timing import perf_counter_ns
 
 
 def serve(host: str, port: int) -> None:

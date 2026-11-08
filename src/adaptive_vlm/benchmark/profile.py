@@ -8,13 +8,13 @@ from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from statistics import median
-from time import perf_counter_ns
 from typing import Any, cast
 
 from adaptive_vlm.artifacts import write_json_atomic
 from adaptive_vlm.benchmark.runner import make_schedule
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.measurement import measure_call
+from adaptive_vlm.timing import perf_counter_ns
 
 _CONFIGURATIONS = {
     ("edge", "synchronous"): "edge/full",
@@ -148,6 +148,12 @@ def build_profile(
         raise ValueError("at least one benchmark run is required")
 
     runs = [_read_run(path) for path in run_dirs]
+    clocks = [
+        run_manifest.get("environment", {}).get("duration_clock")
+        for _, run_manifest, _ in runs
+    ]
+    if any(clock != clocks[0] for clock in clocks):
+        raise ValueError("benchmark runs differ on duration clock")
     reference = runs[0][0]
     modes: set[str] = set()
     for plan, _, _ in runs:
@@ -559,6 +565,7 @@ def build_profile(
     summary = {
         "schema_version": 1,
         "campaign_id": spec["campaign_id"],
+        "duration_clock": clocks[0],
         "specification_sha256": hashlib.sha256(specification.read_bytes()).hexdigest(),
         "dataset_manifest_sha256": frozen.sha256,
         "model_contract_sha256": reference["model_contract_sha256"],

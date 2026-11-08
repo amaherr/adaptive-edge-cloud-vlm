@@ -9,7 +9,6 @@ from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from statistics import median
-from time import perf_counter_ns
 from typing import Any
 
 from adaptive_vlm.artifacts import append_jsonl, write_json_atomic
@@ -37,6 +36,7 @@ from adaptive_vlm.scheduler.predictor import (
     Predictor,
 )
 from adaptive_vlm.scheduler.selector import SelectionConstraints
+from adaptive_vlm.timing import perf_counter_ns
 
 TaskBuilder = Callable[[RequestItem], PredictionTask]
 RegistryProvider = Callable[[], CapabilityRegistry | RegistrySnapshot]
@@ -203,6 +203,12 @@ def run_adaptive_benchmark(
         saved_manifest = json.loads((run_dir / "run_manifest.json").read_text())
         if saved_manifest.get("dataset_manifest_sha256") != manifest.sha256:
             raise ValueError("cannot resume: run manifest differs")
+        if saved_manifest.get("environment", {}).get("duration_clock") != (
+            run_manifest.environment.get("duration_clock")
+        ):
+            raise ValueError(
+                "cannot resume: duration clock differs; use a new run directory"
+            )
         run_id = saved_manifest["run_id"]
     else:
         if run_dir.exists():

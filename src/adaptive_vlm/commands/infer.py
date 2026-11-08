@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from time import perf_counter
 
 from adaptive_vlm.artifacts import create_run_manifest, write_json_atomic
 from adaptive_vlm.commands.server import (
@@ -27,6 +26,7 @@ from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
+from adaptive_vlm.timing import perf_counter
 
 
 def run_fake_infer_command(
