@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import random
 from collections import Counter
 from collections.abc import Mapping, Sequence
@@ -110,6 +111,27 @@ def _read_rows(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def recover_journal_tail(path: Path) -> None:
+    """Preserve a torn final append before resuming; never discard full lines."""
+    if not path.exists():
+        return
+    data = path.read_bytes()
+    if not data or data.endswith(b"\n"):
+        return
+    boundary = data.rfind(b"\n") + 1
+    tail = data[boundary:]
+    # Even a complete JSON object without its commit newline is uncommitted.
+    backup = path.with_name(f"requests.torn-{datetime.now(UTC):%Y%m%dT%H%M%S%f}.bin")
+    with backup.open("xb") as handle:
+        handle.write(tail)
+        handle.flush()
+        os.fsync(handle.fileno())
+    with path.open("r+b") as handle:
+        handle.truncate(boundary)
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
 def semantic_config_sha256(config: Mapping[str, Any]) -> str:
     """Hash experimental settings, excluding machine-specific file locations."""
 
@@ -135,6 +157,7 @@ def run_benchmark(
     repetitions: int,
     pipeline: str,
     resume: bool = False,
+    max_consecutive_failures: int = 0,
 ) -> dict[str, Any]:
     """Execute one policy and persist each attempt before advancing."""
 
@@ -183,6 +206,10 @@ def run_benchmark(
         write_json_atomic(run_dir / "run_manifest.json", run_manifest.to_dict())
         run_id = run_manifest.run_id
 
+    if max_consecutive_failures < 0:
+        raise ValueError("max_consecutive_failures must be non-negative")
+    if resume:
+        recover_journal_tail(raw_path)
     rows = _read_rows(raw_path)
     expected = {trial.trial_id: trial for trial in schedule}
     completed: set[str] = set()
@@ -206,6 +233,7 @@ def run_benchmark(
         completed.add(trial_id)
 
     items = {item.request_id: item for item in manifest.items}
+    consecutive_failures = 0
     for position, trial in enumerate(schedule, 1):
         if trial.trial_id in completed:
             continue
@@ -218,9 +246,7 @@ def run_benchmark(
         started = perf_counter_ns()
         row: dict[str, Any] = {
             **trial.to_dict(),
-            "started_at_utc": datetime.now(UTC)
-            .isoformat()
-            .replace("+00:00", "Z"),
+            "started_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             "plan_sha256": plan_hash,
             "config_sha256": plan["config_sha256"],
             "model_contract_sha256": plan["model_contract_sha256"],
@@ -254,6 +280,15 @@ def run_benchmark(
         row["observed_end_to_end_ms"] = (perf_counter_ns() - started) / 1_000_000
         append_jsonl(raw_path, row)
         rows.append(row)
+        consecutive_failures = consecutive_failures + 1 if row["status"] != "ok" else 0
+        if (
+            max_consecutive_failures
+            and consecutive_failures >= max_consecutive_failures
+        ):
+            raise RuntimeError(
+                f"stopping after {consecutive_failures} consecutive failures; "
+                "attempts are saved; investigate before resuming"
+            )
     summary = summarize(rows, manifest, policy.mode, plan_hash)
     write_json_atomic(run_dir / "summary.json", summary)
     return summary

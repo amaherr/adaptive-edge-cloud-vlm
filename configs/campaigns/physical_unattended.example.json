@@ -1,0 +1,18 @@
+{
+  "cloud_ssh": "REPLACE_USER@REPLACE_CLOUD_LINUX_HOST",
+  "cloud_repo": "/REPLACE/absolute/path/to/adaptive-edge-cloud-vlm",
+  "cloud_python": "/REPLACE/absolute/path/to/adaptive-edge-cloud-vlm/.venv-model/bin/python",
+  "cloud_interface": "eth0",
+  "grid": "configs/profiles/physical_network_blocks_v1.json",
+  "split": "configs/evaluation/physical_vqa_split_v1.json",
+  "config": "configs/experiments/physical_vqa_v1.yaml",
+  "smoke_config": "configs/experiments/physical_pair_v1.yaml",
+  "output_root": "artifacts/phase2/physical-v1-unattended",
+  "python": ".venv-model/bin/python",
+  "test_python": ".venv/bin/python",
+  "adaptive_vlm": ".venv-model/bin/adaptive-vlm",
+  "artifact_manifest": "configs/model/moondream2_artifact.yaml",
+  "cache_dir": ".model-cache",
+  "min_free_gb": 10,
+  "stall_seconds": 900
+}

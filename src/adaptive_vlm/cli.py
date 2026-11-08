@@ -91,6 +91,7 @@ def build_parser() -> argparse.ArgumentParser:
         default="synchronous",
     )
     benchmark_parser.add_argument("--resume", action="store_true")
+    benchmark_parser.add_argument("--max-consecutive-failures", type=int, default=0)
     benchmark_parser.add_argument("-v", "--verbose", action="store_true")
 
     import_parser = subcommands.add_parser(

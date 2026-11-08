@@ -1,0 +1,18 @@
+[Unit]
+Description=Physical VLM cloud GPU server
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=/REPLACE/absolute/repo/path
+ExecStart=/REPLACE/absolute/repo/path/.venv-model/bin/python -u scripts/run_physical_cloud_gpu.py adaptive-server --config configs/experiments/physical_vqa_v1.yaml --artifact-manifest configs/model/moondream2_artifact.yaml --cache-dir .model-cache --offline --device cuda:0 --bind-host 0.0.0.0
+Restart=on-failure
+RestartSec=10
+KillMode=control-group
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

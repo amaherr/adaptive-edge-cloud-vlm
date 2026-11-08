@@ -124,6 +124,7 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
         ),
         pipeline=args.pipeline,
         resume=args.resume,
+        max_consecutive_failures=args.max_consecutive_failures,
     )
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0

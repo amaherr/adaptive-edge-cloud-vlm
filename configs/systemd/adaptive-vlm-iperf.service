@@ -1,0 +1,11 @@
+[Unit]
+Description=Physical VLM independent throughput probe
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/iperf3 -s -p 5051
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

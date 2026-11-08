@@ -10,11 +10,13 @@ import random
 import re
 import subprocess
 import sys
+import tempfile
 from contextlib import suppress
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from adaptive_vlm.artifacts import write_json_atomic
 from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.config import load_experiment_config, model_contract_fingerprint
 from adaptive_vlm.data.manifest import load_frozen_manifest
@@ -26,7 +28,30 @@ def digest(path: Path) -> str:
 
 
 def write_json(path: Path, value: dict[str, Any]) -> None:
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
+    write_json_atomic(path, value)
+
+
+def save_plan(path: Path, plan: dict[str, Any]) -> None:
+    # Compare the JSON representation so tuples cannot break an identical resume.
+    canonical = json.loads(json.dumps(plan))
+    if path.exists() and json.loads(path.read_text()) != canonical:
+        raise RuntimeError("existing block plan differs; refusing to resume")
+    write_json(path, canonical)
+
+
+def prepare_run(run_dir: Path) -> bool:
+    """Recover an interrupted initialization without discarding trial evidence."""
+    if not run_dir.exists():
+        return False
+    if all((run_dir / name).is_file() for name in ("plan.json", "run_manifest.json")):
+        return True
+    raw = run_dir / "requests.jsonl"
+    if raw.exists() and raw.stat().st_size:
+        raise RuntimeError(f"missing run metadata with saved attempts: {run_dir}")
+    history = run_dir.parent / "initialization_recovery"
+    history.mkdir(exist_ok=True)
+    run_dir.rename(history / f"{run_dir.name}-{datetime.now(UTC):%Y%m%dT%H%M%S%f}")
+    return False
 
 
 def policy_order(block_id: str, seed: int) -> tuple[str, ...]:
@@ -68,7 +93,9 @@ def measure_network(host: str, iperf_port: int, echo_port: int) -> dict[str, Any
         ]
         if reverse:
             command.append("-R")
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        result = subprocess.run(
+            command, check=True, capture_output=True, text=True, timeout=60
+        )
         results.append(json.loads(result.stdout))
     echo = subprocess.run(
         [
@@ -87,6 +114,7 @@ def measure_network(host: str, iperf_port: int, echo_port: int) -> dict[str, Any
         check=True,
         capture_output=True,
         text=True,
+        timeout=60,
     )
     forward, reverse = results
     return {
@@ -172,7 +200,7 @@ def main() -> None:
     plan = {
         "schema_version": 1,
         "block_id": args.block,
-        "policy_order": order,
+        "policy_order": list(order),
         "git_sha": subprocess.check_output(
             ["git", "rev-parse", "HEAD"], text=True
         ).strip(),
@@ -185,24 +213,27 @@ def main() -> None:
         "configured_added_rtt_ms": 2 * block["egress_delay_ms"],
     }
     plan_path = output / "plan.json"
-    if plan_path.exists() and json.loads(plan_path.read_text()) != plan:
-        raise RuntimeError("existing block plan differs; refusing to resume")
-    write_json(plan_path, plan)
+    save_plan(plan_path, plan)
     environment_path = output / "environment.json"
     if not environment_path.exists():
         write_json(environment_path, collect_environment())
-    pre_path = output / "network_pre.json"
-    if not pre_path.exists():
-        pre = measure_network(grid["cloud_host"], grid["iperf_port"], grid["echo_port"])
-        write_json(pre_path, pre)
-    else:
-        pre = json.loads(pre_path.read_text())
+    # Every restart needs live evidence. Preserve earlier evidence for audit.
+    live_pre = measure_network(
+        grid["cloud_host"], grid["iperf_port"], grid["echo_port"]
+    )
     verify_measurement(
-        pre,
+        live_pre,
         block["rate_mbps"],
         2 * block["egress_delay_ms"],
         grid["unshaped_echo_median_ms"],
     )
+    history = output / "network_preflights"
+    history.mkdir(exist_ok=True)
+    write_json(history / f"{datetime.now(UTC):%Y%m%dT%H%M%S%f}.json", live_pre)
+    pre_path = output / "network_pre.json"
+    if not pre_path.exists():
+        write_json(pre_path, live_pre)
+    pre = json.loads(pre_path.read_text())
     gpu_log = (output / "edge_gpu_samples.csv").open("a")
     try:
         monitor = subprocess.Popen(
@@ -241,12 +272,14 @@ def main() -> None:
                 "1",
                 "--repetitions",
                 "3",
+                "--max-consecutive-failures",
+                "3",
                 "--vision-device",
                 "cpu" if mode == "cloud" else "cuda:0",
                 "--text-device",
                 "cuda:0" if mode == "edge" else "cpu",
             ]
-            if run_dir.exists():
+            if prepare_run(run_dir):
                 command.append("--resume")
             print(
                 f"Starting {args.block} {mode}; log: {output / (mode + '.log')}",
@@ -263,8 +296,15 @@ def main() -> None:
             monitor.wait(timeout=5)
         gpu_log.close()
     post_path = output / "network_post.json"
-    post = measure_network(grid["cloud_host"], grid["iperf_port"], grid["echo_port"])
-    write_json(post_path, post)
+    # Once a profile is published its evidence must remain immutable, including
+    # a restart between profile publication and validation-report publication.
+    if (output / "profile").exists():
+        post = json.loads(post_path.read_text())
+    else:
+        post = measure_network(
+            grid["cloud_host"], grid["iperf_port"], grid["echo_port"]
+        )
+        write_json(post_path, post)
     verify_measurement(
         post,
         block["rate_mbps"],
@@ -299,11 +339,14 @@ def main() -> None:
     write_json(spec_path, profile_spec)
     profile_dir = output / "profile"
     if not profile_dir.exists():
-        summary = build_profile(
-            run_dirs=[output / mode for mode in ("edge", "cloud", "distributed")],
-            specification=spec_path,
-            output_dir=profile_dir,
-        )
+        with tempfile.TemporaryDirectory(prefix=".profile-", dir=output) as temporary:
+            staged = Path(temporary) / "profile"
+            summary = build_profile(
+                run_dirs=[output / mode for mode in ("edge", "cloud", "distributed")],
+                specification=spec_path,
+                output_dir=staged,
+            )
+            staged.rename(profile_dir)
     else:
         summary = json.loads((profile_dir / "summary.json").read_text())
         if summary["specification_sha256"] != digest(spec_path):
@@ -318,6 +361,24 @@ def main() -> None:
             "network_post_sha256": digest(post_path),
             "profile_sha256": digest(profile_dir / "profile.jsonl"),
             "edge_gpu_samples_sha256": digest(output / "edge_gpu_samples.csv"),
+            "artifact_hashes": {
+                str(path.relative_to(output)): digest(path)
+                for path in [
+                    output / "plan.json",
+                    output / "profile_specification.json",
+                    evidence_path,
+                    *(
+                        output / mode / name
+                        for mode in ("edge", "cloud", "distributed")
+                        for name in (
+                            "plan.json",
+                            "run_manifest.json",
+                            "requests.jsonl",
+                            "summary.json",
+                        )
+                    ),
+                ]
+            },
         },
     )
     print(json.dumps(summary, indent=2, sort_keys=True))

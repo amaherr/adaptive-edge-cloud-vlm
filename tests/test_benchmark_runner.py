@@ -125,7 +125,9 @@ def test_resume_rejects_mismatched_plan(tmp_path: Path) -> None:
         config=config,
         manifest=manifest,
         policy=IntermittentPolicy(),
-        run_manifest=create_run_manifest(config, {}),
+        run_manifest=create_run_manifest(
+            config, {}, dataset_manifest_sha256=manifest.sha256
+        ),
         run_dir=tmp_path / "run",
         warmups=0,
         repetitions=1,
@@ -134,3 +136,130 @@ def test_resume_rejects_mismatched_plan(tmp_path: Path) -> None:
     run_benchmark(**kwargs)
     with pytest.raises(ValueError, match="plan"):
         run_benchmark(**{**kwargs, "repetitions": 2}, resume=True)
+
+
+def test_resume_recovers_torn_append_but_rejects_committed_corruption(
+    tmp_path: Path,
+) -> None:
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"
+    )
+    manifest = load_frozen_manifest(_manifest(tmp_path))
+    policy = IntermittentPolicy()
+    kwargs = dict(
+        config=config,
+        manifest=manifest,
+        policy=policy,
+        run_manifest=create_run_manifest(
+            config, {}, dataset_manifest_sha256=manifest.sha256
+        ),
+        run_dir=tmp_path / "run",
+        warmups=0,
+        repetitions=1,
+        pipeline="synchronous",
+    )
+    run_benchmark(**kwargs)
+    path = tmp_path / "run/requests.jsonl"
+    rows = path.read_bytes().splitlines(keepends=True)
+    path.write_bytes(rows[0] + rows[1][:30])
+    run_benchmark(**kwargs, resume=True)
+    assert policy.calls == 3
+    assert len(path.read_text().splitlines()) == 2
+    backups = list(path.parent.glob("requests.torn-*.bin"))
+    assert len(backups) == 1 and backups[0].read_bytes() == rows[1][:30]
+    path.write_bytes(rows[0] + b"broken\n")
+    with pytest.raises(ValueError, match="invalid raw result line"):
+        run_benchmark(**kwargs, resume=True)
+
+
+def test_failure_circuit_breaker_saves_attempt_before_stopping(tmp_path: Path) -> None:
+    config = load_experiment_config(
+        ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"
+    )
+    manifest = load_frozen_manifest(_manifest(tmp_path))
+    policy = IntermittentPolicy()
+    kwargs = dict(
+        config=config,
+        manifest=manifest,
+        policy=policy,
+        run_manifest=create_run_manifest(
+            config, {}, dataset_manifest_sha256=manifest.sha256
+        ),
+        run_dir=tmp_path / "run",
+        warmups=0,
+        repetitions=2,
+        pipeline="synchronous",
+        max_consecutive_failures=1,
+    )
+    with pytest.raises(RuntimeError, match="attempts are saved"):
+        run_benchmark(**kwargs)
+    path = tmp_path / "run/requests.jsonl"
+    assert len(path.read_text().splitlines()) == 2
+    summary = run_benchmark(**kwargs, resume=True)
+    assert policy.calls == 4
+    assert summary["status_counts"] == {"ok": 3, "oom": 1}
+
+
+def test_sigkill_after_durable_attempt_resumes_without_duplicate(
+    tmp_path: Path,
+) -> None:
+    import os
+    import signal
+    import subprocess
+    import sys
+
+    manifest_path = _manifest(tmp_path)
+    script = tmp_path / "crash.py"
+    script.write_text("""
+import os
+import signal
+import sys
+from pathlib import Path
+from adaptive_vlm.artifacts import create_run_manifest
+from adaptive_vlm.benchmark import runner
+from adaptive_vlm.config import load_experiment_config
+from adaptive_vlm.data.manifest import load_frozen_manifest
+from adaptive_vlm.execution.local import LocalExecutionPolicy
+from adaptive_vlm.models.fake import FakeModelAdapter
+
+config = load_experiment_config(sys.argv[1])
+manifest = load_frozen_manifest(sys.argv[2])
+original_append = runner.append_jsonl
+if sys.argv[4] == "crash":
+    def append_and_die(path, row):
+        original_append(path, row)
+        os.kill(os.getpid(), signal.SIGKILL)
+    runner.append_jsonl = append_and_die
+runner.run_benchmark(
+    config=config, manifest=manifest,
+    policy=LocalExecutionPolicy(FakeModelAdapter()),
+    run_manifest=create_run_manifest(config, {},
+                                    dataset_manifest_sha256=manifest.sha256),
+    run_dir=Path(sys.argv[3]), warmups=1, repetitions=3,
+    pipeline="synchronous", resume=sys.argv[4] == "resume",
+)
+""")
+    directory = tmp_path / "killed-run"
+    command = [
+        sys.executable,
+        str(script),
+        str(ROOT / "configs/experiments/chunk6_fake_benchmark.yaml"),
+        str(manifest_path),
+        str(directory),
+    ]
+    environment = {**os.environ, "PYTHONPATH": str(ROOT / "src")}
+    result = subprocess.run(
+        [*command, "crash"], env=environment, capture_output=True, timeout=30
+    )
+    assert result.returncode == -signal.SIGKILL
+    path = directory / "requests.jsonl"
+    first = path.read_bytes()
+    assert len(first.splitlines()) == 1
+    result = subprocess.run(
+        [*command, "resume"], env=environment, capture_output=True, timeout=30
+    )
+    assert result.returncode == 0, result.stderr.decode()
+    assert path.read_bytes().startswith(first)
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    assert len(rows) == 7
+    assert len({row["trial_id"] for row in rows}) == 7

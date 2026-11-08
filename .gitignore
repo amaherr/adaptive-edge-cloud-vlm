@@ -57,6 +57,15 @@ cover/
 /data/raw/
 /data/cache/
 
+# Local infrastructure settings, provider caches, state and generated plans
+/infra/local/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+/infra/**/backend.local.tf
+/infra/**/terraform.tfvars
+
 # Translations
 *.mo
 *.pot

@@ -1,0 +1,12 @@
+[Unit]
+Description=Physical VLM independent TCP echo probe
+After=network-online.target
+
+[Service]
+WorkingDirectory=/REPLACE/absolute/repo/path
+ExecStart=/REPLACE/absolute/repo/path/.venv-model/bin/python -u scripts/tcp_rtt_probe.py server --bind-host 0.0.0.0 --port 5052
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -423,6 +423,8 @@ The [Phase 0 handoff](docs/phase0_handoff.md) records a fresh three-policy local
 
 The [Phase 1 handoff](docs/phase1_handoff.md) records a resident three-policy localhost campaign through the new manual dispatcher and dual-path server. All 36 request/configuration results completed, all 12 request triples matched, and each matched the Phase 0 edge tokens. The report includes the observed client and server memory footprint; it is not a dynamic scheduling or physical-host performance result.
 
+For the unattended 8,100-attempt physical campaign, use the [launch, monitoring and recovery runbook](docs/physical_unattended_campaign.md). It includes edge orchestration, cloud service templates, mandatory preflights and per-attempt resume.
+
 The [Phase 2 handoff](docs/phase2_handoff.md) documents per-stage timing and exact-byte instrumentation, the validated profile command, and a fresh local Moondream campaign. The local profile has 12/12 measured successes per configuration, 12/12 matching token triples, and zero negative accounting residuals. Its declared loopback condition is uncontrolled; the physical-host and controlled-network G2 checks remain pending.
 
 The [Phase 3 handoff](docs/phase3_handoff.md) records the frozen local predictor fit. On two held-out requests, per-configuration median latency APE was 2.87–4.89%, but the predictor's fastest-choice ranking was 0/2 versus 2/2 for the constant-median baseline. The local G3 ranking target failed; a controlled-network holdout and physical-host validation remain unavailable.
@@ -483,3 +485,108 @@ tests/                            CPU-safe tests and repository image fixtures
 artifacts/                         Generated run data (ignored; archive separately)
 .model-cache/                      Downloaded pinned model/cache (ignored)
 ~~~
+
+## Running the unattended physical campaign
+
+Use `scripts/run_physical_campaign.py` on the **edge laptop**. The full campaign runs nine controlled network blocks × three placements × 100 requests × three repetitions: **8,100 measured attempts**, plus 27 excluded warmups. It requires the cloud device for the cloud and distributed placements. **Edge-only inference needs no cloud device**, and can be tested now with the small local run below.
+
+### Test locally on the edge first
+
+From the repository root, run the software checks in the development environment:
+
+```bash
+.venv/bin/ruff check .
+.venv/bin/mypy
+.venv/bin/python -m pytest -q
+```
+
+Then use the model environment for a small **GPU edge-only** smoke run:
+
+```bash
+nvidia-smi
+.venv-model/bin/python -u scripts/run_physical_campaign.py edge-smoke --requests 3
+```
+
+This selects the first three real VQA requests from the physical manifest and performs **one excluded warmup plus three measured attempts**. It verifies the selected image hashes and pinned offline model artifacts, runs both vision and language stages on `cuda:0`, prints live progress and writes a timestamped log. It requires the local model cache and selected images, but **no cloud settings, SSH connection, server, probes or network shaping**. The experiment YAML's cloud address is unused with `--mode edge`.
+
+The default output directory is `artifacts/unattended/edge-smoke/`:
+
+| File | Purpose |
+| --- | --- |
+| `smoke.log` | Model-loading messages, request progress, errors and summary |
+| `requests_manifest.jsonl` | Frozen three-request subset with resolved image paths |
+| `run/requests.jsonl` | Durable per-attempt checkpoints, including any failures |
+| `run/summary.json` | Final measured counts, failure rate and timing statistics |
+| `run/plan.json`, `run/run_manifest.json` | Schedule, model/config/data hashes and environment provenance |
+
+A successful run ends with `Edge smoke passed: 3/3 measured attempts; checkpoints saved`. To monitor from another terminal or over SSH/Tailscale:
+
+```bash
+tail -F artifacts/unattended/edge-smoke/smoke.log
+```
+
+The smoke run stays in the foreground. If interrupted, repeat the same command to resume saved trial IDs. An already finished run checks its saved results without repeating completed inference attempts. For a fresh test, choose a new directory; changing the request count in an existing directory is rejected:
+
+```bash
+.venv-model/bin/python -u scripts/run_physical_campaign.py edge-smoke \
+  --requests 5 --smoke-dir artifacts/unattended/edge-smoke-five
+```
+
+One failed inference stops the smoke after preserving that attempt. Fix the cause and use a fresh smoke directory to test again; recorded failures are not erased or retried. These small runs test edge GPU inference, logging and checkpoint/resume. Their results stay separate from the full campaign and do **not** count toward its 8,100 attempts or validate the cloud/network setup.
+
+### Prepare and start the full campaign at university
+
+Follow the [university setup and recovery runbook](docs/physical_unattended_campaign.md) for cloud service templates, SSH/sudo permissions, LAN/WSL forwarding, Windows power settings and remote access. Both devices must use the same clean source commit, and their pinned model caches and required data must be available.
+
+Create the local settings file:
+
+```bash
+mkdir -p artifacts/unattended
+cp configs/campaigns/physical_unattended.example.json artifacts/unattended/settings.json
+```
+
+Edit `cloud_ssh`, `cloud_repo` and `cloud_python` for the actual cloud Linux/WSL environment. Check the interfaces and paths. If the university LAN addresses differ from the current experiment files, update the grid and experiment/smoke YAMLs consistently and sync the resulting commit to both hosts as described in the runbook.
+
+Run the two-device preflight while both machines are accessible:
+
+```bash
+.venv-model/bin/python scripts/run_physical_campaign.py preflight \
+  --settings artifacts/unattended/settings.json
+```
+
+This requires host/source/data checks, software tests with **zero skips**, cloud service readiness, and a separate GPU correctness campaign with matching outputs across all three placements. After it passes, start the detached campaign:
+
+```bash
+.venv-model/bin/python scripts/run_physical_campaign.py start \
+  --settings artifacts/unattended/settings.json
+```
+
+`start` repeats preflight before measured work, controls shaping on both hosts, and continues after the SSH session disconnects. Observe the first committed baseline requests before leaving the machines unattended.
+
+### Monitor, stop and resume
+
+From home, SSH into the edge laptop, enter the checkout, and use:
+
+```bash
+tail -F artifacts/phase2/physical-v1-unattended/campaign.log
+```
+
+Get current counts and supervisor status with:
+
+```bash
+.venv-model/bin/python scripts/run_physical_campaign.py status \
+  --settings artifacts/unattended/settings.json
+```
+
+The log and `status.json` report the active stage/block, saved attempts out of 8,100, percentage, status counts and a heartbeat every 30 seconds while child processes run. Detailed request logs live in each block's `edge.log`, `cloud.log` and `distributed.log`. Check `supervisor_running` and timestamps to distinguish a live process from stale status after a crash.
+
+To stop gracefully:
+
+```bash
+.venv-model/bin/python scripts/run_physical_campaign.py stop \
+  --settings artifacts/unattended/settings.json
+```
+
+The supervisor attempts to remove temporary shaping on both hosts. Inspect any `cleanup_errors`. After a failure or reboot, fix the cause, restore cloud services if necessary, and repeat **the same `start` command with the same settings and output directory**. Completed attempts remain saved; completed blocks are hash-checked before being skipped. Live network measurements are repeated for resumed work. Operational failures, stalled progress and three consecutive inference failures stop further baseline work instead of silently consuming the remaining schedule.
+
+Resume requires an operator relaunch after a crash/reboot; local checkpoints require the storage to remain intact. Preserve the complete artifact directory in a separate backup. `state=completed` requires all nine validated blocks and exactly 8,100 measured attempts; declaring scientific G2 complete still requires the final analysis and evidence review in the physical protocol.
