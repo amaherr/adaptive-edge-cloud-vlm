@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import runpy
 import subprocess
+import venv
 from pathlib import Path
 
 import pytest
@@ -158,3 +159,37 @@ def test_edge_smoke_runs_without_cloud_and_resumes_saved_trials(
     assert raw.read_bytes() == before
     with pytest.raises(ValueError, match="positive"):
         smoke(config, tmp_path, 0)
+
+
+def test_settings_preserve_virtual_environment_interpreters(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    environment = tmp_path / ".venv"
+    venv.EnvBuilder(symlinks=True).create(environment)
+    load_settings = MODULE["load_settings"]
+    monkeypatch.setitem(load_settings.__globals__, "ROOT", tmp_path)
+    monkeypatch.setitem(load_settings.__globals__, "checked", lambda command: "")
+    settings = {
+        "cloud_ssh": "cloud",
+        "cloud_repo": "/cloud/repo",
+        "cloud_python": "/cloud/repo/.venv/bin/python",
+        "cloud_interface": "eth0",
+        "stall_seconds": 900,
+        **{key: "unused" for key in (
+            "grid", "split", "config", "smoke_config", "output_root",
+            "artifact_manifest", "cache_dir",
+        )},
+        "python": ".venv/bin/python",
+        "test_python": ".venv/bin/python",
+        "adaptive_vlm": ".venv/bin/adaptive-vlm",
+    }
+    path = tmp_path / "settings.json"
+    path.write_text(json.dumps(settings))
+    loaded = load_settings(path)
+    for key in ("python", "test_python"):
+        executable = loaded[key]
+        assert executable == str(environment / "bin/python")
+        prefix = subprocess.check_output(
+            [executable, "-c", "import sys; print(sys.prefix)"], text=True
+        ).strip()
+        assert prefix == str(environment)

@@ -96,7 +96,14 @@ def load_settings(path: Path) -> dict[str, Any]:
         "artifact_manifest",
         "cache_dir",
     ):
-        settings[name] = str((ROOT / settings[name]).resolve())
+        path = ROOT / settings[name]
+        # Following a venv Python symlink selects the base interpreter and loses
+        # the environment's packages. Keep executable paths inside their venv.
+        settings[name] = (
+            os.path.abspath(path)
+            if name in ("python", "test_python", "adaptive_vlm")
+            else str(path.resolve())
+        )
     if float(settings["stall_seconds"]) < 180:
         raise ValueError("stall_seconds must be at least 180")
     output = Path(settings["output_root"])
