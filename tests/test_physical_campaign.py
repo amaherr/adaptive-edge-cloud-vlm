@@ -226,3 +226,23 @@ def test_host_memory_pressure_blocks_work_without_deleting_checkpoints(
         supervisor.check_host_memory(startup=True)
     monkeypatch.setitem(globals_, "host_available_ram_mib", lambda: 8192)
     supervisor.check_host_memory(startup=True)
+
+
+def test_model_memory_release_wait_is_bounded_and_keeps_threshold(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    supervisor = Supervisor(
+        {"output_root": str(tmp_path), "min_host_available_ram_mib": 6144}
+    )
+    globals_ = Supervisor.check_host_memory.__globals__
+    readings = iter([5300, 5700, 7200])
+    sleeps: list[int] = []
+    monkeypatch.setitem(globals_, "host_available_ram_mib", lambda: next(readings))
+    monkeypatch.setattr(globals_["time"], "sleep", sleeps.append)
+    supervisor.wait_for_memory_release()
+    assert sleeps == [5, 5]
+    sleeps.clear()
+    monkeypatch.setitem(globals_, "host_available_ram_mib", lambda: 5300)
+    with pytest.raises(RuntimeError, match="required 6144"):
+        supervisor.wait_for_memory_release()
+    assert sleeps == [5] * 6

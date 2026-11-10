@@ -367,6 +367,18 @@ class Supervisor:
                 f"required {minimum:.0f} MiB; free memory before resume"
             )
 
+    def wait_for_memory_release(self) -> None:
+        # WDDM can release a terminated model process's memory asynchronously.
+        for attempt in range(7):
+            try:
+                self.check_host_memory(startup=True)
+                return
+            except RuntimeError:
+                if attempt == 6:
+                    raise
+                log("Waiting for model memory release before campaign startup")
+                time.sleep(5)
+
     def run_child(self, command: list[str], *, stall: bool = False) -> None:
         self.child = subprocess.Popen(command, start_new_session=True)
         last_count = progress(self.output)["measured_attempts"]
@@ -750,7 +762,7 @@ class Supervisor:
             # A previous hard kill may have left this campaign's netem active.
             self.shaped = (self.output / "shaping_active.json").exists()
             self.smoke()
-            self.check_host_memory(startup=True)
+            self.wait_for_memory_release()
             if preflight_only:
                 terminal = "preflight_passed"
                 return
