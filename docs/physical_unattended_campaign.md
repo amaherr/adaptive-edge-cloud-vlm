@@ -4,6 +4,8 @@ This runs on the **edge laptop at university**, beside the physical cloud PC. Th
 
 The entry point is `scripts/run_physical_campaign.py`. It runs software/host checks and a separate three-placement GPU correctness campaign before any baseline work. It then applies each network setting to both Linux hosts, invokes the existing block runner, and requires its controlled profile gate to pass. A block failure stops the campaign. Completion means all nine profiles passed; scientific G2 closure still needs the aggregate report, official accuracy evaluation and reviewed cloud/edge memory evidence described in the existing physical protocol.
 
+The explicitly selected [heterogeneous-GPU correctness v2 protocol](physical_g2_heterogeneous_correctness_v2.md) keeps exact transport and same-device path checks, while auditing cross-GPU wording and requiring per-request score agreement. The original strict gate remains the default and historical reports stay unchanged.
+
 ## Test the edge without a cloud device
 
 Run `.venv-model/bin/python -u scripts/run_physical_campaign.py edge-smoke --requests 3` from the repository root. This runs one warmup and three real VQA requests locally on the edge GPU, logs progress to `artifacts/unattended/edge-smoke/smoke.log`, and saves resumable attempts under its `run/` directory. It needs no `--settings`, SSH, cloud server or shaping. Repeat the same command after an interruption to resume, or supply a new `--smoke-dir` for a fresh test. See the final README section for software checks and full usage. These diagnostic rows are separate from the 8,100-attempt baseline and do not validate cloud/network readiness.
@@ -54,7 +56,7 @@ Run the foreground preflight, while both devices are accessible:
   --settings artifacts/unattended/settings.json
 ```
 
-The checks require matching clean source commits, local and remote GPUs, passwordless shaping permissions, at least the configured free disk space on both hosts, all probe listeners, server health/model agreement, the frozen 100-image manifest and split, Ruff, mypy, and the **entire test suite with zero skipped tests**. Then all three policies run the correctness manifest with the pinned offline GPU model; every output token sequence and decoded text must agree. Smoke artifacts live under `preflights/`, outside the measured 8,100 rows. This must run on the actual hosts with sockets/GPU access; a sandbox-skipped socket test does not pass the launch gate.
+The checks require matching clean source commits, local and remote GPUs, passwordless shaping permissions, at least the configured free disk space on both hosts, all probe listeners, server health/model agreement, the frozen 100-image manifest and split, Ruff, mypy, and the **entire test suite with zero skipped tests**. Then all three policies run the correctness manifest with the pinned offline GPU model; the default strict protocol requires matching output tokens/text across placements; explicitly selected v2 instead checks each placement against its hash-bound reference, repeated outputs and per-request scores. Smoke artifacts live under `preflights/`, outside the measured 8,100 rows. This must run on the actual hosts with sockets/GPU access; a sandbox-skipped socket test does not pass the launch gate.
 
 Start the real campaign after that succeeds:
 

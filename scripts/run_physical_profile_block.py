@@ -6,8 +6,10 @@ import argparse
 import hashlib
 import itertools
 import json
+import os
 import random
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -17,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
+from adaptive_vlm.benchmark.heterogeneous import PROTOCOL, verify_reference_evidence
 from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.config import load_experiment_config, model_contract_fingerprint
 from adaptive_vlm.data.manifest import load_frozen_manifest
@@ -64,6 +67,12 @@ def check_edge_qdisc(interface: str, rate_mbps: float, delay_ms: float) -> str:
     output = subprocess.check_output(
         ["tc", "qdisc", "show", "dev", interface], text=True
     )
+    return check_qdisc_output(output, interface, rate_mbps, delay_ms)
+
+
+def check_qdisc_output(
+    output: str, interface: str, rate_mbps: float, delay_ms: float
+) -> str:
     first = output.splitlines()[0]
     rate = re.search(r"rate\s+([\d.]+)([KMG])bit", first)
     delay = re.search(r"delay\s+([\d.]+)(us|ms|s)", first)
@@ -175,6 +184,7 @@ def main() -> None:
     parser.add_argument(
         "--adaptive-vlm", type=Path, default=Path(".venv-model/bin/adaptive-vlm")
     )
+    parser.add_argument("--network-check-only", action="store_true")
     args = parser.parse_args()
     grid = json.loads(args.grid.read_text())
     if args.block not in grid["blocks"]:
@@ -194,6 +204,27 @@ def main() -> None:
     qdisc = check_edge_qdisc(
         grid["edge_interface"], block["rate_mbps"], block["egress_delay_ms"]
     )
+    protocol = grid.get("correctness_protocol", "strict-v1")
+    if protocol not in {"strict-v1", PROTOCOL}:
+        raise RuntimeError("unsupported correctness protocol")
+    reference_path: Path | None = None
+    reference_sha: str | None = None
+    if protocol == PROTOCOL:
+        reference_path = Path(grid["same_device_reference_evidence"]).resolve(
+            strict=True
+        )
+        reference_sha = digest(reference_path)
+        verify_reference_evidence(
+            reference_path,
+            reference_sha,
+            manifest,
+            split["model_contract_sha256"],
+            expected_devices={
+                host: config.to_dict()[host]["gpu"] for host in ("edge", "cloud")
+            },
+        )
+        if not grid.get("cloud_ssh") or not grid.get("cloud_interface"):
+            raise RuntimeError("v2 requires cloud SSH/interface for live queue checks")
     output = args.output_root / args.block
     output.mkdir(parents=True, exist_ok=True)
     order = policy_order(args.block, grid["policy_order_seed"])
@@ -208,10 +239,26 @@ def main() -> None:
         "split_sha256": digest(args.split),
         "grid_sha256": digest(args.grid),
         "model_contract_sha256": split["model_contract_sha256"],
-        "edge_qdisc": qdisc,
+        "edge_qdisc": {
+            "kind": "netem",
+            "interface": grid["edge_interface"],
+            "rate_mbps": block["rate_mbps"],
+            "egress_delay_ms": block["egress_delay_ms"],
+        },
+        "correctness_protocol": protocol,
+        "same_device_reference_evidence_sha256": reference_sha,
         "configured_rate_mbps": block["rate_mbps"],
         "configured_added_rtt_ms": 2 * block["egress_delay_ms"],
     }
+    snapshots = output / "qdisc_snapshots"
+    snapshots.mkdir(exist_ok=True)
+    write_json(
+        snapshots / f"{datetime.now(UTC):%Y%m%dT%H%M%S%f}.json",
+        {
+            "edge_qdisc": qdisc,
+            "phase": "block initialization",
+        },
+    )
     plan_path = output / "plan.json"
     save_plan(plan_path, plan)
     environment_path = output / "environment.json"
@@ -234,6 +281,11 @@ def main() -> None:
     if not pre_path.exists():
         write_json(pre_path, live_pre)
     pre = json.loads(pre_path.read_text())
+    if args.network_check_only:
+        print(
+            "Network/checkpoint preflight complete; no inference attempted", flush=True
+        )
+        return
     gpu_log = (output / "edge_gpu_samples.csv").open("a")
     try:
         monitor = subprocess.Popen(
@@ -251,6 +303,35 @@ def main() -> None:
         gpu_log.write("nvidia-smi unavailable\n")
     try:
         for mode in order:
+            live_queues = {
+                "edge_qdisc": check_edge_qdisc(
+                    grid["edge_interface"], block["rate_mbps"], block["egress_delay_ms"]
+                ),
+                "phase": f"before {mode}",
+            }
+            if protocol == PROTOCOL:
+                cloud_qdisc = subprocess.check_output(
+                    [
+                        "ssh",
+                        "-oBatchMode=yes",
+                        "-oConnectTimeout=10",
+                        grid["cloud_ssh"],
+                        shlex.join(
+                            ["tc", "qdisc", "show", "dev", grid["cloud_interface"]]
+                        ),
+                    ],
+                    text=True,
+                    timeout=30,
+                )
+                live_queues["cloud_qdisc"] = check_qdisc_output(
+                    cloud_qdisc,
+                    grid["cloud_interface"],
+                    block["rate_mbps"],
+                    block["egress_delay_ms"],
+                )
+            write_json(
+                snapshots / f"{datetime.now(UTC):%Y%m%dT%H%M%S%f}.json", live_queues
+            )
             run_dir = output / mode
             command = [
                 str(args.adaptive_vlm),
@@ -304,6 +385,15 @@ def main() -> None:
         post = measure_network(
             grid["cloud_host"], grid["iperf_port"], grid["echo_port"]
         )
+        post_history = output / "network_postflights"
+        post_history.mkdir(exist_ok=True)
+        write_json(post_history / f"{datetime.now(UTC):%Y%m%dT%H%M%S%f}.json", post)
+        verify_measurement(
+            post,
+            block["rate_mbps"],
+            2 * block["egress_delay_ms"],
+            grid["unshaped_echo_median_ms"],
+        )
         write_json(post_path, post)
     verify_measurement(
         post,
@@ -315,7 +405,9 @@ def main() -> None:
     write_json(evidence_path, {"pre": pre, "post": post})
     profile_spec = {
         "schema_version": 1,
-        "campaign_id": f"physical-vqa-v1-{args.block}",
+        "campaign_id": (
+            f"{grid.get('campaign_id_prefix', 'physical-vqa-v1')}-{args.block}"
+        ),
         "host_pair_id": "edge-rtx3050-cloud-rtx2070super-v1",
         "cloud_device": "cuda:0",
         "task_bucket": "vqa-short-answer-32-token-budget",
@@ -335,6 +427,13 @@ def main() -> None:
             "measurement_evidence_sha256": digest(evidence_path),
         },
     }
+    if protocol == PROTOCOL:
+        assert reference_path is not None
+        profile_spec.update(
+            correctness_protocol=protocol,
+            same_device_reference_evidence_path=os.path.relpath(reference_path, output),
+            same_device_reference_evidence_sha256=reference_sha,
+        )
     spec_path = output / "profile_specification.json"
     write_json(spec_path, profile_spec)
     profile_dir = output / "profile"

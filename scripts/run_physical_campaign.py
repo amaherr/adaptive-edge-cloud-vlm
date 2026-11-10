@@ -26,6 +26,11 @@ from xml.etree import ElementTree
 
 from adaptive_vlm.artifacts import write_json_atomic, write_jsonl_atomic
 from adaptive_vlm.benchmark.compare import compare_runs
+from adaptive_vlm.benchmark.heterogeneous import (
+    PROTOCOL,
+    evaluate_rows,
+    verify_reference_evidence,
+)
 from adaptive_vlm.config import load_experiment_config, model_contract_fingerprint
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
@@ -138,6 +143,37 @@ def progress(output: Path) -> dict[str, Any]:
     }
 
 
+def host_available_ram_mib() -> float:
+    """Read Windows host RAM on WSL, or Linux MemAvailable on native Linux."""
+    release = Path("/proc/sys/kernel/osrelease").read_text().lower()
+    if "microsoft" in release:
+        powershell = shutil.which("powershell.exe") or (
+            "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+        )
+        return float(
+            json.loads(
+                checked(
+                    [
+                        powershell,
+                        "-NoProfile",
+                        "-NonInteractive",
+                        "-Command",
+                        "[math]::Round((Get-CimInstance Win32_OperatingSystem)."
+                        "FreePhysicalMemory / 1024, 2) | ConvertTo-Json -Compress",
+                    ],
+                    timeout=20,
+                )
+            )
+        )
+    values = Path("/proc/meminfo").read_text().splitlines()
+    return (
+        float(
+            next(line.split()[1] for line in values if line.startswith("MemAvailable:"))
+        )
+        / 1024
+    )
+
+
 def validate_block(output: Path) -> dict[str, Any]:
     report = read(output / "validation_report.json")
     for name, key in (
@@ -162,6 +198,19 @@ def validate_block(output: Path) -> dict[str, Any]:
             raise ValueError(f"changed completed block input: {relative}")
     if not report.get("artifact_hashes"):
         raise ValueError(f"missing completed-block input hashes: {output}")
+    if summary.get("correctness_protocol") == PROTOCOL:
+        spec = read(output / "profile_specification.json")
+        plan = read(output / "edge/plan.json")
+        dataset = plan["config"]["dataset"]
+        frozen = load_frozen_manifest(
+            dataset["manifest_path"], expected_revision=dataset["revision"]
+        )
+        verify_reference_evidence(
+            (output / spec["same_device_reference_evidence_path"]).resolve(),
+            spec["same_device_reference_evidence_sha256"],
+            frozen,
+            plan["model_contract_sha256"],
+        )
     return report
 
 
@@ -281,6 +330,8 @@ class Supervisor:
         self.stage = "initializing"
         self.block: str | None = None
         self.shaped = False
+        self.reference_outputs: Any = None
+        self.available_host_ram_mib: float | None = None
 
     def status(self, state: str, **extra: Any) -> None:
         payload = {
@@ -289,6 +340,7 @@ class Supervisor:
             "state": state,
             "stage": self.stage,
             "block": self.block,
+            "available_host_ram_mib": self.available_host_ram_mib,
             **progress(self.output),
             **extra,
         }
@@ -298,6 +350,22 @@ class Supervisor:
             f"{payload['measured_attempts']}/8100 ({payload['percent']}%) "
             f"statuses={payload['status_counts']}"
         )
+
+    def check_host_memory(self, *, startup: bool = False) -> None:
+        key = (
+            "min_host_available_ram_mib"
+            if startup
+            else "min_runtime_host_available_ram_mib"
+        )
+        minimum = float(self.settings.get(key, 0))
+        if minimum <= 0:
+            return
+        self.available_host_ram_mib = host_available_ram_mib()
+        if self.available_host_ram_mib < minimum:
+            raise RuntimeError(
+                f"host RAM pressure: available {self.available_host_ram_mib:.0f} MiB, "
+                f"required {minimum:.0f} MiB; free memory before resume"
+            )
 
     def run_child(self, command: list[str], *, stall: bool = False) -> None:
         self.child = subprocess.Popen(command, start_new_session=True)
@@ -310,6 +378,7 @@ class Supervisor:
                     code = self.child.wait(timeout=30)
                     break
                 except subprocess.TimeoutExpired:
+                    self.check_host_memory()
                     self.status("running")
                     if not stall and monotonic() - started > 3600:
                         raise RuntimeError(
@@ -350,6 +419,7 @@ class Supervisor:
 
     def preflight(self) -> dict[str, Any]:
         s = self.settings
+        self.check_host_memory(startup=True)
         self.stage = "software and host preflight"
         self.status("preflight")
         for command in ("ssh", "tc", "sudo", "iperf3", "nvidia-smi"):
@@ -437,11 +507,54 @@ class Supervisor:
 
             with socket.create_connection((grid["cloud_host"], port), timeout=10):
                 pass
+        protocol = grid.get("correctness_protocol", "strict-v1")
+        reference_sha = None
+        if protocol == PROTOCOL:
+            reference_path = Path(grid["same_device_reference_evidence"]).resolve(
+                strict=True
+            )
+            reference_sha = sha(reference_path)
+            proof = verify_reference_evidence(
+                reference_path,
+                reference_sha,
+                manifest,
+                split["model_contract_sha256"],
+                expected_devices={
+                    host: config.to_dict()[host]["gpu"] for host in ("edge", "cloud")
+                },
+            )
+            self.reference_outputs = proof["_expected_outputs"]
+            pinned_runtime = read(reference_path)["runtime_versions"]
+            code = (
+                "import json; from adaptive_vlm.benchmark.heterogeneous "
+                "import runtime_versions; print(json.dumps(runtime_versions()))"
+            )
+            edge_runtime = json.loads(checked([s["python"], "-c", code]))
+            cloud_runtime = json.loads(ssh(s, [s["cloud_python"], "-c", code]))
+            if (
+                edge_runtime != pinned_runtime["edge"]
+                or cloud_runtime != pinned_runtime["cloud"]
+            ):
+                raise RuntimeError(
+                    "runtime versions differ from same-device reference evidence"
+                )
+        elif protocol != "strict-v1":
+            raise ValueError("unsupported correctness protocol")
+        if s.get("require_cloud_wsl_keepalive"):
+            release = ssh(s, ["uname", "-r"]).lower()
+            if "microsoft" in release:
+                sleepers = ssh(s, ["pgrep", "-a", "-x", "sleep"])
+                if not any(
+                    line.endswith("sleep infinity") for line in sleepers.splitlines()
+                ):
+                    raise RuntimeError(
+                        "keep the cloud WSL foreground sleep infinity open"
+                    )
         # Execute in separate processes: CPU tools need not exist in model venv.
         junit = self.output / "tests.xml"
         for arguments in (
             ["ruff", "check", "."],
-            ["mypy"],
+            ["mypy", "--cache-dir", str(self.output / "mypy_cache")],
             ["pytest", "-q", "-rs", f"--junitxml={junit}"],
         ):
             self.run_child([s["test_python"], "-m", *arguments])
@@ -449,6 +562,7 @@ class Supervisor:
             raise RuntimeError("preflight requires tests to pass without skips")
         contract = {
             "schema_version": 1,
+            "same_device_reference_evidence_sha256": reference_sha,
             "git_sha": commit,
             "settings": s,
             "dataset_manifest_sha256": manifest.sha256,
@@ -481,6 +595,7 @@ class Supervisor:
 
     def smoke(self) -> None:
         s = self.settings
+        protocol = read(Path(s["grid"])).get("correctness_protocol", "strict-v1")
         self.stage = "three-placement GPU correctness smoke"
         self.status("preflight")
         output = (
@@ -506,7 +621,7 @@ class Supervisor:
                     "--warmups",
                     "1",
                     "--repetitions",
-                    "1",
+                    "2" if protocol == PROTOCOL else "1",
                     "--max-consecutive-failures",
                     "1",
                     "--vision-device",
@@ -518,7 +633,30 @@ class Supervisor:
         report = compare_runs(
             [output / mode for mode in MODES], output=output / "comparison.json"
         )
-        if not report["complete_and_equal"]:
+        if protocol == PROTOCOL:
+            if self.reference_outputs is None:
+                raise RuntimeError("missing verified same-device reference proof")
+            config = load_experiment_config(s["smoke_config"])
+            manifest = load_frozen_manifest(
+                config.dataset.manifest_path, expected_revision=config.dataset.revision
+            )
+            assessment = evaluate_rows(
+                {
+                    mode: [
+                        json.loads(line)
+                        for line in (output / mode / "requests.jsonl")
+                        .read_text()
+                        .splitlines()
+                    ]
+                    for mode in MODES
+                },
+                manifest,
+                expected_outputs=self.reference_outputs,
+            )
+            write_json_atomic(output / "heterogeneous_correctness.json", assessment)
+            if not assessment["passed"]:
+                raise RuntimeError(f"GPU v2 correctness smoke failed: {output}")
+        elif not report["complete_and_equal"]:
             raise RuntimeError(f"GPU correctness smoke failed: {output}")
         log(f"GPU correctness smoke passed: {output}")
 
@@ -612,6 +750,7 @@ class Supervisor:
             # A previous hard kill may have left this campaign's netem active.
             self.shaped = (self.output / "shaping_active.json").exists()
             self.smoke()
+            self.check_host_memory(startup=True)
             if preflight_only:
                 terminal = "preflight_passed"
                 return

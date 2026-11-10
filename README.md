@@ -594,3 +594,33 @@ Resume requires an operator relaunch after a crash/reboot; local checkpoints req
 ### Timing readiness on WSL
 
 The full 100-request local GPU diagnostic passed without OOM, but exposed clock adjustments that distorted the old elapsed-time counter. Duration measurements now use Linux `CLOCK_MONOTONIC_RAW`, with the selected clock recorded in each run's environment. See the [timing findings and site checks](docs/timing_clock_v1.md). Use a fresh output directory after this timing revision; resume and profile conversion reject mixed clock metadata. Update both hosts to the same clean commit and restart the cloud GPU server before the university preflight. Verify Windows time synchronization there as well as the independent elapsed-time clock checks.
+
+### Current physical site: manual v2 launch
+
+The user-approved [heterogeneous-GPU correctness v2 criterion](docs/physical_g2_heterogeneous_correctness_v2.md) keeps exact transport and full same-GPU path checks, freezes each placement's reference outputs, and requires repeated outputs and per-request task scores to agree under that criterion. Cross-GPU wording differences remain reported. The original strict N3 pilot is preserved; no inference precision or kernels are changed.
+
+On the currently validated router/host pair, the ignored site configuration is `artifacts/unattended/site-preflight-20261110/launch_settings.json`. Its full same-device reference bundle must exist and pass validation before launch. It uses a **new** campaign output directory, preserving the pilot separately. Keep the cloud WSL console running `sleep infinity`, both hosts on AC, and unused memory-heavy apps closed. This site requires at least 6 GiB available host RAM at startup and monitors a 2 GiB runtime floor. The full edge placement uses WDDM shared memory; it is not classified as fitting in 4 GiB dedicated VRAM.
+
+Run a preflight without starting the 8,100 requests:
+
+```bash
+.venv-model/bin/python scripts/run_physical_campaign.py preflight \
+  --settings artifacts/unattended/site-preflight-20261110/launch_settings.json
+```
+
+After preflight passes, **start the full run yourself**:
+
+```bash
+.venv-model/bin/python scripts/run_physical_campaign.py start \
+  --settings artifacts/unattended/site-preflight-20261110/launch_settings.json
+```
+
+`start` detaches and repeats preflight before measured requests. The assistant does not launch this campaign. To inspect status or logs:
+
+```bash
+.venv-model/bin/python scripts/run_physical_campaign.py status \
+  --settings artifacts/unattended/site-preflight-20261110/launch_settings.json
+tail -F artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/campaign.log
+```
+
+Stop with the same settings and the `stop` action; resume by repeating the same `start` command after repairing the cause. Keep the settings, reference bundle, source revision and complete campaign artifacts intact. A changed router/address, model/runtime or protocol requires revalidation. The current native-runtime planning estimate is approximately **16.6 hours**, with a **14–22 hour** practical range, excluding outage/repair time.

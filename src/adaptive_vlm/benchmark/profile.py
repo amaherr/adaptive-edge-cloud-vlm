@@ -11,6 +11,11 @@ from statistics import median
 from typing import Any, cast
 
 from adaptive_vlm.artifacts import write_json_atomic
+from adaptive_vlm.benchmark.heterogeneous import (
+    PROTOCOL,
+    evaluate_rows,
+    verify_reference_evidence,
+)
 from adaptive_vlm.benchmark.runner import make_schedule
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.measurement import measure_call
@@ -118,6 +123,9 @@ def build_profile(
     spec = _read_json(specification)
     if spec.get("schema_version") != 1 or not spec.get("campaign_id"):
         raise ValueError("profile specification requires version 1 and campaign_id")
+    correctness_protocol = spec.get("correctness_protocol", "strict-v1")
+    if correctness_protocol not in {"strict-v1", PROTOCOL}:
+        raise ValueError("unsupported correctness protocol")
     network = spec["network_state"]
     if not isinstance(network.get("controlled"), bool):
         raise ValueError("network_state.controlled must be boolean")
@@ -466,6 +474,7 @@ def build_profile(
                 {
                     "schema_version": 1,
                     "campaign_id": spec["campaign_id"],
+                    "correctness_protocol": correctness_protocol,
                     "measured_at_utc": row.get("started_at_utc"),
                     "trial_id": row["trial_id"],
                     "request_id": row["request_id"],
@@ -548,12 +557,11 @@ def build_profile(
         and row["fields"]["stage_residual_ms"] < 0
         for row in rows_out
     )
-    local_passed = (
+    common_passed = (
         len(coverage) == 3
         and all(value["covered"] for value in coverage.values())
         and len(complete_triplets) >= 10
         and prompt_tokens_equal
-        and output_tokens_equal
         and negative_transport_residuals == 0
         and negative_stage_residuals == 0
         and all(
@@ -562,8 +570,38 @@ def build_profile(
             if row["status"] == "ok"
         )
     )
+    legacy_passed = common_passed and output_tokens_equal
+    correctness: dict[str, Any] = {}
+    local_passed = legacy_passed
+    if correctness_protocol == PROTOCOL:
+        evidence_name = spec.get("same_device_reference_evidence_path")
+        evidence_sha = spec.get("same_device_reference_evidence_sha256")
+        if not isinstance(evidence_name, str) or not isinstance(evidence_sha, str):
+            raise ValueError("heterogeneous correctness requires same-device evidence")
+        expected_devices = {
+            host: config[host]["gpu"]
+            for host in ("edge", "cloud")
+            if isinstance(config.get(host, {}).get("gpu"), str)
+        }
+        proof = verify_reference_evidence(
+            (specification.parent / evidence_name).resolve(strict=True),
+            evidence_sha,
+            frozen,
+            reference["model_contract_sha256"],
+            expected_devices=expected_devices,
+        )
+        correctness = evaluate_rows(
+            {plan["mode"]: rows for plan, _, rows in runs},
+            frozen,
+            expected_outputs=proof.pop("_expected_outputs"),
+        )
+        correctness["same_device_reference"] = proof
+        local_passed = common_passed and correctness["passed"]
     summary = {
         "schema_version": 1,
+        "correctness_protocol": correctness_protocol,
+        "legacy_strict_gate_passed": legacy_passed,
+        "heterogeneous_correctness": correctness,
         "campaign_id": spec["campaign_id"],
         "duration_clock": clocks[0],
         "specification_sha256": hashlib.sha256(specification.read_bytes()).hexdigest(),

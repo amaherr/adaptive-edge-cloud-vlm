@@ -175,10 +175,18 @@ def test_settings_preserve_virtual_environment_interpreters(
         "cloud_python": "/cloud/repo/.venv/bin/python",
         "cloud_interface": "eth0",
         "stall_seconds": 900,
-        **{key: "unused" for key in (
-            "grid", "split", "config", "smoke_config", "output_root",
-            "artifact_manifest", "cache_dir",
-        )},
+        **{
+            key: "unused"
+            for key in (
+                "grid",
+                "split",
+                "config",
+                "smoke_config",
+                "output_root",
+                "artifact_manifest",
+                "cache_dir",
+            )
+        },
         "python": ".venv/bin/python",
         "test_python": ".venv/bin/python",
         "adaptive_vlm": ".venv/bin/adaptive-vlm",
@@ -193,3 +201,28 @@ def test_settings_preserve_virtual_environment_interpreters(
             [executable, "-c", "import sys; print(sys.prefix)"], text=True
         ).strip()
         assert prefix == str(environment)
+
+
+def test_host_memory_pressure_blocks_work_without_deleting_checkpoints(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    supervisor = Supervisor(
+        {
+            "output_root": str(tmp_path),
+            "min_host_available_ram_mib": 6144,
+            "min_runtime_host_available_ram_mib": 2048,
+        }
+    )
+    journal = tmp_path / "requests.jsonl"
+    journal.write_text('{"saved":true}\n')
+    globals_ = Supervisor.check_host_memory.__globals__
+    monkeypatch.setitem(globals_, "host_available_ram_mib", lambda: 1024)
+    with pytest.raises(RuntimeError, match="host RAM pressure"):
+        supervisor.check_host_memory()
+    assert journal.read_text() == '{"saved":true}\n'
+    monkeypatch.setitem(globals_, "host_available_ram_mib", lambda: 4096)
+    supervisor.check_host_memory()
+    with pytest.raises(RuntimeError, match="required 6144"):
+        supervisor.check_host_memory(startup=True)
+    monkeypatch.setitem(globals_, "host_available_ram_mib", lambda: 8192)
+    supervisor.check_host_memory(startup=True)
