@@ -1,0 +1,1322 @@
+{
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/cloud/requests.jsonl": {
+    "sha256": "263301f795076cf10d29b0dd35bd8a675f978958086f65495c92330ae56ddf10",
+    "bytes": 678681
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/cloud/run_manifest.json": {
+    "sha256": "280907c4b221a4bb55ddfaae2b89313c77f12571360ca20a671fce6723290c61",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/cloud/summary.json": {
+    "sha256": "1b3dff27fe8e150cc4d48cd0cd173ccdc00fca443dfa8316b4527eb17e4bb0f2",
+    "bytes": 791
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/cloud.log": {
+    "sha256": "4faba4a02b1afb71a1b51571b17526127fbbfdd95412ccc908cdadfc97b5a88a",
+    "bytes": 16980
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/cloud_qdisc.json": {
+    "sha256": "568e71282ee63c429bd74265d590d1fa0435f6a2c199f936213837d77e7ea730",
+    "bytes": 2489
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/distributed/requests.jsonl": {
+    "sha256": "ac8edc6fc38916fa421df40fa40c9fb872823f251fc1d42952898346d72d882f",
+    "bytes": 904222
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/distributed/run_manifest.json": {
+    "sha256": "1a3c543913aadfca42fc323f224f26db4183f22b9d2fe6d2dc49c132f953091c",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/distributed/summary.json": {
+    "sha256": "3fd90d0d662586604e7cb990e180d19f8964396a6c8f28f6f0b5fcc8186d94f4",
+    "bytes": 787
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/distributed.log": {
+    "sha256": "2031551705f9391414abe6dd72f76ad726b59edd8d0a0e57eac8ca23a7ea5ab3",
+    "bytes": 18894
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/edge/requests.jsonl": {
+    "sha256": "3e0b2e2180eaa74034410be2fab5ef30bdae28477347dc12c615d7b8b09f80d2",
+    "bytes": 533431
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/edge/run_manifest.json": {
+    "sha256": "d7d9df2a8b146ad3b03710ca7a40908d65ea54aa38a3d88613189650210a8416",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/edge/summary.json": {
+    "sha256": "6e698a5a2c58f1e1046db31b4cee3274eef6ceda441b240bcd8ab1aace3246d3",
+    "bytes": 774
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/edge.log": {
+    "sha256": "33e419d5a3840c4c21586e1cd0cb38d5844aa27bc55cd0dd9cf263f57d4664bc",
+    "bytes": 16658
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/edge_gpu_samples.csv": {
+    "sha256": "9d2534f3a79b9cb05cded5875d11da6a78839a7edb63b096e0a1d42ec320e5af",
+    "bytes": 348637
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/environment.json": {
+    "sha256": "1caa79f65d63997349f5eee0ddb21d7880b73745c330eb18308463208c23a715",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/network_evidence.json": {
+    "sha256": "059b0cc241c6a5535dd56f45e8b86fe5f9e0abd6a65b01b52ce8844a6c44f1a0",
+    "bytes": 40302
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/network_post.json": {
+    "sha256": "54427aa76e3a45ffddfd743930902e399c759a2ccdd6908d4158c50955d0a967",
+    "bytes": 18692
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/network_postflights/20261110T164340751933.json": {
+    "sha256": "54427aa76e3a45ffddfd743930902e399c759a2ccdd6908d4158c50955d0a967",
+    "bytes": 18692
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/network_pre.json": {
+    "sha256": "56409589412383027c075d6c007511cfbb599314eed2b8fa86e996042297e5cb",
+    "bytes": 18718
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/network_preflights/20261110T141706242826.json": {
+    "sha256": "56409589412383027c075d6c007511cfbb599314eed2b8fa86e996042297e5cb",
+    "bytes": 18718
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/plan.json": {
+    "sha256": "77adb9e047ffc39772a5dbbe1b453a6c195b79ccafe69fec2fed80ae47d8b11d",
+    "bytes": 877
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/profile/profile.jsonl": {
+    "sha256": "4cae130bdd7e19c38f8ca5bfc4229e9ddfc84caa607ae5c0562b3c52f6a501b9",
+    "bytes": 4609498
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/profile/summary.json": {
+    "sha256": "3532dd8a88ac0bf4b2eb039963f08c5d7e5f757f047c4e70ccb3fecdd9b024c9",
+    "bytes": 3446
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/profile_specification.json": {
+    "sha256": "b5a3fed4cf21e06c9619a487e6f00faed0792ec474aff118c4cae8386b25c8d7",
+    "bytes": 882
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/qdisc_snapshots/20261110T141639747608.json": {
+    "sha256": "9188316306a2bdb801c21835b07fdf2482a1914e33468994246f1680c78f7a43",
+    "bytes": 123
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/qdisc_snapshots/20261110T141706817623.json": {
+    "sha256": "192282d564492027826104398ae1316b85236987e8b9c9f23f103025a7776394",
+    "bytes": 207
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/qdisc_snapshots/20261110T153100733606.json": {
+    "sha256": "1669e27791c65700dc20cbbf891c34ca075a014e42774916b333669354b579a3",
+    "bytes": 201
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/qdisc_snapshots/20261110T154555762745.json": {
+    "sha256": "7d2073be9e2fe2f137bde64d74611aecc0daf675c0f3002132cddfc3d6be8070",
+    "bytes": 200
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N1/validation_report.json": {
+    "sha256": "dab68e865dfb6fc51bab4c34ff0e17c688a56d1cc7f317b72f29df5f02c4151d",
+    "bytes": 5579
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/cloud/requests.jsonl": {
+    "sha256": "2d8149f7fc98263fa2b20fe7ab778878cb14fd08955d31548dd61724f4f4e7c1",
+    "bytes": 678895
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/cloud/run_manifest.json": {
+    "sha256": "b0a9d6730ee9efe3f6dc03d97ebb517e9f9c2d1052a5af59f50eaa84cda01314",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/cloud/summary.json": {
+    "sha256": "f1fea2c5619aa11b60a9e6cd55e3ccdc0a55f190b328600b454e73cee233ce91",
+    "bytes": 794
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/cloud.log": {
+    "sha256": "66546c89c9bbaf8d90e08dbc14d7f422f4042c385bf5fd7176224e1b7c0cbd96",
+    "bytes": 16983
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/cloud_qdisc.json": {
+    "sha256": "81e7d1bfb3ef89455f56399b88b06446764551df6d2b98a9bfaf147e5d932b60",
+    "bytes": 289
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/distributed/requests.jsonl": {
+    "sha256": "6425669a72d1e2c173ca143a26b8e9c74c4a7d2aaaec6e7fd106a8c6fa7c2134",
+    "bytes": 904072
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/distributed/run_manifest.json": {
+    "sha256": "d0f6565eae1157040bad2ceb853c9265d93951de4068c690ef3351790d70b382",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/distributed/summary.json": {
+    "sha256": "639147e08018832a4854679f243136f774ae5d3f0804a3e5df512baff3ed666e",
+    "bytes": 791
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/distributed.log": {
+    "sha256": "70b561e5c7738b3e9cce784623cfc031f67acac99fc2d6fbda84f19da28b09f4",
+    "bytes": 18898
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/edge/requests.jsonl": {
+    "sha256": "67530a838c4325c8830a87392d5598de48443a9400399bff7c24ebbf9cbd9cd8",
+    "bytes": 535274
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/edge/run_manifest.json": {
+    "sha256": "78d2e1e141e780fd8d14c5e9e04a92168731d802751c3ab7793df444bbf8b632",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/edge/summary.json": {
+    "sha256": "a298135e9e79de839de37c9cc14411ac67d3612cc66377c1b4cc4b724198e2cf",
+    "bytes": 773
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/edge.log": {
+    "sha256": "8578d882cc88dabffc477ef862feadb61a386c808c799f93e7233d0a7d5694a0",
+    "bytes": 16656
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/edge_gpu_samples.csv": {
+    "sha256": "012e0983efd5cb8121bf348d5cd96a8535baa91305f84b9fc369d5ebee58c01d",
+    "bytes": 262633
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/environment.json": {
+    "sha256": "6808bd02b8f2d7a141bd59112e7abbec3f3c11d5e4c898e6c280edfd95bdd08a",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/network_evidence.json": {
+    "sha256": "d31ef9c21991df71ee181b6a35787c81f2ed900901c69882db84f16cb452d4d0",
+    "bytes": 40244
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/network_post.json": {
+    "sha256": "05adc0e9ab8f8d17b0d9f893bab9b31423fdf47e567d5a2ca643797abfed15d4",
+    "bytes": 18696
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/network_postflights/20261110T183433513895.json": {
+    "sha256": "05adc0e9ab8f8d17b0d9f893bab9b31423fdf47e567d5a2ca643797abfed15d4",
+    "bytes": 18696
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/network_pre.json": {
+    "sha256": "f2da355f3268640e89fc4677b0ab81eea0667ac58bed84b21751ad41a5cd2157",
+    "bytes": 18656
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/network_preflights/20261110T164414226887.json": {
+    "sha256": "f2da355f3268640e89fc4677b0ab81eea0667ac58bed84b21751ad41a5cd2157",
+    "bytes": 18656
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/plan.json": {
+    "sha256": "5505b673d66db2476da3cd1eec72cd507fcc46d33d04f9b857cc984b37a7d870",
+    "bytes": 877
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/profile/profile.jsonl": {
+    "sha256": "e6d2f2d1c7402dee538b6de8fb93d1199edb5382d3debe8a1c142a741057448c",
+    "bytes": 4609813
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/profile/summary.json": {
+    "sha256": "1e47815d8672ca01260ed5d52d233b0f24a2eb5f144e31bb273f03e13b772456",
+    "bytes": 3433
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/profile_specification.json": {
+    "sha256": "ca38f243735097b35e1b56c2b2d6df6b9f4d70b41e5eb5b02589cf7ad93a6467",
+    "bytes": 879
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/qdisc_snapshots/20261110T164352172938.json": {
+    "sha256": "fa90184d174ff7025024120eaa3074ffbba82621ddfcde17d456faef7cdc00ca",
+    "bytes": 123
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/qdisc_snapshots/20261110T164414774249.json": {
+    "sha256": "e5c3a0758e95665f2c6f06b0a2952cc1a32f7224b0fb41f2d3b8d74ca48472d6",
+    "bytes": 201
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/qdisc_snapshots/20261110T165707582670.json": {
+    "sha256": "00863ac50947fc1dc4f59e26ec546ca773c23941c82f791d2832a1d0bae1f0c0",
+    "bytes": 207
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/qdisc_snapshots/20261110T173326072898.json": {
+    "sha256": "7ab1da5958489e6cd71cc9cdebc1590fd828f43f4c5efebc3aa8f33a033a08ab",
+    "bytes": 200
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N2/validation_report.json": {
+    "sha256": "1db372257605f8e956e3dd30ee6910aa57378bb6a61b0bd5a754f599fbf53f05",
+    "bytes": 5566
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/cloud/requests.jsonl": {
+    "sha256": "30e41f4981d05d4505e70e8145b8b79d280c8eac07f18263f4faf7882d9a036a",
+    "bytes": 678848
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/cloud/run_manifest.json": {
+    "sha256": "9fe122b58be68fc170501575ac4a09a305e4d6c8252094a63c0656dff4d3bfde",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/cloud/summary.json": {
+    "sha256": "1d1e22c92cd705201c78b970723887e70cb95ef8e0b5a0803f0c9b82bfb942bf",
+    "bytes": 791
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/cloud.log": {
+    "sha256": "c7aa8cc00eecc258019b41def8f968ff7ab32d77702c31a8dcb85936f83d1419",
+    "bytes": 16980
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/cloud_qdisc.json": {
+    "sha256": "5d69221d7a9bee95b15216879a0c9f0c6bd281aff939ba7ac4c393c5fe4380f3",
+    "bytes": 290
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/distributed/requests.jsonl": {
+    "sha256": "adc70cc532ccab7167e95710cdd38b05bab15c7ff3be838887b2133d5c05b274",
+    "bytes": 904664
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/distributed/run_manifest.json": {
+    "sha256": "51a14c91d0206909b4c06c37c130aa542d7040b782c2b42454d9f0120360ed1b",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/distributed/summary.json": {
+    "sha256": "a67d476e01c960ee18546e112210d906f300e74f60e6da522a32f7ce0fecb63c",
+    "bytes": 783
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/distributed.log": {
+    "sha256": "db531c6d8df7532bacb986486536f9bccaa2134de782e67316d3ed25d42b0d72",
+    "bytes": 18890
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/edge/requests.jsonl": {
+    "sha256": "8de60ff07d50f652b00db8fd826c41a2f667e097aaea9904ebb169df861ef2a9",
+    "bytes": 535242
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/edge/run_manifest.json": {
+    "sha256": "1cedc1326634b2f00e02cad7096407bd537a51b19f316ed6e8122b028f70f179",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/edge/summary.json": {
+    "sha256": "1ed9aaa73298957ee1774204dffc387e300ea1ef3a55c7ee4474864c9f25d895",
+    "bytes": 780
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/edge.log": {
+    "sha256": "440f37c174f11127a1125a41c3d64ac248b7612a231a56d8000fd054d7381fe7",
+    "bytes": 16663
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/edge_gpu_samples.csv": {
+    "sha256": "47ccc6df7a1278547a26aa42eb9f4e6aabade921278f2e6776ed7637463bca8f",
+    "bytes": 224393
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/environment.json": {
+    "sha256": "392f32a6d4c860833fbdd1427af3e3f5629b8bf1a2bf58930127ff533a6d2414",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/network_evidence.json": {
+    "sha256": "e5eab501664ecd5606839efc9ec5244b1605c48985d82be967e957da33a882f2",
+    "bytes": 40264
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/network_post.json": {
+    "sha256": "f3f2cda70ab550e03178b60449cc5e9672fd6e9615a7528891cb3fdb5ddb1638",
+    "bytes": 18678
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/network_postflights/20261110T200904492532.json": {
+    "sha256": "f3f2cda70ab550e03178b60449cc5e9672fd6e9615a7528891cb3fdb5ddb1638",
+    "bytes": 18678
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/network_pre.json": {
+    "sha256": "e1c0de791ec438d6dc8f78df5e3328d449a89f7d2aaf67a8601392ea32059d30",
+    "bytes": 18694
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/network_preflights/20261110T183506143508.json": {
+    "sha256": "e1c0de791ec438d6dc8f78df5e3328d449a89f7d2aaf67a8601392ea32059d30",
+    "bytes": 18694
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/plan.json": {
+    "sha256": "8b662a1e12dbb4094563b780c4da78a2555e0609aa54cdf9f9751b275a375357",
+    "bytes": 879
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/profile/profile.jsonl": {
+    "sha256": "2cf6cf906016590e691a4c75a4062a9b52d029bb6f9e6c825e0d194290ae0a06",
+    "bytes": 4609792
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/profile/summary.json": {
+    "sha256": "448e8fbe97d902d420384c6441c2b1abf22b5feb39f106178796fe2adeaa0942",
+    "bytes": 3432
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/profile_specification.json": {
+    "sha256": "edc579946ceec9304f0b8f69096a2872601561f31e5859ae84d26e80e46433a9",
+    "bytes": 878
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/qdisc_snapshots/20261110T183444039866.json": {
+    "sha256": "39f7821a4e99b8520e908753bf761bd09a6ead0cf670e07e517dbf0b65c2922e",
+    "bytes": 124
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/qdisc_snapshots/20261110T183506655289.json": {
+    "sha256": "684748f8d9722df160acc9a0b816611fd909ceb0648a8a0299f1474fdbe29edf",
+    "bytes": 203
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/qdisc_snapshots/20261110T184724220141.json": {
+    "sha256": "f7a8692a34f09694b1f601c3f6f51cf38d81d2187be689eeac5422a391e52325",
+    "bytes": 202
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/qdisc_snapshots/20261110T194450040619.json": {
+    "sha256": "125917f89c98cc2a124ee94ef9e4b2d8499e46ea9dbf08a59bb4c4f6c61409ac",
+    "bytes": 209
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N3/validation_report.json": {
+    "sha256": "f63d96a124ef121016145144525dbb48f4c98dba23e8aeb2dfb36027c2b778dd",
+    "bytes": 5565
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/cloud/requests.jsonl": {
+    "sha256": "b22839103a19f36a023f4a9f45f3688c669ef762c2d3018d65c6b42cb8fb7285",
+    "bytes": 679173
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/cloud/run_manifest.json": {
+    "sha256": "fca7ad5059a34330381687cc5ef22a4b52f57b0235f97af2a7e9d15fa4e00fd4",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/cloud/summary.json": {
+    "sha256": "c3b734fa8f897c801542099d104a0abc1971b1c1cfc6a38930fefc352725f3ee",
+    "bytes": 799
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/cloud.log": {
+    "sha256": "0efedad8cbce5196b35a74ee04dcf30cb5d3a8b9a47ccea4b016dde5e17d5a94",
+    "bytes": 16988
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/cloud_qdisc.json": {
+    "sha256": "52078038361cd1d187b8a1c8e4ee5fc3654ece17b0bac6e768e1485763e9ca4b",
+    "bytes": 292
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/distributed/requests.jsonl": {
+    "sha256": "96d3399f7517f58613c76e63efe036375fb0f18d3683b6ad5be9c7f0ce597af0",
+    "bytes": 904124
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/distributed/run_manifest.json": {
+    "sha256": "7baa9c0c22fed55ebc9280cc77e050987d1c3cb5afe77da4b09fe14279e8ee8a",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/distributed/summary.json": {
+    "sha256": "b467dab194c1a8bfdabf1bdc6ef3c67de86c0f482d74b9f1aad00cfe6137a5d6",
+    "bytes": 797
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/distributed.log": {
+    "sha256": "6d735e71f5e847fb6aa64992b2d7569061167d143cbaf54c33fab4896ff2172c",
+    "bytes": 18904
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/edge/requests.jsonl": {
+    "sha256": "e73946fce5c44670db4944e9e4643174ab85f344eeb2ec8fdbb05cdad1db1477",
+    "bytes": 535207
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/edge/run_manifest.json": {
+    "sha256": "f883278a40625bb838b373ce7af6f3dfc768733f74b43bd2a2bf8b59bde2b237",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/edge/summary.json": {
+    "sha256": "b8d9ff0278bf6427effcad66047f960674c83028ff7e7402d974d4a02e9d8317",
+    "bytes": 784
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/edge.log": {
+    "sha256": "570d834e3ec79cdec8e4eaa1f1c1f559561cd617d8b55d30ba3f1360dc9b7d4c",
+    "bytes": 16667
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/edge_gpu_samples.csv": {
+    "sha256": "fc22d7cecdc43ae8220984c12fa31447174b229d0ff321a1d2806c0c9320ab0f",
+    "bytes": 210120
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/environment.json": {
+    "sha256": "e699dbec148a937971d409e8b70109464bb8460f5df315574dbc757ac29d51c5",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/network_evidence.json": {
+    "sha256": "22dd62acec5d8f834535e46aac286948fd1c343e5b12e87aa72f7cec66413485",
+    "bytes": 40333
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/network_post.json": {
+    "sha256": "365bb7a090fdc94fd9e7d44c5e6360a0fa29f0bc7917315cb55db426aca49314",
+    "bytes": 18779
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/network_postflights/20261110T213738893992.json": {
+    "sha256": "365bb7a090fdc94fd9e7d44c5e6360a0fa29f0bc7917315cb55db426aca49314",
+    "bytes": 18779
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/network_pre.json": {
+    "sha256": "02ca3caf67095c4685120065786c2bd279a957653e32109287754f95eda9bda2",
+    "bytes": 18662
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/network_preflights/20261110T200935432250.json": {
+    "sha256": "02ca3caf67095c4685120065786c2bd279a957653e32109287754f95eda9bda2",
+    "bytes": 18662
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/plan.json": {
+    "sha256": "8e4b619dd761989351a20ff54e1a6cb56a151597f442059151fd7c40773aa9eb",
+    "bytes": 879
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/profile/profile.jsonl": {
+    "sha256": "2c30e25698f0f0479c942e00f24ab07a5a0adbcbf8a9ec6e6fe0c810efab2a6a",
+    "bytes": 4619453
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/profile/summary.json": {
+    "sha256": "7a4c2a258e4995489440cc6deb2352b7310cd5a48ef9aef726ff622a39ee2894",
+    "bytes": 3433
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/profile_specification.json": {
+    "sha256": "9e5bfa67249ca9799ae33dbb9482f5999e9dc0c252f7ddf24d337826189cd749",
+    "bytes": 889
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/qdisc_snapshots/20261110T200914767090.json": {
+    "sha256": "3efd97eddc76916711118bef197ac9dae30096abedd886956a6718d9034842bd",
+    "bytes": 124
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/qdisc_snapshots/20261110T200936023131.json": {
+    "sha256": "0b5e23a854a04dac214cfad7c919fe81e55e03bf2da8cee4269482ca8d9e9778",
+    "bytes": 209
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/qdisc_snapshots/20261110T202510207063.json": {
+    "sha256": "53fc6524a6faa87bb08f092c2e8a9b993409fa2f1fb8b671e528aacac0e98fe7",
+    "bytes": 202
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/qdisc_snapshots/20261110T212520888939.json": {
+    "sha256": "88806aee523de010a768873bc7acbafb392f1ae5d0aa888fb659da30d20de0a0",
+    "bytes": 203
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N4/validation_report.json": {
+    "sha256": "639277cafc368bf31ee3a4466eda0f317d6046a207c75ec9e7838c9409cec6ec",
+    "bytes": 5566
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/cloud/requests.jsonl": {
+    "sha256": "e0a090b85a17cc6b2db375755c49e89a99d392e50c5c6d74b6c417882cc476db",
+    "bytes": 678942
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/cloud/run_manifest.json": {
+    "sha256": "337638e397a60ae320e18c3549f26d6c2b11f1a5bf295d6ff2ffcc36ca81cf90",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/cloud/summary.json": {
+    "sha256": "6a42ee8088010bdf6cba14938449c406b9b0c528f6308272af47abb81f408ef9",
+    "bytes": 780
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/cloud.log": {
+    "sha256": "114b0435b47d953b9d55545283908673716dd11ccb7481a5d06d0266790fca22",
+    "bytes": 16969
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/cloud_qdisc.json": {
+    "sha256": "767886c5097ce97a5293f05cda70449e9fa4405858ca0c5b9911680090ea04ae",
+    "bytes": 292
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/distributed/requests.jsonl": {
+    "sha256": "fe6dbfabe9390aea408f8b957eaf6b8092026d27d9f8ec54d98b9ba9ca1e8a0f",
+    "bytes": 903328
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/distributed/run_manifest.json": {
+    "sha256": "8f34aad361f149a7bd7dbe83acf3909b4678d15e938e5d2c370dd15d2cc132e0",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/distributed/summary.json": {
+    "sha256": "9c5494cef1c499dfe46c2f83f0691daa2a2104560765b52a156cb8f3bbe3e1bc",
+    "bytes": 804
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/distributed.log": {
+    "sha256": "3e7a64bd2c0b1bf53b8bd1c7e473d5f795118cd895370acd9237bb9556300f04",
+    "bytes": 18912
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/edge/requests.jsonl": {
+    "sha256": "3f11b8d34222d7cac3ae8b55e015e4ab3b496e28f40e86492fda2bdd71be9e41",
+    "bytes": 532846
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/edge/run_manifest.json": {
+    "sha256": "e4dc612329a516b03926b4166b0dc8a70c5b42df08fb6f73f15899d5d7c4b99b",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/edge/summary.json": {
+    "sha256": "a3e82c447520ec750630c892f3b18a9475b501b54659b3d3689530a9a78bb9ac",
+    "bytes": 770
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/edge.log": {
+    "sha256": "b33cbb76a13baf9b04d18103d632d0e5e4c093fccfd8f65509efe2606f91a400",
+    "bytes": 16653
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/edge_gpu_samples.csv": {
+    "sha256": "5e5416a77e3948af51ff2415bb35c418ac65b3a307d6191752ca7251710a29e1",
+    "bytes": 201000
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/environment.json": {
+    "sha256": "8145ff2a0fb27f841ac61f1592927b6b746bce92c6e1d8a51a622d9009443ac4",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/network_evidence.json": {
+    "sha256": "4ba7df977de5e1e1572f6289160b93847b91b1d681d75c1ca4d45ab8c8da3240",
+    "bytes": 40312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/network_post.json": {
+    "sha256": "cc59537779915423e00ba5f60df2e659ef900c23a6a8c8efb5b43196f10933b0",
+    "bytes": 18724
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/network_postflights/20261110T230208044526.json": {
+    "sha256": "cc59537779915423e00ba5f60df2e659ef900c23a6a8c8efb5b43196f10933b0",
+    "bytes": 18724
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/network_pre.json": {
+    "sha256": "32304488e9dd372cae642662c59f2c7cfde6d9c37f004d44e04b5d8f2c889db6",
+    "bytes": 18696
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/network_preflights/20261110T213810855881.json": {
+    "sha256": "32304488e9dd372cae642662c59f2c7cfde6d9c37f004d44e04b5d8f2c889db6",
+    "bytes": 18696
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/plan.json": {
+    "sha256": "48174ecfb69567d727bfbf19784a9409cad0ebae58124ecbdaa51dfae7a2cf15",
+    "bytes": 879
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/profile/profile.jsonl": {
+    "sha256": "0ea8368a2b4376317a6e824aee0acb8cd182504f90ad6193ceba8f7baa0c0c8c",
+    "bytes": 4607217
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/profile/summary.json": {
+    "sha256": "763a4d7932cf082a38d73967095f838896b5a56980f050983e026467798837f3",
+    "bytes": 3446
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/profile_specification.json": {
+    "sha256": "f8a26dacc909d122da90778614636784b078582e5fd2ae26889add0971936f24",
+    "bytes": 881
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/qdisc_snapshots/20261110T213749567641.json": {
+    "sha256": "1ac140afe1b8849f57af4d8f55bae334377599545c8cd49ef98da81769d4c3b3",
+    "bytes": 124
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/qdisc_snapshots/20261110T213811376346.json": {
+    "sha256": "a474f5bc7dbdeefca7bc4cbc5d8eff43a3d7659ac3bbada5cdf9b37275a288b2",
+    "bytes": 202
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/qdisc_snapshots/20261110T223729214502.json": {
+    "sha256": "6ee17ab401be1cfbeaa17ca22d9f5e0ce95450be32dea886df33e7ed2bfbf419",
+    "bytes": 203
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/qdisc_snapshots/20261110T224931374715.json": {
+    "sha256": "1a45b5fb9e744cc497ab449ff29e483e390af18698869fd33e6946b59d3c0da1",
+    "bytes": 209
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N5/validation_report.json": {
+    "sha256": "731da80a3a91edfc44da884d39e29464589ee3184220c86e505b1abf5dda6fac",
+    "bytes": 5579
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/cloud/requests.jsonl": {
+    "sha256": "0c0966e24b6b5928597e1e876319621673f0e362f533bf301bf590b8669cb4d7",
+    "bytes": 679376
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/cloud/run_manifest.json": {
+    "sha256": "9274fcb08a5d1f053211e64d2607d9f82f0eea0c7fc1500004c0a5fef098ce8a",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/cloud/summary.json": {
+    "sha256": "b5defe79ac617c6ddf5269537c1fc6618bebdd18acd80e3c8f1b4f933659c07d",
+    "bytes": 791
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/cloud.log": {
+    "sha256": "7e8f579511e8c536b7c5eeb6ab4ffa49f74a2506804ac7e9c1d04217db18b2bb",
+    "bytes": 16980
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/cloud_qdisc.json": {
+    "sha256": "41cb3d1325b347340786cb1112d7f28c447cfe0d73a2aa8c35bf55e2877fff37",
+    "bytes": 293
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/distributed/requests.jsonl": {
+    "sha256": "821724b4d7a0a6351c8b6adf5198f005c37e9ff4ab55749cdc1f5da3bb4c4182",
+    "bytes": 902712
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/distributed/run_manifest.json": {
+    "sha256": "a0d721ec8f762d8c4cdf2f5bb43eb48b56f6bfc284cae3a1adb76c871de1d2c2",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/distributed/summary.json": {
+    "sha256": "8706c68711f5b66ba239f5cc5db495f41757f8f34cd76a0d49de8838b957a282",
+    "bytes": 797
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/distributed.log": {
+    "sha256": "5d50f186bff98d615dbb919056856dbc8496c68fede12c54209565a1a3ab62fc",
+    "bytes": 18904
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/edge/requests.jsonl": {
+    "sha256": "162b8b2f1002d728def70bbc287516d769feab7a09cc03bba44cd2bc4ac88814",
+    "bytes": 535243
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/edge/run_manifest.json": {
+    "sha256": "e216a498303797aa6a4a8ec969f9f153d654a643457599453711e4de48a33c32",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/edge/summary.json": {
+    "sha256": "4cca0d6db84e1016ece7d9711791646f93afd238bd8f6a1b432d61b4b509d95d",
+    "bytes": 774
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/edge.log": {
+    "sha256": "e82b85885cf1e1edfe50c000970c55cb9968a8915e042a6e4b0e29644e805f2d",
+    "bytes": 16657
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/edge_gpu_samples.csv": {
+    "sha256": "788d90ba83f2fb94b2aa4f4d5446d087a38fca54bab3f8169d3b4bed96e3b222",
+    "bytes": 199770
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/environment.json": {
+    "sha256": "a862859afa077267512fc5475e80e362a21d3e54bdb797da8e9ad62919126d70",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/network_evidence.json": {
+    "sha256": "72c82cee1168453e2528096817700cc4fb0ff81523bc6c7be97d53127c42141d",
+    "bytes": 40322
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/network_post.json": {
+    "sha256": "9a9224cb942d60dba60a76dd351c490c5dee8c87a36c61e08a4130d519391cb4",
+    "bytes": 18706
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/network_postflights/20261111T002623587469.json": {
+    "sha256": "9a9224cb942d60dba60a76dd351c490c5dee8c87a36c61e08a4130d519391cb4",
+    "bytes": 18706
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/network_pre.json": {
+    "sha256": "b5fff0cb0deb86eafac122c23937cc9622c4465ee5a2507fcbec7ca26aa6870a",
+    "bytes": 18724
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/network_preflights/20261110T230240698526.json": {
+    "sha256": "b5fff0cb0deb86eafac122c23937cc9622c4465ee5a2507fcbec7ca26aa6870a",
+    "bytes": 18724
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/plan.json": {
+    "sha256": "b2fba3b0c367d4310739b0f1aea36ac82a09bc4ca3b656fa8a1ab962a31c2d5b",
+    "bytes": 881
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/profile/profile.jsonl": {
+    "sha256": "f50e1d378b62613b1ea54252dca769a2453251143ebdc48eba007f8f4def0c23",
+    "bytes": 4615865
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/profile/summary.json": {
+    "sha256": "f01e9f9321d0435ba94a50e873c21c89bac10266de7eb0c63e44e6dbdf78301d",
+    "bytes": 3433
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/profile_specification.json": {
+    "sha256": "af4c81f327b78e4347f636763acaebfef26136d66ecfcd36a9b92a66a2755224",
+    "bytes": 886
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/qdisc_snapshots/20261110T230219676591.json": {
+    "sha256": "17cd382c2d1336d74d39fe46817a4275acfa771bbc7fea864a23321281d20751",
+    "bytes": 125
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/qdisc_snapshots/20261110T230241224406.json": {
+    "sha256": "38880051806d67041e95445eb965fb8ee30dc9188a69f5e7121c7eaebadf8f40",
+    "bytes": 204
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/qdisc_snapshots/20261111T000339694956.json": {
+    "sha256": "2f40d2c86b9ea0df2386b7ada3c60bec506bddda6016d99e91d4810132ee45c8",
+    "bytes": 211
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/qdisc_snapshots/20261111T001407415491.json": {
+    "sha256": "91e2382b50280c687607960b2aab1a4c304486091f43497df05944b9f1208f2e",
+    "bytes": 205
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N6/validation_report.json": {
+    "sha256": "8a53e8590354d1e83e397384e038d3817f6b66ecfcbccb18d27cc6bce8b4090d",
+    "bytes": 5566
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/cloud/requests.jsonl": {
+    "sha256": "ce351793478a63b78467d37275b98cab0ad0c6f76b7fed7c9c9f1255d3f6975c",
+    "bytes": 678731
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/cloud/run_manifest.json": {
+    "sha256": "b1dca123915539aba9c0c38913416e5e6bddaad8c42b71b9514a5edd5161e632",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/cloud/summary.json": {
+    "sha256": "53d8c5c20d2a2d397e9f7b449fb3edfe4f0217d30c5dd00b5db33c69291ed8b7",
+    "bytes": 786
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/cloud.log": {
+    "sha256": "c5d2562089130ef613000986b6a1ceb086dfbca4d5c06caf870af98678a458cc",
+    "bytes": 16975
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/cloud_qdisc.json": {
+    "sha256": "e0cf01d5bcf2402cab184fd7a8ec8f9edae68049daf630a4b5cee7539faf98c9",
+    "bytes": 295
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/distributed/requests.jsonl": {
+    "sha256": "4f1f29eeaeba1a3b2813865f29c5ab68cd8577b0709f37a26fee9cdbd381b16d",
+    "bytes": 903588
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/distributed/run_manifest.json": {
+    "sha256": "bfb9b239b4fdacce2b32268d82ba8a6ff760a7140e6c562a3372a6be6615066b",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/distributed/summary.json": {
+    "sha256": "627c5d8af0c47215edf1ed4c446280f07049e6bb9a6adb1625e8f3cba7175f1a",
+    "bytes": 783
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/distributed.log": {
+    "sha256": "6d0d6c00b4bedd1001318e4e49661e2d42e4069577b07e5fc686a98ee5049655",
+    "bytes": 18890
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/edge/requests.jsonl": {
+    "sha256": "1eb6a5440ddfb0ee3b644cdeddab636a08d778fd6137e7ae7ae98307d240cad3",
+    "bytes": 535277
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/edge/run_manifest.json": {
+    "sha256": "ba34e45e344f1d7e0b27ef028d87fa1a266ab071dc6f2bb5aece053e9b706a05",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/edge/summary.json": {
+    "sha256": "99684e1f0f5465901b86561bbd199cd7882d989015fb9eb4df6987774dfab0bb",
+    "bytes": 773
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/edge.log": {
+    "sha256": "c1d94396ca47f0ed4d134315c35f9366b3beffcbe13e757d10f1f9708c336c9c",
+    "bytes": 16656
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/edge_gpu_samples.csv": {
+    "sha256": "f5b637e6fe3cc0ea517a0d9252335ad616f45c3832b30663385f9d7fb0200752",
+    "bytes": 224876
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/environment.json": {
+    "sha256": "a94881980f46cfaa58b7accf65a4850a2da77c982569257762b4e316551fe13b",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/network_evidence.json": {
+    "sha256": "8a213dbb6085eaee10c26887d8e7af41a2b94106982585be7a01caff3b1ec87a",
+    "bytes": 40141
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/network_post.json": {
+    "sha256": "55983af89847f549126ab8ae9cc369d67cd6b21253859f5b8b005338f68c1226",
+    "bytes": 18575
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/network_postflights/20261111T020112532397.json": {
+    "sha256": "55983af89847f549126ab8ae9cc369d67cd6b21253859f5b8b005338f68c1226",
+    "bytes": 18575
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/network_pre.json": {
+    "sha256": "6d478255aff0b972a02e65c8155ae71da0e8fad2332d26223d386d3a4cfdcfb8",
+    "bytes": 18674
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/network_preflights/20261111T002654411000.json": {
+    "sha256": "6d478255aff0b972a02e65c8155ae71da0e8fad2332d26223d386d3a4cfdcfb8",
+    "bytes": 18674
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/plan.json": {
+    "sha256": "0240ec5d0f56f13b9be836a3c778c074a4bf95a5134d8fcbe2c1961a4149cbdf",
+    "bytes": 881
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/profile/profile.jsonl": {
+    "sha256": "db7765ede3e25d785201af0bca74ca0f8ed34327dbe1384c87d9d58d3900ccdb",
+    "bytes": 4614060
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/profile/summary.json": {
+    "sha256": "9bc7b28b3395edaf3c13dfbb48ae520b62eb4f0971822ea17a787ec2772419d2",
+    "bytes": 3433
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/profile_specification.json": {
+    "sha256": "9cd212647ed3944e174556d0c5e919a659f5abfef8819ec97443bb824da195dd",
+    "bytes": 885
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/qdisc_snapshots/20261111T002633952273.json": {
+    "sha256": "bfeac8195820c2b50ad31c6517e296ebfb6a49ba91089825891758a8a52228f7",
+    "bytes": 125
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/qdisc_snapshots/20261111T002654782840.json": {
+    "sha256": "ed4121912f2ab8aec3f9b5933e83c11aa0584d621d62eae148cac4fa25a3108d",
+    "bytes": 211
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/qdisc_snapshots/20261111T005028480990.json": {
+    "sha256": "ef58bbe7235cfd89c86ee5a2288312f8f9a9e58c5aae14f3b9a399fd5eacdd9f",
+    "bytes": 205
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/qdisc_snapshots/20261111T010237235318.json": {
+    "sha256": "521cb393709757d9e43a7860e5c7f22642686deeb75c064d3c31f6ab2717c139",
+    "bytes": 204
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N7/validation_report.json": {
+    "sha256": "8f5e8fe491cadbfd54e735421e94ebd09c09aa505fc24bee6b602ee8c2753ec8",
+    "bytes": 5566
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/cloud/requests.jsonl": {
+    "sha256": "292d82f4299189bb52fa509c61e99aa39d607a3a27a7620d3bc775786805ffcc",
+    "bytes": 679056
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/cloud/run_manifest.json": {
+    "sha256": "fe9c573eb9285ae74f18205a89c071d279ac6f6d1286f0f63d7a6b750a8eb234",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/cloud/summary.json": {
+    "sha256": "6ec08a601d4cb62d3bf6265bbd4d824e50f2472e63986d033a62fed862a994b8",
+    "bytes": 777
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/cloud.log": {
+    "sha256": "7e600c8ca373e6b3ac0f8e78443287f8acafb4c7497bcb7c8f7756d5c75732c1",
+    "bytes": 16966
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/cloud_qdisc.json": {
+    "sha256": "c664193a8c4b0ed92f720e2a9bb9392a7cabbb49c7f9e94c22932afcf2342322",
+    "bytes": 294
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/distributed/requests.jsonl": {
+    "sha256": "5930186d443a11ad1609985b093d713b16f4d299e436f3d8a829b97cfc031a1a",
+    "bytes": 903977
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/distributed/run_manifest.json": {
+    "sha256": "aa6ba6cf978be409905d502b66e03c9825e7d57e5b01ca4c4c26a6301edabb0b",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/distributed/summary.json": {
+    "sha256": "87e17c6440ec827a8dbcc7016a458cdc43e138f920aae8cb73a39e4705f18a1f",
+    "bytes": 787
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/distributed.log": {
+    "sha256": "51134521d3a6bb2d07466a7c8b63da0a4e303ca42b71c439effccf478a4bd860",
+    "bytes": 18894
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/edge/requests.jsonl": {
+    "sha256": "de11c47c26f56bdaf739d2feb002197555c0ecc9fbe78367107c1c9c8724c169",
+    "bytes": 535281
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/edge/run_manifest.json": {
+    "sha256": "39ac141b15e7d867cd236a48a03f662106e512730acbb7454fcf6f023b05e73a",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/edge/summary.json": {
+    "sha256": "c0b7ed93b930a3b105e6d6d492c0b3ee41351ed6290f1f253998af63143eb118",
+    "bytes": 772
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/edge.log": {
+    "sha256": "bad797abb963153abeeed8a763765c0e33bd7146ddbe288fe9491222d3b4e764",
+    "bytes": 16655
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/edge_gpu_samples.csv": {
+    "sha256": "81c5b95c6d02dfcbc0aca8b1df1a9b2ac74881be2a5fb110bf48d1af23f74f1e",
+    "bytes": 236514
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/environment.json": {
+    "sha256": "d90cb48436a4b7d8430c99eef58464f9c4e74c16475046486a8d173301ca7b17",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/network_evidence.json": {
+    "sha256": "83f3188d3f84a28eb75a6f9aa7ebfc75e238be5d6955733f177aba7b144e430a",
+    "bytes": 40285
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/network_post.json": {
+    "sha256": "d5ad894cfb96c226b18a1656b9a0ea25c8226da6aed6fe0aa85f287454b09ceb",
+    "bytes": 18702
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/network_postflights/20261111T033928749764.json": {
+    "sha256": "d5ad894cfb96c226b18a1656b9a0ea25c8226da6aed6fe0aa85f287454b09ceb",
+    "bytes": 18702
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/network_pre.json": {
+    "sha256": "34185fbc7e3fe37032472dd3ad7d268b08bbfb38bfa19e10f966a7508f246dc2",
+    "bytes": 18691
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/network_preflights/20261111T020145733278.json": {
+    "sha256": "34185fbc7e3fe37032472dd3ad7d268b08bbfb38bfa19e10f966a7508f246dc2",
+    "bytes": 18691
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/plan.json": {
+    "sha256": "0fcd6b36180136d8f379b71262b809efbe1327e03a85dfcf2d4ecaf0aa83a37d",
+    "bytes": 879
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/profile/profile.jsonl": {
+    "sha256": "cd9e47786edbb1f158f38f409cb7e6228a7efd8184095a37b235b033d15e660a",
+    "bytes": 4609119
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/profile/summary.json": {
+    "sha256": "79f7c0fba0df408e7a2cf50b14094a27d0ec73c59c7659f88ddd9f9dddae9275",
+    "bytes": 3433
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/profile_specification.json": {
+    "sha256": "5e1ff9e2bd89eec89011d050775cbc718ef2bdbef292f8ff1799c58218a8966e",
+    "bytes": 878
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/qdisc_snapshots/20261111T020123489023.json": {
+    "sha256": "39f69819b4efb6d6938af2b4b805f48c32611e4331683e921827d4fc1a7b55b5",
+    "bytes": 124
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/qdisc_snapshots/20261111T020146587202.json": {
+    "sha256": "e53835b31e401ad62ed4cc2342b2af6ad77e93d9a98d0d3391bb3b3876ff612a",
+    "bytes": 203
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/qdisc_snapshots/20261111T021424570643.json": {
+    "sha256": "83091fefc5d9eb521d61e9968a083c558a32b1d542397af5ff7efcdcc19c1cb5",
+    "bytes": 209
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/qdisc_snapshots/20261111T023827686889.json": {
+    "sha256": "ae36ba08eed83f561ce46bfeabc6ce9e803793e1265628503eaced4a56e65e07",
+    "bytes": 202
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N8/validation_report.json": {
+    "sha256": "a72c70cffa9c01fb788267df49b93be43377a03bc3bf21eddc7d6bada5fb0968",
+    "bytes": 5566
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/cloud/plan.json": {
+    "sha256": "583962d40dc78ba45cb4db071aebaed6f220ad7db1874279dd03b59bb1822dcb",
+    "bytes": 45139
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/cloud/requests.jsonl": {
+    "sha256": "fb11ccae2a63221dcc6f298155f9d75da040e1cb2bc3521de42354ee1ee478e1",
+    "bytes": 679106
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/cloud/run_manifest.json": {
+    "sha256": "9d12be4b22a7315b2f4dffac069bb4d624f62e7a76cfda9b60703a76b641dab1",
+    "bytes": 4307
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/cloud/summary.json": {
+    "sha256": "f2b8374c8a992f2f8e43db79e662dfafff1f96767ace84468cec93e75bba629b",
+    "bytes": 794
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/cloud.log": {
+    "sha256": "4e510c078d0ae226baecc9f747812f071245dacbe15d2e28f21ebb88b3c95e1a",
+    "bytes": 16983
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/cloud_qdisc.json": {
+    "sha256": "0f31f060ff2ca3b1d3ef5b08f2b5d339a740abf8af2492280f79a547fa79c10f",
+    "bytes": 292
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/distributed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/distributed/requests.jsonl": {
+    "sha256": "65a92a642abdd68a0e1e3ab323b9aab2faeeb78838bd209cde7c5778f79c8e8d",
+    "bytes": 904210
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/distributed/run_manifest.json": {
+    "sha256": "8e4df176b751078c63b5c5623c8fedc4095cbebfd42789ee70d10c6ca8c54528",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/distributed/summary.json": {
+    "sha256": "48296e3d5c9098c6cf7d129e21cc7e3235420dc19f89382cd3d58b5d1e3a33ad",
+    "bytes": 791
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/distributed.log": {
+    "sha256": "4526bc7fe54550d51c1e7b4a3c5dac893587c82f446b7cfecd661775c0b05c5f",
+    "bytes": 18898
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/edge/plan.json": {
+    "sha256": "167e4d2af2bfb13c328a4ce32661cc2749df0c7b64ea4e6f8ad72dc045cdd2d2",
+    "bytes": 45138
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/edge/requests.jsonl": {
+    "sha256": "34a44e6f7585c30fff95849106f01ec6fd58376cd781b2d3b73537ba0f91c4bb",
+    "bytes": 535291
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/edge/run_manifest.json": {
+    "sha256": "fcbed20ec01b805a98b4a43b80574c5c0f766c248a4e24639250eadf93e4a985",
+    "bytes": 4312
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/edge/summary.json": {
+    "sha256": "3096b373ffc7530c85c1f6ffe2c38dd3523d8aac7abf3c682d8046c17484e47b",
+    "bytes": 770
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/edge.log": {
+    "sha256": "6a823644f9cdf04ed39958eb9f51917196692bd6608f753caeb4df42c35e1ad5",
+    "bytes": 16653
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/edge_gpu_samples.csv": {
+    "sha256": "b577703c62e1ec75f1d21e286a87ced48af8a471744e611a716291732fce0aee",
+    "bytes": 240545
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/environment.json": {
+    "sha256": "a256abddd791a21b96c01bb8d932da6df123cdca195e3fa98dd021d502c26c99",
+    "bytes": 955
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/network_evidence.json": {
+    "sha256": "5eb63a96422af3ecb8876d35399ec28d4f5289351e92c5079245aa45335878ad",
+    "bytes": 40283
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/network_post.json": {
+    "sha256": "3393d545fb5b6dbf4ff8e9b2b7f22309d1f534de412362e709260510d22001dd",
+    "bytes": 18709
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/network_postflights/20261111T052049877388.json": {
+    "sha256": "3393d545fb5b6dbf4ff8e9b2b7f22309d1f534de412362e709260510d22001dd",
+    "bytes": 18709
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/network_pre.json": {
+    "sha256": "11a942ee8067a891b78929383b6b445ac438e788f57e96a8b7b017707db71d08",
+    "bytes": 18682
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/network_preflights/20261111T034005652774.json": {
+    "sha256": "11a942ee8067a891b78929383b6b445ac438e788f57e96a8b7b017707db71d08",
+    "bytes": 18682
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/plan.json": {
+    "sha256": "77dfb5e045632b2023385dbf461aa7bebae316859f6e6bde521d66a0e5afc08e",
+    "bytes": 880
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/profile/profile.jsonl": {
+    "sha256": "1560a8b21e2fa0da7ea02208b5e71cfdb9721a0f70b20280d876bb0a8fc4fe94",
+    "bytes": 4607671
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/profile/summary.json": {
+    "sha256": "e2dec849b474bc035ed37b89f63fd3648c5fbca2fd6035c8350b2d43545066dd",
+    "bytes": 3446
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/profile_specification.json": {
+    "sha256": "2345d33922ef91c6145fd95076d5eda66d211e221efb9d5577cb8a206f919587",
+    "bytes": 876
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/qdisc_snapshots/20261111T033941390151.json": {
+    "sha256": "618488ccd5857f2a1e6d9c7a1115101b858a7816b1973c9789990544d15ebba5",
+    "bytes": 124
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/qdisc_snapshots/20261111T034007080752.json": {
+    "sha256": "224876cec20850dbc2970eff60230bd30b4e210103a95ce80ad1ce596e9cbcab",
+    "bytes": 203
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/qdisc_snapshots/20261111T035333299681.json": {
+    "sha256": "31c721e87335ea4a7b2df57366bb98dc0299bade78c1604f3dddf874fe07276b",
+    "bytes": 202
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/qdisc_snapshots/20261111T045511744378.json": {
+    "sha256": "cda3f1bafecdbfebdbc17a5f8be4d8a394bb9df303acf9fa1ce2363fe6be8c32",
+    "bytes": 209
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/N9/validation_report.json": {
+    "sha256": "12fef4e7915b39e636ee8c856e18062f91f295f07be7de307e3b1c8192c384a6",
+    "bytes": 5579
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/campaign.log": {
+    "sha256": "d44429ff853dc86f1e48572bc8e8ba73132c082e9ab93e9819aa88dcb3a725b4",
+    "bytes": 232211
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/campaign_plan.json": {
+    "sha256": "63cca3d9dd0a51a424a7f19f90f3accadd2ca58245177d924b606f17e2c318b0",
+    "bytes": 2218
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/host_preflight.json": {
+    "sha256": "04c54ade24c8a06cf799bf6d25b42b899f8398dbc785c5ef6c64e8060f0f2cd0",
+    "bytes": 3686
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/cloud/plan.json": {
+    "sha256": "218d72ac8ba20f5b4ce58d3c74102b355fbf8c801aaac554c2b9fccdefda53d4",
+    "bytes": 4943
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/cloud/requests.jsonl": {
+    "sha256": "a04d1773b327129d83e90e689e007be3d7f95c906e154668affe51e158a0fd5a",
+    "bytes": 29505
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/cloud/run_manifest.json": {
+    "sha256": "fc8d4719ca0bce44e76fa259c2caaa55523ba7894e0560584af52d70ab4ff4f5",
+    "bytes": 4369
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/cloud/summary.json": {
+    "sha256": "0742071e5dd0d32e0631c47f3b380489d45e995b292db889fa9e218b6015cb64",
+    "bytes": 783
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/comparison.json": {
+    "sha256": "874826668309ec660235bdf6aa6d150eaa11b871d2aa55a5026bf127d6b78d6f",
+    "bytes": 21066
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/distributed/plan.json": {
+    "sha256": "06dc9ec8506bdddbe4354db60a966fe4329d8de9e02e36681e50033a0cf26c17",
+    "bytes": 4949
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/distributed/requests.jsonl": {
+    "sha256": "947460969f0645c9a3b0400a7fd97e582cdc9f2b2cce5c06ba26a60333ab65f0",
+    "bytes": 39068
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/distributed/run_manifest.json": {
+    "sha256": "9f178961c12377bd7640fdaa48130ea8ac42980f2e049c504b5f16fa0d545f13",
+    "bytes": 4378
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/distributed/summary.json": {
+    "sha256": "8c2c3b6b8dc483977d262c62f7f9601515363109c1029780e32695c4a84a9292",
+    "bytes": 789
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/edge/plan.json": {
+    "sha256": "67ceabcc6b8068a107c6266095d74c79d7d848e352a3f8c730dea6adaf49452c",
+    "bytes": 4942
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/edge/requests.jsonl": {
+    "sha256": "1c9d7e8e7f7ad0c326b55747fa9d6e193b01aa2cca5e445d622d982e2aa5c717",
+    "bytes": 22783
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/edge/run_manifest.json": {
+    "sha256": "66c4aa1fd8f41b4697591493df731807d41354204ea0d14ca3f3e73785f62163",
+    "bytes": 4374
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/edge/summary.json": {
+    "sha256": "88633521630699add472261ffecbd703912849830344932d22cfacbeb9c28757",
+    "bytes": 768
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/preflights/20261110T140949005613/heterogeneous_correctness.json": {
+    "sha256": "fb6a8ec630eb81d560917c2ad0afda482ff8c51dd74708787f11cc299062871a",
+    "bytes": 836
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/status.json": {
+    "sha256": "e27ea083494feb862985e7766af180b58fcbd3ecf43d4204f0288a1eda7a3c21",
+    "bytes": 415
+  },
+  "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/tests.xml": {
+    "sha256": "1eb8a07186937305c2c752cd6f87a680b0983b4dcc350630389640d83bf8acd5",
+    "bytes": 27715
+  },
+  "artifacts/unattended/site-preflight-20261110/completed_resume_verification.json": {
+    "sha256": "52baabf8ef99656d1ea50af5fffb6642a38507d5658a59192344a0679c9123a3",
+    "bytes": 1032
+  },
+  "artifacts/unattended/site-preflight-20261110/launch_network_grid_v2.json": {
+    "sha256": "4c158363759db883f10b593cdd606ffff7830492f391cb2592e923b98c62b954",
+    "bytes": 1282
+  },
+  "artifacts/unattended/site-preflight-20261110/launch_settings.json": {
+    "sha256": "b86f8b754d0f0854c39dac2f8c62aa77bab44cbc7351b8d2b182b8399d7da3b1",
+    "bytes": 1166
+  },
+  "artifacts/unattended/site-preflight-20261110/network_resume_verification_v2.json": {
+    "sha256": "9dbcc82873a22959d0b5dfc32bfe22b288f662c3567e36bddb7b785ad2d7e3b8",
+    "bytes": 242
+  },
+  "artifacts/unattended/site-preflight-20261110/numeric_requests/manifest.jsonl": {
+    "sha256": "f064f6aea5818616d2f365826f32122c556e49cba38003c39e445591f752c5d1",
+    "bytes": 2573
+  },
+  "artifacts/unattended/site-preflight-20261110/pilot_inputs/manifest.jsonl": {
+    "sha256": "b43bc21cca0f3eb27b0d8b1d97930c13f85d5991c71c2a4b30345a8a6f2a69c6",
+    "bytes": 46146
+  },
+  "artifacts/unattended/site-preflight-20261110/pilot_inputs/original_manifest.jsonl": {
+    "sha256": "4e62826280e49359e8cf98d85154000c1583d63474be83a2e9a429da9bde72c9",
+    "bytes": 41146
+  },
+  "artifacts/unattended/site-preflight-20261110/runtime_estimate.json": {
+    "sha256": "a6bc7e39097939a0edf26055458aa4ce6d8fbd55f561ca1cbadf2ca0103fc9c1",
+    "bytes": 4763
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/cloud/report.json": {
+    "sha256": "81b55f0c74dbc2dffa28434c948ed28ed812277de1b50c47dd701b8532f54949",
+    "bytes": 1026
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/cloud/requests.jsonl": {
+    "sha256": "f6381c0ce9fc8fed942d96b4b8682eba43366b9a2b29afe0a4983986c451061e",
+    "bytes": 234307
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/context/completed_resume_verification.json": {
+    "sha256": "52baabf8ef99656d1ea50af5fffb6642a38507d5658a59192344a0679c9123a3",
+    "bytes": 1032
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/context/pilot_quality_comparison.json": {
+    "sha256": "51f94f868d84d475c6cf0246373cab65a01bb5959dce3a1d544e14707aae8692",
+    "bytes": 151
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/context/preprocessing_comparison.json": {
+    "sha256": "d145d427b300041dd82cb94ebb872ae1edef286bba48cc3288ea365b508f3f9d",
+    "bytes": 328
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/context/runtime_cache_comparison.json": {
+    "sha256": "91d64c3bee3292685622b6fdd0f70c71ad302b425aec4a44a5cf21d6ae4eaa73",
+    "bytes": 392
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/edge/report.json": {
+    "sha256": "8f2a4fc5f94cdefc482c531c1acda356b6186a477ddaf047a049db87e021cad6",
+    "bytes": 1031
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/edge/requests.jsonl": {
+    "sha256": "89eba11bce9dc85c2e370c9db5d7f212ae3b97c3a88471ffe0deb6e4a64a94d3",
+    "bytes": 238211
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/index.json": {
+    "sha256": "a5480a674841a387b90f8fbaee20fb35358d638cff18fee21452825dfaa616db",
+    "bytes": 9869
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/mixed/plan.json": {
+    "sha256": "cd4f3578161549fa424b1933806651b905bc43f1e8b2883220818d583eb284f0",
+    "bytes": 45145
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/mixed/requests.jsonl": {
+    "sha256": "2dfae42de8815dab703ac08ab60d839e4949dfa4022140120a64cb5fecc62f04",
+    "bytes": 903705
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/mixed/run_manifest.json": {
+    "sha256": "9ab263f0e1f996abdeafbd1fe7a928bec2142933cdc3852b0c4c8dd3eed28944",
+    "bytes": 4316
+  },
+  "artifacts/unattended/site-preflight-20261110/same_device_reference/verify_same_device_vqa.py": {
+    "sha256": "44bc4237aa5c3d0da52a944bbac3138aef885ec1318d1296f7f6eb62a74d198a",
+    "bytes": 3808
+  },
+  "artifacts/unattended/site-preflight-20261110/site_vqa.yaml": {
+    "sha256": "d0c73733e4bf7ef18dcb6661dda85ccceef5bd5c22997299f89ff9b2129a1b28",
+    "bytes": 731
+  },
+  "artifacts/unattended/site-preflight-20261110/site_vqa_regression_v2.yaml": {
+    "sha256": "21d38142e963705a9a02fba305943844f38c6de6e52ce3a9bbcf4b456e5b76e9",
+    "bytes": 779
+  }
+}

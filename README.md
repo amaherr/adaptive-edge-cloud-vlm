@@ -595,6 +595,8 @@ Resume requires an operator relaunch after a crash/reboot; local checkpoints req
 
 The full 100-request local GPU diagnostic passed without OOM, but exposed clock adjustments that distorted the old elapsed-time counter. Duration measurements now use Linux `CLOCK_MONOTONIC_RAW`, with the selected clock recorded in each run's environment. See the [timing findings and site checks](docs/timing_clock_v1.md). Use a fresh output directory after this timing revision; resume and profile conversion reject mixed clock metadata. Update both hosts to the same clean commit and restart the cloud GPU server before the university preflight. Verify Windows time synchronization there as well as the independent elapsed-time clock checks.
 
+Completed run: [physical G2 results, 10–11 November 2026](results/physical-g2-20261110/README.md), including all 8,100 successful measured requests, summaries, and a checksum-verified evidence archive.
+
 ### Current physical site: manual v2 launch
 
 The user-approved [heterogeneous-GPU correctness v2 criterion](docs/physical_g2_heterogeneous_correctness_v2.md) keeps exact transport and full same-GPU path checks, freezes each placement's reference outputs, and requires repeated outputs and per-request task scores to agree under that criterion. Cross-GPU wording differences remain reported. The original strict N3 pilot is preserved; no inference precision or kernels are changed.

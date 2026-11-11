@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "campaign": "physical-g2-20261110",
+  "source_commit": "3c38be2a68d902dbbf286621a593832aa2149978",
+  "correctness_protocol": "physical-heterogeneous-v2",
+  "started_at_utc": "2026-11-10T14:08:49+00:00",
+  "completed_at_utc": "2026-11-11T05:20:58+00:00",
+  "elapsed_seconds_including_preflight": 54729.0,
+  "measured_requests": 8100,
+  "warmups": 27,
+  "status_counts": {
+    "ok": 8100
+  },
+  "cleanup_errors": [],
+  "blocks": [
+    {
+      "block": "N1",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    },
+    {
+      "block": "N2",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    },
+    {
+      "block": "N3",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    },
+    {
+      "block": "N4",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    },
+    {
+      "block": "N5",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    },
+    {
+      "block": "N6",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    },
+    {
+      "block": "N7",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    },
+    {
+      "block": "N8",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    },
+    {
+      "block": "N9",
+      "controlled_gate_passed": true,
+      "legacy_strict_gate_passed": false,
+      "cross_gpu_disagreement_request_count": 26
+    }
+  ],
+  "placements": {
+    "edge": {
+      "requests": 2700,
+      "successful": 2700,
+      "mean_latency_ms": 11524.76395494037,
+      "median_latency_ms": 13260.0847855,
+      "p95_latency_ms": 15026.8703026,
+      "mean_provisional_quality_score": 0.03
+    },
+    "cloud": {
+      "requests": 2700,
+      "successful": 2700,
+      "mean_latency_ms": 2444.199774690741,
+      "median_latency_ms": 2515.2645295,
+      "p95_latency_ms": 3165.7582300999993,
+      "mean_provisional_quality_score": 0.03
+    },
+    "distributed": {
+      "requests": 2700,
+      "successful": 2700,
+      "mean_latency_ms": 5118.782346167407,
+      "median_latency_ms": 4409.886816,
+      "p95_latency_ms": 14427.594615599999,
+      "mean_provisional_quality_score": 0.03
+    }
+  },
+  "quality_scope": "Frozen benchmark provisional VQA scoring; not an official VQA evaluation or general accuracy claim",
+  "byte_scope": "Application protocol frame bytes; excludes network stack headers, retransmissions, probes, SSH"
+}
