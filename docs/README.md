@@ -18,6 +18,7 @@ Start with the [project README](../README.md) for setup and usage. This folder h
 
 - [Roadmap](roadmap.md): the physical validation plan from repository cleanup to the final thesis matrix, with every gate.
 - [G2 v2 preparation](g2-v2-preparation.md): everything to finish off site and on site before the new unattended baseline run.
+- [G2 v2 protocol](protocols/g2-v2-protocol.md): the baseline's design; the prompt selection rule and dataset construction are frozen, and the rest is a draft until the pilot.
 - [Physical campaign runbook](runbooks/physical-campaign.md): launching, monitoring, stopping and resuming the unattended edge/cloud campaign.
 
 ## Physical testbed
