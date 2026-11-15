@@ -11,7 +11,8 @@ The original G2 ([results/physical-g2-20261110](../results/physical-g2-20261110/
 | W0 Source baseline | Done (`3bf33d8`, merged to `main`) |
 | W1 Protocol | Drafted: [g2-v2-protocol.md](protocols/g2-v2-protocol.md). Sections 3–4 are frozen and executed; the rest is frozen after W8 |
 | W2 Dataset and prompt | Done 15 November 2026: P1 selected ([calibration](../results/prompt-calibration-20261115/README.md)); 120-question manifest and split frozen |
-| W3–W9 | Not started |
+| W3 Interleaved runner | Done 15 November 2026: `interleaved-benchmark`, CUDA-failure exit and restart helper, core-dump guard, swap residency and free-VRAM preflight in the campaign scripts; checked on the real edge GPU |
+| W4–W9 | Not started |
 
 ## Why a new baseline
 
@@ -105,6 +106,19 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
 5. Write unit tests for order generation, state preparation, resume in the middle of an interleaved set, and record compatibility.
 
 *Done when* a fake-model interleaved run on loopback produces three per-placement run directories that `build_profile` accepts, and a kill-and-resume produces no duplicates or gaps.
+
+**Done (15 November 2026).**
+- `adaptive-vlm interleaved-benchmark` (`src/adaptive_vlm/benchmark/interleaved.py`) writes per-placement run directories with an `interleave` block. `build_profile` verifies that block by regenerating the order.
+- The fake adapter and `adaptive-server` now serve all three placements, so the full path runs over loopback in the test suite. That suite covers the profile check and kill-and-resume.
+- A local CUDA error records the attempt and exits with code 75. `run_with_device_restarts` resumes it; the v2 supervisor uses it in W6.
+- `disable_core_dumps()` is applied by the command and both campaign scripts.
+- `edge_residency` is a campaign setting, and preflight requires 3,400 MiB free VRAM for swap.
+- On the real RTX 3050:
+  - an edge-only run reproduced the P1 calibration answers exactly;
+  - alternating edge/full and distributed vision on one swap adapter kept the edge answers identical and the projected features bit-identical;
+  - the untimed preparation moved the switch cost (about 90 ms to vision, about 267 ms to text) out of the timed request;
+  - peak reserved memory was 3,184 MiB.
+- Not yet run: a real three-placement run with a cloud server, which needs the cloud PC (W8 pilot, on site).
 
 ### W4. Resource-state instrumentation (1 day)
 

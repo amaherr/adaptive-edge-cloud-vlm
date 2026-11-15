@@ -13,6 +13,7 @@
   "adaptive_vlm": ".venv-model/bin/adaptive-vlm",
   "artifact_manifest": "configs/model/moondream2_artifact.yaml",
   "cache_dir": ".model-cache",
+  "edge_residency": "resident",
   "min_free_gb": 10,
   "stall_seconds": 900
 }

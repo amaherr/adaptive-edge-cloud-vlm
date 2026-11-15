@@ -16,6 +16,10 @@ from adaptive_vlm.benchmark.heterogeneous_correctness import (
     evaluate_rows,
     verify_reference_evidence,
 )
+from adaptive_vlm.benchmark.interleaved import (
+    placement_schedule,
+    verify_interleave_parameters,
+)
 from adaptive_vlm.benchmark.runner import make_schedule
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.measurement import measure_call
@@ -173,8 +177,9 @@ def build_profile(
             "model_contract_sha256",
             "dataset_manifest_sha256",
             "schedule",
+            "interleave",
         ):
-            if plan[name] != reference[name]:
+            if plan.get(name) != reference.get(name):
                 raise ValueError(f"benchmark runs differ on {name}")
         if (plan["mode"], plan["pipeline"]) not in _CONFIGURATIONS:
             raise ValueError("unsupported configuration or pipeline")
@@ -188,6 +193,20 @@ def build_profile(
     if frozen.sha256 != reference["dataset_manifest_sha256"]:
         raise ValueError("frozen manifest hash differs from benchmark plan")
     planned = reference["schedule"]
+    interleave = reference.get("interleave")
+    if interleave is not None:
+        # Interleaved runs cover a recorded subset of request IDs and
+        # repetitions; verify against the order those parameters reproduce.
+        verify_interleave_parameters(interleave)
+        unknown = set(interleave["request_ids"]) - {
+            item.request_id for item in frozen.items
+        }
+        if unknown:
+            raise ValueError("interleaved request IDs are not in the frozen manifest")
+        if planned != placement_schedule(interleave):
+            raise ValueError("benchmark schedule differs from frozen interleaved order")
+        if {plan["mode"] for plan, _, _ in runs} != set(interleave["placements"]):
+            raise ValueError("interleaved profile must include every placement")
     warmups = sum(bool(trial["warmup"]) for trial in planned)
     repetitions = (
         max(
@@ -202,7 +221,9 @@ def build_profile(
         repetitions=repetitions,
         seed=int(config["runtime"]["seed"]),
     )
-    if planned != [trial.to_dict() for trial in expected_schedule]:
+    if interleave is None and planned != [
+        trial.to_dict() for trial in expected_schedule
+    ]:
         raise ValueError("benchmark schedule differs from frozen seeded schedule")
     items = {item.request_id: item for item in frozen.items}
     rows_out: list[dict[str, Any]] = []

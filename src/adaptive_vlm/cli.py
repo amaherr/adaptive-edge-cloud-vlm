@@ -20,6 +20,10 @@ from adaptive_vlm.commands import (
 from adaptive_vlm.commands import (
     config as config_commands,
 )
+from adaptive_vlm.commands.interleaved import (
+    add_interleaved_parser,
+    run_interleaved_benchmark_command,
+)
 from adaptive_vlm.config import ConfigError, ExecutionMode
 from adaptive_vlm.models.moondream.residency import WEIGHT_RESIDENCIES
 from adaptive_vlm.scheduler.configuration import ConfigurationId
@@ -95,6 +99,8 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_parser.add_argument("--resume", action="store_true")
     benchmark_parser.add_argument("--max-consecutive-failures", type=int, default=0)
     benchmark_parser.add_argument("-v", "--verbose", action="store_true")
+
+    add_interleaved_parser(subcommands, _add_edge_residency_argument)
 
     import_parser = subcommands.add_parser(
         "import-vqa-v2", help="Freeze a seeded VQA v2 val2014 subset"
@@ -361,6 +367,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return evaluate.run_network_trace_command(args)
         if args.command == "benchmark":
             return benchmark.run_fixed_benchmark_command(args)
+        if args.command == "interleaved-benchmark":
+            return run_interleaved_benchmark_command(args)
         if args.command == "import-vqa-v2":
             return vqa.run_vqa_import_command(args)
         if args.command == "config":

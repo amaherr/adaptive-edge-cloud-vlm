@@ -138,3 +138,40 @@ def _parse_int(value: str) -> int | None:
     except ValueError:
         return None
 
+
+# The swap-residency peak measured on the RTX 3050 edge was 3,164 MiB reserved;
+# require that plus a margin free before an unattended run starts.
+SWAP_RESIDENCY_MIN_FREE_VRAM_MIB = 3_400
+
+
+def disable_core_dumps() -> bool:
+    """Stop this process and its children from writing core dumps.
+
+    WSL pipes core dumps to its own crash collector, which ignores a limit of
+    0 and wrote a 5.4 GB dump of a crashed benchmark to the Windows system
+    drive. The kernel skips piped core dumps when the limit is exactly 1.
+    Returns False where resource limits are unavailable (Windows).
+    """
+
+    try:
+        import resource
+    except ImportError:
+        return False
+    resource.setrlimit(resource.RLIMIT_CORE, (1, 1))
+    return True
+
+
+def gpu_free_memory_mib(index: int = 0) -> int | None:
+    """Free memory on one NVIDIA GPU as reported by nvidia-smi, if available."""
+
+    result = _run(
+        [
+            "nvidia-smi",
+            f"--id={index}",
+            "--query-gpu=memory.free",
+            "--format=csv,noheader,nounits",
+        ]
+    )
+    if result is None or result.returncode != 0:
+        return None
+    return _parse_int(result.stdout.strip())

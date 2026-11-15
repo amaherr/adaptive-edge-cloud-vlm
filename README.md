@@ -252,6 +252,13 @@ Start with the [real shared configuration](configs/experiments/local_campaign.ya
 
 Choose **fresh** run directories; an existing directory is refused unless `--resume` is given with the same arguments, config, manifest, and plan. The benchmark records individual failures but may still exit successfully after completing the schedule; inspect `status_counts`/`failure_rate`. Likewise, inspect `compare-runs`'s `complete_and_equal` field rather than relying only on its exit code.
 
+**Interleaved placements (G2 v2).** `interleaved-benchmark` runs every placement for each request back to back, in a seeded random order, so slow drift affects all placements alike. One edge model serves edge/full and the vision half of distributed. Before each timed request, the needed stage is activated outside the timer and its cost recorded as `stage_prepare_ms`. Each placement gets its own run directory under `--run-dir` that `profile-runs` accepts; the global order is in `interleave.json`. If the local CUDA context fails, the command records the attempt and exits with code 75 so a supervisor can resume with `--resume`. Core dumps are disabled.
+
+~~~bash
+# Start adaptive-server (fake or Moondream) first; then:
+.venv-model/bin/adaptive-vlm interleaved-benchmark   --config configs/experiments/physical_vqa_v2.yaml   --run-dir artifacts/example-interleaved   --split configs/evaluation/physical_vqa_split_v2.json --split-name training   --order-seed 5113 --repetition-indices 0   --artifact-manifest configs/model/moondream2_artifact.yaml   --cache-dir .model-cache --offline --edge-residency swap
+~~~
+
 For a fast 100-request storage/scheduling run without Moondream, use `fake_benchmark.yaml`, `--mode edge`, `--manifest data/manifests/benchmark_fixture.jsonl`, `--warmups 10`, and `--repetitions 1`. That fixture has no task-quality references.
 
 ### Phase 2 profiling
@@ -389,6 +396,7 @@ The parser and command routing live in `cli.py`; command execution lives in [`co
 | `distributed-server` | `--config PATH --artifact-manifest PATH` | `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST`, `-v/--verbose`. |
 | `distributed-infer` | `--config PATH --artifact-manifest PATH --image PATH --prompt TEXT` | `--cache-dir` (`.model-cache`), `--request-id` (`distributed-0001`), `--vision-device` (`cpu`), `--pipeline` (`synchronous` or `prompt_first`), `--offline`, `--output-dir PATH`, `-v/--verbose`. |
 | `benchmark` | `--config PATH --mode edge|cloud|distributed --run-dir PATH` | `--manifest PATH` (config dataset path), `--artifact-manifest PATH` (required for real edge/distributed), `--cache-dir` (`.model-cache`), `--vision-device` (`cpu`), `--text-device` (`cpu`), `--offline`, `--warmups N` and `--repetitions N` (config values), `--pipeline` (`synchronous` or `prompt_first`), `--resume`, `-v/--verbose`. |
+| `interleaved-benchmark` | `--config PATH --run-dir PATH --order-seed N` | `--split PATH --split-name NAME` (default: all manifest IDs), `--placements` (all three), `--repetition-indices N…` (all configured), `--warmups N` (config), `--edge-device` (`cuda:0`), `--edge-residency` (`resident` or `swap`), `--artifact-manifest PATH`, `--cache-dir`, `--offline`, `--resume`, `--max-consecutive-failures N`. Exit code 75 means the local CUDA context failed; resume. |
 | `compare-runs` | At least two `RUN_DIR` paths | `--output PATH` saves comparison JSON; comparison is always printed. |
 | `profile-runs` | Completed matching `RUN_DIR` paths | `--specification PATH --output-dir PATH`; validates raw trials, hashes and coverage and writes versioned profile rows. |
 | `calibrate-predictor` | `--profile PATH --split PATH --output-dir PATH` | Fits only frozen training rows and writes a calibration, held-out evaluation and per-trial predictions. |
@@ -397,7 +405,7 @@ The parser and command routing live in `cli.py`; command execution lives in [`co
 | `analyze-adaptive` | `ADAPTIVE_RUN_DIR EDGE_DIR CLOUD_DIR DISTRIBUTED_DIR` | Matches each choice to a fixed control and audits tokens, placement, wire bytes, and decisions. |
 | `replay-network-trace` | `--calibration PATH --trace PATH --output-dir PATH` | Replays frozen bandwidth/RTT/health states through the predictor and selector; reports switches and safety. |
 | `analyze-monitor` | `RUN_DIR --output PATH` | Audits live probe timestamps, age, fail-closed decisions, passive updates, and monitor overhead. |
-| `import-vqa-v2` | `--questions PATH --annotations PATH --images-dir PATH --output PATH --revision LABEL` | `--count N` (100), `--seed N` (42). |
+| `import-vqa-v2` | `--questions PATH --annotations PATH --images-dir PATH --output PATH --revision LABEL` | `--count N` (100), `--seed N` (42), `--candidates PATH` (frozen candidate order), `--two-crop-count N`, `--prompt-template TEXT`. |
 | `analyze-thesis` | `--specification PATH --adaptive-run DIR --fixed-runs EDGE_DIR CLOUD_DIR DISTRIBUTED_DIR --output-dir DIR` | Split-safe paired analysis with raw trial table and input hashes. |
 | `prepare-vqa-eval-subset` | `--manifest PATH --questions PATH --annotations PATH --output-dir DIR` | Writes official-schema question/annotation files for exactly the frozen IDs. |
 | `export-vqa-predictions` | `--manifest PATH --run-dir DIR --output PATH` | `--repetition N` (0); writes official-format answers and provenance. |

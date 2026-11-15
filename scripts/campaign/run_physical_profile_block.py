@@ -26,7 +26,8 @@ from adaptive_vlm.benchmark.heterogeneous_correctness import (
 from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.config import load_experiment_config, model_contract_fingerprint
 from adaptive_vlm.data.manifest import load_frozen_manifest
-from adaptive_vlm.environment import collect_environment
+from adaptive_vlm.environment import collect_environment, disable_core_dumps
+from adaptive_vlm.models.moondream.residency import WEIGHT_RESIDENCIES
 
 
 def digest(path: Path) -> str:
@@ -188,7 +189,11 @@ def main() -> None:
         "--adaptive-vlm", type=Path, default=Path(".venv-model/bin/adaptive-vlm")
     )
     parser.add_argument("--network-check-only", action="store_true")
+    parser.add_argument(
+        "--edge-residency", choices=WEIGHT_RESIDENCIES, default="resident"
+    )
     args = parser.parse_args()
+    disable_core_dumps()
     grid = json.loads(args.grid.read_text())
     if args.block not in grid["blocks"]:
         parser.error(f"unknown block: {args.block}")
@@ -253,6 +258,9 @@ def main() -> None:
         "configured_rate_mbps": block["rate_mbps"],
         "configured_added_rtt_ms": 2 * block["egress_delay_ms"],
     }
+    if args.edge_residency != "resident":
+        # Recorded only when non-default so G2 v1 block plans resume unchanged.
+        plan["edge_residency"] = args.edge_residency
     snapshots = output / "qdisc_snapshots"
     snapshots.mkdir(exist_ok=True)
     write_json(
@@ -363,6 +371,8 @@ def main() -> None:
                 "--text-device",
                 "cuda:0" if mode == "edge" else "cpu",
             ]
+            if mode == "edge":
+                command += ["--edge-residency", args.edge_residency]
             if prepare_run(run_dir):
                 command.append("--resume")
             print(

@@ -33,8 +33,14 @@ from adaptive_vlm.benchmark.heterogeneous_correctness import (
 )
 from adaptive_vlm.config import load_experiment_config, model_contract_fingerprint
 from adaptive_vlm.data.manifest import load_frozen_manifest
+from adaptive_vlm.environment import (
+    SWAP_RESIDENCY_MIN_FREE_VRAM_MIB,
+    disable_core_dumps,
+    gpu_free_memory_mib,
+)
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
+from adaptive_vlm.models.moondream.residency import WEIGHT_RESIDENCIES
 from adaptive_vlm.timing import monotonic
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -109,6 +115,9 @@ def load_settings(path: Path) -> dict[str, Any]:
             if name in ("python", "test_python", "adaptive_vlm")
             else str(path.resolve())
         )
+    settings.setdefault("edge_residency", "resident")
+    if settings["edge_residency"] not in WEIGHT_RESIDENCIES:
+        raise ValueError(f"edge_residency must be one of {WEIGHT_RESIDENCIES}")
     if float(settings["stall_seconds"]) < 180:
         raise ValueError("stall_seconds must be at least 180")
     output = Path(settings["output_root"])
@@ -214,7 +223,12 @@ def validate_block(output: Path) -> dict[str, Any]:
     return report
 
 
-def edge_smoke(config_path: Path, output: Path, requests: int) -> None:
+def edge_smoke(
+    config_path: Path,
+    output: Path,
+    requests: int,
+    edge_residency: str = "resident",
+) -> None:
     """Exercise real local inference and checkpoints without any cloud access."""
     if requests < 1:
         raise ValueError("--requests must be positive")
@@ -274,6 +288,8 @@ def edge_smoke(config_path: Path, output: Path, requests: int) -> None:
             "cuda:0",
             "--max-consecutive-failures",
             "1",
+            "--edge-residency",
+            edge_residency,
         ]
         if run_dir.exists():
             command.append("--resume")
@@ -467,6 +483,13 @@ class Supervisor:
         ssh(s, ["sudo", "-n", "tc", "qdisc", "show", "dev", s["cloud_interface"]])
         edge_gpu = checked(["nvidia-smi"])
         cloud_gpu = ssh(s, ["nvidia-smi"])
+        if s["edge_residency"] == "swap":
+            free_vram = gpu_free_memory_mib()
+            if free_vram is None or free_vram < SWAP_RESIDENCY_MIN_FREE_VRAM_MIB:
+                raise RuntimeError(
+                    f"edge GPU has {free_vram} MiB free; swap residency needs "
+                    f"{SWAP_RESIDENCY_MIN_FREE_VRAM_MIB} MiB (close GPU applications)"
+                )
         minimum = float(s["min_free_gb"]) * 1024**3
         if shutil.disk_usage(self.output).free < minimum:
             raise RuntimeError("insufficient free disk space on edge")
@@ -800,6 +823,8 @@ class Supervisor:
                         s["artifact_manifest"],
                         "--cache-dir",
                         s["cache_dir"],
+                        "--edge-residency",
+                        s["edge_residency"],
                     ],
                     stall=True,
                 )
@@ -842,10 +867,23 @@ def main() -> None:
         type=Path,
         default=Path("configs/experiments/physical_vqa_v1.yaml"),
     )
+    parser.add_argument(
+        "--edge-residency",
+        choices=WEIGHT_RESIDENCIES,
+        default="resident",
+        help="edge-smoke: edge full-model weight residency (default: resident)",
+    )
     args = parser.parse_args()
     os.chdir(ROOT)
+    # Inherited by every child: a crashed benchmark must not fill the system drive.
+    disable_core_dumps()
     if args.action == "edge-smoke":
-        edge_smoke(args.edge_config.resolve(), args.smoke_dir.resolve(), args.requests)
+        edge_smoke(
+            args.edge_config.resolve(),
+            args.smoke_dir.resolve(),
+            args.requests,
+            args.edge_residency,
+        )
         return
     if args.settings is None:
         parser.error("--settings is required except for edge-smoke")

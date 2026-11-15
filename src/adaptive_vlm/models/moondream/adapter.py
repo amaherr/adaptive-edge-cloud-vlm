@@ -221,6 +221,18 @@ class MoondreamAdapter(ModelAdapter):
 
         return "swap" if self._swapper is not None else "resident"
 
+    def activate_stage(self, stage: Literal["vision", "text"]) -> float:
+        """Make one stage device-resident ahead of a request; return its cost.
+
+        Interleaved benchmarks call this outside the timed region so each request
+        starts from the state a run of same-placement requests leaves behind.
+        Resident adapters already hold every retained stage and return 0.0.
+        """
+
+        if stage not in ("vision", "text"):
+            raise ValueError(f"unknown stage: {stage}")
+        return self._activate_stage(stage)
+
     def retain_only(self, role: Literal["vision", "text"]) -> None:
         """Irreversibly release the opposite stage after a full-model check."""
 

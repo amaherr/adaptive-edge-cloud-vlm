@@ -36,8 +36,6 @@ def run_cloud_server_command(
     progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
     config = load_experiment_config(config_path)
     validate_cloud_config(config.mode, config.cloud.status)
-    if dual_paths and config.model.adapter != "moondream2":
-        raise ConfigError("adaptive-server requires the Moondream2 adapter")
     seeded = seed_everything(config.runtime.seed)
     load_started = perf_counter()
     inference_function: Callable[[InferenceRequest], InferenceResult]
@@ -73,7 +71,16 @@ def run_cloud_server_command(
     contract_fingerprint = model_contract_fingerprint(config.model)
     progress.detail(f"Model contract fingerprint: {contract_fingerprint}")
 
-    if dual_paths:
+    if dual_paths and config.model.adapter == "fake":
+        # Raw-image and synchronous projected paths only; no prompt-first state.
+        processor = CloudRequestProcessor(
+            protocol_version=config.transport.protocol_version,
+            model_fingerprint=contract_fingerprint,
+            inference_function=inference_function,
+            tensor_inference_function=fake_adapter.generate_from_payload,
+            event_callback=progress.info,
+        )
+    elif dual_paths:
         processor = CloudRequestProcessor(
             protocol_version=config.transport.protocol_version,
             model_fingerprint=contract_fingerprint,
