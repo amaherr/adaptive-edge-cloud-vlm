@@ -1,0 +1,1615 @@
+{
+  "schema_version": 1,
+  "seed": 3907,
+  "count": 400,
+  "questions_sha256": "f34d9c9909dea76700d361baddd63dd47b4494945097459b542d9fe840244811",
+  "annotations_sha256": "0564650e712b34c246e4ad142894692bf2e45dee8e9cc6ebb2cedbe85731c4bf",
+  "exclusion_manifest_sha256": [
+    "4e62826280e49359e8cf98d85154000c1583d63474be83a2e9a429da9bde72c9",
+    "fbca79655197eaae756bc967368cad2d7fbfb4af82b6662a477bd2fb83a5cf44"
+  ],
+  "excluded_question_count": 300,
+  "excluded_image_count": 300,
+  "candidates": [
+    {
+      "question_id": 520531000,
+      "image_id": 520531
+    },
+    {
+      "question_id": 297819004,
+      "image_id": 297819
+    },
+    {
+      "question_id": 416663000,
+      "image_id": 416663
+    },
+    {
+      "question_id": 223746002,
+      "image_id": 223746
+    },
+    {
+      "question_id": 252133015,
+      "image_id": 252133
+    },
+    {
+      "question_id": 202040003,
+      "image_id": 202040
+    },
+    {
+      "question_id": 311497007,
+      "image_id": 311497
+    },
+    {
+      "question_id": 350000002,
+      "image_id": 350000
+    },
+    {
+      "question_id": 562229003,
+      "image_id": 562229
+    },
+    {
+      "question_id": 463876009,
+      "image_id": 463876
+    },
+    {
+      "question_id": 44950002,
+      "image_id": 44950
+    },
+    {
+      "question_id": 116517000,
+      "image_id": 116517
+    },
+    {
+      "question_id": 93353002,
+      "image_id": 93353
+    },
+    {
+      "question_id": 164899001,
+      "image_id": 164899
+    },
+    {
+      "question_id": 269489001,
+      "image_id": 269489
+    },
+    {
+      "question_id": 527163002,
+      "image_id": 527163
+    },
+    {
+      "question_id": 392632006,
+      "image_id": 392632
+    },
+    {
+      "question_id": 563653002,
+      "image_id": 563653
+    },
+    {
+      "question_id": 342006000,
+      "image_id": 342006
+    },
+    {
+      "question_id": 492472003,
+      "image_id": 492472
+    },
+    {
+      "question_id": 111789004,
+      "image_id": 111789
+    },
+    {
+      "question_id": 121457004,
+      "image_id": 121457
+    },
+    {
+      "question_id": 334521004,
+      "image_id": 334521
+    },
+    {
+      "question_id": 85584002,
+      "image_id": 85584
+    },
+    {
+      "question_id": 217060000,
+      "image_id": 217060
+    },
+    {
+      "question_id": 180718005,
+      "image_id": 180718
+    },
+    {
+      "question_id": 412440006,
+      "image_id": 412440
+    },
+    {
+      "question_id": 61492002,
+      "image_id": 61492
+    },
+    {
+      "question_id": 566049004,
+      "image_id": 566049
+    },
+    {
+      "question_id": 570171000,
+      "image_id": 570171
+    },
+    {
+      "question_id": 389256001,
+      "image_id": 389256
+    },
+    {
+      "question_id": 150872002,
+      "image_id": 150872
+    },
+    {
+      "question_id": 156445006,
+      "image_id": 156445
+    },
+    {
+      "question_id": 263251002,
+      "image_id": 263251
+    },
+    {
+      "question_id": 573853003,
+      "image_id": 573853
+    },
+    {
+      "question_id": 527961002,
+      "image_id": 527961
+    },
+    {
+      "question_id": 367929000,
+      "image_id": 367929
+    },
+    {
+      "question_id": 432898001,
+      "image_id": 432898
+    },
+    {
+      "question_id": 10192002,
+      "image_id": 10192
+    },
+    {
+      "question_id": 286858005,
+      "image_id": 286858
+    },
+    {
+      "question_id": 222548006,
+      "image_id": 222548
+    },
+    {
+      "question_id": 72632003,
+      "image_id": 72632
+    },
+    {
+      "question_id": 344197000,
+      "image_id": 344197
+    },
+    {
+      "question_id": 310516000,
+      "image_id": 310516
+    },
+    {
+      "question_id": 160498018,
+      "image_id": 160498
+    },
+    {
+      "question_id": 416078002,
+      "image_id": 416078
+    },
+    {
+      "question_id": 238029016,
+      "image_id": 238029
+    },
+    {
+      "question_id": 141882000,
+      "image_id": 141882
+    },
+    {
+      "question_id": 267664002,
+      "image_id": 267664
+    },
+    {
+      "question_id": 476008002,
+      "image_id": 476008
+    },
+    {
+      "question_id": 107751002,
+      "image_id": 107751
+    },
+    {
+      "question_id": 408610000,
+      "image_id": 408610
+    },
+    {
+      "question_id": 111683003,
+      "image_id": 111683
+    },
+    {
+      "question_id": 154846003,
+      "image_id": 154846
+    },
+    {
+      "question_id": 539565000,
+      "image_id": 539565
+    },
+    {
+      "question_id": 466565004,
+      "image_id": 466565
+    },
+    {
+      "question_id": 256941000,
+      "image_id": 256941
+    },
+    {
+      "question_id": 521550004,
+      "image_id": 521550
+    },
+    {
+      "question_id": 422833002,
+      "image_id": 422833
+    },
+    {
+      "question_id": 390072002,
+      "image_id": 390072
+    },
+    {
+      "question_id": 166505000,
+      "image_id": 166505
+    },
+    {
+      "question_id": 494863000,
+      "image_id": 494863
+    },
+    {
+      "question_id": 128034009,
+      "image_id": 128034
+    },
+    {
+      "question_id": 10694023,
+      "image_id": 10694
+    },
+    {
+      "question_id": 271548002,
+      "image_id": 271548
+    },
+    {
+      "question_id": 327590003,
+      "image_id": 327590
+    },
+    {
+      "question_id": 185125003,
+      "image_id": 185125
+    },
+    {
+      "question_id": 473015007,
+      "image_id": 473015
+    },
+    {
+      "question_id": 500765000,
+      "image_id": 500765
+    },
+    {
+      "question_id": 67833003,
+      "image_id": 67833
+    },
+    {
+      "question_id": 232357004,
+      "image_id": 232357
+    },
+    {
+      "question_id": 172733004,
+      "image_id": 172733
+    },
+    {
+      "question_id": 315696000,
+      "image_id": 315696
+    },
+    {
+      "question_id": 150320007,
+      "image_id": 150320
+    },
+    {
+      "question_id": 342448001,
+      "image_id": 342448
+    },
+    {
+      "question_id": 160437002,
+      "image_id": 160437
+    },
+    {
+      "question_id": 138115001,
+      "image_id": 138115
+    },
+    {
+      "question_id": 240340007,
+      "image_id": 240340
+    },
+    {
+      "question_id": 509750000,
+      "image_id": 509750
+    },
+    {
+      "question_id": 52232000,
+      "image_id": 52232
+    },
+    {
+      "question_id": 429174003,
+      "image_id": 429174
+    },
+    {
+      "question_id": 38034006,
+      "image_id": 38034
+    },
+    {
+      "question_id": 244633003,
+      "image_id": 244633
+    },
+    {
+      "question_id": 5690016,
+      "image_id": 5690
+    },
+    {
+      "question_id": 349915001,
+      "image_id": 349915
+    },
+    {
+      "question_id": 162363000,
+      "image_id": 162363
+    },
+    {
+      "question_id": 185276002,
+      "image_id": 185276
+    },
+    {
+      "question_id": 101223001,
+      "image_id": 101223
+    },
+    {
+      "question_id": 75786014,
+      "image_id": 75786
+    },
+    {
+      "question_id": 132136002,
+      "image_id": 132136
+    },
+    {
+      "question_id": 337653004,
+      "image_id": 337653
+    },
+    {
+      "question_id": 120826005,
+      "image_id": 120826
+    },
+    {
+      "question_id": 403919004,
+      "image_id": 403919
+    },
+    {
+      "question_id": 237420001,
+      "image_id": 237420
+    },
+    {
+      "question_id": 312191000,
+      "image_id": 312191
+    },
+    {
+      "question_id": 183716015,
+      "image_id": 183716
+    },
+    {
+      "question_id": 520047005,
+      "image_id": 520047
+    },
+    {
+      "question_id": 493218000,
+      "image_id": 493218
+    },
+    {
+      "question_id": 472160004,
+      "image_id": 472160
+    },
+    {
+      "question_id": 289855005,
+      "image_id": 289855
+    },
+    {
+      "question_id": 513342001,
+      "image_id": 513342
+    },
+    {
+      "question_id": 101053025,
+      "image_id": 101053
+    },
+    {
+      "question_id": 267694006,
+      "image_id": 267694
+    },
+    {
+      "question_id": 13357005,
+      "image_id": 13357
+    },
+    {
+      "question_id": 30407000,
+      "image_id": 30407
+    },
+    {
+      "question_id": 233915008,
+      "image_id": 233915
+    },
+    {
+      "question_id": 358707002,
+      "image_id": 358707
+    },
+    {
+      "question_id": 335644001,
+      "image_id": 335644
+    },
+    {
+      "question_id": 502347002,
+      "image_id": 502347
+    },
+    {
+      "question_id": 435475002,
+      "image_id": 435475
+    },
+    {
+      "question_id": 188416001,
+      "image_id": 188416
+    },
+    {
+      "question_id": 478220003,
+      "image_id": 478220
+    },
+    {
+      "question_id": 303253005,
+      "image_id": 303253
+    },
+    {
+      "question_id": 115412003,
+      "image_id": 115412
+    },
+    {
+      "question_id": 458781000,
+      "image_id": 458781
+    },
+    {
+      "question_id": 206257002,
+      "image_id": 206257
+    },
+    {
+      "question_id": 414709010,
+      "image_id": 414709
+    },
+    {
+      "question_id": 521282013,
+      "image_id": 521282
+    },
+    {
+      "question_id": 14439001,
+      "image_id": 14439
+    },
+    {
+      "question_id": 308964002,
+      "image_id": 308964
+    },
+    {
+      "question_id": 255315008,
+      "image_id": 255315
+    },
+    {
+      "question_id": 156375001,
+      "image_id": 156375
+    },
+    {
+      "question_id": 432553000,
+      "image_id": 432553
+    },
+    {
+      "question_id": 342476001,
+      "image_id": 342476
+    },
+    {
+      "question_id": 439481001,
+      "image_id": 439481
+    },
+    {
+      "question_id": 334941014,
+      "image_id": 334941
+    },
+    {
+      "question_id": 252844002,
+      "image_id": 252844
+    },
+    {
+      "question_id": 519387002,
+      "image_id": 519387
+    },
+    {
+      "question_id": 47263002,
+      "image_id": 47263
+    },
+    {
+      "question_id": 84701004,
+      "image_id": 84701
+    },
+    {
+      "question_id": 226874001,
+      "image_id": 226874
+    },
+    {
+      "question_id": 570709002,
+      "image_id": 570709
+    },
+    {
+      "question_id": 228644002,
+      "image_id": 228644
+    },
+    {
+      "question_id": 535588001,
+      "image_id": 535588
+    },
+    {
+      "question_id": 498802010,
+      "image_id": 498802
+    },
+    {
+      "question_id": 521197002,
+      "image_id": 521197
+    },
+    {
+      "question_id": 262162019,
+      "image_id": 262162
+    },
+    {
+      "question_id": 410221007,
+      "image_id": 410221
+    },
+    {
+      "question_id": 355575016,
+      "image_id": 355575
+    },
+    {
+      "question_id": 284365002,
+      "image_id": 284365
+    },
+    {
+      "question_id": 147958003,
+      "image_id": 147958
+    },
+    {
+      "question_id": 286089008,
+      "image_id": 286089
+    },
+    {
+      "question_id": 341246002,
+      "image_id": 341246
+    },
+    {
+      "question_id": 268044002,
+      "image_id": 268044
+    },
+    {
+      "question_id": 66179005,
+      "image_id": 66179
+    },
+    {
+      "question_id": 318130005,
+      "image_id": 318130
+    },
+    {
+      "question_id": 125850002,
+      "image_id": 125850
+    },
+    {
+      "question_id": 366723002,
+      "image_id": 366723
+    },
+    {
+      "question_id": 481313002,
+      "image_id": 481313
+    },
+    {
+      "question_id": 308587002,
+      "image_id": 308587
+    },
+    {
+      "question_id": 561563003,
+      "image_id": 561563
+    },
+    {
+      "question_id": 38816001,
+      "image_id": 38816
+    },
+    {
+      "question_id": 19888001,
+      "image_id": 19888
+    },
+    {
+      "question_id": 396404003,
+      "image_id": 396404
+    },
+    {
+      "question_id": 162677004,
+      "image_id": 162677
+    },
+    {
+      "question_id": 555012000,
+      "image_id": 555012
+    },
+    {
+      "question_id": 436456001,
+      "image_id": 436456
+    },
+    {
+      "question_id": 459272004,
+      "image_id": 459272
+    },
+    {
+      "question_id": 551304002,
+      "image_id": 551304
+    },
+    {
+      "question_id": 205863000,
+      "image_id": 205863
+    },
+    {
+      "question_id": 532812002,
+      "image_id": 532812
+    },
+    {
+      "question_id": 222322000,
+      "image_id": 222322
+    },
+    {
+      "question_id": 64157000,
+      "image_id": 64157
+    },
+    {
+      "question_id": 561919003,
+      "image_id": 561919
+    },
+    {
+      "question_id": 239327000,
+      "image_id": 239327
+    },
+    {
+      "question_id": 134926000,
+      "image_id": 134926
+    },
+    {
+      "question_id": 68838003,
+      "image_id": 68838
+    },
+    {
+      "question_id": 360698006,
+      "image_id": 360698
+    },
+    {
+      "question_id": 285651002,
+      "image_id": 285651
+    },
+    {
+      "question_id": 475990000,
+      "image_id": 475990
+    },
+    {
+      "question_id": 308735004,
+      "image_id": 308735
+    },
+    {
+      "question_id": 316700001,
+      "image_id": 316700
+    },
+    {
+      "question_id": 244299003,
+      "image_id": 244299
+    },
+    {
+      "question_id": 87456000,
+      "image_id": 87456
+    },
+    {
+      "question_id": 242605001,
+      "image_id": 242605
+    },
+    {
+      "question_id": 521071004,
+      "image_id": 521071
+    },
+    {
+      "question_id": 231408014,
+      "image_id": 231408
+    },
+    {
+      "question_id": 248427001,
+      "image_id": 248427
+    },
+    {
+      "question_id": 6818001,
+      "image_id": 6818
+    },
+    {
+      "question_id": 226848002,
+      "image_id": 226848
+    },
+    {
+      "question_id": 459921001,
+      "image_id": 459921
+    },
+    {
+      "question_id": 337226003,
+      "image_id": 337226
+    },
+    {
+      "question_id": 455343002,
+      "image_id": 455343
+    },
+    {
+      "question_id": 358410001,
+      "image_id": 358410
+    },
+    {
+      "question_id": 426203007,
+      "image_id": 426203
+    },
+    {
+      "question_id": 66650008,
+      "image_id": 66650
+    },
+    {
+      "question_id": 265579002,
+      "image_id": 265579
+    },
+    {
+      "question_id": 426578000,
+      "image_id": 426578
+    },
+    {
+      "question_id": 70134011,
+      "image_id": 70134
+    },
+    {
+      "question_id": 228197000,
+      "image_id": 228197
+    },
+    {
+      "question_id": 105782003,
+      "image_id": 105782
+    },
+    {
+      "question_id": 145101008,
+      "image_id": 145101
+    },
+    {
+      "question_id": 521352007,
+      "image_id": 521352
+    },
+    {
+      "question_id": 80316002,
+      "image_id": 80316
+    },
+    {
+      "question_id": 225558000,
+      "image_id": 225558
+    },
+    {
+      "question_id": 325919002,
+      "image_id": 325919
+    },
+    {
+      "question_id": 562139009,
+      "image_id": 562139
+    },
+    {
+      "question_id": 166260001,
+      "image_id": 166260
+    },
+    {
+      "question_id": 109937000,
+      "image_id": 109937
+    },
+    {
+      "question_id": 355569002,
+      "image_id": 355569
+    },
+    {
+      "question_id": 515226001,
+      "image_id": 515226
+    },
+    {
+      "question_id": 146363002,
+      "image_id": 146363
+    },
+    {
+      "question_id": 215554003,
+      "image_id": 215554
+    },
+    {
+      "question_id": 342819021,
+      "image_id": 342819
+    },
+    {
+      "question_id": 335233001,
+      "image_id": 335233
+    },
+    {
+      "question_id": 410278001,
+      "image_id": 410278
+    },
+    {
+      "question_id": 191138060,
+      "image_id": 191138
+    },
+    {
+      "question_id": 99026009,
+      "image_id": 99026
+    },
+    {
+      "question_id": 401820000,
+      "image_id": 401820
+    },
+    {
+      "question_id": 536200047,
+      "image_id": 536200
+    },
+    {
+      "question_id": 558171001,
+      "image_id": 558171
+    },
+    {
+      "question_id": 68381000,
+      "image_id": 68381
+    },
+    {
+      "question_id": 38829006,
+      "image_id": 38829
+    },
+    {
+      "question_id": 304357001,
+      "image_id": 304357
+    },
+    {
+      "question_id": 193680001,
+      "image_id": 193680
+    },
+    {
+      "question_id": 402717000,
+      "image_id": 402717
+    },
+    {
+      "question_id": 472216000,
+      "image_id": 472216
+    },
+    {
+      "question_id": 550980004,
+      "image_id": 550980
+    },
+    {
+      "question_id": 517629000,
+      "image_id": 517629
+    },
+    {
+      "question_id": 101491007,
+      "image_id": 101491
+    },
+    {
+      "question_id": 123239012,
+      "image_id": 123239
+    },
+    {
+      "question_id": 14549007,
+      "image_id": 14549
+    },
+    {
+      "question_id": 135890001,
+      "image_id": 135890
+    },
+    {
+      "question_id": 16631007,
+      "image_id": 16631
+    },
+    {
+      "question_id": 578524006,
+      "image_id": 578524
+    },
+    {
+      "question_id": 364340004,
+      "image_id": 364340
+    },
+    {
+      "question_id": 142360002,
+      "image_id": 142360
+    },
+    {
+      "question_id": 349776004,
+      "image_id": 349776
+    },
+    {
+      "question_id": 514550000,
+      "image_id": 514550
+    },
+    {
+      "question_id": 131743000,
+      "image_id": 131743
+    },
+    {
+      "question_id": 427876000,
+      "image_id": 427876
+    },
+    {
+      "question_id": 69670000,
+      "image_id": 69670
+    },
+    {
+      "question_id": 194414002,
+      "image_id": 194414
+    },
+    {
+      "question_id": 360371000,
+      "image_id": 360371
+    },
+    {
+      "question_id": 34196006,
+      "image_id": 34196
+    },
+    {
+      "question_id": 90645000,
+      "image_id": 90645
+    },
+    {
+      "question_id": 372794006,
+      "image_id": 372794
+    },
+    {
+      "question_id": 131207006,
+      "image_id": 131207
+    },
+    {
+      "question_id": 490842007,
+      "image_id": 490842
+    },
+    {
+      "question_id": 88432002,
+      "image_id": 88432
+    },
+    {
+      "question_id": 318825002,
+      "image_id": 318825
+    },
+    {
+      "question_id": 404889003,
+      "image_id": 404889
+    },
+    {
+      "question_id": 385625000,
+      "image_id": 385625
+    },
+    {
+      "question_id": 254919005,
+      "image_id": 254919
+    },
+    {
+      "question_id": 137156000,
+      "image_id": 137156
+    },
+    {
+      "question_id": 100711001,
+      "image_id": 100711
+    },
+    {
+      "question_id": 569450006,
+      "image_id": 569450
+    },
+    {
+      "question_id": 68409000,
+      "image_id": 68409
+    },
+    {
+      "question_id": 388026012,
+      "image_id": 388026
+    },
+    {
+      "question_id": 76588002,
+      "image_id": 76588
+    },
+    {
+      "question_id": 424744014,
+      "image_id": 424744
+    },
+    {
+      "question_id": 71241004,
+      "image_id": 71241
+    },
+    {
+      "question_id": 577880008,
+      "image_id": 577880
+    },
+    {
+      "question_id": 493695002,
+      "image_id": 493695
+    },
+    {
+      "question_id": 518719002,
+      "image_id": 518719
+    },
+    {
+      "question_id": 32001010,
+      "image_id": 32001
+    },
+    {
+      "question_id": 402788002,
+      "image_id": 402788
+    },
+    {
+      "question_id": 554523017,
+      "image_id": 554523
+    },
+    {
+      "question_id": 505455015,
+      "image_id": 505455
+    },
+    {
+      "question_id": 392670002,
+      "image_id": 392670
+    },
+    {
+      "question_id": 431352008,
+      "image_id": 431352
+    },
+    {
+      "question_id": 202489003,
+      "image_id": 202489
+    },
+    {
+      "question_id": 523229000,
+      "image_id": 523229
+    },
+    {
+      "question_id": 539436006,
+      "image_id": 539436
+    },
+    {
+      "question_id": 552545001,
+      "image_id": 552545
+    },
+    {
+      "question_id": 185409001,
+      "image_id": 185409
+    },
+    {
+      "question_id": 62170002,
+      "image_id": 62170
+    },
+    {
+      "question_id": 366440004,
+      "image_id": 366440
+    },
+    {
+      "question_id": 299631000,
+      "image_id": 299631
+    },
+    {
+      "question_id": 406155002,
+      "image_id": 406155
+    },
+    {
+      "question_id": 27371033,
+      "image_id": 27371
+    },
+    {
+      "question_id": 193332002,
+      "image_id": 193332
+    },
+    {
+      "question_id": 220176001,
+      "image_id": 220176
+    },
+    {
+      "question_id": 463272004,
+      "image_id": 463272
+    },
+    {
+      "question_id": 296012000,
+      "image_id": 296012
+    },
+    {
+      "question_id": 552636012,
+      "image_id": 552636
+    },
+    {
+      "question_id": 476841001,
+      "image_id": 476841
+    },
+    {
+      "question_id": 411727004,
+      "image_id": 411727
+    },
+    {
+      "question_id": 108327004,
+      "image_id": 108327
+    },
+    {
+      "question_id": 182334007,
+      "image_id": 182334
+    },
+    {
+      "question_id": 301563011,
+      "image_id": 301563
+    },
+    {
+      "question_id": 577030008,
+      "image_id": 577030
+    },
+    {
+      "question_id": 374485000,
+      "image_id": 374485
+    },
+    {
+      "question_id": 161840001,
+      "image_id": 161840
+    },
+    {
+      "question_id": 542694006,
+      "image_id": 542694
+    },
+    {
+      "question_id": 315281000,
+      "image_id": 315281
+    },
+    {
+      "question_id": 179327001,
+      "image_id": 179327
+    },
+    {
+      "question_id": 115793000,
+      "image_id": 115793
+    },
+    {
+      "question_id": 45594001,
+      "image_id": 45594
+    },
+    {
+      "question_id": 226498009,
+      "image_id": 226498
+    },
+    {
+      "question_id": 51984000,
+      "image_id": 51984
+    },
+    {
+      "question_id": 111036006,
+      "image_id": 111036
+    },
+    {
+      "question_id": 475634003,
+      "image_id": 475634
+    },
+    {
+      "question_id": 494555001,
+      "image_id": 494555
+    },
+    {
+      "question_id": 451263000,
+      "image_id": 451263
+    },
+    {
+      "question_id": 196664003,
+      "image_id": 196664
+    },
+    {
+      "question_id": 149446005,
+      "image_id": 149446
+    },
+    {
+      "question_id": 94501001,
+      "image_id": 94501
+    },
+    {
+      "question_id": 546702001,
+      "image_id": 546702
+    },
+    {
+      "question_id": 195165003,
+      "image_id": 195165
+    },
+    {
+      "question_id": 68650000,
+      "image_id": 68650
+    },
+    {
+      "question_id": 50975001,
+      "image_id": 50975
+    },
+    {
+      "question_id": 570826000,
+      "image_id": 570826
+    },
+    {
+      "question_id": 342273012,
+      "image_id": 342273
+    },
+    {
+      "question_id": 381646000,
+      "image_id": 381646
+    },
+    {
+      "question_id": 546444002,
+      "image_id": 546444
+    },
+    {
+      "question_id": 313341003,
+      "image_id": 313341
+    },
+    {
+      "question_id": 294634002,
+      "image_id": 294634
+    },
+    {
+      "question_id": 329827002,
+      "image_id": 329827
+    },
+    {
+      "question_id": 333998016,
+      "image_id": 333998
+    },
+    {
+      "question_id": 362127002,
+      "image_id": 362127
+    },
+    {
+      "question_id": 514249002,
+      "image_id": 514249
+    },
+    {
+      "question_id": 549399000,
+      "image_id": 549399
+    },
+    {
+      "question_id": 178691002,
+      "image_id": 178691
+    },
+    {
+      "question_id": 325198000,
+      "image_id": 325198
+    },
+    {
+      "question_id": 121041001,
+      "image_id": 121041
+    },
+    {
+      "question_id": 206783000,
+      "image_id": 206783
+    },
+    {
+      "question_id": 271565001,
+      "image_id": 271565
+    },
+    {
+      "question_id": 69860000,
+      "image_id": 69860
+    },
+    {
+      "question_id": 71929001,
+      "image_id": 71929
+    },
+    {
+      "question_id": 236592003,
+      "image_id": 236592
+    },
+    {
+      "question_id": 99186013,
+      "image_id": 99186
+    },
+    {
+      "question_id": 30455002,
+      "image_id": 30455
+    },
+    {
+      "question_id": 336600004,
+      "image_id": 336600
+    },
+    {
+      "question_id": 140691002,
+      "image_id": 140691
+    },
+    {
+      "question_id": 47769004,
+      "image_id": 47769
+    },
+    {
+      "question_id": 245450002,
+      "image_id": 245450
+    },
+    {
+      "question_id": 336309012,
+      "image_id": 336309
+    },
+    {
+      "question_id": 463825000,
+      "image_id": 463825
+    },
+    {
+      "question_id": 200348002,
+      "image_id": 200348
+    },
+    {
+      "question_id": 350289003,
+      "image_id": 350289
+    },
+    {
+      "question_id": 394132005,
+      "image_id": 394132
+    },
+    {
+      "question_id": 578776005,
+      "image_id": 578776
+    },
+    {
+      "question_id": 372654023,
+      "image_id": 372654
+    },
+    {
+      "question_id": 464719004,
+      "image_id": 464719
+    },
+    {
+      "question_id": 61805001,
+      "image_id": 61805
+    },
+    {
+      "question_id": 141879004,
+      "image_id": 141879
+    },
+    {
+      "question_id": 97230001,
+      "image_id": 97230
+    },
+    {
+      "question_id": 538963000,
+      "image_id": 538963
+    },
+    {
+      "question_id": 136642005,
+      "image_id": 136642
+    },
+    {
+      "question_id": 123639003,
+      "image_id": 123639
+    },
+    {
+      "question_id": 60093002,
+      "image_id": 60093
+    },
+    {
+      "question_id": 31000001,
+      "image_id": 31000
+    },
+    {
+      "question_id": 393068003,
+      "image_id": 393068
+    },
+    {
+      "question_id": 508218002,
+      "image_id": 508218
+    },
+    {
+      "question_id": 376684000,
+      "image_id": 376684
+    },
+    {
+      "question_id": 126822005,
+      "image_id": 126822
+    },
+    {
+      "question_id": 154607000,
+      "image_id": 154607
+    },
+    {
+      "question_id": 184330002,
+      "image_id": 184330
+    },
+    {
+      "question_id": 279047000,
+      "image_id": 279047
+    },
+    {
+      "question_id": 64510002,
+      "image_id": 64510
+    },
+    {
+      "question_id": 75768002,
+      "image_id": 75768
+    },
+    {
+      "question_id": 94376001,
+      "image_id": 94376
+    },
+    {
+      "question_id": 568555001,
+      "image_id": 568555
+    },
+    {
+      "question_id": 121384020,
+      "image_id": 121384
+    },
+    {
+      "question_id": 243190000,
+      "image_id": 243190
+    },
+    {
+      "question_id": 417586000,
+      "image_id": 417586
+    },
+    {
+      "question_id": 83036063,
+      "image_id": 83036
+    },
+    {
+      "question_id": 176799000,
+      "image_id": 176799
+    },
+    {
+      "question_id": 227440004,
+      "image_id": 227440
+    },
+    {
+      "question_id": 343951001,
+      "image_id": 343951
+    },
+    {
+      "question_id": 78060011,
+      "image_id": 78060
+    },
+    {
+      "question_id": 428830000,
+      "image_id": 428830
+    },
+    {
+      "question_id": 147375001,
+      "image_id": 147375
+    },
+    {
+      "question_id": 548538002,
+      "image_id": 548538
+    },
+    {
+      "question_id": 197163003,
+      "image_id": 197163
+    },
+    {
+      "question_id": 172021000,
+      "image_id": 172021
+    },
+    {
+      "question_id": 3865002,
+      "image_id": 3865
+    },
+    {
+      "question_id": 110560005,
+      "image_id": 110560
+    },
+    {
+      "question_id": 472762000,
+      "image_id": 472762
+    },
+    {
+      "question_id": 136270000,
+      "image_id": 136270
+    },
+    {
+      "question_id": 49682000,
+      "image_id": 49682
+    },
+    {
+      "question_id": 202231003,
+      "image_id": 202231
+    },
+    {
+      "question_id": 151657014,
+      "image_id": 151657
+    },
+    {
+      "question_id": 244379000,
+      "image_id": 244379
+    },
+    {
+      "question_id": 275198003,
+      "image_id": 275198
+    },
+    {
+      "question_id": 236904000,
+      "image_id": 236904
+    },
+    {
+      "question_id": 574216001,
+      "image_id": 574216
+    },
+    {
+      "question_id": 322987005,
+      "image_id": 322987
+    },
+    {
+      "question_id": 310493000,
+      "image_id": 310493
+    },
+    {
+      "question_id": 260486019,
+      "image_id": 260486
+    },
+    {
+      "question_id": 153130016,
+      "image_id": 153130
+    },
+    {
+      "question_id": 411184005,
+      "image_id": 411184
+    },
+    {
+      "question_id": 327314001,
+      "image_id": 327314
+    },
+    {
+      "question_id": 498400002,
+      "image_id": 498400
+    },
+    {
+      "question_id": 343867003,
+      "image_id": 343867
+    },
+    {
+      "question_id": 133619002,
+      "image_id": 133619
+    },
+    {
+      "question_id": 432702002,
+      "image_id": 432702
+    },
+    {
+      "question_id": 511777001,
+      "image_id": 511777
+    },
+    {
+      "question_id": 562243020,
+      "image_id": 562243
+    },
+    {
+      "question_id": 438304001,
+      "image_id": 438304
+    },
+    {
+      "question_id": 485909018,
+      "image_id": 485909
+    },
+    {
+      "question_id": 248616003,
+      "image_id": 248616
+    },
+    {
+      "question_id": 31829000,
+      "image_id": 31829
+    },
+    {
+      "question_id": 376751004,
+      "image_id": 376751
+    },
+    {
+      "question_id": 334391002,
+      "image_id": 334391
+    },
+    {
+      "question_id": 298656001,
+      "image_id": 298656
+    },
+    {
+      "question_id": 205636004,
+      "image_id": 205636
+    },
+    {
+      "question_id": 19631003,
+      "image_id": 19631
+    },
+    {
+      "question_id": 240972006,
+      "image_id": 240972
+    }
+  ]
+}

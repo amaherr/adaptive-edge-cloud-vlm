@@ -4,6 +4,15 @@ G2 v2 is the physical baseline the rest of the thesis builds on: Predictor V2 r2
 
 The original G2 ([results/physical-g2-20261110](../results/physical-g2-20261110/README.md)) stays valid evidence for its own contract and is reported alongside G2 v2. It is not modified.
 
+## Progress
+
+| Workstream | Status |
+| --- | --- |
+| W0 Source baseline | Done (`3bf33d8`, merged to `main`) |
+| W1 Protocol | Drafted: [g2-v2-protocol.md](protocols/g2-v2-protocol.md). Sections 3–4 are frozen and executed; the rest is frozen after W8 |
+| W2 Dataset and prompt | Done 15 November 2026: P1 selected ([calibration](../results/prompt-calibration-20261115/README.md)); 120-question manifest and split frozen |
+| W3–W9 | Not started |
+
 ## Why a new baseline
 
 | G2 (November 2026) | Problem | G2 v2 |
@@ -67,7 +76,7 @@ Everything here can be done now on the edge laptop. Estimates are working days f
 
 ### W2. Dataset and prompt contract (1.5–2 days)
 
-1. Get the VQA v2 val2014 **annotations** file. It isn't in `data/raw/vqa`, which only holds the questions. The importer and the official evaluator both need it.
+1. Get the VQA v2 val2014 **annotations** file. *(Done: the copy from G2 scoring at `artifacts/official-vqa-g2/` matched the pinned hash.)*
 2. Extend `adaptive-vlm import-vqa` (`src/adaptive_vlm/data/vqa_import.py`) with:
    - an exclusion list of request IDs;
    - crop-count stratification, reusing the existing crop computation;
@@ -76,7 +85,7 @@ Everything here can be done now on the edge laptop. Estimates are working days f
 3. Import the prompt calibration set (~200 questions) and fetch its images with `scripts/vqa/fetch_vqa_subset_images.py`.
 4. Run each candidate template on the edge with swap residency (about 5 minutes per template). Score with the pinned official evaluator and apply the selection rule written down in advance. Record answer lengths and how often the 32-token cap is hit.
 5. Import the frozen 120-ID G2 v2 manifest and build the split file (`configs/evaluation/physical_vqa_split_v2.json`), with the dataset and model-contract hashes.
-6. Add the experiment configs `configs/experiments/physical_vqa_v2.yaml` and a matching correctness-smoke config.
+6. Add the experiment config `configs/experiments/physical_vqa_v2.yaml`. The correctness smoke config `physical_pair_v1.yaml` uses synthetic fixtures, so it is reused unchanged.
 
 *Done when* the manifest, split, configs and calibration results (with the selection record) are committed, and the chosen prompt's calibration accuracy is reported.
 
@@ -91,8 +100,9 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
    - does the untimed state preparation with a logged switch cost;
    - writes a separate `requests.jsonl` per placement, in the existing record schema plus new fields, so the profile builder and later stages keep working.
 2. Keep resume, `--max-consecutive-failures`, warmup exclusion and the clean-tree and hash checks.
-3. Pass `--edge-residency swap` through `run_physical_campaign.py`, `run_physical_profile_block.py` and the settings file. Have preflight refuse to start unless measured free VRAM covers the swap peak plus a margin at the current load level.
-4. Write unit tests for order generation, state preparation, resume in the middle of an interleaved set, and record compatibility.
+3. **Recover from CUDA context failures.** During calibration, one `CUDA error: unknown error` appeared in about 730 swap-residency requests. After it, every later request in that process failed. The supervisor must restart the edge process and resume the sub-block. It must also run every campaign process with core dumps disabled (`ulimit -c 1`). WSL's crash handler ignores `ulimit -c 0`, and the 5.4 GB dump it wrote filled the Windows C: drive.
+4. Pass `--edge-residency swap` through `run_physical_campaign.py`, `run_physical_profile_block.py` and the settings file. Have preflight refuse to start unless measured free VRAM covers the swap peak plus a margin at the current load level.
+5. Write unit tests for order generation, state preparation, resume in the middle of an interleaved set, and record compatibility.
 
 *Done when* a fake-model interleaved run on loopback produces three per-placement run directories that `build_profile` accepts, and a kill-and-resume produces no duplicates or gaps.
 
@@ -205,4 +215,5 @@ These are model-based estimates calibrated on G2 (the model reproduces G2's 14.3
 | Edge VRAM margin too small under the load generator | Spill makes loaded edge timing unstable | Free-VRAM preflight; shared-memory counter per request; calibrate levels off site |
 | Short prompt still scores low | The selector's quality floor isn't meaningful | Calibration set and selection rule in W2; report calibration accuracy before freezing |
 | Interleaving changes thermal behaviour compared with G2 | Timings not comparable with G2 | Expected and intended; G2 v2 is a new baseline, and resource state is logged |
+| CUDA context failure on the edge (one in ~730 swap requests during calibration) | Every later request in that process fails; a crash dump can fill C: | Supervisor restarts the edge process and resumes (W3); core dumps disabled; keep at least 15 GB free on C: |
 | Run longer than one night | Fewer hours of supervision | Checkpointed resume; plan two sessions if the pilot points to more than 16 h |

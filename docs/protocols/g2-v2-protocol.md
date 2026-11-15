@@ -1,6 +1,6 @@
 # G2 v2 baseline protocol
 
-**Status: draft.** Section 3 (prompt contract and selection rule) and section 4 (dataset construction) are **frozen**: they were committed before any calibration answer was generated or scored, and are applied exactly as written. All other sections stay a draft until the off-site rehearsal and edge pilot in the [preparation roadmap](../g2-v2-preparation.md) confirm feasibility. At that point the whole document is frozen, and the campaign grid config pins its SHA-256. Changes after freezing are allowed only as dated amendments at the end of this document, written before the affected data is collected.
+**Status: draft.** Section 3 (prompt contract and selection rule) and section 4 (dataset construction) are **frozen and executed**: they were committed before any calibration answer was generated or scored, and were applied exactly as written. All other sections stay a draft until the off-site rehearsal and edge pilot in the [preparation roadmap](../g2-v2-preparation.md) confirm feasibility. At that point the whole document is frozen, and the campaign grid config pins its SHA-256. Changes after freezing are allowed only as dated amendments at the end of this document, written before the affected data is collected.
 
 ## 1. Purpose and scope
 
@@ -72,6 +72,8 @@ The G2 prompt sent the VQA question verbatim. Moondream answered in full sentenc
 
 The selection record (all metrics, the chosen ID, and the hashes of the calibration manifest and predictions) is committed next to the calibration results, before the G2 v2 dataset is imported.
 
+**Executed 15 November 2026.** The rule selected **P1** at 56.7% official accuracy. P2 scored 57.2% and was also near-best; P1 won the tie-break on mean output tokens (1.47 against 1.50). No template hit the 32-token cap. See [results/prompt-calibration-20261115](../../results/prompt-calibration-20261115/README.md).
+
 ## 4. Dataset construction (frozen)
 
 ### 4.1 Candidate order (shared by the calibration set and the dataset)
@@ -102,6 +104,12 @@ The selection record (all metrics, the chosen ID, and the hashes of the calibrat
 | Evaluation (protected test) | 30 | 6 | 24 | E01–E05 |
 
 Within each crop stratum, request IDs are shuffled with seed `3907` and assigned to training, validation and evaluation in that order. Request IDs are measured only under their own split's conditions. G2 crossed every ID with every block; G2 v2 does not. The split file is [physical_vqa_split_v2.json](../../configs/evaluation/physical_vqa_split_v2.json).
+
+**Executed 15 November 2026.**
+- **Manifest:** [physical_vqa_v2.jsonl](../../data/manifests/physical_vqa_v2/physical_vqa_v2.jsonl), SHA-256 `4f8bfe63f245db948274d7e0717bde3bab388e5ffe65505a3f841a35e3f9b89d`. It holds 120 questions (24 two-crop), filled from the first 126 of the 400 candidates, with prompt P1.
+- **Split:** 60/30/30 requests, with 12/6/6 two-crop. SHA-256 `9133a9d3011d4c92d377abd30b29265ee1179cd03d157f1bcc7f81be64143dd1`.
+- **Model contract:** unchanged from G2 (`e7ef0180…94aa1`).
+- **Overlap:** no question or image is shared with G2 or with the calibration set.
 
 ## 5. Network conditions (draft)
 
@@ -150,6 +158,7 @@ Each split therefore contains cells where the best placement changes with load.
   - then each request ID of the split, in a per-sub-block seeded order;
   - for each request, all three placements, in a per-request seeded order.
 - **Edge state preparation:** before each timed request, the adapter is set, untimed, to the stage a run of same-placement requests would leave active: text before edge/full, vision before distributed. The time spent is logged as `switch_cost_ms`. Edge/full still pays both of its stage swaps inside the timed request.
+- **CUDA failures:** a `CUDA error: unknown error` leaves the process's CUDA context unusable. It happened once in about 730 swap-residency requests during calibration. The supervisor must restart the edge process and resume the sub-block, rather than stopping the campaign. Restarted attempts are recorded, and failures still count toward the section 8 limit. Core dumps are disabled for every campaign process (`ulimit -c 1`; WSL's piped crash handler ignores `ulimit -c 0`), so a crash can't fill the Windows system drive.
 - **Resource state:** immediately before each timed request, record:
   - edge and cloud GPU clocks, temperature, power, utilization, used and free VRAM;
   - the edge Windows shared GPU memory counter;
@@ -181,7 +190,7 @@ An invalid sub-block is rerun as a whole. A dataset with any invalid sub-block l
 
 - **Latency.** For each cell and placement: median, p90 and the bootstrap 95% CI of the median end-to-end latency over all of the split's IDs and repetitions (seed `1707`, 2,000 resamples, as in G2).
 - **Measured winner.** For each cell, the placement with the lowest median latency, plus its margin over the runner-up. Cells where the CIs of the top two overlap are reported as ties.
-- **Quality.** Official VQA accuracy for each placement on each split, scored as in section 3.3. Placement quality parity: the accuracy difference between any two placements, on the same IDs, must be at most 2 percentage points. If not, the selector must treat quality as placement-dependent.
+- **Quality.** Official VQA accuracy for each placement on each split, scored as in section 3.3. *Proposed, to be decided before freezing:* the primary score lowercases each answer before export. That is standard VQA submission practice, and it avoids the evaluator's case-sensitive comparison when all references agree; the [calibration](../../results/prompt-calibration-20261115/README.md#diagnostic-the-evaluators-case-handling) found that comparison costs about 22 points on capitalized "Yes"/"No" answers. The unchanged score is reported alongside. Placement quality parity: the accuracy difference between any two placements, on the same IDs, must be at most 2 percentage points. If not, the selector must treat quality as placement-dependent.
 - **Isolation.** Training cells only, for anything fitted (Predictor V2 r2, G3). The validation cells are opened once for G3. The evaluation cells stay sealed until the selector is frozen for G4.
 
 ## Amendments

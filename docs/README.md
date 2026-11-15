@@ -11,7 +11,7 @@ Start with the [project README](../README.md) for setup and usage. This folder h
 | Physical G2 baseline: 8,100 requests over nine network blocks | Done | [G2 results](../results/physical-g2-20261110/README.md) |
 | Predictor V2 r1 (G3) | **Failed**: cloud error tails and edge memory coverage | [Validation report](predictor-v2/validation-report.md) |
 | Edge full-model memory | Fixed by swap residency, not yet used by the campaign scripts | [GPU placement and memory](physical-testbed/gpu-placement-and-memory.md#edge-full-model-swap-residency-15-november-2026) |
-| G2 v2 baseline (swap-residency edge, short-answer prompt, interleaved placements, edge-load factor) | Preparing off site | [G2 v2 preparation](g2-v2-preparation.md) |
+| G2 v2 baseline (swap-residency edge, short-answer prompt, interleaved placements, edge-load factor) | Preparing off site: protocol drafted, prompt selected (P1), dataset and split frozen | [G2 v2 preparation](g2-v2-preparation.md), [prompt calibration](../results/prompt-calibration-20261115/README.md) |
 | Selector vs measured oracle (G4) and later phases | Not started; builds on G2 v2 | [Roadmap](roadmap.md) |
 
 ## Plan and runbook
