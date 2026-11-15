@@ -178,6 +178,7 @@ def build_profile(
             "dataset_manifest_sha256",
             "schedule",
             "interleave",
+            "conditions",
         ):
             if plan.get(name) != reference.get(name):
                 raise ValueError(f"benchmark runs differ on {name}")

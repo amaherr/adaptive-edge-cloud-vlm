@@ -12,7 +12,9 @@ The original G2 ([results/physical-g2-20261110](../results/physical-g2-20261110/
 | W1 Protocol | Drafted: [g2-v2-protocol.md](protocols/g2-v2-protocol.md). Sections 3–4 are frozen and executed; the rest is frozen after W8 |
 | W2 Dataset and prompt | Done 15 November 2026: P1 selected ([calibration](../results/prompt-calibration-20261115/README.md)); 120-question manifest and split frozen |
 | W3 Interleaved runner | Done 15 November 2026: `interleaved-benchmark`, CUDA-failure exit and restart helper, core-dump guard, swap residency and free-VRAM preflight in the campaign scripts; checked on the real edge GPU |
-| W4–W9 | Not started |
+| W4 Resource-state logging | Done 16 November 2026: edge NVML, host memory and Windows GPU counters in every record; cloud state via `adaptive-server --report-resource-state`; deliberate spill visible |
+| W5 Edge-load generator | Done 16 November 2026: supervised worker with heartbeat; L1/L2 calibrated and reproduced over three runs ([results](../results/edge-load-calibration-20261116/README.md)) |
+| W6–W9 | Not started |
 
 ## Why a new baseline
 
@@ -41,7 +43,7 @@ Go on site only when all of these are true:
 
 These shape the code, so settle them first. Each one has a recommendation; the protocol records what was chosen.
 
-**D1. Edge GPU load becomes a campaign factor.** With swap residency, unloaded edge/full (~1.5 s) beats cloud (~2.3–2.9 s) and distributed in every condition of the planned network grid. Network conditions alone would therefore never change the winner. With an active 1 GiB competitor, edge rises to ~3.7 s and cloud or distributed wins, depending on the network. *Recommendation:* three edge-load levels: none, medium (512 MiB active competitor) and high (1 GiB). Run the full network grid at no load. Run the loaded levels on a subset of conditions drawn from all three splits (for example four training, one validation and one test condition), so validation and test both contain winner changes. Calibrate the medium level so edge sits near the cloud/distributed tie.
+**D1. Edge GPU load becomes a campaign factor.** With swap residency, unloaded edge/full (~1.5 s) beats cloud (~2.3–2.9 s) and distributed in every condition of the planned network grid. Network conditions alone would therefore never change the winner. With an active 1 GiB competitor, edge rises to ~3.7 s and cloud or distributed wins, depending on the network. *Recommendation:* three edge-load levels: none, medium (512 MiB active competitor) and high (1 GiB). Run the full network grid at no load. Run the loaded levels on a subset of conditions drawn from all three splits (for example four training, one validation and one test condition), so validation and test both contain winner changes. Calibrate the medium level so edge sits near the cloud/distributed tie. *Decided after calibration (W5): both levels use a 512 MiB working set with different duty cycles (L1 1.85 s, L2 2.81 s); 1 GiB was dropped because it measures memory pressure rather than load.*
 
 **D2. Network grid.** *Recommendation:* the 22-condition grid already proposed: 12 training conditions (60 IDs), 5 validation conditions (30 new IDs) and 5 test conditions (30 new IDs). Bandwidth runs from 5 to 200 Mb/s and added RTT from 5 to 150 ms. Every validation and test condition lies inside the training range, and none was used in G2. Set the netem `limit` explicitly (for example 10,000 packets) and require zero drops. Run each condition as two sub-blocks in a randomized order, never sweeping bandwidth in sequence. Keep one TCP connection per request and record that in the protocol. If the pilot shows the Wi-Fi uplink can't sustain 200 Mb/s, cap the grid at 150 Mb/s.
 
@@ -129,6 +131,14 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
 
 *Done when* rehearsal records carry snapshots for both hosts and a deliberate spill shows up in them.
 
+**Done (16 November 2026).**
+- `adaptive_vlm.resource_state` reads NVML through ctypes, so no extra dependency is needed; every field is supported on the RTX 3050 under WSL. It also reads host memory and swap, and streams the Windows GPU adapter counters through `powershell.exe`.
+- `interleaved-benchmark --resource-state` records the edge snapshot after stage preparation, outside the timer.
+- `adaptive-server --report-resource-state` polls the cloud every 0.5 s and returns the latest sample with each response as `server_state_*`. The loopback test checks this end to end.
+- On the real GPU, the resident edge model's spill shows as Windows dedicated usage at the 3,960 MiB maximum, against 3,271 MiB under swap.
+- Shared usage is **not** a spill signal under swap: Windows counts the pinned weight copies (about 4.4 GB) as shared memory. Protocol gate 8.4 was changed to check dedicated usage.
+- The real cloud-side numbers wait for the on-site pilot.
+
 ### W5. Edge-load generator (1 day)
 
 1. Move the memory-study competitor (`artifacts/edge-memory-study/active_competitor.py`, currently untracked) into `scripts/campaign/`. Parameterize it by load level, then have the supervisor start it and confirm it's running before a loaded sub-block. Stop it afterwards and verify it stopped.
@@ -136,6 +146,12 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
 3. Log the competitor's own throughput, so the effective load can be verified afterwards.
 
 *Done when* the load levels reproduce their target edge latencies on three separate runs, and the supervisor recovers cleanly if the competitor dies.
+
+**Done (16 November 2026).**
+- The worker is `adaptive_vlm.benchmark.edge_load_worker`, a package module rather than a script. It is controlled by `adaptive_vlm.benchmark.edge_load.EdgeLoadGenerator`, which starts it, waits for its heartbeat, checks it before each attempt, records snapshots, and stops it and verifies the stop.
+- A dead or stalled generator exits the run with code 76, which `run_with_device_restarts` resumes. Tests cover a killed worker, a stalled heartbeat and a failed start.
+- The calibration chose a 512 MiB working set for both levels: L1 at 1.85 s and L2 at 2.81 s, against 1.27 s at L0. Both reproduced within 1.5% over three runs. The 1 GiB level was dropped because it is driven by memory pressure; see [results](../results/edge-load-calibration-20261116/README.md).
+- Whether L1 sits near the cloud/distributed range is checked at the pilot, with a predeclared re-selection rule in protocol section 6.
 
 ### W6. Grid v2 and the campaign supervisor (1.5–2 days)
 

@@ -12,8 +12,10 @@ from typing import Any
 import pytest
 
 from adaptive_vlm.artifacts import create_run_manifest
+from adaptive_vlm.benchmark.edge_load import LoadGeneratorFailure
 from adaptive_vlm.benchmark.interleaved import (
     DEVICE_RESTART_EXIT_CODE,
+    ENVIRONMENT_RESTART_EXIT_CODE,
     PLACEMENTS,
     DeviceContextFailure,
     interleave_parameters,
@@ -109,6 +111,7 @@ def _run(
     prepare: Any = None,
     resume: bool = False,
     max_failures: int = 0,
+    **extra: Any,
 ) -> dict[str, Any]:
     config, manifest = _setup()
     return run_interleaved_benchmark(
@@ -127,6 +130,7 @@ def _run(
         prepare_stage=prepare,
         resume=resume,
         max_consecutive_failures=max_failures,
+        **extra,
     )
 
 
@@ -413,6 +417,7 @@ artifacts_dir: {tmp_path.as_posix()}
         model_fingerprint=fingerprint,
         inference_function=adapter.generate,
         tensor_inference_function=adapter.generate_from_payload,
+        state_provider=lambda: {"gpu_temperature_c": 55, "sample_age_s": 0.1},
     )
     server = CloudServer(
         host="127.0.0.1", port=0, timeout_seconds=5.0, processor=processor
@@ -455,6 +460,12 @@ artifacts_dir: {tmp_path.as_posix()}
             (tmp_path / "run" / placement / "run_manifest.json").read_text()
         )
         assert manifest["environment"]["execution_placement"]["interleaved"]
+    for placement in ("cloud", "distributed"):
+        for row in _journal(tmp_path, placement):
+            assert row["metrics"]["server_state_gpu_temperature_c"] == 55
+    assert (
+        "server_state_gpu_temperature_c" not in _journal(tmp_path, "edge")[0]["metrics"]
+    )
     edge = {r["trial_id"]: r["output_text"] for r in _journal(tmp_path, "edge")}
     cloud = {r["trial_id"]: r["output_text"] for r in _journal(tmp_path, "cloud")}
     assert edge == cloud
@@ -475,3 +486,154 @@ artifacts_dir: {tmp_path.as_posix()}
         output_dir=tmp_path / "profile",
     )
     assert summary
+
+
+def test_state_probe_is_recorded_for_every_attempt(tmp_path: Path) -> None:
+    calls: list[int] = []
+
+    def probe() -> dict[str, Any]:
+        calls.append(1)
+        return {"edge_gpu_temperature_c": 50 + len(calls)}
+
+    _run(tmp_path, policies=_policies([]), state_probe=probe)
+    states = [
+        row["resource_state"]["edge_gpu_temperature_c"]
+        for p in PLACEMENTS
+        for row in _journal(tmp_path, p)
+    ]
+    assert len(states) == len(calls) == 3 * (1 + 2 * len(IDS))
+    assert len(set(states)) == len(states)
+
+
+def test_failed_precondition_records_nothing_and_resumes(tmp_path: Path) -> None:
+    checks = [0]
+
+    def precondition() -> None:
+        checks[0] += 1
+        if checks[0] == 5:
+            raise LoadGeneratorFailure("edge load L1 is not running")
+
+    conditions = {"edge_load_level": "L1", "edge_load": {"working_set_mib": 512}}
+    with pytest.raises(LoadGeneratorFailure):
+        _run(
+            tmp_path,
+            policies=_policies([]),
+            precondition=precondition,
+            conditions=conditions,
+        )
+    assert sum(len(_journal(tmp_path, p)) for p in PLACEMENTS) == 4
+    with pytest.raises(ValueError, match="plan differs"):
+        _run(tmp_path, policies=_policies([]), resume=True)
+    _run(tmp_path, policies=_policies([]), resume=True, conditions=conditions)
+    plan = json.loads((tmp_path / "run" / "edge" / "plan.json").read_text())
+    assert plan["conditions"] == conditions
+    assert all(len(_journal(tmp_path, p)) == 1 + 2 * len(IDS) for p in PLACEMENTS)
+
+
+def test_environment_failures_are_restartable() -> None:
+    codes = iter([ENVIRONMENT_RESTART_EXIT_CODE, 0])
+    assert run_with_device_restarts(
+        ["bench"], max_restarts=2, run=lambda _: next(codes)
+    ) == (0, 1)
+
+
+def test_cli_runs_edge_load_and_resource_state_hooks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import adaptive_vlm.commands.interleaved as command
+
+    events: list[str] = []
+
+    class FakeGenerator:
+        def __init__(self, level: Any, *, directory: Path) -> None:
+            self.level = level
+
+        def start(self) -> None:
+            events.append(f"start:{self.level.name}")
+
+        def check(self) -> None:
+            events.append("check")
+
+        def snapshot(self) -> dict[str, Any]:
+            return {"load_level": self.level.name, "load_alive": True}
+
+        def stop(self) -> dict[str, Any]:
+            events.append("stop")
+            return {"status": "stopped"}
+
+    class FakeReader:
+        def __init__(self, index: int) -> None:
+            assert index == 0
+
+        def snapshot(self) -> dict[str, Any]:
+            return {"gpu_temperature_c": 48}
+
+    class FakeWindows:
+        def start(self) -> None:
+            events.append("windows")
+
+        def wait_for_sample(self) -> bool:
+            return True
+
+        def snapshot(self) -> dict[str, Any]:
+            return {"windows_gpu_shared_mib": 12.0}
+
+        def stop(self) -> None:
+            events.append("windows-stop")
+
+    monkeypatch.setattr(command, "EdgeLoadGenerator", FakeGenerator)
+    monkeypatch.setattr(command, "NvmlReader", FakeReader)
+    monkeypatch.setattr(command, "WindowsGpuCounterSampler", FakeWindows)
+    levels = tmp_path / "levels.json"
+    levels.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "levels": {"L1": {"working_set_mib": 512, "busy_ms": 8, "idle_ms": 12}},
+            }
+        )
+    )
+    argv = [
+        "interleaved-benchmark",
+        "--config",
+        str(ROOT / "configs/experiments/fake_benchmark.yaml"),
+        "--run-dir",
+        str(tmp_path / "run"),
+        "--placements",
+        "edge",
+        "--order-seed",
+        "3",
+        "--repetition-indices",
+        "0",
+        "--warmups",
+        "0",
+        "--resource-state",
+        "--edge-load-config",
+        str(levels),
+        "--edge-load-level",
+        "L1",
+    ]
+    assert main(argv) == 0
+    rows = _journal(tmp_path, "edge")
+    assert rows and all(row["status"] == "ok" for row in rows)
+    state = rows[0]["resource_state"]
+    assert {
+        "edge_gpu_temperature_c": 48,
+        "edge_windows_gpu_shared_mib": 12.0,
+        "edge_load_level": "L1",
+        "edge_load_alive": True,
+    }.items() <= state.items()
+    assert set(state) - {
+        "edge_gpu_temperature_c",
+        "edge_windows_gpu_shared_mib",
+        "edge_load_level",
+        "edge_load_alive",
+    } <= {"edge_host_memory_available_mib", "edge_host_swap_used_mib"}
+    assert events[0] == "windows" and events[1] == "start:L1"
+    assert events.count("check") == len(rows)
+    assert events[-2:] == ["stop", "windows-stop"]
+    plan = json.loads((tmp_path / "run" / "edge" / "plan.json").read_text())
+    assert plan["conditions"]["edge_load_level"] == "L1"
+    unknown = [*argv[:-1], "L9"]
+    unknown[unknown.index(str(tmp_path / "run"))] = str(tmp_path / "other")
+    assert main(unknown) == 2

@@ -6,12 +6,12 @@ import logging
 import socket
 import tempfile
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, cast
 
-from adaptive_vlm.contracts import InferenceRequest, InferenceResult
+from adaptive_vlm.contracts import InferenceRequest, InferenceResult, MetricValue
 from adaptive_vlm.timing import monotonic, perf_counter_ns
 from adaptive_vlm.transport.protocol import (
     DEFAULT_MAX_HEADER_BYTES,
@@ -68,6 +68,7 @@ class CloudRequestProcessor:
         max_pending_requests: int = 128,
         clock: Callable[[], float] = monotonic,
         event_callback: EventCallback | None = None,
+        state_provider: Callable[[], Mapping[str, MetricValue]] | None = None,
     ) -> None:
         if (
             inference_function is None
@@ -105,6 +106,7 @@ class CloudRequestProcessor:
         self._pending: dict[str, _PendingPrompt] = {}
         self._pending_lock = threading.Lock()
         self._event_callback = event_callback
+        self._state_provider = state_provider
         self._completed_requests = 0
         self._rejected_requests = 0
         self._failed_requests = 0
@@ -365,6 +367,14 @@ class CloudRequestProcessor:
                 "server_request_wire_bytes": received.wire_bytes,
             }
         )
+        if self._state_provider is not None:
+            # A cached background sample: reading it adds no measurable latency.
+            metrics.update(
+                {
+                    f"server_state_{key}": value
+                    for key, value in self._state_provider().items()
+                }
+            )
         self._increment("completed")
         self._emit(
             f"Request {frame.request_id}: completed in {server_total_ms / 1000:.1f}s "

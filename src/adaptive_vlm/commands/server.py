@@ -17,6 +17,12 @@ from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.models.fake import FakeModelAdapter
 from adaptive_vlm.models.moondream.adapter import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
+from adaptive_vlm.resource_state import (
+    CachedSampler,
+    NvmlReader,
+    combine,
+    host_memory_snapshot,
+)
 from adaptive_vlm.timing import perf_counter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer
 
@@ -31,6 +37,7 @@ def run_cloud_server_command(
     bind_host: str | None,
     verbose: bool,
     dual_paths: bool = False,
+    report_resource_state: bool = False,
 ) -> int:
     progress = ProgressReporter(verbose)
     progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
@@ -68,6 +75,14 @@ def run_cloud_server_command(
                 f"unsupported cloud model adapter: {config.model.adapter}"
             )
     model_load_ms = (perf_counter() - load_started) * 1000
+    state_sampler: CachedSampler | None = None
+    if report_resource_state:
+        index = int(device.split(":", 1)[1]) if device.startswith("cuda:") else 0
+        state_sampler = CachedSampler(
+            combine(NvmlReader(index).snapshot, host_memory_snapshot), period_s=0.5
+        )
+        state_sampler.start()
+        progress.info("Reporting resource state with every response")
     contract_fingerprint = model_contract_fingerprint(config.model)
     progress.detail(f"Model contract fingerprint: {contract_fingerprint}")
 
@@ -79,6 +94,7 @@ def run_cloud_server_command(
             inference_function=inference_function,
             tensor_inference_function=fake_adapter.generate_from_payload,
             event_callback=progress.info,
+            state_provider=state_sampler.latest if state_sampler else None,
         )
     elif dual_paths:
         processor = CloudRequestProcessor(
@@ -90,6 +106,7 @@ def run_cloud_server_command(
             prepared_tensor_inference_function=moondream_adapter.generate_from_payload,
             pending_timeout_seconds=config.transport.timeout_seconds,
             event_callback=progress.info,
+            state_provider=state_sampler.latest if state_sampler else None,
         )
     else:
         processor = CloudRequestProcessor(
@@ -97,6 +114,7 @@ def run_cloud_server_command(
             model_fingerprint=contract_fingerprint,
             inference_function=inference_function,
             event_callback=progress.info,
+            state_provider=state_sampler.latest if state_sampler else None,
         )
     server = CloudServer(
         host=bind_host or config.transport.host,
@@ -118,6 +136,7 @@ def run_cloud_server_command(
                 "model_load_ms": model_load_ms,
                 "seeded_providers": list(seeded),
                 "supported_paths": list(processor.supported_paths),
+                "reports_resource_state": state_sampler is not None,
             },
             sort_keys=True,
         ),
@@ -129,6 +148,8 @@ def run_cloud_server_command(
         server.shutdown()
     finally:
         server.shutdown()
+        if state_sampler is not None:
+            state_sampler.stop()
         progress.info("Cloud server stopped")
     return 0
 

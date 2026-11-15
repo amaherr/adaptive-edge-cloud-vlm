@@ -4,12 +4,22 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 from adaptive_vlm.artifacts import create_run_manifest
+from adaptive_vlm.benchmark.edge_load import (
+    NO_LOAD,
+    EdgeLoadGenerator,
+    LoadGeneratorFailure,
+    LoadLevel,
+    level_conditions,
+    load_levels,
+)
 from adaptive_vlm.benchmark.interleaved import (
     DEVICE_RESTART_EXIT_CODE,
+    ENVIRONMENT_RESTART_EXIT_CODE,
     PLACEMENTS,
     DeviceContextFailure,
     run_interleaved_benchmark,
@@ -30,6 +40,13 @@ from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter, fake_tensor_payload
 from adaptive_vlm.progress import ProgressReporter
+from adaptive_vlm.resource_state import (
+    NvmlReader,
+    Snapshot,
+    WindowsGpuCounterSampler,
+    combine,
+    host_memory_snapshot,
+)
 from adaptive_vlm.transport.tensors import TensorPayload
 
 
@@ -149,7 +166,38 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
         )
 
     prepare = getattr(adapter, "activate_stage", None) if adapter is not None else None
+    load_level = _load_level(args)
+    generator = (
+        EdgeLoadGenerator(
+            load_level,
+            directory=args.run_dir.parent / f".{args.run_dir.name}-edge-load",
+        )
+        if load_level is not None
+        else None
+    )
+    sources: list[Callable[[], Snapshot]] = []
+    windows: WindowsGpuCounterSampler | None = None
+    if args.resource_state:
+        index = _device_index(args.edge_device)
+        sources += [NvmlReader(index).snapshot, host_memory_snapshot]
+        try:
+            windows = WindowsGpuCounterSampler()
+        except FileNotFoundError:
+            progress.info("powershell.exe unreachable: no Windows GPU counters")
+        else:
+            windows.start()
+            if not windows.wait_for_sample():
+                progress.info("Windows GPU counters produced no sample yet")
+            sources.append(windows.snapshot)
+    if generator is not None:
+        sources.append(generator.snapshot)
+    state_probe = combine(*sources, prefix="edge_") if sources else None
     try:
+        if generator is not None:
+            with progress.phase(
+                f"Starting edge load {load_level.name if load_level else ''}"
+            ):
+                generator.start()
         summary = run_interleaved_benchmark(
             config=config,
             manifest=manifest,
@@ -161,12 +209,24 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
             warmups=warmups,
             seed=args.order_seed,
             prepare_stage=prepare if callable(prepare) else None,
+            state_probe=state_probe,
+            precondition=generator.check if generator is not None else None,
+            conditions=level_conditions(load_level),
             resume=args.resume,
             max_consecutive_failures=args.max_consecutive_failures,
         )
     except DeviceContextFailure as exc:
         print(f"error: {exc}", flush=True)
         return DEVICE_RESTART_EXIT_CODE
+    except LoadGeneratorFailure as exc:
+        print(f"error: {exc}; resume restarts the load generator", flush=True)
+        return ENVIRONMENT_RESTART_EXIT_CODE
+    finally:
+        if generator is not None:
+            final = generator.stop()
+            progress.info(f"Edge load stopped: {json.dumps(final, sort_keys=True)}")
+        if windows is not None:
+            windows.stop()
     print(json.dumps(summary["placements"], indent=2, sort_keys=True))
     return 0
 
@@ -201,5 +261,39 @@ def add_interleaved_parser(
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--max-consecutive-failures", type=int, default=0)
+    parser.add_argument(
+        "--resource-state",
+        action="store_true",
+        help=(
+            "Record edge GPU (NVML), host memory and Windows GPU shared-memory "
+            "state before every timed request"
+        ),
+    )
+    parser.add_argument(
+        "--edge-load-config", type=Path, help="Edge-load levels JSON (L1, L2, ...)"
+    )
+    parser.add_argument(
+        "--edge-load-level",
+        default=NO_LOAD,
+        help="L0 (no load, default) or a level from --edge-load-config",
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
     return parser
+
+
+def _device_index(device: str) -> int:
+    return int(device.split(":", 1)[1]) if device.startswith("cuda:") else 0
+
+
+def _load_level(args: argparse.Namespace) -> LoadLevel | None:
+    if args.edge_load_level == NO_LOAD:
+        return None
+    if args.edge_load_config is None:
+        raise ConfigError("--edge-load-level other than L0 needs --edge-load-config")
+    levels = load_levels(args.edge_load_config)
+    if args.edge_load_level not in levels:
+        raise ConfigError(
+            f"unknown edge-load level {args.edge_load_level}; "
+            f"choose L0 or one of {sorted(levels)}"
+        )
+    return levels[args.edge_load_level]

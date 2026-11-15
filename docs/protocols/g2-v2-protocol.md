@@ -134,13 +134,17 @@ Every validation and evaluation condition lies inside the training rate and RTT 
 
 ## 6. Edge GPU load (draft)
 
-| Level | Competitor | Purpose |
-| --- | --- | --- |
-| L0 | None | Unloaded edge |
-| L1 | Active CUDA competitor, 512 MiB working set | Edge near the cloud/distributed range |
-| L2 | Active CUDA competitor, 1 GiB working set | Edge clearly slower than cloud |
+| Level | Competitor ([levels_v1.json](../../configs/edge_load/levels_v1.json)) | Edge/full median under P1 | Purpose |
+| --- | --- | ---: | --- |
+| L0 | None | 1.27 s | Unloaded edge |
+| L1 | 512 MiB working set, 10 ms busy / 10 ms idle (achieved duty 0.60) | 1.85 s | Edge near the likely cloud/distributed range |
+| L2 | 512 MiB working set, 20 ms busy / 0 ms idle (achieved duty 0.99) | 2.81 s | Edge clearly slower than cloud |
 
-Before the pilot, the competitor's kernel duty cycle is calibrated on the edge laptop so that L1 puts the median edge/full latency, under the selected prompt, between 2.0 and 3.0 s. That is the range G2 measured for cloud. Its working set and duty cycle are then fixed. The competitor runs in its own process. The supervisor starts it before an L1/L2 sub-block, verifies it, and stops it afterwards. Its throughput is logged.
+[Calibrated 15–16 November 2026](../../results/edge-load-calibration-20261116/README.md). Both levels reproduced within 1.5% over three separate runs. They load the GPU with compute on a fixed 512 MiB working set. The draft's 1 GiB L2 was dropped: it sat within about 50 MiB of the edge's dedicated-memory limit, made latency insensitive to the duty cycle, and gave a p90 about 55% above the median. That is uncontrolled memory pressure rather than load.
+
+The competitor (`python -m adaptive_vlm.benchmark.edge_load_worker`) runs in its own process. `interleaved-benchmark --edge-load-config … --edge-load-level L1|L2` starts it after the model has loaded. It verifies the heartbeat before every attempt; if the generator is not alive, the command exits with code 76 and the supervisor resumes. It stops the generator at the end. Its level, liveness, heartbeat age and achieved duty are in every record.
+
+**Pilot check.** If the pilot shows the median cloud latency at 35 Mb/s / 20 ms (V02) below 1.6 s or above 2.6 s, L1 does not sit near the cloud/distributed range. The levels are then re-chosen from the calibration curve by a dated amendment, before any G2 v2 data is collected.
 
 All conditions run at L0. L1 and L2 run on six conditions:
 - training: T02, T04, T06, T09;
@@ -157,12 +161,12 @@ Each split therefore contains cells where the best placement changes with load.
   - one excluded warmup per placement;
   - then each request ID of the split, in a per-sub-block seeded order;
   - for each request, all three placements, in a per-request seeded order.
-- **Edge state preparation:** before each timed request, the adapter is set, untimed, to the stage a run of same-placement requests would leave active: text before edge/full, vision before distributed. The time spent is logged as `switch_cost_ms`. Edge/full still pays both of its stage swaps inside the timed request.
+- **Edge state preparation:** before each timed request, the adapter is set, untimed, to the stage a run of same-placement requests would leave active: text before edge/full, vision before distributed. The time spent is logged as `stage_prepare_ms`. Edge/full still pays both of its stage swaps inside the timed request.
 - **CUDA failures:** a `CUDA error: unknown error` leaves the process's CUDA context unusable. It happened once in about 730 swap-residency requests during calibration. The supervisor must restart the edge process and resume the sub-block, rather than stopping the campaign. Restarted attempts are recorded, and failures still count toward the section 8 limit. Core dumps are disabled for every campaign process (`ulimit -c 1`; WSL's piped crash handler ignores `ulimit -c 0`), so a crash can't fill the Windows system drive.
-- **Resource state:** immediately before each timed request, record:
-  - edge and cloud GPU clocks, temperature, power, utilization, used and free VRAM;
-  - the edge Windows shared GPU memory counter;
-  - competitor status.
+- **Resource state:** each record carries a snapshot taken outside the timed region (`interleaved-benchmark --resource-state`, `adaptive-server --report-resource-state`):
+  - **Edge, read synchronously right before the timer starts:** NVML GPU clocks, temperature, power, utilization, used and free VRAM, performance state and clock-event reasons; host available memory and swap; competitor status (level, alive, heartbeat age, achieved duty).
+  - **Edge Windows GPU counters:** dedicated and shared usage on the CUDA adapter. One read takes about 1.4 s, so a background `powershell.exe` streams them once a second, and each record stores the latest sample and its age.
+  - **Cloud:** the same NVML and host fields, polled every 0.5 s in the server's background thread and returned with each cloud and distributed response as `server_state_*`, with the sample's age. Reading the cached sample adds no latency.
 
 ### Expected attempt count
 
@@ -181,7 +185,7 @@ A sub-block is valid only if:
 1. it passes the pre and post network measurements and the zero-drop check;
 2. the heterogeneous-correctness reference was verified at campaign preflight;
 3. every planned attempt has a record, with at most 1% failed attempts and fewer than three consecutive failures;
-4. at L0, the edge shared GPU memory counter stays below 256 MiB at every request snapshot (no spill);
+4. at L0, the edge never spills: Windows *dedicated* usage on the CUDA adapter stays at least 128 MiB below the adapter's maximum (3,960 MiB on the RTX 3050) at every request snapshot. Shared usage is not the spill signal under swap residency, because Windows counts the pinned host master copies (about 4.4 GB) as GPU shared usage. The resident model on this GPU spilled with dedicated usage at 3,960 MiB and about 670 MiB shared; swap ran at 3,271 MiB dedicated;
 5. at L1/L2, the competitor was verified running at the first and last request snapshots.
 
 An invalid sub-block is rerun as a whole. A dataset with any invalid sub-block left is not G2 v2.

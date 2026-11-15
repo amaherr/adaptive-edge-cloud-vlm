@@ -176,6 +176,7 @@ def build_parser() -> argparse.ArgumentParser:
     server_parser.add_argument("--device", default="cpu")
     server_parser.add_argument("--offline", action="store_true")
     server_parser.add_argument("--bind-host")
+    _add_resource_state_argument(server_parser)
     server_parser.add_argument("-v", "--verbose", action="store_true")
 
     adaptive_server = subcommands.add_parser(
@@ -187,6 +188,7 @@ def build_parser() -> argparse.ArgumentParser:
     adaptive_server.add_argument("--device", default="cpu")
     adaptive_server.add_argument("--offline", action="store_true")
     adaptive_server.add_argument("--bind-host")
+    _add_resource_state_argument(adaptive_server)
     adaptive_server.add_argument("-v", "--verbose", action="store_true")
 
     adaptive_parser = subcommands.add_parser(
@@ -339,6 +341,18 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _add_resource_state_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--report-resource-state",
+        action="store_true",
+        help=(
+            "Sample this host's GPU (NVML) and memory every 0.5 s in the "
+            "background and attach the latest sample to each response as "
+            "server_state_* metrics."
+        ),
+    )
+
+
 def _add_edge_residency_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--edge-residency",
@@ -411,6 +425,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 bind_host=args.bind_host,
                 verbose=args.verbose,
                 dual_paths=args.command == "adaptive-server",
+                report_resource_state=args.report_resource_state,
             )
         if args.command == "adaptive-infer":
             return adaptive.run_adaptive_infer_command(args)

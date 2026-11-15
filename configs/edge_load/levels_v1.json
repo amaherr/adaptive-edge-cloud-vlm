@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "description": "G2 v2 edge GPU load levels on the RTX 3050 edge (protocol section 6). Compute contention on a fixed 512 MiB working set; L0 means no load generator.",
+  "levels": {
+    "L1": {"working_set_mib": 512, "busy_ms": 10, "idle_ms": 10},
+    "L2": {"working_set_mib": 512, "busy_ms": 20, "idle_ms": 0}
+  }
+}

@@ -54,7 +54,12 @@ PREPARED_STAGE: Mapping[str, str | None] = {
     "cloud": None,
 }
 DEVICE_RESTART_EXIT_CODE = 75
+ENVIRONMENT_RESTART_EXIT_CODE = 76
+RESTARTABLE_EXIT_CODES = frozenset(
+    {DEVICE_RESTART_EXIT_CODE, ENVIRONMENT_RESTART_EXIT_CODE}
+)
 StagePreparer = Callable[[str], float]
+StateProbe = Callable[[], Mapping[str, Any]]
 
 
 class DeviceContextFailure(RuntimeError):
@@ -193,10 +198,21 @@ def run_interleaved_benchmark(
     seed: int,
     pipeline: str = "synchronous",
     prepare_stage: StagePreparer | None = None,
+    state_probe: StateProbe | None = None,
+    precondition: Callable[[], None] | None = None,
+    conditions: Mapping[str, Any] | None = None,
     resume: bool = False,
     max_consecutive_failures: int = 0,
 ) -> dict[str, Any]:
-    """Run every placement for each request in a seeded interleaved order."""
+    """Run every placement for each request in a seeded interleaved order.
+
+    ``conditions`` (for example the edge-load level) is recorded in every
+    placement plan, so a resume under different conditions is refused.
+    ``precondition`` runs before each attempt; if it raises, nothing is
+    recorded for that attempt and the exception propagates (the caller exits
+    for a restart). ``state_probe`` runs after stage preparation, outside the
+    timer, and its snapshot is stored as ``resource_state``.
+    """
 
     if manifest.revision != config.dataset.revision:
         raise ValueError("request manifest revision differs from experiment config")
@@ -240,6 +256,7 @@ def run_interleaved_benchmark(
             "pipeline": pipeline if placement == "distributed" else "synchronous",
             "schedule": schedule,
             "interleave": parameters,
+            "conditions": dict(conditions or {}),
         }
         plan["plan_sha256"] = _digest(plan)
         plans[placement] = plan
@@ -319,6 +336,8 @@ def run_interleaved_benchmark(
     for position, (placement, trial) in enumerate(order, 1):
         if (placement, trial.trial_id) in completed:
             continue
+        if precondition is not None:
+            precondition()
         item = items[trial.request_id]
         plan = plans[placement]
         print(
@@ -340,6 +359,7 @@ def run_interleaved_benchmark(
             "interleave_position": position,
             "prepared_stage": PREPARED_STAGE[placement],
             "stage_prepare_ms": None,
+            "resource_state": None,
         }
         failure: Exception | None = None
         started = perf_counter_ns()
@@ -347,6 +367,8 @@ def run_interleaved_benchmark(
             stage = PREPARED_STAGE[placement]
             if stage is not None and prepare_stage is not None:
                 row["stage_prepare_ms"] = prepare_stage(stage)
+            if state_probe is not None:
+                row["resource_state"] = dict(state_probe())
             started = perf_counter_ns()
             result = policies[placement].infer(item.to_request())
             if result.request_id != item.request_id:
@@ -416,8 +438,10 @@ def run_with_device_restarts(
 ) -> tuple[int, int]:
     """Run an interleaved benchmark, resuming after device-context failures.
 
-    Returns ``(exit_code, restarts)``. Only exit code 75 triggers a restart;
-    ``--resume`` is appended to every restart that does not already carry it.
+    Returns ``(exit_code, restarts)``. Exit codes 75 (local CUDA context
+    failure) and 76 (an environment check such as the edge load generator
+    failed) trigger a restart; ``--resume`` is appended to every restart that
+    does not already carry it.
     """
 
     if max_restarts < 0:
@@ -427,7 +451,7 @@ def run_with_device_restarts(
     restarts = 0
     while True:
         code = execute(argv)
-        if code != DEVICE_RESTART_EXIT_CODE or restarts >= max_restarts:
+        if code not in RESTARTABLE_EXIT_CODES or restarts >= max_restarts:
             return code, restarts
         restarts += 1
         if "--resume" not in argv:
