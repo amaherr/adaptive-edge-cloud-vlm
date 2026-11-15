@@ -1,0 +1,15 @@
+{
+  "weighting": "Equal weight per condition and request; 3 repeats averaged per request",
+  "best_static": "cloud",
+  "best_static_mean_ms": 2444.199774690741,
+  "retrospective_condition_choice_mean_ms": 2358.878918473704,
+  "retrospective_condition_saving_ms": 85.3208562170371,
+  "retrospective_condition_saving_percent": 3.490748059979367,
+  "conditional_fixed_choice_saving_ci95_ms": [
+    71.90464881405559,
+    97.96760048788896
+  ],
+  "retrospective_request_oracle_mean_ms": 2349.840258235185,
+  "retrospective_request_oracle_saving_percent": 3.8605484474972878,
+  "caution": "Both choices use observed candidate outcomes: optimistic in-sample references, not adaptive runtime results. CI conditions on selected block policies."
+}

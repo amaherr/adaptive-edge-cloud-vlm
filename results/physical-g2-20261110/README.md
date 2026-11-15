@@ -2,6 +2,19 @@
 
 All **8,100 measured requests succeeded**, plus 27 warmups. All nine controlled network blocks passed the user-approved `physical-heterogeneous-v2` criterion. The campaign completed at **2026-11-11T05:20:58+00:00** (07:20:58 Cairo), in **15.20 hours** including preflight. Source commit: `3c38be2a68d902dbbf286621a593832aa2149978`.
 
+## Stage-level analysis and thesis findings
+
+Start with [the detailed stage analysis](analysis/stage_analysis.md). It explains the bottleneck in every network condition, includes four scientific figures and paired uncertainty, and relates the measured crossover and memory effects to adaptive placement. The analysis covers all 8,100 measured rows; the original evidence is unchanged.
+
+Cloud-only wins N1–N4 and N7–N9 on mean latency; the projected split wins N5–N6. The fitted crossing near 39 Mb/s is descriptive, not a validated live switching threshold. A retrospective condition-wise choice saves about 3.5% against always-cloud on this equally weighted grid, before sensing/switching costs.
+
+- [Stage budgets CSV](analysis/stage_summary.csv): all 27 network/placement budgets.
+- [Placement comparison CSV](analysis/placement_comparison.csv): paired request-level confidence intervals and winner counts.
+- [Analysis validation](analysis/analysis_validation.json): archive hashes, row counts, timing closure and software versions.
+- [Reproduction script](analysis/analyze_stages.py): regenerate all tables and figures without a GPU or cloud connection.
+
+## Original run evidence
+
 - [summary.json](summary.json): completion, aggregate placement timings, counts and correctness outcomes.
 - [block_summary.csv](block_summary.csv): latency, quality and framed-byte summaries for all 27 block/placement combinations.
 - [evidence.tar.gz](evidence.tar.gz): original request journals, plans, manifests, profiles, GPU samples, pre/post network measurements, validation reports, preflight logs and hash-bound same-device correctness references.

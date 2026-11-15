@@ -1,0 +1,21 @@
+{
+  "scope": "Descriptive N1-N6 fit only; compute state changes across blocks",
+  "formula_seconds": "T_distributed - T_cloud = a + b / uplink_Mbps",
+  "a_seconds": -0.6120835006029216,
+  "b_seconds_mbps": 23.98701915920597,
+  "fitted_crossover_mbps": 39.189128828955525,
+  "leave_one_condition_out_crossover_range_mbps": [
+    36.42287882939682,
+    43.471014204360856
+  ],
+  "in_sample_rmse_ms": 132.0858787584953,
+  "observed_nominal_crossover_bracket_mbps": [
+    25,
+    50
+  ],
+  "observed_measured_crossover_bracket_mbps": [
+    23.925950712333535,
+    48.006610285205284
+  ],
+  "not_a_confidence_interval": "Leave-one-condition-out range is a sensitivity check, not CI or independent validation"
+}
