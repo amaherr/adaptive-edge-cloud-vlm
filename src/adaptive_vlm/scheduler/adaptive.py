@@ -7,15 +7,15 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
+from adaptive_vlm.prediction.v1.predictor import (
+    PredictionState,
+    PredictionTask,
+    Predictor,
+)
 from adaptive_vlm.scheduler.configuration import (
     CONFIGURATIONS,
     CapabilityRegistry,
     ConfigurationId,
-)
-from adaptive_vlm.scheduler.predictor import (
-    PredictionState,
-    PredictionTask,
-    Predictor,
 )
 from adaptive_vlm.scheduler.selector import (
     CandidateSnapshot,

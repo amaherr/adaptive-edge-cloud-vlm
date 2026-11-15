@@ -1,6 +1,6 @@
 # Reproduce official scoring
 
-The evaluation uses the **unmodified** upstream source, not a Python 3 rewrite. The primary predictions are exact saved `output_text` values. The existing adapter `scripts/run_official_vqa_eval.py` records the actual upstream source/input hashes in every result. No GPU, model loading or university cloud connection is needed.
+The evaluation uses the **unmodified** upstream source, not a Python 3 rewrite. The primary predictions are exact saved `output_text` values. The existing adapter `scripts/vqa/run_official_vqa_eval.py` records the actual upstream source/input hashes in every result. No GPU, model loading or university cloud connection is needed.
 
 Required inputs are the committed evidence archive, the frozen manifest, and the same 100 image paths (the existing manifest exporter validates their presence). Keep original questions and annotations in ignored data/artifact directories. The official source JSONs and the runtime are not redistributed in this results directory.
 

@@ -21,6 +21,7 @@ from adaptive_vlm.commands import (
     config as config_commands,
 )
 from adaptive_vlm.config import ConfigError, ExecutionMode
+from adaptive_vlm.models.moondream.residency import WEIGHT_RESIDENCIES
 from adaptive_vlm.scheduler.configuration import ConfigurationId
 
 
@@ -82,6 +83,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     benchmark_parser.add_argument("--vision-device", default="cpu")
     benchmark_parser.add_argument("--text-device", default="cpu")
+    _add_edge_residency_argument(benchmark_parser)
     benchmark_parser.add_argument("--offline", action="store_true")
     benchmark_parser.add_argument("--warmups", type=int)
     benchmark_parser.add_argument("--repetitions", type=int)
@@ -140,6 +142,7 @@ def build_parser() -> argparse.ArgumentParser:
     edge_parser.add_argument("--request-id", default="edge-0001")
     edge_parser.add_argument("--vision-device", default="cpu")
     edge_parser.add_argument("--text-device", default="cpu")
+    _add_edge_residency_argument(edge_parser)
     edge_parser.add_argument("--offline", action="store_true")
     edge_parser.add_argument("--output-dir", type=Path)
     edge_parser.add_argument("-v", "--verbose", action="store_true")
@@ -316,6 +319,19 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _add_edge_residency_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--edge-residency",
+        choices=WEIGHT_RESIDENCIES,
+        default="resident",
+        help=(
+            "Edge full-model weight placement: 'resident' keeps both stages on "
+            "the device; 'swap' pins weights in host memory and copies only the "
+            "executing stage to one CUDA device (same arithmetic, less VRAM)."
+        ),
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
@@ -361,6 +377,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 offline=args.offline,
                 output_dir=args.output_dir,
                 verbose=args.verbose,
+                weight_residency=args.edge_residency,
             )
         if args.command in {"cloud-server", "adaptive-server"}:
             return server.run_cloud_server_command(

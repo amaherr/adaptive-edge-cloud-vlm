@@ -12,7 +12,6 @@ from statistics import median
 from typing import Any
 
 from adaptive_vlm.artifacts import append_jsonl, write_json_atomic
-from adaptive_vlm.benchmark.calibrate import canonical_sha256
 from adaptive_vlm.benchmark.runner import (
     _quality,
     _read_rows,
@@ -23,17 +22,18 @@ from adaptive_vlm.benchmark.runner import (
 from adaptive_vlm.config import ExperimentConfig, model_contract_fingerprint
 from adaptive_vlm.contracts import RunManifest
 from adaptive_vlm.data.manifest import FrozenManifest, RequestItem
+from adaptive_vlm.prediction.v1.calibration import canonical_sha256
+from adaptive_vlm.prediction.v1.predictor import (
+    Calibration,
+    PredictionState,
+    PredictionTask,
+    Predictor,
+)
 from adaptive_vlm.scheduler.adaptive import RegistrySnapshot, execute_adaptive_request
 from adaptive_vlm.scheduler.configuration import (
     CONFIGURATIONS,
     CapabilityRegistry,
     ConfigurationId,
-)
-from adaptive_vlm.scheduler.predictor import (
-    Calibration,
-    PredictionState,
-    PredictionTask,
-    Predictor,
 )
 from adaptive_vlm.scheduler.selector import SelectionConstraints
 from adaptive_vlm.timing import perf_counter_ns

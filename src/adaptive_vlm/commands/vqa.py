@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 
-from adaptive_vlm.benchmark.vqa_export import (
+from adaptive_vlm.data.vqa_export import (
     export_vqa_predictions,
     prepare_vqa_eval_subset,
 )

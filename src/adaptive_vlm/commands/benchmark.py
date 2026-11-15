@@ -23,7 +23,7 @@ from adaptive_vlm.execution.distributed import DistributedExecutionPolicy
 from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
-from adaptive_vlm.models.moondream import MoondreamAdapter
+from adaptive_vlm.models.moondream.adapter import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
 
 
@@ -39,6 +39,10 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
         raise ConfigError("distributed benchmark requires the Moondream2 adapter")
     if mode is not ExecutionMode.EDGE and config.cloud.status == "pending":
         raise ConfigError("remote benchmark requires declared cloud hardware")
+    if args.edge_residency != "resident" and (
+        mode is not ExecutionMode.EDGE or config.model.adapter != "moondream2"
+    ):
+        raise ConfigError("--edge-residency swap applies only to Moondream edge runs")
     seeded = seed_everything(config.runtime.seed)
     environment = collect_environment()
     environment["seeded_providers"] = list(seeded)
@@ -46,6 +50,7 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
         "mode": mode.value,
         "vision_device": args.vision_device,
         "text_device": args.text_device,
+        "weight_residency": args.edge_residency,
         "pipeline": args.pipeline,
         "remote": f"{config.transport.host}:{config.transport.port}",
     }
@@ -81,6 +86,7 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
                     vision_device=args.vision_device,
                     text_device=args.text_device,
                     offline=args.offline,
+                    weight_residency=args.edge_residency,
                 )
             policy = LocalExecutionPolicy(adapter)
     elif mode is ExecutionMode.CLOUD:

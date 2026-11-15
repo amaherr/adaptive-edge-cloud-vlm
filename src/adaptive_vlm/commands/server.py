@@ -15,7 +15,7 @@ from adaptive_vlm.config import (
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult
 from adaptive_vlm.determinism import seed_everything
 from adaptive_vlm.models.fake import FakeModelAdapter
-from adaptive_vlm.models.moondream import MoondreamAdapter
+from adaptive_vlm.models.moondream.adapter import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.timing import perf_counter
 from adaptive_vlm.transport.server import CloudRequestProcessor, CloudServer

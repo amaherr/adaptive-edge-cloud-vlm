@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 
-from adaptive_vlm.benchmark.predictor_eval import run_predictor_evaluation
+from adaptive_vlm.prediction.v1.evaluation import run_predictor_evaluation
 
 
 def run_calibrate_command(args: argparse.Namespace) -> int:

@@ -20,7 +20,7 @@ HERE = Path(__file__).resolve().parent
 RESULTS = HERE.parent
 REPO = HERE.parents[2]
 sys.path.insert(0, str(REPO / "src"))
-from adaptive_vlm.benchmark.vqa_export import (  # noqa: E402
+from adaptive_vlm.data.vqa_export import (  # noqa: E402
     export_vqa_predictions,
     prepare_vqa_eval_subset,
 )
@@ -119,7 +119,7 @@ def main():
             return saved
         cmd = [
             str(args.python2),
-            str(REPO / "scripts/run_official_vqa_eval.py"),
+            str(REPO / "scripts/vqa/run_official_vqa_eval.py"),
             "--vqa-root",
             str(args.vqa_root),
             "--questions",
@@ -245,7 +245,7 @@ def main():
         "upstream_commit": PIN,
         "upstream_tracked_sources_modified": False,
         "source_sha256": source_hashes,
-        "adapter_sha256": sha(REPO / "scripts/run_official_vqa_eval.py"),
+        "adapter_sha256": sha(REPO / "scripts/vqa/run_official_vqa_eval.py"),
         "archive_sha256": archive_hash,
         "manifest_sha256": MANIFEST_SHA,
         "python2_version": subprocess.check_output(
@@ -257,7 +257,7 @@ def main():
         "attempts_evaluated": sum(r["question_count"] for r in records),
         "unique_question_ids": 100,
         "input_alignment_verified": True,
-        "exporter_sha256": sha(REPO / "src/adaptive_vlm/benchmark/vqa_export.py"),
+        "exporter_sha256": sha(REPO / "src/adaptive_vlm/data/vqa_export.py"),
         "orchestrator_sha256": sha(Path(__file__)),
         "pypy_download_url": (
             "https://downloads.python.org/pypy/pypy2.7-v7.3.15-linux64.tar.bz2"

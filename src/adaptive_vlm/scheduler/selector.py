@@ -6,12 +6,12 @@ import math
 from dataclasses import dataclass
 from typing import Any
 
+from adaptive_vlm.prediction.v1.predictor import Prediction
 from adaptive_vlm.scheduler.configuration import (
     CONFIGURATIONS,
     CapabilityStatus,
     ConfigurationId,
 )
-from adaptive_vlm.scheduler.predictor import Prediction
 
 
 @dataclass(frozen=True)

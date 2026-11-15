@@ -494,7 +494,7 @@ def write_report(summaries, pairs, question_rows):
         "",
         "The official source JSONs remain under ignored `data/raw/` or `artifacts/`; no full VQA dataset is redistributed. Re-fetch the exact pinned upstream checkout and official inputs if absent. See [REPRODUCE.md](REPRODUCE.md) for commands. No GPU or cloud device is required.",
         "",
-        "Sources: [official VQA evaluation documentation](https://visualqa.org/evaluation.html), [pinned upstream evaluator](https://github.com/GT-Vision-Lab/VQA/blob/a013f0043c1e2cdc995922dfe257f7149aa9af06/PythonEvaluationTools/vqaEvaluation/vqaEval.py), [official annotations download](https://visualqa.org/download.html), [frozen dataset protocol](../../../docs/physical_dataset_protocol_v1.md), [provisional runner](../../../src/adaptive_vlm/benchmark/runner.py), and [pinned upstream checksum source for PyPy](https://pypy.org/checksums.html).",
+        "Sources: [official VQA evaluation documentation](https://visualqa.org/evaluation.html), [pinned upstream evaluator](https://github.com/GT-Vision-Lab/VQA/blob/a013f0043c1e2cdc995922dfe257f7149aa9af06/PythonEvaluationTools/vqaEvaluation/vqaEval.py), [official annotations download](https://visualqa.org/download.html), [frozen dataset protocol](../../../docs/physical-testbed/vqa-dataset.md), [provisional runner](../../../src/adaptive_vlm/benchmark/runner.py), and [pinned upstream checksum source for PyPy](https://pypy.org/checksums.html).",
     ]
     # Both quality and analysis are direct children of the run folder.
     (HERE / "quality_report.md").write_text("\n".join(lines) + "\n")

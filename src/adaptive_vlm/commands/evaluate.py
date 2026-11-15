@@ -5,12 +5,12 @@ from __future__ import annotations
 import argparse
 import json
 
-from adaptive_vlm.benchmark.adaptive_analysis import analyze_adaptive_run
 from adaptive_vlm.benchmark.compare import compare_runs
-from adaptive_vlm.benchmark.monitor_eval import analyze_monitor_run
-from adaptive_vlm.benchmark.network_trace import run_network_trace
-from adaptive_vlm.benchmark.oracle import run_oracle_evaluation
-from adaptive_vlm.benchmark.thesis_eval import analyze_thesis_campaign
+from adaptive_vlm.evaluation.adaptive_analysis import analyze_adaptive_run
+from adaptive_vlm.evaluation.monitor_evaluation import analyze_monitor_run
+from adaptive_vlm.evaluation.network_trace import run_network_trace
+from adaptive_vlm.evaluation.oracle import run_oracle_evaluation
+from adaptive_vlm.evaluation.thesis_analysis import analyze_thesis_campaign
 
 
 def _print_report(report: dict[str, object]) -> int:

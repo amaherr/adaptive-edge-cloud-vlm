@@ -11,7 +11,7 @@ from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.execution.distributed import DistributedExecutionPolicy
 from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
-from adaptive_vlm.models.moondream import MoondreamAdapter
+from adaptive_vlm.models.moondream.adapter import MoondreamAdapter
 from adaptive_vlm.scheduler.configuration import ConfigurationId
 
 EdgeComponents = Literal["full", "vision", "none"]

@@ -11,7 +11,7 @@ from statistics import median
 from typing import Any, cast
 
 from adaptive_vlm.artifacts import write_json_atomic
-from adaptive_vlm.benchmark.heterogeneous import (
+from adaptive_vlm.benchmark.heterogeneous_correctness import (
     PROTOCOL,
     evaluate_rows,
     verify_reference_evidence,

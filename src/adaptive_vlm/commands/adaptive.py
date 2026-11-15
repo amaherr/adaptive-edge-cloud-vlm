@@ -25,12 +25,12 @@ from adaptive_vlm.execution.adaptive import load_phase1_policies
 from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.execution.remote import check_remote_capabilities
 from adaptive_vlm.models.base import ModelMetadata
+from adaptive_vlm.prediction.v1.predictor import Calibration, PredictionTask
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.scheduler.adaptive import RegistrySnapshot
 from adaptive_vlm.scheduler.configuration import CapabilityRegistry, ConfigurationId
 from adaptive_vlm.scheduler.dispatch import ConfigurationDispatcher
 from adaptive_vlm.scheduler.monitor import LiveMonitor, MonitorConfig
-from adaptive_vlm.scheduler.predictor import Calibration, PredictionTask
 from adaptive_vlm.scheduler.state import SystemState, TaskState
 
 

@@ -24,7 +24,8 @@ from adaptive_vlm.execution.distributed import DistributedExecutionPolicy
 from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter
-from adaptive_vlm.models.moondream import MoondreamAdapter
+from adaptive_vlm.models.moondream.adapter import MoondreamAdapter
+from adaptive_vlm.models.moondream.residency import WeightResidency
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.timing import perf_counter
 
@@ -88,6 +89,7 @@ def run_edge_infer_command(
     offline: bool,
     output_dir: Path | None,
     verbose: bool,
+    weight_residency: WeightResidency = "resident",
 ) -> int:
     progress = ProgressReporter(verbose)
     progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
@@ -103,12 +105,14 @@ def run_edge_infer_command(
     environment["execution_placement"] = {
         "vision_device": vision_device,
         "text_device": text_device,
+        "weight_residency": weight_residency,
         "offline_model_cache": offline,
     }
     manifest = create_run_manifest(config, environment)
     progress.detail(
         f"Model {config.model.model_id}@{config.model.revision}; "
-        f"vision={vision_device}, text={text_device}, offline={offline}"
+        f"vision={vision_device}, text={text_device}, "
+        f"residency={weight_residency}, offline={offline}"
     )
     load_started = perf_counter()
     with progress.phase("Loading and verifying the pinned Moondream2 model"):
@@ -119,6 +123,7 @@ def run_edge_infer_command(
             vision_device=vision_device,
             text_device=text_device,
             offline=offline,
+            weight_residency=weight_residency,
         )
     model_load_ms = (perf_counter() - load_started) * 1000
     policy = LocalExecutionPolicy(adapter)
