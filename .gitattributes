@@ -1,0 +1,6 @@
+# Hash-pinned inputs and sealed evidence must keep their committed bytes on
+# every platform; never convert their line endings on checkout.
+data/manifests/** -text
+configs/evaluation/** -text
+configs/profiles/** -text
+results/** -text
