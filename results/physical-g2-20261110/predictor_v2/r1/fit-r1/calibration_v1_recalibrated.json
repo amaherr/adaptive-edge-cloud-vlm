@@ -1,0 +1,420 @@
+{
+  "calibration_id": "61815fc7744b6a868daa652c48f7443efe916ee6190dc550f1e7582b7740049e",
+  "candidates": {
+    "cloud/raw_image": {
+      "cloud_memory_requirement_mib": 5786.000000000001,
+      "components": {
+        "client_preprocess_ms": {
+          "intercept_ms": 4.493819,
+          "scales": {},
+          "slopes": {}
+        },
+        "client_residual_ms": {
+          "intercept_ms": 0.15289050000001225,
+          "scales": {},
+          "slopes": {}
+        },
+        "edge_compute_ms": {
+          "intercept_ms": 0.0,
+          "scales": {},
+          "slopes": {}
+        },
+        "serialization_ms": {
+          "intercept_ms": 0.0,
+          "scales": {},
+          "slopes": {}
+        },
+        "server_fixed_ms": {
+          "intercept_ms": 2088.0127,
+          "scales": {},
+          "slopes": {}
+        }
+      },
+      "constant_median_ms": 2519.2867945,
+      "decode_ms_per_token": 21.151309374999997,
+      "edge_memory_requirement_mib": 0.0,
+      "expected_output_tokens": 11.0,
+      "independent_training_requests": 60,
+      "interval_half_width_ms": 1074.208618736792,
+      "network": {
+        "independent_network_blocks": 5,
+        "intercept_ms": 72.33486567027978,
+        "rtt_coefficient": 1.0462304010317736,
+        "signed_training_serialization_corrections_ms": {
+          "N1": 58.71742389518226,
+          "N3": 63.0992822724969,
+          "N5": 100.59955826729106,
+          "N6": 107.32014269463558,
+          "N8": 136.51715007172032
+        },
+        "support": {
+          "downlink_bps": [
+            1966075.8220888781,
+            96338546.2005503
+          ],
+          "rtt_ms": [
+            24.0683975,
+            55.382844
+          ],
+          "uplink_bps": [
+            1961040.126873934,
+            90048229.09210797
+          ]
+        }
+      },
+      "placement_profile_sha256": "f3f108f3999a2ca736745c2b7186a577c21793543b773b0b4fd27092d2c71ec9",
+      "request_framing_bytes": 352.5,
+      "response_wire_bytes": 1528.0,
+      "scheduled_training_rows": 900,
+      "successful_training_rows": 900,
+      "task_support": {
+        "image_bytes": [
+          40406,
+          308610
+        ],
+        "image_height": [
+          333,
+          640
+        ],
+        "image_width": [
+          270,
+          640
+        ],
+        "prompt_tokens": [
+          9,
+          17
+        ]
+      },
+      "training_status_counts": {
+        "ok": 900
+      },
+      "uncertainty_independent_requests": 56,
+      "uncertainty_source": "training grouped-OOF request max absolute error, not a probability guarantee"
+    },
+    "distributed/projected/synchronous": {
+      "cloud_memory_requirement_mib": 5786.000000000001,
+      "components": {
+        "client_preprocess_ms": {
+          "intercept_ms": 0.0,
+          "scales": {},
+          "slopes": {}
+        },
+        "client_residual_ms": {
+          "intercept_ms": 3.6589465000001837,
+          "scales": {},
+          "slopes": {}
+        },
+        "edge_compute_ms": {
+          "intercept_ms": 707.7948269999999,
+          "scales": {},
+          "slopes": {}
+        },
+        "serialization_ms": {
+          "intercept_ms": 1.2133935,
+          "scales": {},
+          "slopes": {}
+        },
+        "server_fixed_ms": {
+          "intercept_ms": 833.66775,
+          "scales": {},
+          "slopes": {}
+        }
+      },
+      "constant_median_ms": 4366.8898665,
+      "decode_ms_per_token": 21.30308611111111,
+      "edge_memory_requirement_mib": 1392.6000000000001,
+      "expected_output_tokens": 11.0,
+      "independent_training_requests": 60,
+      "interval_half_width_ms": 1005.0088870548316,
+      "network": {
+        "independent_network_blocks": 5,
+        "intercept_ms": -163.41461068835096,
+        "rtt_coefficient": 11.26616296441539,
+        "signed_training_serialization_corrections_ms": {
+          "N1": 294.22899201236953,
+          "N3": 55.7400217538182,
+          "N5": 112.00420925622824,
+          "N6": 119.84757876176347,
+          "N8": 161.24081736020227
+        },
+        "support": {
+          "downlink_bps": [
+            1966075.8220888781,
+            96338546.2005503
+          ],
+          "rtt_ms": [
+            24.0683975,
+            55.382844
+          ],
+          "uplink_bps": [
+            1961040.126873934,
+            90048229.09210797
+          ]
+        }
+      },
+      "placement_profile_sha256": "61cee0bf5285be03ae20e60c0fed3354877b58966336dbac2acb946a36f06891",
+      "request_framing_bytes": 453.0,
+      "response_wire_bytes": 1552.0,
+      "scheduled_training_rows": 900,
+      "successful_training_rows": 900,
+      "task_support": {
+        "image_bytes": [
+          40406,
+          308610
+        ],
+        "image_height": [
+          333,
+          640
+        ],
+        "image_width": [
+          270,
+          640
+        ],
+        "prompt_tokens": [
+          9,
+          17
+        ]
+      },
+      "training_status_counts": {
+        "ok": 900
+      },
+      "uncertainty_independent_requests": 56,
+      "uncertainty_source": "training grouped-OOF request max absolute error, not a probability guarantee"
+    },
+    "edge/full": {
+      "cloud_memory_requirement_mib": 0.0,
+      "components": {
+        "client_preprocess_ms": {
+          "intercept_ms": 0.0,
+          "scales": {},
+          "slopes": {}
+        },
+        "client_residual_ms": {
+          "intercept_ms": 3.57437199999913,
+          "scales": {},
+          "slopes": {}
+        },
+        "edge_compute_ms": {
+          "intercept_ms": 12504.151414,
+          "scales": {},
+          "slopes": {}
+        },
+        "serialization_ms": {
+          "intercept_ms": 0.0,
+          "scales": {},
+          "slopes": {}
+        },
+        "server_fixed_ms": {
+          "intercept_ms": 0.0,
+          "scales": {},
+          "slopes": {}
+        }
+      },
+      "constant_median_ms": 13248.303702000001,
+      "decode_ms_per_token": 55.67460113596491,
+      "edge_memory_requirement_mib": 5027.0,
+      "expected_output_tokens": 11.0,
+      "independent_training_requests": 60,
+      "interval_half_width_ms": 10151.039695119049,
+      "network": {
+        "intercept_ms": 0.0,
+        "rtt_coefficient": 0.0,
+        "support": {
+          "downlink_bps": [
+            1966075.8220888781,
+            96338546.2005503
+          ],
+          "rtt_ms": [
+            24.0683975,
+            55.382844
+          ],
+          "uplink_bps": [
+            1961040.126873934,
+            90048229.09210797
+          ]
+        }
+      },
+      "placement_profile_sha256": "44b5ce657f953eee51bbf8045dc5c073abcc85e4c28b0183e817648c3e78b63d",
+      "request_framing_bytes": 0.0,
+      "response_wire_bytes": 0.0,
+      "scheduled_training_rows": 900,
+      "successful_training_rows": 900,
+      "task_support": {
+        "image_bytes": [
+          40406,
+          308610
+        ],
+        "image_height": [
+          333,
+          640
+        ],
+        "image_width": [
+          270,
+          640
+        ],
+        "prompt_tokens": [
+          9,
+          17
+        ]
+      },
+      "training_status_counts": {
+        "ok": 900
+      },
+      "uncertainty_independent_requests": 56,
+      "uncertainty_source": "training grouped-OOF request max absolute error, not a probability guarantee"
+    }
+  },
+  "policy": {
+    "automatic_extrapolation_enabled": false,
+    "campaign_id": "physical-vqa-heterogeneous-v2",
+    "candidate_models": [
+      "v1_recalibrated",
+      "v2_a"
+    ],
+    "cloud_dedicated_memory_mib": 8192,
+    "compute_features": [
+      "image_pixels",
+      "prompt_tokens"
+    ],
+    "compute_ridge_alpha": 1e-06,
+    "dataset_manifest_sha256": "4e62826280e49359e8cf98d85154000c1583d63474be83a2e9a429da9bde72c9",
+    "edge_dedicated_memory_mib": 4096,
+    "environment_kind": "physical_wsl",
+    "extrapolation_interval_multiplier": 2.0,
+    "final_evaluation_authorized": false,
+    "grouped_request_folds": 5,
+    "host_pair_id": "edge-rtx3050-cloud-rtx2070super-v1",
+    "inference_git_commit": "3c38be2a68d902dbbf286621a593832aa2149978",
+    "interval_quantile": 0.95,
+    "live_probe_max_age_seconds": 30,
+    "max_controlled_block_probe_age_seconds": 14400,
+    "memory_headroom_fraction": 0.1,
+    "minimum_validation_coverage": 1.0,
+    "model_artifact_sha256": "70a7d94c0c8349eb58ed2d9e636ef2d0916960f321ecabeac6354b8ba3d7403f",
+    "model_config_sha256": "aa0296bfbf20f4ac2132f82e80812c88a323fe575b056ec8c8ff6ad479b579df",
+    "model_contract_sha256": "e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1",
+    "model_revision": "9a7d4024050840e001defacec2b00727e89149e6",
+    "network_envelope": {
+      "downlink_bps": [
+        1000000,
+        200000000
+      ],
+      "rtt_ms": [
+        0,
+        250
+      ],
+      "uplink_bps": [
+        1000000,
+        200000000
+      ]
+    },
+    "network_source": "physical_wsl_netem_measured",
+    "offline_network_assumption": "Block-constant controlled netem; pre-block probe only; no post-block measurement feature. Not live instantaneous goodput.",
+    "placement_profile_sha256": {
+      "cloud/raw_image": "f3f108f3999a2ca736745c2b7186a577c21793543b773b0b4fd27092d2c71ec9",
+      "distributed/projected/synchronous": "61cee0bf5285be03ae20e60c0fed3354877b58966336dbac2acb946a36f06891",
+      "edge/full": "44b5ce657f953eee51bbf8045dc5c073abcc85e4c28b0183e817648c3e78b63d"
+    },
+    "prior_final_outcomes_inspected": true,
+    "revision": "physical-v2-r1",
+    "schema_version": 2,
+    "shared_memory_live_approved": false,
+    "supported_task_bucket": "vqa-short-answer-32-token-budget",
+    "target_median_ape": 0.15,
+    "target_p90_ape": 0.3,
+    "task_envelope": {
+      "image_bytes": [
+        1,
+        67108864
+      ],
+      "image_height": [
+        1,
+        8192
+      ],
+      "image_width": [
+        1,
+        8192
+      ],
+      "prompt_tokens": [
+        1,
+        128
+      ]
+    },
+    "template_source_sha256": "ee7707c9b4d091dd6d3441ceebc54a36be4023e97d0504e59b5ea7d71147854b",
+    "tokenizer_sha256": "0512fdcac4a5f9e7746cbefce4a468dc93bf0f93f11e701b84f8b31bff199e9c",
+    "v2_b": "not implemented; optional residual model excluded before validation"
+  },
+  "schema_version": 2,
+  "split_sha256": "608e06c06e3916b79e33eda400f324a6bc9d2db73ccc6549fa1214277945e3cc",
+  "training_block_ids": [
+    "N1",
+    "N3",
+    "N5",
+    "N6",
+    "N8"
+  ],
+  "training_request_ids": [
+    "vqa-v2-val2014-112269002",
+    "vqa-v2-val2014-141538003",
+    "vqa-v2-val2014-153094003",
+    "vqa-v2-val2014-155142005",
+    "vqa-v2-val2014-156397014",
+    "vqa-v2-val2014-161605000",
+    "vqa-v2-val2014-164779000",
+    "vqa-v2-val2014-164885001",
+    "vqa-v2-val2014-174091007",
+    "vqa-v2-val2014-17778003",
+    "vqa-v2-val2014-188434015",
+    "vqa-v2-val2014-189932003",
+    "vqa-v2-val2014-197444001",
+    "vqa-v2-val2014-197756000",
+    "vqa-v2-val2014-21198000",
+    "vqa-v2-val2014-242870004",
+    "vqa-v2-val2014-253825000",
+    "vqa-v2-val2014-255630000",
+    "vqa-v2-val2014-257865001",
+    "vqa-v2-val2014-261780000",
+    "vqa-v2-val2014-267683002",
+    "vqa-v2-val2014-268770002",
+    "vqa-v2-val2014-296404001",
+    "vqa-v2-val2014-298151004",
+    "vqa-v2-val2014-298627001",
+    "vqa-v2-val2014-30504007",
+    "vqa-v2-val2014-31984003",
+    "vqa-v2-val2014-320396009",
+    "vqa-v2-val2014-324390020",
+    "vqa-v2-val2014-378860002",
+    "vqa-v2-val2014-386204008",
+    "vqa-v2-val2014-386313002",
+    "vqa-v2-val2014-398066004",
+    "vqa-v2-val2014-409178005",
+    "vqa-v2-val2014-417742000",
+    "vqa-v2-val2014-418959003",
+    "vqa-v2-val2014-427464000",
+    "vqa-v2-val2014-429042003",
+    "vqa-v2-val2014-432647001",
+    "vqa-v2-val2014-4396000",
+    "vqa-v2-val2014-453649002",
+    "vqa-v2-val2014-461692001",
+    "vqa-v2-val2014-476233019",
+    "vqa-v2-val2014-480379000",
+    "vqa-v2-val2014-485773002",
+    "vqa-v2-val2014-495825003",
+    "vqa-v2-val2014-498368004",
+    "vqa-v2-val2014-500423000",
+    "vqa-v2-val2014-50431001",
+    "vqa-v2-val2014-508541002",
+    "vqa-v2-val2014-518701002",
+    "vqa-v2-val2014-527219004",
+    "vqa-v2-val2014-543422012",
+    "vqa-v2-val2014-573605002",
+    "vqa-v2-val2014-575921015",
+    "vqa-v2-val2014-61925003",
+    "vqa-v2-val2014-66423002",
+    "vqa-v2-val2014-69140002",
+    "vqa-v2-val2014-74013005",
+    "vqa-v2-val2014-90373006"
+  ],
+  "training_rows_sha256": "545df1cc808e7a59967a873046f0f60eb56a89e0df5b5f76f4b1a06ec6b32fdb",
+  "variant": "v1_recalibrated"
+}

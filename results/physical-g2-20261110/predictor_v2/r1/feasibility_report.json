@@ -1,0 +1,34 @@
+{
+  "cloud_budget_mib": 8192,
+  "edge_budget_mib": 4096,
+  "full_edge_reason": "edge_memory_budget_exceeded",
+  "known_unsafe_claims": {
+    "constant_median": 0,
+    "v1_recalibrated": 0,
+    "v2_a": 0
+  },
+  "live_eligible_forecasts": {
+    "constant_median": 0,
+    "v1_recalibrated": 0,
+    "v2_a": 0
+  },
+  "requirements_mib": {
+    "cloud/raw_image": {
+      "cloud": 5786.000000000001,
+      "edge": 0.0
+    },
+    "distributed/projected/synchronous": {
+      "cloud": 5786.000000000001,
+      "edge": 1392.6000000000001
+    },
+    "edge/full": {
+      "cloud": 0.0,
+      "edge": 5027.0
+    }
+  },
+  "scope": "Conservative training reserved-memory requirements plus 10% headroom, dedicated VRAM only; not an execution guarantee",
+  "shared_memory_live_approval": false,
+  "validation_all_placements_attempts": 360,
+  "validation_failures": 0,
+  "validation_successes": 360
+}

@@ -1,0 +1,6 @@
+{
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "source_commit": "3d702928ee0f598958c2e1d6e6454a5bfd6a7199",
+  "training_device": "CPU, dependency-light scalar linear algebra"
+}

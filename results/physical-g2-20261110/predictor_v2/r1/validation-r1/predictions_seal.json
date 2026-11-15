@@ -1,0 +1,20 @@
+{
+  "calibration_file_sha256": {
+    "constant_median": "e71c62d98dccaec49f582d7c8439118b7fb0fdad0c7fa1f5b916189e1b53fe15",
+    "v1_recalibrated": "055fec197703c36b2f7dec3bf9ec164496d553b4d905b918d963613bc81cbd45",
+    "v2_a": "3191e67f19fe471347d5affbc6796ee81164213e36b398b3539d4a263fc55b0b"
+  },
+  "calibration_ids": {
+    "constant_median": "c268433b00c417ba6c21d3ab676e0b2c3509da2df2254f34a8ffe6a57b90fe76",
+    "v1_recalibrated": "61815fc7744b6a868daa652c48f7443efe916ee6190dc550f1e7582b7740049e",
+    "v2_a": "2b0789184034b6a6b5292dbd95450ccf5eda847f0ac3230447a9d4efc0456761"
+  },
+  "final_outcomes_read": false,
+  "input_snapshots_sha256": "6d02cee6e3d1ee793c91b07a146409efe0c6de5f0deafbeeed7ff2a0a3915cda",
+  "partition_audit_sha256": "7b70b1acea324580e24234b4ccfc293cb116b292164b712914cbfa7d2e781eff",
+  "prediction_rows": 1080,
+  "prediction_sha256": "780dea37d103609553ee2d26ad9eb552ca1b52489692c15b76fccf79d574b558",
+  "schema_version": 2,
+  "seal_sha256": "4e1e5e9a495f6236672bb161acb71199087dbc4e36827eea2ddf4eb2e46fa52f",
+  "validation_outcomes_read": false
+}

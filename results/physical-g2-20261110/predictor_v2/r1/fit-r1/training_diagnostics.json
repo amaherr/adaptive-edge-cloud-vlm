@@ -1,0 +1,26 @@
+{
+  "final_outcomes_read": false,
+  "interval_method": "95th percentile request-max grouped OOF absolute residual; twice width on extrapolation",
+  "lobo_predictions": 8100,
+  "models": {
+    "constant_median": "c268433b00c417ba6c21d3ab676e0b2c3509da2df2254f34a8ffe6a57b90fe76",
+    "v1_recalibrated": "61815fc7744b6a868daa652c48f7443efe916ee6190dc550f1e7582b7740049e",
+    "v2_a": "2b0789184034b6a6b5292dbd95450ccf5eda847f0ac3230447a9d4efc0456761"
+  },
+  "network_blocks": [
+    "N1",
+    "N3",
+    "N5",
+    "N6",
+    "N8"
+  ],
+  "oof_predictions": 8100,
+  "optional_v2_b": "not a declared candidate in this revision",
+  "schema_version": 2,
+  "status_counts": {
+    "ok": 2700
+  },
+  "training_attempts": 2700,
+  "unique_training_requests": 60,
+  "validation_outcomes_read": false
+}

@@ -1,0 +1,2710 @@
+{
+  "final_outcomes_read": false,
+  "independent_requests": 60,
+  "reports": {
+    "training_lobo.jsonl": {
+      "constant_median": {
+        "cloud/raw_image": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 357.25890652666664,
+            "median_ape": 0.07658162203428256,
+            "p90_ape": 0.41839072039216485,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.04748769947115515,
+            "signed_bias_ms": -5.860657916666703,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 649.3492272888889,
+              "median_ape": 0.21399404449968917,
+              "p90_ape": 0.35393373063184264,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.12123650435243831,
+              "signed_bias_ms": -473.0059782777778,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 268.46972205000003,
+              "median_ape": 0.04479719356413779,
+              "p90_ape": 0.48189088535202623,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.08109631195135165,
+              "signed_bias_ms": 91.83492038333357,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 292.7652929222221,
+              "median_ape": 0.06905504637544299,
+              "p90_ape": 0.5582410639385579,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.12174595595840695,
+              "signed_bias_ms": 181.8675713055553,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N6": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 292.49669756666657,
+              "median_ape": 0.07257127459690765,
+              "p90_ape": 0.5638163917047783,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.12069315807392435,
+              "signed_bias_ms": 179.94198713333319,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N8": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 283.21359280555555,
+              "median_ape": 0.05042104451993714,
+              "p90_ape": 0.40971934163323576,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.03513957572453111,
+              "signed_bias_ms": -9.941790127777754,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 357.25890652666664,
+            "median_ape": 0.07658162203428256,
+            "p90_ape": 0.41839072039216485,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.04748769947115515,
+            "signed_bias_ms": -5.860657916666703,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          }
+        },
+        "distributed/projected/synchronous": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 3739.730948137778,
+            "median_ape": 0.7738541498995427,
+            "p90_ape": 1.5357854208712158,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.27427832035314714,
+            "signed_bias_ms": -1720.5792152688891,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 11216.307163172223,
+              "median_ape": 0.7741847887723738,
+              "p90_ape": 0.7806868140519406,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.7749374614436778,
+              "signed_bias_ms": -11216.307163172223,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 1164.573130672222,
+              "median_ape": 0.2571494226500002,
+              "p90_ape": 0.3204010556376456,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.2592037786699373,
+              "signed_bias_ms": -1164.573130672222,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 2397.4785045055555,
+              "median_ape": 1.2136720564145773,
+              "p90_ape": 1.442673589868308,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 1.1854522231507238,
+              "signed_bias_ms": 2397.4785045055555,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N6": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 2650.4008276666664,
+              "median_ape": 1.513775765148433,
+              "p90_ape": 1.808406377063128,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 1.4987622730215173,
+              "signed_bias_ms": 2650.4008276666664,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N8": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 1269.8951146722222,
+              "median_ape": 0.27532337544145524,
+              "p90_ape": 0.3400344071476979,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.2786816542928903,
+              "signed_bias_ms": -1269.8951146722222,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 3739.730948137778,
+            "median_ape": 0.7738541498995427,
+            "p90_ape": 1.5357854208712158,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.27427832035314714,
+            "signed_bias_ms": -1720.5792152688891,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          }
+        },
+        "edge/full": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 900
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 2153.4607534422225,
+            "median_ape": 0.05925193166808464,
+            "p90_ape": 2.572030237678433,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.4250805827876692,
+            "signed_bias_ms": 1225.4584014544444,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2154.019444716667,
+              "median_ape": 0.06509593763242767,
+              "p90_ape": 2.669175935548242,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.48437688836435766,
+              "signed_bias_ms": 1883.847556205556,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2120.89671185,
+              "median_ape": 0.06180684582461515,
+              "p90_ape": 2.873073978560559,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.4930510975538151,
+              "signed_bias_ms": 1738.0180530111109,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2058.883681077778,
+              "median_ape": 0.04577095546247343,
+              "p90_ape": 2.623761016352333,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.41787268094967767,
+              "signed_bias_ms": 1143.5941541444447,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2263.5287583277777,
+              "median_ape": 0.0640430887051221,
+              "p90_ape": 2.419834503191847,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.3664242976947315,
+              "signed_bias_ms": 627.8996885499996,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2169.9751712388893,
+              "median_ape": 0.054546866104546385,
+              "p90_ape": 2.3839734411590916,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.36367794937576403,
+              "signed_bias_ms": 733.9325553611104,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 900
+            },
+            "failed_attempts": 0,
+            "interval_coverage": null,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": null,
+            "median_ape": null,
+            "p90_ape": null,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 0,
+            "signed_bias_fraction": null,
+            "signed_bias_ms": null,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          }
+        }
+      },
+      "v1_recalibrated": {
+        "cloud/raw_image": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "v1_strict_support_exceeded": 720
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 264.92440514686524,
+            "median_ape": 0.049106316692432636,
+            "p90_ape": 0.4996034791336933,
+            "prediction_coverage": 0.2,
+            "scheduled": 900,
+            "scored": 180,
+            "signed_bias_fraction": 0.09242692641480618,
+            "signed_bias_ms": 123.50919758251922,
+            "successful_attempts": 900,
+            "valid_predictions": 180
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": null,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": null,
+              "median_ape": null,
+              "p90_ape": null,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 0,
+              "signed_bias_fraction": null,
+              "signed_bias_ms": null,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 264.92440514686524,
+              "median_ape": 0.049106316692432636,
+              "p90_ape": 0.4996034791336933,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.09242692641480618,
+              "signed_bias_ms": 123.50919758251922,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": null,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": null,
+              "median_ape": null,
+              "p90_ape": null,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 0,
+              "signed_bias_fraction": null,
+              "signed_bias_ms": null,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N6": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": null,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": null,
+              "median_ape": null,
+              "p90_ape": null,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 0,
+              "signed_bias_fraction": null,
+              "signed_bias_ms": null,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N8": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": null,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": null,
+              "median_ape": null,
+              "p90_ape": null,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 0,
+              "signed_bias_fraction": null,
+              "signed_bias_ms": null,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "v1_strict_support_exceeded": 720
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 264.92440514686524,
+            "median_ape": 0.049106316692432636,
+            "p90_ape": 0.4996034791336933,
+            "prediction_coverage": 0.2,
+            "scheduled": 900,
+            "scored": 180,
+            "signed_bias_fraction": 0.09242692641480618,
+            "signed_bias_ms": 123.50919758251922,
+            "successful_attempts": 900,
+            "valid_predictions": 180
+          }
+        },
+        "distributed/projected/synchronous": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "v1_strict_support_exceeded": 720
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 320.11887896200847,
+            "median_ape": 0.06234633223658768,
+            "p90_ape": 0.1414564562743971,
+            "prediction_coverage": 0.2,
+            "scheduled": 900,
+            "scored": 180,
+            "signed_bias_fraction": -0.06414537821863213,
+            "signed_bias_ms": -297.3086313378015,
+            "successful_attempts": 900,
+            "valid_predictions": 180
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": null,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": null,
+              "median_ape": null,
+              "p90_ape": null,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 0,
+              "signed_bias_fraction": null,
+              "signed_bias_ms": null,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 320.11887896200847,
+              "median_ape": 0.06234633223658768,
+              "p90_ape": 0.1414564562743971,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.06414537821863213,
+              "signed_bias_ms": -297.3086313378015,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": null,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": null,
+              "median_ape": null,
+              "p90_ape": null,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 0,
+              "signed_bias_fraction": null,
+              "signed_bias_ms": null,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N6": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": null,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": null,
+              "median_ape": null,
+              "p90_ape": null,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 0,
+              "signed_bias_fraction": null,
+              "signed_bias_ms": null,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N8": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": null,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": null,
+              "median_ape": null,
+              "p90_ape": null,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 0,
+              "signed_bias_fraction": null,
+              "signed_bias_ms": null,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "v1_strict_support_exceeded": 720
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 320.11887896200847,
+            "median_ape": 0.06234633223658768,
+            "p90_ape": 0.1414564562743971,
+            "prediction_coverage": 0.2,
+            "scheduled": 900,
+            "scored": 180,
+            "signed_bias_fraction": -0.06414537821863213,
+            "signed_bias_ms": -297.3086313378015,
+            "successful_attempts": 900,
+            "valid_predictions": 180
+          }
+        },
+        "edge/full": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 900
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 2144.830191206121,
+            "median_ape": 0.05732005240342141,
+            "p90_ape": 2.5517911653938326,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.41630282650997874,
+            "signed_bias_ms": 1144.39065387988,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2090.550405456666,
+              "median_ape": 0.057093332987069256,
+              "p90_ape": 2.640332388005951,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.47270813873166434,
+              "signed_bias_ms": 1778.0658241055542,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2074.1907121139893,
+              "median_ape": 0.05916137030423532,
+              "p90_ape": 2.847162874789698,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.4830624936340178,
+              "signed_bias_ms": 1648.1165925602206,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2073.9957064750006,
+              "median_ape": 0.047375308269435215,
+              "p90_ape": 2.59180466393296,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.4053690862386118,
+              "signed_bias_ms": 1027.062041894442,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2303.6885186830996,
+              "median_ape": 0.06901675060152022,
+              "p90_ape": 2.401661550617587,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.3591631381458859,
+              "signed_bias_ms": 558.4494606447366,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2181.725613301851,
+              "median_ape": 0.056160726769796165,
+              "p90_ape": 2.3778523787240906,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.36121127579971385,
+              "signed_bias_ms": 710.2593501944464,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 900
+            },
+            "failed_attempts": 0,
+            "interval_coverage": null,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": null,
+            "median_ape": null,
+            "p90_ape": null,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 0,
+            "signed_bias_fraction": null,
+            "signed_bias_ms": null,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          }
+        }
+      },
+      "v2_a": {
+        "cloud/raw_image": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 242.04137931565847,
+            "median_ape": 0.06221805908100482,
+            "p90_ape": 0.2417464687862619,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": -0.0118211520511561,
+            "signed_bias_ms": -71.39157351477606,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 232.60220865117643,
+              "median_ape": 0.04865940289453474,
+              "p90_ape": 0.20362500987174145,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.006701880640010936,
+              "signed_bias_ms": -19.028490025615643,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 236.687476784391,
+              "median_ape": 0.05864202699084091,
+              "p90_ape": 0.25209451773080915,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.004267162904509188,
+              "signed_bias_ms": -35.839086157698716,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 243.15087740063638,
+              "median_ape": 0.07332087522835476,
+              "p90_ape": 0.2514070924642048,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.01721726115860365,
+              "signed_bias_ms": -86.47412509695363,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N6": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 246.9892647223974,
+              "median_ape": 0.08278505189868218,
+              "p90_ape": 0.24682806719167527,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.024053038426203443,
+              "signed_bias_ms": -102.23666206502061,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N8": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 250.7770690196912,
+              "median_ape": 0.08009258709060617,
+              "p90_ape": 0.22672861370558695,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.02880450421549353,
+              "signed_bias_ms": -113.37950422859166,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 242.04137931565847,
+            "median_ape": 0.06221805908100482,
+            "p90_ape": 0.2417464687862619,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": -0.0118211520511561,
+            "signed_bias_ms": -71.39157351477606,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          }
+        },
+        "distributed/projected/synchronous": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 369.06676969375997,
+            "median_ape": 0.053014278753621843,
+            "p90_ape": 0.30271150034142247,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.06711929194444785,
+            "signed_bias_ms": -24.410535364711983,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 601.296482191263,
+              "median_ape": 0.03689432662712924,
+              "p90_ape": 0.06585875843198788,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.04120860554118318,
+              "signed_bias_ms": -601.296482191263,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 226.38527366047455,
+              "median_ape": 0.03746925998199932,
+              "p90_ape": 0.1200646295094952,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.04041556280958171,
+              "signed_bias_ms": -190.41706962586355,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 406.761255777811,
+              "median_ape": 0.22247048049344176,
+              "p90_ape": 0.3509653764065436,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.20123524824593486,
+              "signed_bias_ms": 389.1760895223716,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N6": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 424.5357946173687,
+              "median_ape": 0.27049758606057883,
+              "p90_ape": 0.42082369296328226,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.24184619928777273,
+              "signed_bias_ms": 407.66855767784216,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N8": {
+              "coverage_labels": {
+                "physics_extrapolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 186.35504222188248,
+              "median_ape": 0.02718490339289842,
+              "p90_ape": 0.10585346787805286,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.025860819460703403,
+              "signed_bias_ms": -127.18377220664729,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 180,
+              "physics_extrapolation": 720
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 369.06676969375997,
+            "median_ape": 0.053014278753621843,
+            "p90_ape": 0.30271150034142247,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.06711929194444785,
+            "signed_bias_ms": -24.410535364711983,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          }
+        },
+        "edge/full": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 900
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 1870.0960493553264,
+            "median_ape": 0.09755605278122625,
+            "p90_ape": 1.3883094029178202,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.16300411532122888,
+            "signed_bias_ms": -37.65569083859749,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 1629.707949883356,
+              "median_ape": 0.07086546980936184,
+              "p90_ape": 1.4165099790218705,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.21495023560219484,
+              "signed_bias_ms": 601.0885633525431,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 1676.0148117749004,
+              "median_ape": 0.07780260745116924,
+              "p90_ape": 1.5117901143365466,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.21550742877351106,
+              "signed_bias_ms": 446.14480550086495,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 1817.6586538043837,
+              "median_ape": 0.09563255693081582,
+              "p90_ape": 1.3363859359508972,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.15671872764885744,
+              "signed_bias_ms": -112.79909779895353,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2162.780123905592,
+              "median_ape": 0.13171645565111256,
+              "p90_ape": 1.3158641797323052,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.11336916369383138,
+              "signed_bias_ms": -615.4298178280956,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 180
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2064.3187074084003,
+              "median_ape": 0.12631660144013196,
+              "p90_ape": 1.2455908390333792,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.11447502088774973,
+              "signed_bias_ms": -507.28290741934654,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 900
+            },
+            "failed_attempts": 0,
+            "interval_coverage": null,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": null,
+            "median_ape": null,
+            "p90_ape": null,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 0,
+            "signed_bias_fraction": null,
+            "signed_bias_ms": null,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          }
+        }
+      }
+    },
+    "training_oof.jsonl": {
+      "constant_median": {
+        "cloud/raw_image": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 348.8237855322222,
+            "median_ape": 0.07140257669927802,
+            "p90_ape": 0.4184511555487725,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.04605467451016387,
+            "signed_bias_ms": -7.537566116666683,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 622.5806704722222,
+              "median_ape": 0.2138441447219439,
+              "p90_ape": 0.35096771981208486,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.10807863500415517,
+              "signed_bias_ms": -435.8056018777778,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 271.28965322777776,
+              "median_ape": 0.047904657623211805,
+              "p90_ape": 0.47054422969729337,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.07658951694952301,
+              "signed_bias_ms": 81.22765328333331,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 284.952865,
+              "median_ape": 0.060646712738797855,
+              "p90_ape": 0.5292859734412608,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.10933541939490767,
+              "signed_bias_ms": 153.56495020555553,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 285.0557131777777,
+              "median_ape": 0.059737549197541435,
+              "p90_ape": 0.5364332952402354,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.1082152474104897,
+              "signed_bias_ms": 151.45196653333332,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 280.2400257833333,
+              "median_ape": 0.04404171755701829,
+              "p90_ape": 0.42038286532560704,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.044211823800054166,
+              "signed_bias_ms": 11.873201272222207,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 348.8237855322222,
+            "median_ape": 0.07140257669927802,
+            "p90_ape": 0.4184511555487725,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.04605467451016387,
+            "signed_bias_ms": -7.537566116666683,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          }
+        },
+        "distributed/projected/synchronous": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 3069.1784066866667,
+            "median_ape": 0.6970453993587824,
+            "p90_ape": 1.485261942146273,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.36558242617714487,
+            "signed_bias_ms": -1103.5513461688888,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 10107.293247172222,
+              "median_ape": 0.6972615775455617,
+              "p90_ape": 0.706427114057381,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.698274393496419,
+              "signed_bias_ms": -10107.293247172222,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 180.94454046666655,
+              "median_ape": 0.025996194384459697,
+              "p90_ape": 0.10316640820928039,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.018250699381819085,
+              "signed_bias_ms": -93.35725317222206,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 2295.4263225055556,
+              "median_ape": 1.1592407258541406,
+              "p90_ape": 1.390095202147727,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 1.1356060948040099,
+              "signed_bias_ms": 2295.4263225055556,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 2548.348645666667,
+              "median_ape": 1.4593667839816842,
+              "p90_ape": 1.7484109032767354,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 1.4417992072104697,
+              "signed_bias_ms": 2548.348645666667,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 213.8792776222221,
+              "median_ape": 0.032195313034960274,
+              "p90_ape": 0.11585465651815106,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.03296807825051703,
+              "signed_bias_ms": -160.88119867222207,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 3069.1784066866667,
+            "median_ape": 0.6970453993587824,
+            "p90_ape": 1.485261942146273,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.36558242617714487,
+            "signed_bias_ms": -1103.5513461688888,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          }
+        },
+        "edge/full": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 2087.858439456667,
+            "median_ape": 0.05098335351423085,
+            "p90_ape": 2.5880650473341484,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.42287474914199374,
+            "signed_bias_ms": 1210.8415504544444,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2034.3701471555557,
+              "median_ape": 0.05355496503032753,
+              "p90_ape": 2.635841608214468,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.4601717166327363,
+              "signed_bias_ms": 1665.9340313055554,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2044.911895838889,
+              "median_ape": 0.05233974202803089,
+              "p90_ape": 2.8167016391502404,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.4707065100468684,
+              "signed_bias_ms": 1538.494043611111,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2071.222562088889,
+              "median_ape": 0.044977952608473204,
+              "p90_ape": 2.621046436904483,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.42030354340685616,
+              "signed_bias_ms": 1167.7159747444443,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2179.613010888889,
+              "median_ape": 0.05225159275279655,
+              "p90_ape": 2.4870420392141197,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.3839468197503529,
+              "signed_bias_ms": 797.1087966499999,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2109.174581311111,
+              "median_ape": 0.04561519631947483,
+              "p90_ape": 2.4433772475837063,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.3792451558731549,
+              "signed_bias_ms": 884.9549059611111,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": null,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": null,
+            "median_ape": null,
+            "p90_ape": null,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 0,
+            "signed_bias_fraction": null,
+            "signed_bias_ms": null,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          }
+        }
+      },
+      "v1_recalibrated": {
+        "cloud/raw_image": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "v1_strict_support_exceeded": 60
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 266.9299470937653,
+            "median_ape": 0.04176326554066364,
+            "p90_ape": 0.48705761167254574,
+            "prediction_coverage": 0.9333333333333333,
+            "scheduled": 900,
+            "scored": 840,
+            "signed_bias_fraction": 0.07426034217145872,
+            "signed_bias_ms": 84.95879349138178,
+            "successful_attempts": 900,
+            "valid_predictions": 840
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 272.2114677206758,
+              "median_ape": 0.03970228286898557,
+              "p90_ape": 0.38435155630675866,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.07485853015372788,
+              "signed_bias_ms": 120.60280467864418,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 271.63786779338193,
+              "median_ape": 0.047763618771805766,
+              "p90_ape": 0.4931079582542856,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.08798375537049288,
+              "signed_bias_ms": 109.03078396068332,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 263.9063722815666,
+              "median_ape": 0.0415545389228382,
+              "p90_ape": 0.4957866184776534,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.0737396443634552,
+              "signed_bias_ms": 70.04351212370267,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 263.6559219749214,
+              "median_ape": 0.03524916583246246,
+              "p90_ape": 0.49378905628864495,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.06741568406716683,
+              "signed_bias_ms": 55.7015351177005,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 263.23810569828083,
+              "median_ape": 0.03835681328200821,
+              "p90_ape": 0.4617474438170873,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.06730409690245076,
+              "signed_bias_ms": 69.41533157617825,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "v1_strict_support_exceeded": 60
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 266.9299470937653,
+            "median_ape": 0.04176326554066364,
+            "p90_ape": 0.48705761167254574,
+            "prediction_coverage": 0.9333333333333333,
+            "scheduled": 900,
+            "scored": 840,
+            "signed_bias_fraction": 0.07426034217145872,
+            "signed_bias_ms": 84.95879349138178,
+            "successful_attempts": 900,
+            "valid_predictions": 840
+          }
+        },
+        "distributed/projected/synchronous": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "v1_strict_support_exceeded": 60
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 311.9425168951611,
+            "median_ape": 0.056713887950877645,
+            "p90_ape": 0.2519613298693585,
+            "prediction_coverage": 0.9333333333333333,
+            "scheduled": 900,
+            "scored": 840,
+            "signed_bias_fraction": 0.07042972627864548,
+            "signed_bias_ms": 57.32672441093365,
+            "successful_attempts": 900,
+            "valid_predictions": 840
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 417.1880722302793,
+              "median_ape": 0.02494997346630343,
+              "p90_ape": 0.05425900828558194,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": -0.02780491357783722,
+              "signed_bias_ms": -408.29544398411093,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 186.70763945117855,
+              "median_ape": 0.028281532510211455,
+              "p90_ape": 0.105467057837628,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": -0.016570367631256026,
+              "signed_bias_ms": -86.73880942010187,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 337.99171969120425,
+              "median_ape": 0.16914833088710826,
+              "p90_ape": 0.3011129037858183,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.1594182321089825,
+              "signed_bias_ms": 298.6044649790685,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 363.58634477222444,
+              "median_ape": 0.20685363688727837,
+              "p90_ape": 0.37299487827865835,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.19909819728917358,
+              "signed_bias_ms": 324.53537706624195,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 254.23880833091889,
+              "median_ape": 0.051567443226305285,
+              "p90_ape": 0.09697095006653637,
+              "prediction_coverage": 0.9333333333333333,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.03800748320416457,
+              "signed_bias_ms": 158.5280334135706,
+              "successful_attempts": 180,
+              "valid_predictions": 168
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "v1_strict_support_exceeded": 60
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 311.9425168951611,
+            "median_ape": 0.056713887950877645,
+            "p90_ape": 0.2519613298693585,
+            "prediction_coverage": 0.9333333333333333,
+            "scheduled": 900,
+            "scored": 840,
+            "signed_bias_fraction": 0.07042972627864548,
+            "signed_bias_ms": 57.32672441093365,
+            "successful_attempts": 900,
+            "valid_predictions": 840
+          }
+        },
+        "edge/full": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 840,
+              "v1_strict_support_exceeded": 60
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 2028.3523822843258,
+            "median_ape": 0.05097368910627727,
+            "p90_ape": 2.5880341864514187,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 840,
+            "signed_bias_fraction": 0.4026220527581799,
+            "signed_bias_ms": 1033.3615770559259,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 168,
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 1900.039058984514,
+              "median_ape": 0.04985940130697373,
+              "p90_ape": 2.5921001341511536,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.4389842843922475,
+              "signed_bias_ms": 1484.8025128142592,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 168,
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 1934.3954330886888,
+              "median_ape": 0.04342130450818798,
+              "p90_ape": 2.7850903626297456,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.45048137706053004,
+              "signed_bias_ms": 1366.7192468618784,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 168,
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2008.7299473534388,
+              "median_ape": 0.04803349833099331,
+              "p90_ape": 2.615908915166121,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.39995989191119014,
+              "signed_bias_ms": 999.844235903545,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 168,
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2188.244614066604,
+              "median_ape": 0.06264237060767164,
+              "p90_ape": 2.4743347872304224,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.3644528580259125,
+              "signed_bias_ms": 615.1281221237831,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 168,
+                "v1_strict_support_exceeded": 12
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2110.3528579283834,
+              "median_ape": 0.05342466302924145,
+              "p90_ape": 2.431031847484636,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 168,
+              "signed_bias_fraction": 0.3592318524010194,
+              "signed_bias_ms": 700.3137675761641,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": null,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 840,
+              "v1_strict_support_exceeded": 60
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": null,
+            "median_ape": null,
+            "p90_ape": null,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 0,
+            "signed_bias_fraction": null,
+            "signed_bias_ms": null,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          }
+        }
+      },
+      "v2_a": {
+        "cloud/raw_image": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 249.52980160275885,
+            "median_ape": 0.06945204870990604,
+            "p90_ape": 0.26055511972376005,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": -0.011893133866253154,
+            "signed_bias_ms": -72.59282974210133,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 244.8810775055958,
+              "median_ape": 0.056746064956849855,
+              "p90_ape": 0.2192027275136097,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.001154840294621688,
+              "signed_bias_ms": -41.02734608650507,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 247.6159025326599,
+              "median_ape": 0.06945204870990604,
+              "p90_ape": 0.2724353985516748,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.0032506104130938154,
+              "signed_bias_ms": -54.164219951042526,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 251.74170747641395,
+              "median_ape": 0.07930612005472466,
+              "p90_ape": 0.2645469070120379,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.01898477430029332,
+              "signed_bias_ms": -91.32699233140053,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 255.24068460140253,
+              "median_ape": 0.08175877392334208,
+              "p90_ape": 0.25988738904488085,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.025091203142617587,
+              "signed_bias_ms": -105.43222891234844,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 248.16963589772215,
+              "median_ape": 0.07450970910541788,
+              "p90_ape": 0.2609637136019634,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.010984241180639362,
+              "signed_bias_ms": -71.01336142921011,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 249.52980160275885,
+            "median_ape": 0.06945204870990604,
+            "p90_ape": 0.26055511972376005,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": -0.011893133866253154,
+            "signed_bias_ms": -72.59282974210133,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          }
+        },
+        "distributed/projected/synchronous": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 300.1968203786103,
+            "median_ape": 0.046843331924916555,
+            "p90_ape": 0.2585347622389801,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.0584665792399346,
+            "signed_bias_ms": 4.768582501632631,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 400.12664364217255,
+              "median_ape": 0.02278516252803622,
+              "p90_ape": 0.05238802455146728,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.027150103899680703,
+              "signed_bias_ms": -397.97362594477505,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 179.93541669225232,
+              "median_ape": 0.028187025810776173,
+              "p90_ape": 0.0970022275313509,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.014008193603077496,
+              "signed_bias_ms": -73.11575212859195,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 349.5503317788762,
+              "median_ape": 0.18674891631844037,
+              "p90_ape": 0.3167861182488717,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.1640478670718187,
+              "signed_bias_ms": 312.8363593604236,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 368.4548883428565,
+              "median_ape": 0.2323248311640643,
+              "p90_ape": 0.38204319847312396,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.20065904736085968,
+              "signed_bias_ms": 333.5333738331848,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {},
+              "live_selection_eligible": 0,
+              "mae_ms": 202.91682143689377,
+              "median_ape": 0.029975676643730423,
+              "p90_ape": 0.11126495134150019,
+              "prediction_coverage": 1.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": -0.031215720730247185,
+              "signed_bias_ms": -151.4374426120782,
+              "successful_attempts": 180,
+              "valid_predictions": 180
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {},
+            "live_selection_eligible": 0,
+            "mae_ms": 300.1968203786103,
+            "median_ape": 0.046843331924916555,
+            "p90_ape": 0.2585347622389801,
+            "prediction_coverage": 1.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.0584665792399346,
+            "signed_bias_ms": 4.768582501632631,
+            "successful_attempts": 900,
+            "valid_predictions": 900
+          }
+        },
+        "edge/full": {
+          "all_numeric_diagnostics": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": 0,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": 1891.5166517372782,
+            "median_ape": 0.09728328025438746,
+            "p90_ape": 1.3677705783120655,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 900,
+            "signed_bias_fraction": 0.16157863124782637,
+            "signed_bias_ms": -58.117909047249725,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          },
+          "by_block": {
+            "N1": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 1685.2094754866475,
+              "median_ape": 0.07247745799282121,
+              "p90_ape": 1.3404504134415833,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.19557842680127138,
+              "signed_bias_ms": 396.97457180386135,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N3": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 1746.049694547967,
+              "median_ape": 0.08370222227077317,
+              "p90_ape": 1.4823673434158222,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.1989230026397563,
+              "signed_bias_ms": 269.534584109417,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N5": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 1860.9728123562213,
+              "median_ape": 0.09976056562389854,
+              "p90_ape": 1.3677705783120655,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.15873541317342094,
+              "signed_bias_ms": -101.24348475724972,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N6": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2119.8911662666505,
+              "median_ape": 0.12951813049744376,
+              "p90_ape": 1.3438478150731648,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.12774172214656251,
+              "signed_bias_ms": -471.85066285169415,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            },
+            "N8": {
+              "coverage_labels": {
+                "interpolation": 168,
+                "physics_extrapolation": 12
+              },
+              "failed_attempts": 0,
+              "interval_coverage": 0,
+              "invalid_reasons": {
+                "edge_memory_budget_exceeded": 180
+              },
+              "live_selection_eligible": 0,
+              "mae_ms": 2045.4601100289046,
+              "median_ape": 0.1219957365264194,
+              "p90_ape": 1.2991628281132255,
+              "prediction_coverage": 0.0,
+              "scheduled": 180,
+              "scored": 180,
+              "signed_bias_fraction": 0.12691459147812073,
+              "signed_bias_ms": -384.00455354058306,
+              "successful_attempts": 180,
+              "valid_predictions": 0
+            }
+          },
+          "valid_only": {
+            "coverage_labels": {
+              "interpolation": 840,
+              "physics_extrapolation": 60
+            },
+            "failed_attempts": 0,
+            "interval_coverage": null,
+            "invalid_reasons": {
+              "edge_memory_budget_exceeded": 900
+            },
+            "live_selection_eligible": 0,
+            "mae_ms": null,
+            "median_ape": null,
+            "p90_ape": null,
+            "prediction_coverage": 0.0,
+            "scheduled": 900,
+            "scored": 0,
+            "signed_bias_fraction": null,
+            "signed_bias_ms": null,
+            "successful_attempts": 900,
+            "valid_predictions": 0
+          }
+        }
+      }
+    }
+  },
+  "schema_version": 2,
+  "training_network_blocks": 5,
+  "uncertainty_note": "OOF/LOBO point predictions precede interval fitting; their zero-width interval fields are not calibrated coverage.",
+  "validation_outcomes_read": false
+}

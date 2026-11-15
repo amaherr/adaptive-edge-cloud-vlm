@@ -1,0 +1,35 @@
+{
+  "candidate_gates": {
+    "v1_recalibrated": {
+      "coverage_gate": false,
+      "known_unsafe_claims": 0,
+      "numerical_gate": false,
+      "passed": false,
+      "ranking_gate": false
+    },
+    "v2_a": {
+      "coverage_gate": false,
+      "known_unsafe_claims": 0,
+      "numerical_gate": false,
+      "passed": false,
+      "ranking_gate": true
+    }
+  },
+  "decision_sha256": "48eb4d3f4adfa7f857ebeb6fa3f2d82f2c4a85a77d9ac88480836835dc7bca0d",
+  "final_evaluation_authorized": false,
+  "gate": "G3 FAILED",
+  "model_ids": {
+    "constant_median": "c268433b00c417ba6c21d3ab676e0b2c3509da2df2254f34a8ffe6a57b90fe76",
+    "v1_recalibrated": "61815fc7744b6a868daa652c48f7443efe916ee6190dc550f1e7582b7740049e",
+    "v2_a": "2b0789184034b6a6b5292dbd95450ccf5eda847f0ac3230447a9d4efc0456761"
+  },
+  "prior_final_inspection_disclosed": true,
+  "reason": "All-three-configuration coverage/numerical/ranking targets required; no edge/shared-memory eligibility waiver",
+  "schema_version": 2,
+  "selected_variant": null,
+  "selection_evidence": {
+    "reason": "No model passed all mandatory gates"
+  },
+  "selection_rule": "Ranking gains need a positive paired request-bootstrap lower bound. At tied ranking, V2-A needs >=5% MAE gain and a positive paired lower bound; otherwise prefer V1. No validation refit.",
+  "validation_seal_sha256": "4e1e5e9a495f6236672bb161acb71199087dbc4e36827eea2ddf4eb2e46fa52f"
+}
