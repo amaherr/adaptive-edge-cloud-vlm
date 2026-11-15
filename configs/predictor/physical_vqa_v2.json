@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "revision": "physical-v2-r1",
+  "environment_kind": "physical_wsl",
+  "host_pair_id": "edge-rtx3050-cloud-rtx2070super-v1",
+  "campaign_id": "physical-vqa-heterogeneous-v2",
+  "inference_git_commit": "3c38be2a68d902dbbf286621a593832aa2149978",
+  "archive_prefix": "artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2",
+  "archive_sha256": "51201e91cafb3864e0cb70e7aa3ea8aff0408d7ea3ce87773d493fe0a76e34ff",
+  "frozen_split_sha256": "608e06c06e3916b79e33eda400f324a6bc9d2db73ccc6549fa1214277945e3cc",
+  "model_contract_sha256": "e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1",
+  "dataset_manifest_sha256": "4e62826280e49359e8cf98d85154000c1583d63474be83a2e9a429da9bde72c9",
+  "model_revision": "9a7d4024050840e001defacec2b00727e89149e6",
+  "model_artifact_sha256": "70a7d94c0c8349eb58ed2d9e636ef2d0916960f321ecabeac6354b8ba3d7403f",
+  "model_config_sha256": "aa0296bfbf20f4ac2132f82e80812c88a323fe575b056ec8c8ff6ad479b579df",
+  "tokenizer_sha256": "0512fdcac4a5f9e7746cbefce4a468dc93bf0f93f11e701b84f8b31bff199e9c",
+  "placement_profile_sha256": {
+    "edge/full": "44b5ce657f953eee51bbf8045dc5c073abcc85e4c28b0183e817648c3e78b63d",
+    "cloud/raw_image": "f3f108f3999a2ca736745c2b7186a577c21793543b773b0b4fd27092d2c71ec9",
+    "distributed/projected/synchronous": "61cee0bf5285be03ae20e60c0fed3354877b58966336dbac2acb946a36f06891"
+  },
+  "network_source": "physical_wsl_netem_measured",
+  "max_controlled_block_probe_age_seconds": 14400,
+  "live_probe_max_age_seconds": 30,
+  "network_envelope": {
+    "uplink_bps": [
+      1000000,
+      200000000
+    ],
+    "downlink_bps": [
+      1000000,
+      200000000
+    ],
+    "rtt_ms": [
+      0,
+      250
+    ]
+  },
+  "memory_headroom_fraction": 0.1,
+  "edge_dedicated_memory_mib": 4096,
+  "cloud_dedicated_memory_mib": 8192,
+  "shared_memory_live_approved": false,
+  "candidate_models": [
+    "v1_recalibrated",
+    "v2_a"
+  ],
+  "v2_b": "not implemented; optional residual model excluded before validation",
+  "compute_features": [
+    "image_pixels",
+    "prompt_tokens"
+  ],
+  "compute_ridge_alpha": 1e-06,
+  "grouped_request_folds": 5,
+  "interval_quantile": 0.95,
+  "extrapolation_interval_multiplier": 2.0,
+  "automatic_extrapolation_enabled": false,
+  "target_median_ape": 0.15,
+  "target_p90_ape": 0.3,
+  "minimum_validation_coverage": 1.0,
+  "prior_final_outcomes_inspected": true,
+  "final_evaluation_authorized": false,
+  "offline_network_assumption": "Block-constant controlled netem; pre-block probe only; no post-block measurement feature. Not live instantaneous goodput.",
+  "task_envelope": {
+    "image_bytes": [
+      1,
+      67108864
+    ],
+    "image_width": [
+      1,
+      8192
+    ],
+    "image_height": [
+      1,
+      8192
+    ],
+    "prompt_tokens": [
+      1,
+      128
+    ]
+  },
+  "supported_task_bucket": "vqa-short-answer-32-token-budget",
+  "template_source_sha256": "ee7707c9b4d091dd6d3441ceebc54a36be4023e97d0504e59b5ea7d71147854b"
+}

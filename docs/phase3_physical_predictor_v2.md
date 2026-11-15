@@ -33,3 +33,19 @@ The baseline audit verifies the exact 60/20/20 assignment, disjoint IDs, complet
 5. Final tested handoff and hashes. No N4/N9 prediction/evaluation artifacts in this phase.
 
 Regular commits are required after tested phases. Data-dependent gates and final calibration are **not passed or frozen yet**.
+
+## Data-partition checkpoint
+
+The data implementation uses metadata-only routing of shared JSONL profiles: outcome/stage values for crossed rows are skipped without decoding. It never extracts N4/N9 outcome members. Only schedule metadata from those blocks is read to verify the predeclared 8100 slots. The independent real-archive test rejects any attempt to open protected final targets.
+
+Prepared bundle: `artifacts/phase3/physical-v2/data-r3`. It contains 2700 successful training attempts and 360 pre-execution validation snapshots; all 4680 crossed slots are excluded and all 360 final slots stay unmaterialized. Training JSONL SHA-256: `c9c4a4cbe87b4e576833f717e4aae0fd018d77cff56ce52bcee03a16b30480d0`. Validation-input SHA-256: `6d02cee6e3d1ee793c91b07a146409efe0c6de5f0deafbeeed7ff2a0a3915cda`.
+
+Pre-execution input metadata is committed in `configs/predictor/physical_vqa_v2_input_features.json`: image byte count/header dimensions plus exact pinned Starmie tokenizer/template prompt counts. It contains no measured output or latency. The preparation script checks all source image hashes and the tokenizer/template SHA; it does not load a model or GPU.
+
+**Network scope, declared before fitting/validation:** this is an offline block-constant netem study. Inputs use the pre-block independent iperf/echo probe only, never the post-block probe or profile's pre/post aggregate. A four-hour maximum block-probe age is an explicit engineering assumption for this offline controlled-block context, not a claim of continuously fresh goodput. Live prediction uses a separate 30-second freshness ceiling. The RTT envelope is 0–250 ms and bidirectional goodput 1–200 Mb/s; measured-support departures must be labeled physics extrapolation, with doubled empirical uncertainty and automatic extrapolation disabled. These bounds are engineering restrictions, not learned from held-out latency.
+
+**Resource scope, declared before validation:** use candidate-specific training reserved-memory maxima with 10% headroom against dedicated budgets (4096 MiB edge, 8192 MiB cloud). Full edge already exceeds dedicated VRAM in the baseline; do not invent a safe shared-memory budget. Its diagnostic latency can be fitted but execution eligibility must remain conditional/excluded. Do not hide this candidate from coverage accounting or silently relax the G3 gate. Existing VQA correctness approval is not a new task-accuracy guarantee.
+
+Windows DrvFS did not enforce `chmod 000` during the initial prototype. The corrected pipeline places validation targets in a private Linux `/tmp/predictor-v2-sealed-*` directory and verifies permission bits are actually zero. Its path and expected SHA are recorded in `partition_audit.json`. Training has no reader for this store. Validation may temporarily read it only after predictions are sealed and checked. It is ephemeral across WSL reboots: regenerate a fresh source-identical partition bundle if needed; never substitute a changed dataset.
+
+Actual checkpoint checks: 12 partition/leakage tests passed (4.45 s), Ruff passed, strict mypy passed (66 source files). The real-archive integration test confirms permission-denied validation targets and no post-probe/final-outcome access. Fitting has not started and validation targets have not been scored for V2.
