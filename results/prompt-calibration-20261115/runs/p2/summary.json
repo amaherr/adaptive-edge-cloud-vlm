@@ -1,0 +1,22 @@
+{
+  "dataset_manifest_sha256": "4f5b7052335d1792d80d7f41615c1d32be8da9dbd08e24ec4a5a572558a2b7e1",
+  "failure_rate": 0.0,
+  "latency_ms_iqr_success": 32.556302250000044,
+  "latency_ms_mean_success": 1219.8039115499994,
+  "latency_ms_median_success": 1278.7847015000002,
+  "latency_ms_p95_success": 1358.9963039000002,
+  "measured_attempts": 200,
+  "mode": "edge",
+  "plan_sha256": "450b3d9e34dfa0ab08edd3ed581b56ab78aaa0d6315fead252f194b693969503",
+  "quality_mean_success": 0.7870000000000001,
+  "quality_metric": "fixture_exact_match_or_provisional_vqa_consensus",
+  "quality_scored_attempts": 200,
+  "revision": "vqa-v2-val2014-prompt-calibration-p2",
+  "schema_version": 1,
+  "source": "vqa-v2-val2014",
+  "status_counts": {
+    "ok": 200
+  },
+  "warmup_attempts": 1,
+  "wire_bytes_mean_success": null
+}

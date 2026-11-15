@@ -1,0 +1,119 @@
+{
+  "config": {
+    "artifacts_dir": "/mnt/d/Programming/adaptive-edge-cloud-vlm/artifacts",
+    "cloud": {
+      "cpu": "unknown",
+      "gpu": null,
+      "gpu_vram_mib": null,
+      "host_id": "cloud-pending",
+      "notes": "Replace every placeholder and set status to verified before benchmarking.",
+      "operating_system": "unknown",
+      "ram_gib": 1.0,
+      "role": "cloud",
+      "status": "pending"
+    },
+    "dataset": {
+      "manifest_path": "/mnt/d/Programming/adaptive-edge-cloud-vlm/data/manifests/prompt_calibration/p1.jsonl",
+      "revision": "vqa-v2-val2014-prompt-calibration-p1"
+    },
+    "edge": {
+      "cpu": "11th Gen Intel Core i7-11800H",
+      "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+      "gpu_vram_mib": 4096,
+      "host_id": "edge-rtx3050",
+      "notes": "WDDM driver 610.62 and CUDA UMD 13.3. PyTorch 2.7.1+cu128 verified CUDA, compute capability 8.6, BF16 support, and a BF16 matrix operation through WSL /dev/dxg. Restricted development commands require elevated sandbox access.",
+      "operating_system": "WSL 2.5.10.0 / Linux 6.6.87.2 on Windows 10.0.26200.9457",
+      "ram_gib": 7.637,
+      "role": "edge",
+      "status": "verified"
+    },
+    "mode": "edge",
+    "model": {
+      "adapter": "moondream2",
+      "artifact_sha256": "70a7d94c0c8349eb58ed2d9e636ef2d0916960f321ecabeac6354b8ba3d7403f",
+      "batch_size": 1,
+      "do_sample": false,
+      "max_new_tokens": 32,
+      "model_id": "vikhyatk/moondream2",
+      "precision": "bf16",
+      "preprocessing_backend": "pillow",
+      "release_tag": "2025-06-21",
+      "revision": "9a7d4024050840e001defacec2b00727e89149e6",
+      "status": "approved",
+      "temperature": 0.0,
+      "trust_remote_code": true,
+      "variant": null
+    },
+    "name": "prompt-calibration-p1",
+    "runtime": {
+      "measured_repetitions": 1,
+      "seed": 42,
+      "warmup_requests": 1
+    },
+    "schema_version": 1,
+    "source_path": "/mnt/d/Programming/adaptive-edge-cloud-vlm/configs/experiments/prompt_calibration/p1.yaml",
+    "transport": {
+      "host": "127.0.0.1",
+      "port": 5050,
+      "protocol_version": 1,
+      "timeout_seconds": 120.0
+    }
+  },
+  "created_at_utc": "2026-11-15T19:59:17Z",
+  "dataset_manifest_sha256": "d1a5c80ab24a836d81be382e521c695684a3baaafc5e39248588058d9d83c0c5",
+  "dependency_lock_sha256": "96d07ba6bb6310b29d259c64652de18f4c5f72f2f0629a17844d09ffacedffbd",
+  "environment": {
+    "collected_at_utc": "2026-11-15T19:59:15Z",
+    "duration_clock": {
+      "name": "CLOCK_MONOTONIC_RAW",
+      "scope": "host_local_elapsed_time",
+      "uses_raw_clock": true
+    },
+    "execution_placement": {
+      "mode": "edge",
+      "pipeline": "synchronous",
+      "remote": "127.0.0.1:5050",
+      "text_device": "cuda:0",
+      "vision_device": "cuda:0",
+      "weight_residency": "swap"
+    },
+    "git": {
+      "available": true,
+      "commit": "d5662f068a0850f0fcecc8048fe84abb67e05973",
+      "dirty": true
+    },
+    "gpu": {
+      "available": true,
+      "devices": [
+        {
+          "driver_version": "610.62",
+          "index": 0,
+          "memory_total_mib": 4096,
+          "name": "NVIDIA GeForce RTX 3050 Laptop GPU"
+        }
+      ]
+    },
+    "host": {
+      "cpu": "11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz",
+      "hostname": "DESKTOP-SC5IGIT",
+      "logical_cpu_count": 16,
+      "machine": "x86_64",
+      "operating_system": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "ram_gib": 7.637
+    },
+    "python": {
+      "executable": "/mnt/d/Programming/adaptive-edge-cloud-vlm/.venv-model/bin/python",
+      "implementation": "CPython",
+      "version": "3.11.17"
+    },
+    "seeded_providers": [
+      "python",
+      "numpy",
+      "torch"
+    ]
+  },
+  "git_commit": "d5662f068a0850f0fcecc8048fe84abb67e05973",
+  "git_dirty": true,
+  "run_id": "20261115T195917Z-c16ecc3f",
+  "schema_version": 1
+}

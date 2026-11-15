@@ -1,0 +1,102 @@
+{
+  "decision": {
+    "best_eligible_accuracy_percent": 57.2,
+    "near_best": [
+      "p1",
+      "p2"
+    ],
+    "reason": "fewest token-cap hits, then lowest mean output tokens, then lowest template ID among templates within 1.0 pp of the best eligible accuracy",
+    "selected": "p1"
+  },
+  "protocol": "docs/protocols/g2-v2-protocol.md sections 3.3-3.4",
+  "question_count": 200,
+  "rule": {
+    "floor_percent": 50.0,
+    "near_best_pp": 1.0,
+    "token_cap": 32
+  },
+  "schema_version": 1,
+  "subset_metadata": {
+    "annotations_source_sha256": "0564650e712b34c246e4ad142894692bf2e45dee8e9cc6ebb2cedbe85731c4bf",
+    "annotations_subset_sha256": "1acac3dde0d23796fdc62eb55afb0da0fd7df0b5ce07647b608f765e5f2dc657",
+    "manifest_sha256": "fbca79655197eaae756bc967368cad2d7fbfb4af82b6662a477bd2fb83a5cf44",
+    "question_count": 200,
+    "questions_source_sha256": "f34d9c9909dea76700d361baddd63dd47b4494945097459b542d9fe840244811",
+    "questions_subset_sha256": "3212249ccc3c296e474227b7262883881bf8b09a47e48920e2f09b6b924fb657",
+    "schema_version": 1
+  },
+  "templates": {
+    "p0": {
+      "accuracy_by_answer_type_percent": {
+        "number": 6.9,
+        "other": 0.0,
+        "yes/no": 0.0
+      },
+      "accuracy_percent": 1.0,
+      "eligible": false,
+      "failed_requests": 0,
+      "manifest_sha256": "fbca79655197eaae756bc967368cad2d7fbfb4af82b6662a477bd2fb83a5cf44",
+      "mean_output_tokens": 12.28,
+      "measured_requests": 200,
+      "median_end_to_end_ms": 1534.488508,
+      "official_result_sha256": "f4ac60091caf528c1785dc02e24410fa36bda3a0fd367f736281322c15878ff4",
+      "predictions_sha256": "2e2774c80b9710db8aadfe4635a78d2cc8fb34ddaf58f679d57684a7a342b96a",
+      "prompt_template": "{question}",
+      "token_cap_hits": 13
+    },
+    "p1": {
+      "accuracy_by_answer_type_percent": {
+        "number": 57.93,
+        "other": 61.0,
+        "yes/no": 50.14
+      },
+      "accuracy_percent": 56.7,
+      "eligible": true,
+      "failed_requests": 0,
+      "manifest_sha256": "d1a5c80ab24a836d81be382e521c695684a3baaafc5e39248588058d9d83c0c5",
+      "mean_output_tokens": 1.47,
+      "measured_requests": 200,
+      "median_end_to_end_ms": 1312.1880084999998,
+      "official_result_sha256": "8627026d5c680e3f0fb2f045f1bf80c5a9d69b38551b4f87e03dce30a6ccd6ae",
+      "predictions_sha256": "d488ba3f2bf43362538f415db3d18f255d66728ababcaf926326c16a4d8e55ad",
+      "prompt_template": "{question} Answer with a single word or phrase.",
+      "token_cap_hits": 0
+    },
+    "p2": {
+      "accuracy_by_answer_type_percent": {
+        "number": 57.93,
+        "other": 62.0,
+        "yes/no": 50.14
+      },
+      "accuracy_percent": 57.2,
+      "eligible": true,
+      "failed_requests": 0,
+      "manifest_sha256": "4f5b7052335d1792d80d7f41615c1d32be8da9dbd08e24ec4a5a572558a2b7e1",
+      "mean_output_tokens": 1.5,
+      "measured_requests": 200,
+      "median_end_to_end_ms": 1278.7847015000002,
+      "official_result_sha256": "b3b05a76895fd1065b5f907c74b277b03a4b26b80116f1227b84db3d06efe6d5",
+      "predictions_sha256": "4c7a40df7c7124955cdfb51fc5151e3e52a329660f13686bafdacc84d76ff2c5",
+      "prompt_template": "{question} Answer in one or two words.",
+      "token_cap_hits": 0
+    },
+    "p3": {
+      "accuracy_by_answer_type_percent": {
+        "number": 61.38,
+        "other": 51.6,
+        "yes/no": 50.0
+      },
+      "accuracy_percent": 52.45,
+      "eligible": true,
+      "failed_requests": 0,
+      "manifest_sha256": "b68cb292804f67e52001a0ea755b44bb88990c761f843883971af7130464a69d",
+      "mean_output_tokens": 1.81,
+      "measured_requests": 200,
+      "median_end_to_end_ms": 1314.8519765,
+      "official_result_sha256": "c63e965683287c4dd780b98ffbc0c48afedeb2a8f54100d5b1581507aac7c035",
+      "predictions_sha256": "93ce57b94f4aae52ab0d461ba3c78dd7e4c18e0a3dfa06c5b5fe4fc2b892eaef",
+      "prompt_template": "{question} Respond with only the answer, in as few words as possible.",
+      "token_cap_hits": 0
+    }
+  }
+}

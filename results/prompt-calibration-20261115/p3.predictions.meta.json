@@ -1,0 +1,10 @@
+{
+  "accuracy_metric": "pending_official_vqa_evaluator",
+  "failed_answers_exported_empty": 0,
+  "manifest_sha256": "b68cb292804f67e52001a0ea755b44bb88990c761f843883971af7130464a69d",
+  "plan_sha256": "58a5bc2706675d09d1e46ad1d84c5fbbe1920782478998d7582936f56ba416de",
+  "predictions_sha256": "93ce57b94f4aae52ab0d461ba3c78dd7e4c18e0a3dfa06c5b5fe4fc2b892eaef",
+  "question_count": 200,
+  "repetition": 0,
+  "schema_version": 1
+}
