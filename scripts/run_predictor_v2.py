@@ -10,20 +10,37 @@ from pathlib import Path
 
 from adaptive_vlm.artifacts import write_json_atomic
 from adaptive_vlm.benchmark.calibrate_v2 import train_bundle
+from adaptive_vlm.benchmark.predictor_eval_v2 import (
+    evaluate_validation,
+    review_training,
+    seal_validation_predictions,
+)
 from adaptive_vlm.benchmark.predictor_v2_data import digest, strict_json
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("fit",))
+    parser.add_argument("action", choices=("fit", "review", "validate"))
     parser.add_argument("--data-bundle", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--fit-dir", type=Path)
     args = parser.parse_args()
     dirty = subprocess.check_output(["git", "status", "--porcelain"], text=True).strip()
     if dirty:
         raise RuntimeError("commit source before the reproducible predictor run")
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-    report = train_bundle(args.data_bundle, args.output_dir)
+    if args.action == "fit":
+        report = train_bundle(args.data_bundle, args.output_dir)
+    else:
+        if args.fit_dir is None:
+            parser.error("--fit-dir is required for review/validate")
+        if args.action == "review":
+            report = review_training(args.data_bundle, args.fit_dir, args.output_dir)
+        else:
+            seal_validation_predictions(args.data_bundle, args.fit_dir, args.output_dir)
+            report = evaluate_validation(
+                args.data_bundle, args.fit_dir, args.output_dir
+            )
     audit = strict_json((args.data_bundle / "partition_audit.json").read_bytes())
     write_json_atomic(
         args.output_dir / "source_manifest.json",
@@ -37,7 +54,7 @@ def main() -> None:
             "source_archive_sha256": audit["archive_sha256"],
             "frozen_split_sha256": audit["split_sha256"],
             "data_scope": "Physical G2 only; AWS/Vultr excluded",
-            "validation_outcomes_read": False,
+            "validation_outcomes_read": args.action == "validate",
             "final_outcomes_read": False,
         },
     )

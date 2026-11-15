@@ -61,3 +61,21 @@ Decode cost and output-length/response-byte priors come solely from successful t
 Known resource exclusions retain diagnostic component totals with `valid=false`; they cannot pass through the selector. Both edge and cloud reserved-memory evidence are considered. Offline/static-preflight predictions and physics extrapolation are not eligible for live automatic selection. No prediction is an execution command.
 
 Checkpoint checks: 59 V1/V2/partition/selector compatibility tests passed (5.91 s), Ruff passed, strict mypy passed (68 source files). This includes units, monotonicity, component sums, schema reload/tamper detection, identity/freshness/availability errors, low/high RTT, both memory unknown/exceeded semantics, failure preservation, forbidden fit rows, grouped-CV outcome independence and exclusion of research predictions by the unchanged three-policy registry. No V2 validation outcome has been accessed.
+
+## Validation protocol checkpoint (before real outcome access)
+
+Physical training completed with exactly 2700 successful attempts, 60 independent requests and five training blocks. Main fit source commit is `3d70292`. Fits under `artifacts/phase3/physical-v2/fit-r1` are immutable, with calibration IDs:
+
+- Constant median: `c268433b00c417ba6c21d3ab676e0b2c3509da2df2254f34a8ffe6a57b90fe76`.
+- Recalibrated V1: `61815fc7744b6a868daa652c48f7443efe916ee6190dc550f1e7582b7740049e`.
+- V2-A: `2b0789184034b6a6b5292dbd95450ccf5eda847f0ac3230447a9d4efc0456761`.
+
+Training emitted 8100 grouped-OOF and 8100 leave-training-block-out predictions across the three comparison models. These are diagnostic repeated predictions, not extra independent requests. No validation outcome was read to fit them.
+
+The validation adapter produces and hashes all 1080 candidate prediction rows (360 original validation slots × three comparison models), with complete pre-execution snapshots, before unlocking the Linux outcome store. It verifies source/model/prediction hashes, reads only the 360 N2/N7 validation targets, and immediately restores the permission seal. A second model-selection report in the same output directory is rejected.
+
+Metrics include per-network/per-configuration request-primary and repeat-secondary error, bias, coverage/failure reasons, empirical interval coverage, interpolation/extrapolation labels, pure `predict()` overhead, and fastest-feasible request/block ranking. Any missing prediction for an executable candidate leaves that matched condition unranked; it is not removed to improve agreement. Request bootstrap intervals preserve the same IDs across the two networks. Static/offline and live eligibility remain distinct. All three original configurations remain visible in gate denominators; no shared-memory eligibility waiver is introduced.
+
+**Model choice, fixed before validation:** only models passing all mandatory error/coverage/safety/ranking gates can be selected. A V2-A ranking gain over V1 must have a positive paired request-bootstrap lower bound. At tied ranking, V2-A needs at least 5% MAE improvement and a positive paired lower bound; otherwise prefer V1. Bootstrap uses the frozen seed 1707 and 2000 resamples. No validation refit or post-validation coefficient/feature tuning is authorized. A failed/blocked gate produces no approved freeze marker.
+
+The first full CPU CI run passed **268 tests** with **81.40% branch-aware coverage**, above the unchanged 80% threshold. Five validation protocol checks passed, including target-read tripwires, changed-prediction/changed-fit rejection, prevention of all-invalid passing, and the simplicity rule. Six additional synthetic training checks passed, covering the complete grouped CV/LOBO pipeline and source-preserving diagnostics. Strict mypy passed (69 source files); Ruff passed. The real validation outcome store is still sealed at this checkpoint.
