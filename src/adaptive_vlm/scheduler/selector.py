@@ -109,6 +109,8 @@ def _exclusion(
         return "prediction_missing"
     if not prediction.valid:
         return prediction.reason or "prediction_invalid"
+    if getattr(prediction, "selection_eligible", True) is False:
+        return "prediction_not_live_eligible"
     if (
         prediction.total_ms is None
         or not math.isfinite(prediction.total_ms)
