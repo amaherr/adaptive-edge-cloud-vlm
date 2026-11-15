@@ -201,6 +201,9 @@ def join_diagnostics(
                     ),
                     "prompt_tokens": task["prompt_tokens"],
                     "actual_output_tokens_posthoc": fields["actual_output_tokens"],
+                    "predicted_output_tokens": p["prediction"].get(
+                        "estimated_output_tokens"
+                    ),
                     "edge_peak_reserved_mib_posthoc": fields["edge_peak_reserved_mib"],
                     "cloud_peak_reserved_mib_posthoc": fields[
                         "cloud_peak_reserved_mib"
@@ -309,7 +312,13 @@ def associations(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             if row["block"] == block:
                 group[row["request_id"]].append(row)
         feature_names = sorted(rows[0]["features"])
-        targets = ["signed_error_ms", "ape", *sorted(rows[0]["component_errors_ms"])]
+        targets = [
+            "signed_error_ms",
+            "ape",
+            *sorted(rows[0]["component_errors_ms"]),
+            *["observed:" + k for k in sorted(rows[0]["observed_components_ms"])],
+            *["measured:" + k for k in sorted(rows[0]["measured_substages_ms"])],
+        ]
         for feature in feature_names:
             for target in targets:
                 x, y = [], []
@@ -322,6 +331,10 @@ def associations(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         median(
                             r[target]
                             if target in {"signed_error_ms", "ape"}
+                            else r["observed_components_ms"][target.split(":", 1)[1]]
+                            if target.startswith("observed:")
+                            else r["measured_substages_ms"][target.split(":", 1)[1]]
+                            if target.startswith("measured:")
                             else r["component_errors_ms"][target]
                             for r in repeats
                         )
@@ -336,6 +349,75 @@ def associations(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     }
                 )
     return result
+
+
+def descriptive_features(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    by_crop = {}
+    for crop in sorted({r["features"]["geometry_crop_count_diagnostic"] for r in rows}):
+        group = [
+            r for r in rows if r["features"]["geometry_crop_count_diagnostic"] == crop
+        ]
+        by_crop[str(crop)] = {
+            "metrics": metrics(group),
+            "observed_component_trial_medians_ms": {
+                k: median(r["observed_components_ms"][k] for r in group)
+                for k in group[0]["observed_components_ms"]
+            },
+            "component_error_trial_medians_ms": {
+                k: median(r["component_errors_ms"][k] for r in group)
+                for k in group[0]["component_errors_ms"]
+            },
+        }
+    memory: dict[str, Any] = {}
+    for block in sorted({r["block"] for r in rows}):
+        memory[block] = {}
+        for name in rows[0]["features"]:
+            if "mib" not in name:
+                continue
+            values = [
+                r["features"][name]
+                for r in rows
+                if r["block"] == block and r["features"][name] is not None
+            ]
+            memory[block][name] = {
+                "observations": len(values),
+                "unique_values": len(set(values)),
+                "minimum": min(values) if values else None,
+                "median": median(values) if values else None,
+                "maximum": max(values) if values else None,
+            }
+    # Compare the same IDs across blocks; this is not an intervention on bandwidth.
+    by_request_block: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        by_request_block[row["request_id"], row["block"]].append(row)
+    cross_block = {}
+    if "N3" in {r["block"] for r in rows}:
+        for block in sorted({r["block"] for r in rows} - {"N3"}):
+            shifts: dict[str, list[float]] = defaultdict(list)
+            for rid in sorted({r["request_id"] for r in rows}):
+                reference, current = (
+                    by_request_block[rid, "N3"],
+                    by_request_block[rid, block],
+                )
+                for stage in rows[0]["observed_components_ms"]:
+                    shifts[stage].append(
+                        median(r["observed_components_ms"][stage] for r in current)
+                        - median(r["observed_components_ms"][stage] for r in reference)
+                    )
+            cross_block[block] = {
+                s: {
+                    "paired_requests": len(v),
+                    "median_shift_ms": median(v),
+                    "p10_shift_ms": quantile(v, 0.1),
+                    "p90_shift_ms": quantile(v, 0.9),
+                }
+                for s, v in shifts.items()
+            }
+    return {
+        "by_geometry_crop_count": by_crop,
+        "memory_observations_by_block": memory,
+        "matched_request_block_shift_relative_to_N3": cross_block,
+    }
 
 
 def _csv(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -365,6 +447,7 @@ def diagnose(bundle: Path, fit: Path, output: Path) -> dict[str, Any]:
         for cid in sorted({r["configuration_id"] for r in joined}):
             rows = [r for r in joined if r["configuration_id"] == cid]
             report = summarize(rows)
+            report["feature_diagnostics"] = descriptive_features(rows)
             report["by_block"] = {
                 b: summarize([r for r in rows if r["block"] == b])
                 for b in sorted({r["block"] for r in rows})

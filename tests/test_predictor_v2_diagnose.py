@@ -12,10 +12,12 @@ from adaptive_vlm.benchmark.predictor_v2_data import digest
 from adaptive_vlm.benchmark.predictor_v2_diagnose import (
     correlation,
     crop_count,
+    descriptive_features,
     diagnose,
     join_diagnostics,
     metrics,
     observed_components,
+    repeat_changes,
 )
 
 
@@ -104,6 +106,41 @@ def test_rank_ties_and_constant_features_are_not_fake_associations() -> None:
     assert correlation([1, 1, 3], [3, 3, 1]) == pytest.approx(-1)
     assert correlation([1, 1, 1], [1, 2, 3]) is None
     assert correlation([1, 2], [2, 1]) is None
+
+
+def test_matched_block_and_repeat_differences_keep_requests_paired() -> None:
+    rows, predictions = fixture_rows()
+    joined = join_diagnostics(rows, predictions)
+    cid = "cloud/raw_image"
+    first = [r for r in joined if r["configuration_id"] == cid]
+    reference = copy.deepcopy(first)
+    for row in reference:
+        row["block"] = "N3"
+        row["observed_components_ms"]["decode_ms"] += 50
+        row["observed_ms"] += 50
+        row["predicted_ms"] += 50
+    report = descriptive_features(first + reference)
+    shift = report["matched_request_block_shift_relative_to_N3"]["N1"]["decode_ms"]
+    assert shift["paired_requests"] == 3
+    assert shift["median_shift_ms"] == -50
+    for row in first:
+        if row["repetition"] == 2:
+            row["observed_components_ms"]["decode_ms"] += 3
+            row["observed_ms"] += 3
+    assert (
+        repeat_changes(first)["observed_total_ms"]["median_third_minus_first_ms"] == 3
+    )
+
+
+def test_component_cancellation_does_not_imply_additive_oracle_gains() -> None:
+    rows, predictions = fixture_rows()
+    joined = join_diagnostics(rows, predictions)
+    for row in joined:
+        row["component_errors_ms"]["decode_ms"] = 10
+        row["component_errors_ms"]["client_residual_ms"] = -9
+        row["predicted_ms"] = row["observed_ms"] + 1
+    assert metrics(joined)["mae_ms"] == 1
+    assert metrics(joined, "decode_ms")["mae_ms"] == 9
 
 
 def test_crop_geometry_boundary_and_maximum_tile_scaling() -> None:
