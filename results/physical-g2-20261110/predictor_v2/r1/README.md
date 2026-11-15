@@ -16,3 +16,5 @@ See the [complete handoff](../../../../docs/phase3_physical_g3_handoff.md) for i
 N4/N9 outcomes were not read by this pipeline. Earlier analyses had already inspected them; they cannot be described as pristine unseen final measurements. No final evaluation, approved freeze marker or live activation was performed.
 
 ![Validation error and full-domain coverage](validation_overview.png)
+
+The subsequent [training-only stage diagnosis](stage_diagnosis/README.md) identifies crop-dependent compute errors, output-length uncertainty and block-dependent timing shifts. It preserves the original fits and failed gate; no held-out scoring or new inference was performed.

@@ -115,3 +115,7 @@ tar -xzf evidence.tar.gz -C /tmp/physical-v2-r1-evidence
 Original `file_hashes.json` receipts cover files in the complete archive, including larger files omitted from the expanded summary directories. Verify those receipts after extraction. No image dataset, model weights, credentials, protected final outcomes or Linux sealed raw target store are added to this derived evidence archive. No AWS/Vultr provisioning, experiment, backup or artifact upload was performed.
 
 Candidate V2-A calibration: `fit-r1/calibration_v2_a.json` in the result directory. Its canonical calibration ID is `2b0789184034b6a6b5292dbd95450ccf5eda847f0ac3230447a9d4efc0456761`; its exact file SHA-256 is `3191e67f19fe471347d5affbc6796ee81164213e36b398b3539d4a263fc55b0b`. These are different hash domains. Load through `CalibrationV2.load` and `PredictorV2` only as a research artifact; invalid/diagnostic estimates must never become execution choices. Gate decision canonical SHA is `48eb4d3f4adfa7f857ebeb6fa3f2d82f2c4a85a77d9ac88480836835dc7bca0d`. File-byte hashes for every report, fit and archive are in `SHA256SUMS`.
+
+## Subsequent training-only diagnosis
+
+The [stage diagnosis](../results/physical-g2-20261110/predictor_v2/r1/stage_diagnosis/README.md) decomposes saved OOF/LOBO errors and identifies crop-dependent vision work, output-length uncertainty and unexplained block-dependent compute shifts. It does not change r1 coefficients, validation decisions or eligibility. The next feature candidate is crop-aware vision modeling; resource-state causes require targeted measurements.

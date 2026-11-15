@@ -1,0 +1,152 @@
+{
+  "method": "Isolated AST select_tiling from pinned source, no import/model/GPU; deterministic geometry only",
+  "reference_sha256": "1f3f469fcbd3291966c6f9fda5c90f8044d39b391261bac14ef6bbcfb76496cb",
+  "config_sha256": "ee7707c9b4d091dd6d3441ceebc54a36be4023e97d0504e59b5ea7d71147854b",
+  "unique_training_dimensions": 24,
+  "checks": [
+    {
+      "height": 333,
+      "width": 500,
+      "computed_crops": 2,
+      "reference_crops": 2
+    },
+    {
+      "height": 360,
+      "width": 270,
+      "computed_crops": 2,
+      "reference_crops": 2
+    },
+    {
+      "height": 360,
+      "width": 640,
+      "computed_crops": 2,
+      "reference_crops": 2
+    },
+    {
+      "height": 375,
+      "width": 500,
+      "computed_crops": 2,
+      "reference_crops": 2
+    },
+    {
+      "height": 392,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 399,
+      "width": 500,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 402,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 415,
+      "width": 500,
+      "computed_crops": 10,
+      "reference_crops": 10
+    },
+    {
+      "height": 419,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 424,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 425,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 426,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 427,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 429,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 480,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 483,
+      "width": 640,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 516,
+      "width": 640,
+      "computed_crops": 10,
+      "reference_crops": 10
+    },
+    {
+      "height": 612,
+      "width": 612,
+      "computed_crops": 10,
+      "reference_crops": 10
+    },
+    {
+      "height": 640,
+      "width": 360,
+      "computed_crops": 2,
+      "reference_crops": 2
+    },
+    {
+      "height": 640,
+      "width": 424,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 640,
+      "width": 426,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 640,
+      "width": 427,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 640,
+      "width": 480,
+      "computed_crops": 9,
+      "reference_crops": 9
+    },
+    {
+      "height": 640,
+      "width": 640,
+      "computed_crops": 10,
+      "reference_crops": 10
+    }
+  ]
+}

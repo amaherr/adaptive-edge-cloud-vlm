@@ -1,0 +1,12 @@
+{
+  "code_git_commit": "0b6c74529b331fb16ce47e8bdd4fdf3d93e83092",
+  "final_outcomes_read": false,
+  "fits_modified": false,
+  "git_dirty": false,
+  "prediction_file_hashes": {
+    "training_lobo.jsonl": "0d9bb9b61327990854376cb9e2da611d95ee533bf2ac15af3263e6af0f708e77",
+    "training_oof.jsonl": "0560c126a7a4bf9f4e7fb0f4ff2c039f8b0b206360dd68f562f86f754fd0994e"
+  },
+  "training_rows_sha256": "c9c4a4cbe87b4e576833f717e4aae0fd018d77cff56ce52bcee03a16b30480d0",
+  "validation_outcomes_read": false
+}
