@@ -1,3 +1,9 @@
+# Check out every text file with LF on every platform, overriding a global
+# core.autocrlf. Source files are fingerprinted by their bytes (correctness
+# evidence) and the campaign requires a clean tree from WSL, so a Windows
+# checkout must not rewrite them with CRLF.
+* text=auto eol=lf
+
 # Hash-pinned inputs and sealed evidence must keep their committed bytes on
 # every platform; never convert their line endings on checkout.
 data/manifests/** -text
