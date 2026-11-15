@@ -21,6 +21,9 @@ def run_vqa_import_command(args: argparse.Namespace) -> int:
         count=args.count,
         seed=args.seed,
         revision=args.revision,
+        candidates_path=args.candidates,
+        two_crop_count=args.two_crop_count,
+        prompt_template=args.prompt_template,
     )
     print(f"Frozen {count} VQA requests at {args.output}")
     return 0

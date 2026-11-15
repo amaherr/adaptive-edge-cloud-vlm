@@ -1,4 +1,8 @@
-"""Fetch the seeded VQA v2 val2014 image subset from the official COCO bucket."""
+"""Fetch VQA v2 val2014 images from the official COCO bucket.
+
+Images come either from the seeded G2 v1 sample (``--count``/``--seed``) or
+from a frozen candidate file (``--candidates``).
+"""
 
 from __future__ import annotations
 
@@ -50,7 +54,8 @@ def fetch_one(image_id: int, images_dir: Path) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--questions", type=Path, required=True)
+    parser.add_argument("--questions", type=Path)
+    parser.add_argument("--candidates", type=Path)
     parser.add_argument("--images-dir", type=Path, required=True)
     parser.add_argument("--count", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
@@ -58,7 +63,13 @@ def main() -> None:
     args = parser.parse_args()
     if args.workers < 1:
         parser.error("workers must be positive")
-    ids = selected_image_ids(args.questions, args.count, args.seed)
+    if (args.questions is None) == (args.candidates is None):
+        parser.error("give exactly one of --questions or --candidates")
+    if args.candidates is not None:
+        record = json.loads(args.candidates.read_text(encoding="utf-8"))
+        ids = sorted({int(row["image_id"]) for row in record["candidates"]})
+    else:
+        ids = selected_image_ids(args.questions, args.count, args.seed)
     args.images_dir.mkdir(parents=True, exist_ok=True)
     downloaded = 0
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
@@ -69,7 +80,7 @@ def main() -> None:
             downloaded += future.result() == "downloaded"
             if index % 10 == 0 or index == len(ids):
                 print(f"images {index}/{len(ids)}; downloaded {downloaded}", flush=True)
-    print(f"selected questions {args.count}; unique images {len(ids)}")
+    print(f"unique images {len(ids)}")
 
 
 if __name__ == "__main__":

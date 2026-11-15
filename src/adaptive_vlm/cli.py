@@ -106,6 +106,20 @@ def build_parser() -> argparse.ArgumentParser:
     import_parser.add_argument("--count", type=int, default=100)
     import_parser.add_argument("--seed", type=int, default=42)
     import_parser.add_argument("--revision", required=True)
+    import_parser.add_argument(
+        "--candidates",
+        type=Path,
+        help="Frozen candidate order from scripts/vqa/select_vqa_candidates.py",
+    )
+    import_parser.add_argument(
+        "--two-crop-count",
+        type=int,
+        help="Exact number of two-crop images (requires --candidates)",
+    )
+    import_parser.add_argument(
+        "--prompt-template",
+        help="Prompt text containing {question} once; default is the question",
+    )
 
     config_parser = subcommands.add_parser("config", help="Configuration tools")
     config_commands = config_parser.add_subparsers(dest="config_command", required=True)

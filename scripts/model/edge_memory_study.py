@@ -33,7 +33,7 @@ from PIL import Image
 from adaptive_vlm.config import load_experiment_config
 from adaptive_vlm.data.manifest import RequestItem, load_frozen_manifest
 from adaptive_vlm.models.moondream.adapter import MoondreamAdapter
-from adaptive_vlm.prediction.v2.diagnosis.components import crop_count
+from adaptive_vlm.models.moondream.geometry import crop_count
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "configs/experiments/physical_vqa_v1.yaml"

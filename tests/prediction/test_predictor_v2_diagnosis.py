@@ -8,13 +8,13 @@ from typing import Any
 import pytest
 from test_predictor_v2 import ROOT, synthetic_training
 
+from adaptive_vlm.models.moondream.geometry import crop_count
 from adaptive_vlm.prediction.v2.dataset.parsing import digest
 from adaptive_vlm.prediction.v2.diagnosis.analysis import (
     descriptive_features,
     repeat_changes,
 )
 from adaptive_vlm.prediction.v2.diagnosis.components import (
-    crop_count,
     join_diagnostics,
     metrics,
     observed_components,
