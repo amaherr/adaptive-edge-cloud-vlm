@@ -1,0 +1,5 @@
+# Python 2 json.dump(indent=2) emits comma-space-newline. Preserve the evaluator
+# output bytes and their recorded hashes instead of rewriting archival JSON.
+official_outputs/**/*.json whitespace=-blank-at-eol
+diagnostic_outputs/*.json whitespace=-blank-at-eol
+*-answer-forms.json whitespace=-blank-at-eol

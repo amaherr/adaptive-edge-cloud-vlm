@@ -1,0 +1,103 @@
+{
+  "placements": [
+    {
+      "placement": "edge",
+      "evaluated_attempts": 2700,
+      "independent_question_ids": 100,
+      "official_raw_accuracy_percent": 2.0,
+      "request_bootstrap_ci95_percent": [
+        0.0,
+        5.0
+      ],
+      "provisional_accuracy_percent": 3.0,
+      "one_word_answers": 3,
+      "answers_at_32_token_cap": 8,
+      "zero_score_answers_containing_reference_span": 82,
+      "leading_yes_no_diagnostic_percent": 32.0,
+      "lowercase_only_diagnostic_percent": 3.0
+    },
+    {
+      "placement": "cloud",
+      "evaluated_attempts": 2700,
+      "independent_question_ids": 100,
+      "official_raw_accuracy_percent": 2.0,
+      "request_bootstrap_ci95_percent": [
+        0.0,
+        5.0
+      ],
+      "provisional_accuracy_percent": 3.0,
+      "one_word_answers": 3,
+      "answers_at_32_token_cap": 8,
+      "zero_score_answers_containing_reference_span": 82,
+      "leading_yes_no_diagnostic_percent": 32.0,
+      "lowercase_only_diagnostic_percent": 3.0
+    },
+    {
+      "placement": "distributed",
+      "evaluated_attempts": 2700,
+      "independent_question_ids": 100,
+      "official_raw_accuracy_percent": 2.0,
+      "request_bootstrap_ci95_percent": [
+        0.0,
+        5.0
+      ],
+      "provisional_accuracy_percent": 3.0,
+      "one_word_answers": 3,
+      "answers_at_32_token_cap": 8,
+      "zero_score_answers_containing_reference_span": 82,
+      "leading_yes_no_diagnostic_percent": 32.0,
+      "lowercase_only_diagnostic_percent": 3.0
+    }
+  ],
+  "paired": [
+    {
+      "left": "edge",
+      "right": "cloud",
+      "difference_definition": "left minus right, percentage points",
+      "paired_questions": 100,
+      "mean_difference_pp": 0.0,
+      "ci95_low_pp": 0.0,
+      "ci95_high_pp": 0.0,
+      "left_higher_questions": 0,
+      "right_higher_questions": 0,
+      "tied_score_questions": 100,
+      "different_raw_answer_text_questions": 19,
+      "different_token_sequence_questions": 19
+    },
+    {
+      "left": "edge",
+      "right": "distributed",
+      "difference_definition": "left minus right, percentage points",
+      "paired_questions": 100,
+      "mean_difference_pp": 0.0,
+      "ci95_low_pp": 0.0,
+      "ci95_high_pp": 0.0,
+      "left_higher_questions": 0,
+      "right_higher_questions": 0,
+      "tied_score_questions": 100,
+      "different_raw_answer_text_questions": 18,
+      "different_token_sequence_questions": 18
+    },
+    {
+      "left": "cloud",
+      "right": "distributed",
+      "difference_definition": "left minus right, percentage points",
+      "paired_questions": 100,
+      "mean_difference_pp": 0.0,
+      "ci95_low_pp": 0.0,
+      "ci95_high_pp": 0.0,
+      "left_higher_questions": 0,
+      "right_higher_questions": 0,
+      "tied_score_questions": 100,
+      "different_raw_answer_text_questions": 16,
+      "different_token_sequence_questions": 16
+    }
+  ],
+  "answer_type_counts": {
+    "yes/no": 37,
+    "other": 50,
+    "number": 13
+  },
+  "scope": "Official raw-answer scores on 100 frozen VQA v2 validation questions, repeated across 9 states and 3 repetitions. Not full-validation benchmark accuracy.",
+  "uncertainty": "10000 paired request-ID cluster bootstrap replicates, seed20261115; average repetitions/blocks within ID. Zero-width paired intervals do not prove population equivalence."
+}

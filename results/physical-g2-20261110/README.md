@@ -2,6 +2,12 @@
 
 All **8,100 measured requests succeeded**, plus 27 warmups. All nine controlled network blocks passed the user-approved `physical-heterogeneous-v2` criterion. The campaign completed at **2026-11-11T05:20:58+00:00** (07:20:58 Cairo), in **15.20 hours** including preflight. Source commit: `3c38be2a68d902dbbf286621a593832aa2149978`.
 
+## Official VQA quality follow-up
+
+Read [the official scoring and quality diagnosis](official_vqa/quality_report.md). All 81 run/repetition exports score **2.0%** with the untouched official evaluator on the saved raw answers (100 unique questions). All three paired placement score differences are **0 percentage points**; that floor-level agreement does not establish semantic equivalence. The report explains the 3% provisional score, verbose-answer mismatch and `Hotel` case-handling discrepancy. A clearly separate leading-yes/no diagnostic scores 32%; it does not replace the raw baseline.
+
+See [paired quality differences](official_vqa/paired_quality_differences.csv), [per-question answers and scores](official_vqa/per_question_quality.csv), and [reproduction commands](official_vqa/REPRODUCE.md). Original inference artifacts and gate results are preserved.
+
 ## Stage-level analysis and thesis findings
 
 Start with [the detailed stage analysis](analysis/stage_analysis.md). It explains the bottleneck in every network condition, includes four scientific figures and paired uncertainty, and relates the measured crossover and memory effects to adaptive placement. The analysis covers all 8,100 measured rows; the original evidence is unchanged.

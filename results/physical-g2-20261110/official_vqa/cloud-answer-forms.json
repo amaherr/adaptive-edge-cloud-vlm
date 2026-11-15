@@ -1,0 +1,2905 @@
+{
+  "inspector_sha256": "0cbe44cd6457bf2c8b8d9f4ecac47c68fedce1ff3b9459b386707868644d6eb4", 
+  "questions": {
+    "4396000": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "No, the bear in the image is not wearing shoes. It is sitting barefoot on a table.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no bear in image is not wearing shoes it is sitting barefoot on table", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "17778003": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "hummingbird is perched on flowers in image", 
+      "prediction_unconditionally_normalized_for_diagnosis": "hummingbird is perched on flowers in image", 
+      "references_after_actual_official_branch": [
+        "hummingbird", 
+        "bee", 
+        "hummingbird", 
+        "hummingbird", 
+        "pollen", 
+        "hummingbird", 
+        "red white", 
+        "hummingbird", 
+        "hummingbird", 
+        "butterfly"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "hummingbird", 
+        "bee", 
+        "hummingbird", 
+        "hummingbird", 
+        "pollen", 
+        "hummingbird", 
+        "red white", 
+        "hummingbird", 
+        "hummingbird", 
+        "butterfly"
+      ]
+    }, 
+    "18874002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "No, the giraffes are standing on dirt in a zoo enclosure.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no giraffes are standing on dirt in zoo enclosure", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "21198000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "women are sitting at dining table enjoying meal together they are likely having conversation or engaging in casual dining experience", 
+      "prediction_unconditionally_normalized_for_diagnosis": "women are sitting at dining table enjoying meal together they are likely having conversation or engaging in casual dining experience", 
+      "references_after_actual_official_branch": [
+        "eating", 
+        "playing cards", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "talking", 
+        "reading"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "eating", 
+        "playing cards", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "talking", 
+        "reading"
+      ]
+    }, 
+    "22423000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "man is missing hat", 
+      "prediction_unconditionally_normalized_for_diagnosis": "man is missing hat", 
+      "references_after_actual_official_branch": [
+        "his hat", 
+        "hat", 
+        "hat", 
+        "hat", 
+        "hat", 
+        "hat", 
+        "his hat", 
+        "hat", 
+        "hat", 
+        "hat"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "his hat", 
+        "hat", 
+        "hat", 
+        "hat", 
+        "hat", 
+        "hat", 
+        "his hat", 
+        "hat", 
+        "hat", 
+        "hat"
+      ]
+    }, 
+    "30504007": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "water bottle is sticking out of skiers' backpack", 
+      "prediction_unconditionally_normalized_for_diagnosis": "water bottle is sticking out of skiers' backpack", 
+      "references_after_actual_official_branch": [
+        "water bottle", 
+        "nothing", 
+        "bottle", 
+        "straps", 
+        "bottle", 
+        "bottle", 
+        "pants", 
+        "water", 
+        "bottle", 
+        "cloth"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "water bottle", 
+        "nothing", 
+        "bottle", 
+        "straps", 
+        "bottle", 
+        "bottle", 
+        "pants", 
+        "water", 
+        "bottle", 
+        "cloth"
+      ]
+    }, 
+    "31984003": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "1", 
+      "prediction_unconditionally_normalized_for_diagnosis": "1", 
+      "references_after_actual_official_branch": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1"
+      ]
+    }, 
+    "49097000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "there is green bag or bag attached to back wheel of bicycle", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there is green bag or bag attached to back wheel of bicycle", 
+      "references_after_actual_official_branch": [
+        "backpack", 
+        "backpack", 
+        "bag", 
+        "bag", 
+        "saddle bag", 
+        "side bag", 
+        "backpack", 
+        "bag", 
+        "lock", 
+        "backpack"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "backpack", 
+        "backpack", 
+        "bag", 
+        "bag", 
+        "saddle bag", 
+        "side bag", 
+        "backpack", 
+        "bag", 
+        "lock", 
+        "backpack"
+      ]
+    }, 
+    "50431001": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Hotel", 
+      "prediction_unconditionally_normalized_for_diagnosis": "hotel", 
+      "references_after_actual_official_branch": [
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel", 
+        "hotel"
+      ]
+    }, 
+    "55126000": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the couple is on a riverboat or canal boat.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes couple is on riverboat or canal boat", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "56205001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes scene appears to be in park with man sitting on bench near bicycle", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes scene appears to be in park with man sitting on bench near bicycle", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes"
+      ]
+    }, 
+    "61925003": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "floor is made of wood", 
+      "prediction_unconditionally_normalized_for_diagnosis": "floor is made of wood", 
+      "references_after_actual_official_branch": [
+        "wood", 
+        "wood", 
+        "wood", 
+        "wood", 
+        "carpet", 
+        "wood", 
+        "carpet", 
+        "carpet", 
+        "wood", 
+        "wood"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "wood", 
+        "wood", 
+        "wood", 
+        "wood", 
+        "carpet", 
+        "wood", 
+        "carpet", 
+        "carpet", 
+        "wood", 
+        "wood"
+      ]
+    }, 
+    "66423002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "The group of people in the image is practicing surfing. They are standing on surfboards and preparing to ride the waves in the ocean.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "group of people in image is practicing surfing they are standing on surfboards and preparing to ride waves in ocean", 
+      "references_after_actual_official_branch": [
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing"
+      ]
+    }, 
+    "67122002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "chair is decorated with various food related items and patterns", 
+      "prediction_unconditionally_normalized_for_diagnosis": "chair is decorated with various food related items and patterns", 
+      "references_after_actual_official_branch": [
+        "bbq stuff", 
+        "food and chef hat", 
+        "food", 
+        "food", 
+        "cooking utensils", 
+        "grill things", 
+        "medal", 
+        "cookout print", 
+        "food", 
+        "food"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "bbq stuff", 
+        "food and chef hat", 
+        "food", 
+        "food", 
+        "cooking utensils", 
+        "grill things", 
+        "medal", 
+        "cookout print", 
+        "food", 
+        "food"
+      ]
+    }, 
+    "69140002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "more glasses of red wine are visible in image", 
+      "prediction_unconditionally_normalized_for_diagnosis": "more glasses of red wine are visible in image", 
+      "references_after_actual_official_branch": [
+        "red", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "red", 
+        "red", 
+        "red", 
+        "red wine", 
+        "red", 
+        "more red wine"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "red", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "red", 
+        "red", 
+        "red", 
+        "red wine", 
+        "red", 
+        "more red wine"
+      ]
+    }, 
+    "72737002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "skateboard is on top of rail or ramp in skate park", 
+      "prediction_unconditionally_normalized_for_diagnosis": "skateboard is on top of rail or ramp in skate park", 
+      "references_after_actual_official_branch": [
+        "on ramp", 
+        "on ramp", 
+        "under boy", 
+        "on rail", 
+        "railing", 
+        "on rail", 
+        "railing", 
+        "rail", 
+        "on ramp", 
+        "on railing"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "on ramp", 
+        "on ramp", 
+        "under boy", 
+        "on rail", 
+        "railing", 
+        "on rail", 
+        "railing", 
+        "rail", 
+        "on ramp", 
+        "on railing"
+      ]
+    }, 
+    "73729002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the keyboard keys in the image are black.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes keyboard keys in image are black", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "74013005": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "cat is laying down or sitting on shoes possibly playing with them or exploring area", 
+      "prediction_unconditionally_normalized_for_diagnosis": "cat is laying down or sitting on shoes possibly playing with them or exploring area", 
+      "references_after_actual_official_branch": [
+        "lying on floor", 
+        "sitting in shoes", 
+        "resting", 
+        "laying down", 
+        "laying on shoes", 
+        "sitting", 
+        "laying on shoes", 
+        "playing", 
+        "sitting", 
+        "playing"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "lying on floor", 
+        "sitting in shoes", 
+        "resting", 
+        "laying down", 
+        "laying on shoes", 
+        "sitting", 
+        "laying on shoes", 
+        "playing", 
+        "sitting", 
+        "playing"
+      ]
+    }, 
+    "80130002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "This scene takes place at night.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this scene takes place at night", 
+      "references_after_actual_official_branch": [
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night", 
+        "night"
+      ]
+    }, 
+    "90373006": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "No, the trees in the image are bare and leafless.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no trees in image are bare and leafless", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "101031015": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "No, the photo is colorful and vibrant.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no photo is colorful and vibrant", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "112269002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "man is eating large sandwich which appears to be quite substantial in size", 
+      "prediction_unconditionally_normalized_for_diagnosis": "man is eating large sandwich which appears to be quite substantial in size", 
+      "references_after_actual_official_branch": [
+        "sandwich", 
+        "sandwich", 
+        "sub", 
+        "big hoagie", 
+        "sub sandwich", 
+        "hero sandwich", 
+        "sandwich", 
+        "giant sandwich", 
+        "sandwich", 
+        "giant sandwich"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "sandwich", 
+        "sandwich", 
+        "sub", 
+        "big hoagie", 
+        "sub sandwich", 
+        "hero sandwich", 
+        "sandwich", 
+        "giant sandwich", 
+        "sandwich", 
+        "giant sandwich"
+      ]
+    }, 
+    "115106005": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "there are several leaves in shot scattered across tree branch and roof of building", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there are several leaves in shot scattered across tree branch and roof of building", 
+      "references_after_actual_official_branch": [
+        "75", 
+        "25", 
+        "lot", 
+        "53", 
+        "20", 
+        "100", 
+        "48", 
+        "8", 
+        "many", 
+        "lot"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "75", 
+        "25", 
+        "lot", 
+        "53", 
+        "20", 
+        "100", 
+        "48", 
+        "8", 
+        "many", 
+        "lot"
+      ]
+    }, 
+    "117079002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "it is daytime", 
+      "prediction_unconditionally_normalized_for_diagnosis": "it is daytime", 
+      "references_after_actual_official_branch": [
+        "2:00", 
+        "5pm", 
+        "afternoon", 
+        "3:00", 
+        "not sure", 
+        "afternoon", 
+        "afternoon", 
+        "afternoon", 
+        "evening", 
+        "mid afternoon"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "2:00", 
+        "5pm", 
+        "afternoon", 
+        "3:00", 
+        "not sure", 
+        "afternoon", 
+        "afternoon", 
+        "afternoon", 
+        "evening", 
+        "mid afternoon"
+      ]
+    }, 
+    "122777000": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "No, there is no cell phone visible in the image.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no there is no cell phone visible in image", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "137321002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the bed is neatly made.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes bed is neatly made", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "141538003": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "it is dog specifically german shepherd", 
+      "prediction_unconditionally_normalized_for_diagnosis": "it is dog specifically german shepherd", 
+      "references_after_actual_official_branch": [
+        "dog", 
+        "dog", 
+        "dog", 
+        "dog", 
+        "dog", 
+        "dog", 
+        "dogs", 
+        "dog", 
+        "dog", 
+        "dog"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "dog", 
+        "dog", 
+        "dog", 
+        "dog", 
+        "dog", 
+        "dog", 
+        "dogs", 
+        "dog", 
+        "dog", 
+        "dog"
+      ]
+    }, 
+    "148739007": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "The person in the image is riding a wave on a surfboard in the ocean. They are skillfully navigating the wave and maintaining their balance as they surf.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "person in image is riding wave on surfboard in ocean they are skillfully navigating wave and maintaining their balance as they surf", 
+      "references_after_actual_official_branch": [
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing", 
+        "surfing"
+      ]
+    }, 
+    "153094003": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes there is light on steeple of clock tower", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes there is light on steeple of clock tower", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes"
+      ]
+    }, 
+    "155142005": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this is hotel room with neatly arranged bedroom setup", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this is hotel room with neatly arranged bedroom setup", 
+      "references_after_actual_official_branch": [
+        "bedroom", 
+        "hotel", 
+        "hotel", 
+        "bedroom", 
+        "hotel", 
+        "bedroom", 
+        "bedroom", 
+        "hotel", 
+        "hotel room", 
+        "bedroom"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "bedroom", 
+        "hotel", 
+        "hotel", 
+        "bedroom", 
+        "hotel", 
+        "bedroom", 
+        "bedroom", 
+        "hotel", 
+        "hotel room", 
+        "bedroom"
+      ]
+    }, 
+    "156397014": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "i cannot provide exact number of sheep as there are multiple sheep in image however i can confirm that there is herd of sheep gathered together likely grazing or resting", 
+      "prediction_unconditionally_normalized_for_diagnosis": "i cannot provide exact number of sheep as there are multiple sheep in image however i can confirm that there is herd of sheep gathered together likely grazing or resting", 
+      "references_after_actual_official_branch": [
+        "30", 
+        "28", 
+        "30", 
+        "more than 20", 
+        "30", 
+        "27", 
+        "13", 
+        "30", 
+        "50", 
+        "20"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "30", 
+        "28", 
+        "30", 
+        "more than 20", 
+        "30", 
+        "27", 
+        "13", 
+        "30", 
+        "50", 
+        "20"
+      ]
+    }, 
+    "158222001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "there is 1 seating area in room which includes chair and bed", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there is 1 seating area in room which includes chair and bed", 
+      "references_after_actual_official_branch": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "2", 
+        "1", 
+        "1"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "2", 
+        "1", 
+        "1"
+      ]
+    }, 
+    "161605000": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, there is a water bottle on the table.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes there is water bottle on table", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "164779000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "no weather in image appears to be cold and nighttime", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no weather in image appears to be cold and nighttime", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "164885001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "man is skiing down snow covered slope performing jump or trick while riding his skis he is wearing green jacket and yellow pants showcasing his skiing skills", 
+      "prediction_unconditionally_normalized_for_diagnosis": "man is skiing down snow covered slope performing jump or trick while riding his skis he is wearing green jacket and yellow pants showcasing his skiing skills", 
+      "references_after_actual_official_branch": [
+        "skiing", 
+        "skiing", 
+        "flying", 
+        "skiing", 
+        "skiing", 
+        "skiing", 
+        "skiing", 
+        "skiing", 
+        "skiing", 
+        "skiing"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "skiing", 
+        "skiing", 
+        "flying", 
+        "skiing", 
+        "skiing", 
+        "skiing", 
+        "skiing", 
+        "skiing", 
+        "skiing", 
+        "skiing"
+      ]
+    }, 
+    "174091007": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the picture is taken indoors, with a wooden table and a pizza on a plate.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes picture is taken indoors with wooden table and pizza on plate", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "188434015": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this can is likely beverage or snack container placed on table in living room it could be used for enjoying drink or snack while watching television relaxing or engaging in conversation", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this can is likely beverage or snack container placed on table in living room it could be used for enjoying drink or snack while watching television relaxing or engaging in conversation", 
+      "references_after_actual_official_branch": [
+        "vase", 
+        "living room", 
+        "home", 
+        "table", 
+        "flowers", 
+        "living room", 
+        "living room", 
+        "living room", 
+        "no can", 
+        "living room"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "vase", 
+        "living room", 
+        "home", 
+        "table", 
+        "flowers", 
+        "living room", 
+        "living room", 
+        "living room", 
+        "no can", 
+        "living room"
+      ]
+    }, 
+    "189932003": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes image features cookie shaped cell phone charm attached to cell phone combination of cookie shaped charm and cell phone suggests that it might be fun and creative way to carry", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes image features cookie shaped cell phone charm attached to cell phone combination of cookie shaped charm and cell phone suggests that it might be fun and creative way to carry", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "no"
+      ]
+    }, 
+    "195561003": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "there is 1 statue visible in image", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there is 1 statue visible in image", 
+      "references_after_actual_official_branch": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "0", 
+        "1"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "0", 
+        "1"
+      ]
+    }, 
+    "197444001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes dessert on white plate includes fruit and ice cream which suggests combination of healthy and indulgent elements fruit includes berries likely raspberries or blackberries", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes dessert on white plate includes fruit and ice cream which suggests combination of healthy and indulgent elements fruit includes berries likely raspberries or blackberries", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "197528000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this is tabby cat", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this is tabby cat", 
+      "references_after_actual_official_branch": [
+        "brown", 
+        "gray", 
+        "persian", 
+        "persian", 
+        "housecat", 
+        "indoor", 
+        "gray", 
+        "tabby", 
+        "domestic", 
+        "siamese"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "brown", 
+        "gray", 
+        "persian", 
+        "persian", 
+        "housecat", 
+        "indoor", 
+        "gray", 
+        "tabby", 
+        "domestic", 
+        "siamese"
+      ]
+    }, 
+    "197756000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "girl is holding camera in her hand", 
+      "prediction_unconditionally_normalized_for_diagnosis": "girl is holding camera in her hand", 
+      "references_after_actual_official_branch": [
+        "bottle", 
+        "bottle", 
+        "bottle", 
+        "bottle", 
+        "bottle", 
+        "beer bottle", 
+        "glass", 
+        "beer", 
+        "bottle", 
+        "bottle"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "bottle", 
+        "bottle", 
+        "bottle", 
+        "bottle", 
+        "bottle", 
+        "beer bottle", 
+        "glass", 
+        "beer", 
+        "bottle", 
+        "bottle"
+      ]
+    }, 
+    "205676001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "they are going down busy city street likely in asian country given presence of japanese signs and architecture", 
+      "prediction_unconditionally_normalized_for_diagnosis": "they are going down busy city street likely in asian country given presence of japanese signs and architecture", 
+      "references_after_actual_official_branch": [
+        "walking", 
+        "downtown", 
+        "work", 
+        "shopping", 
+        "to town", 
+        "home", 
+        "home", 
+        "store", 
+        "home", 
+        "school"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "walking", 
+        "downtown", 
+        "work", 
+        "shopping", 
+        "to town", 
+        "home", 
+        "home", 
+        "store", 
+        "home", 
+        "school"
+      ]
+    }, 
+    "208585002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, there is a car on the sidewalk.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes there is car on sidewalk", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "237626001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "there is 1 trailer in image", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there is 1 trailer in image", 
+      "references_after_actual_official_branch": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "0", 
+        "1"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "0", 
+        "1"
+      ]
+    }, 
+    "240279002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes there are some leaves on banana tree that appear dead or browned", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes there are some leaves on banana tree that appear dead or browned", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "yes"
+      ]
+    }, 
+    "242870004": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this image features toy motorcycle specifically dirt bike parked near body of water motorcycle is silhouetted against bright sky and appears to be parked on hill or cliff edge setting creates", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this image features toy motorcycle specifically dirt bike parked near body of water motorcycle is silhouetted against bright sky and appears to be parked on hill or cliff edge setting creates", 
+      "references_after_actual_official_branch": [
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "bicycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "bicycle", 
+        "motorcycle", 
+        "motorcycle", 
+        "motorcycle"
+      ]
+    }, 
+    "251019002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "man is trying to hit tennis ball with tennis racket", 
+      "prediction_unconditionally_normalized_for_diagnosis": "man is trying to hit tennis ball with tennis racket", 
+      "references_after_actual_official_branch": [
+        "tennis ball", 
+        "tennis ball", 
+        "tennis ball", 
+        "tennis ball", 
+        "tennis ball", 
+        "ball", 
+        "ball", 
+        "ball", 
+        "tennis ball", 
+        "tennis ball"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "tennis ball", 
+        "tennis ball", 
+        "tennis ball", 
+        "tennis ball", 
+        "tennis ball", 
+        "ball", 
+        "ball", 
+        "ball", 
+        "tennis ball", 
+        "tennis ball"
+      ]
+    }, 
+    "253825000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "vase contains orange roses", 
+      "prediction_unconditionally_normalized_for_diagnosis": "vase contains orange roses", 
+      "references_after_actual_official_branch": [
+        "roses", 
+        "tulip", 
+        "rose", 
+        "rose", 
+        "rose", 
+        "rose", 
+        "roses", 
+        "flowers", 
+        "rose", 
+        "rose"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "roses", 
+        "tulip", 
+        "rose", 
+        "rose", 
+        "rose", 
+        "rose", 
+        "roses", 
+        "flowers", 
+        "rose", 
+        "rose"
+      ]
+    }, 
+    "255630000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes surfer is falling while riding wave in ocean", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes surfer is falling while riding wave in ocean", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "no", 
+        "yes", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "no", 
+        "yes", 
+        "no"
+      ]
+    }, 
+    "257865001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "guy is wearing white shirt", 
+      "prediction_unconditionally_normalized_for_diagnosis": "guy is wearing white shirt", 
+      "references_after_actual_official_branch": [
+        "white shirt", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "white shirt", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white"
+      ]
+    }, 
+    "261780000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "bright spot on window is sunlight streaming through illuminating room and creating warm atmosphere", 
+      "prediction_unconditionally_normalized_for_diagnosis": "bright spot on window is sunlight streaming through illuminating room and creating warm atmosphere", 
+      "references_after_actual_official_branch": [
+        "sun", 
+        "light", 
+        "light", 
+        "light", 
+        "light", 
+        "sunlight", 
+        "light", 
+        "nothing", 
+        "light", 
+        "lamp"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "sun", 
+        "light", 
+        "light", 
+        "light", 
+        "light", 
+        "sunlight", 
+        "light", 
+        "nothing", 
+        "light", 
+        "lamp"
+      ]
+    }, 
+    "267683002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes image depicts fast food restaurant setting where woman is preparing food presence of tray of food bowl utensils and possibly other food items suggests that she is working", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes image depicts fast food restaurant setting where woman is preparing food presence of tray of food bowl utensils and possibly other food items suggests that she is working", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "268641001": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "There is one orange fire hydrant in the image.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there is 1 orange fire hydrant in image", 
+      "references_after_actual_official_branch": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "1"
+      ]
+    }, 
+    "268770002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "sign says no smoking", 
+      "prediction_unconditionally_normalized_for_diagnosis": "sign says no smoking", 
+      "references_after_actual_official_branch": [
+        "$200 no trash", 
+        "$200", 
+        "no litter", 
+        "no trash $ 200 fine", 
+        "no littering", 
+        "fine $200", 
+        "$200", 
+        "$200", 
+        "no littering", 
+        "fine for littering"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "$200 no trash", 
+        "$200", 
+        "no litter", 
+        "no trash $ 200 fine", 
+        "no littering", 
+        "fine $200", 
+        "$200", 
+        "$200", 
+        "no littering", 
+        "fine for littering"
+      ]
+    }, 
+    "296404001": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "No, there are no white clouds in the sky. The sky is clear and cloudless.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no there are no white clouds in sky sky is clear and cloudless", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "298151004": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "breads are on plate placed next to oranges and walnuts", 
+      "prediction_unconditionally_normalized_for_diagnosis": "breads are on plate placed next to oranges and walnuts", 
+      "references_after_actual_official_branch": [
+        "cinnamon", 
+        "plate", 
+        "raisin", 
+        "plate", 
+        "on plate", 
+        "platter", 
+        "plate", 
+        "on left", 
+        "on plate", 
+        "on plate"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "cinnamon", 
+        "plate", 
+        "raisin", 
+        "plate", 
+        "on plate", 
+        "platter", 
+        "plate", 
+        "on left", 
+        "on plate", 
+        "on plate"
+      ]
+    }, 
+    "298627001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "picture features herd of sheep with many of them being black or brown in color exact number of sheep is difficult to determine precisely but it's clear that there are several in group", 
+      "prediction_unconditionally_normalized_for_diagnosis": "picture features herd of sheep with many of them being black or brown in color exact number of sheep is difficult to determine precisely but it's clear that there are several in group", 
+      "references_after_actual_official_branch": [
+        "12", 
+        "12", 
+        "14", 
+        "15", 
+        "10", 
+        "9", 
+        "13", 
+        "25", 
+        "7", 
+        "12"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "12", 
+        "12", 
+        "14", 
+        "15", 
+        "10", 
+        "9", 
+        "13", 
+        "25", 
+        "7", 
+        "12"
+      ]
+    }, 
+    "316795002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this is white horse", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this is white horse", 
+      "references_after_actual_official_branch": [
+        "white", 
+        "white 1", 
+        "stallion", 
+        "mustang", 
+        "gray horse", 
+        "white", 
+        "steed", 
+        "white", 
+        "white", 
+        "white"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "white", 
+        "white 1", 
+        "stallion", 
+        "mustang", 
+        "gray horse", 
+        "white", 
+        "steed", 
+        "white", 
+        "white", 
+        "white"
+      ]
+    }, 
+    "320396009": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this image depicts scene on beach during summer season", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this image depicts scene on beach during summer season", 
+      "references_after_actual_official_branch": [
+        "summer", 
+        "fall", 
+        "fall", 
+        "summer", 
+        "spring", 
+        "winter", 
+        "spring", 
+        "fall", 
+        "summer", 
+        "fall"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "summer", 
+        "fall", 
+        "fall", 
+        "summer", 
+        "spring", 
+        "winter", 
+        "spring", 
+        "fall", 
+        "summer", 
+        "fall"
+      ]
+    }, 
+    "324390020": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "meat shown in image is pork", 
+      "prediction_unconditionally_normalized_for_diagnosis": "meat shown in image is pork", 
+      "references_after_actual_official_branch": [
+        "ham", 
+        "ham", 
+        "pork", 
+        "pork", 
+        "dinner", 
+        "pork", 
+        "pork", 
+        "pork", 
+        "ham", 
+        "chicken"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "ham", 
+        "ham", 
+        "pork", 
+        "pork", 
+        "dinner", 
+        "pork", 
+        "pork", 
+        "pork", 
+        "ham", 
+        "chicken"
+      ]
+    }, 
+    "358103001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "no there are no flowers in image bathroom is clean empty and features various items such as sink toilet shower curtain window plant and books", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no there are no flowers in image bathroom is clean empty and features various items such as sink toilet shower curtain window plant and books", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "no"
+      ]
+    }, 
+    "378860002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "The topping on this pizza is pepperoni.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "topping on this pizza is pepperoni", 
+      "references_after_actual_official_branch": [
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni", 
+        "pepperoni"
+      ]
+    }, 
+    "380487005": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the image shows a young girl sitting happily on a bed in a bedroom. The girl is smiling and appears to be enjoying her time on the bed.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes image shows young girl sitting happily on bed in bedroom girl is smiling and appears to be enjoying her time on bed", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "386204008": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "woman is wearing sneakers", 
+      "prediction_unconditionally_normalized_for_diagnosis": "woman is wearing sneakers", 
+      "references_after_actual_official_branch": [
+        "converse", 
+        "sneakers", 
+        "tennis shoes", 
+        "sneakers", 
+        "tennis", 
+        "sneaker", 
+        "canvas", 
+        "sneakers", 
+        "sneakers", 
+        "sneakers"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "converse", 
+        "sneakers", 
+        "tennis shoes", 
+        "sneakers", 
+        "tennis", 
+        "sneaker", 
+        "canvas", 
+        "sneakers", 
+        "sneakers", 
+        "sneakers"
+      ]
+    }, 
+    "386313002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the bike has a basket.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes bike has basket", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "391290004": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "sport being played in image is frisbee", 
+      "prediction_unconditionally_normalized_for_diagnosis": "sport being played in image is frisbee", 
+      "references_after_actual_official_branch": [
+        "frisbee", 
+        "frisbee", 
+        "frisbee", 
+        "frisbee", 
+        "frisbee", 
+        "boxing", 
+        "frisbee", 
+        "ultimate frisbee", 
+        "frisbee", 
+        "frisbee"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "frisbee", 
+        "frisbee", 
+        "frisbee", 
+        "frisbee", 
+        "frisbee", 
+        "boxing", 
+        "frisbee", 
+        "ultimate frisbee", 
+        "frisbee", 
+        "frisbee"
+      ]
+    }, 
+    "398066004": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, there is a ball in motion in the picture, flying towards a batter who is swinging his bat.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes there is ball in motion in picture flying towards batter who is swinging his bat", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "409178005": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes skier is skiing down snowy slope", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes skier is skiing down snowy slope", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no"
+      ]
+    }, 
+    "417742000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "adult likely boy's father is helping little boy by holding his hand while they ski down snowy hill", 
+      "prediction_unconditionally_normalized_for_diagnosis": "adult likely boy's father is helping little boy by holding his hand while they ski down snowy hill", 
+      "references_after_actual_official_branch": [
+        "mom", 
+        "adult", 
+        "man", 
+        "adult", 
+        "adult", 
+        "man", 
+        "man", 
+        "adult", 
+        "man", 
+        "man"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "mom", 
+        "adult", 
+        "man", 
+        "adult", 
+        "adult", 
+        "man", 
+        "man", 
+        "adult", 
+        "man", 
+        "man"
+      ]
+    }, 
+    "418959003": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes it is raining in image", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes it is raining in image", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "no", 
+        "no", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "yes", 
+        "no", 
+        "no", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "427464000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes bananas in image are ripe", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes bananas in image are ripe", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "429042003": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the scooter is about to turn, as it is positioned next to a street corner.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes scooter is about to turn as it is positioned next to street corner", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "432647001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "building is made of brick", 
+      "prediction_unconditionally_normalized_for_diagnosis": "building is made of brick", 
+      "references_after_actual_official_branch": [
+        "bricks", 
+        "brick", 
+        "brick", 
+        "brick", 
+        "brick", 
+        "brick", 
+        "bricks", 
+        "brick", 
+        "bricks", 
+        "bricks"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "bricks", 
+        "brick", 
+        "brick", 
+        "brick", 
+        "brick", 
+        "brick", 
+        "bricks", 
+        "brick", 
+        "bricks", 
+        "bricks"
+      ]
+    }, 
+    "438861000": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "The man is laying on a bed.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "man is laying on bed", 
+      "references_after_actual_official_branch": [
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed", 
+        "bed"
+      ]
+    }, 
+    "446354002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes there is wooden spoon in pot stirring stir fried vegetables", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes there is wooden spoon in pot stirring stir fried vegetables", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "450543002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, there is a swimming pool directly in front of the boy in the image. The boy is skateboarding on the edge of the pool, performing a trick or maneuver.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes there is swimming pool directly in front of boy in image boy is skateboarding on edge of pool performing trick or maneuver", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "451053000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this is l shaped desk", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this is l shaped desk", 
+      "references_after_actual_official_branch": [
+        "rectangle", 
+        "rectangular", 
+        "rectangle", 
+        "square", 
+        "l", 
+        "l shaped", 
+        "l shaped", 
+        "l", 
+        "l", 
+        "l"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "rectangle", 
+        "rectangular", 
+        "rectangle", 
+        "square", 
+        "l", 
+        "l shaped", 
+        "l shaped", 
+        "l", 
+        "l", 
+        "l"
+      ]
+    }, 
+    "453649002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "There are two zebras in the picture.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there are 2 zebras in picture", 
+      "references_after_actual_official_branch": [
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2"
+      ]
+    }, 
+    "460407002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "animals specifically cows are grazing and walking near water's edge in scenic area", 
+      "prediction_unconditionally_normalized_for_diagnosis": "animals specifically cows are grazing and walking near water's edge in scenic area", 
+      "references_after_actual_official_branch": [
+        "grazing", 
+        "eating", 
+        "grazing", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "grazing", 
+        "eating", 
+        "eating"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "grazing", 
+        "eating", 
+        "grazing", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "eating", 
+        "grazing", 
+        "eating", 
+        "eating"
+      ]
+    }, 
+    "461692001": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "towel has design featuring disney character ariel", 
+      "prediction_unconditionally_normalized_for_diagnosis": "towel has design featuring disney character ariel", 
+      "references_after_actual_official_branch": [
+        "0", 
+        "solid", 
+        "modern", 
+        "0", 
+        "plain", 
+        "0", 
+        "no design", 
+        "plain", 
+        "monogram", 
+        "solid"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "0", 
+        "solid", 
+        "modern", 
+        "0", 
+        "plain", 
+        "0", 
+        "no design", 
+        "plain", 
+        "monogram", 
+        "solid"
+      ]
+    }, 
+    "469777002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes elephant is in large open field with people around it which suggests that it might be in wildlife sanctuary or tourist attraction", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes elephant is in large open field with people around it which suggests that it might be in wildlife sanctuary or tourist attraction", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "476233019": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "The game being played is soccer, or football, as indicated by the presence of players and a soccer ball.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "game being played is soccer or football as indicated by presence of players and soccer ball", 
+      "references_after_actual_official_branch": [
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer", 
+        "soccer"
+      ]
+    }, 
+    "480379000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "2", 
+      "prediction_unconditionally_normalized_for_diagnosis": "2", 
+      "references_after_actual_official_branch": [
+        "2", 
+        "2", 
+        "1", 
+        "3", 
+        "2", 
+        "3", 
+        "3", 
+        "4", 
+        "2", 
+        "3"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "2", 
+        "2", 
+        "1", 
+        "3", 
+        "2", 
+        "3", 
+        "3", 
+        "4", 
+        "2", 
+        "3"
+      ]
+    }, 
+    "485773002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes image features clock tower that also serves as union station sign clock tower is lit up at night displaying union station's name and possibly other important information for", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes image features clock tower that also serves as union station sign clock tower is lit up at night displaying union station's name and possibly other important information for", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "495825003": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the mountains have snow on their caps.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes mountains have snow on their caps", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes"
+      ]
+    }, 
+    "498368004": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this is vegetable soup or stew containing broccoli and possibly other vegetables", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this is vegetable soup or stew containing broccoli and possibly other vegetables", 
+      "references_after_actual_official_branch": [
+        "soup", 
+        "soup", 
+        "soup", 
+        "signpost", 
+        "broccoli", 
+        "soup", 
+        "broccoli", 
+        "soup", 
+        "broccoli", 
+        "soup"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "soup", 
+        "soup", 
+        "soup", 
+        "signpost", 
+        "broccoli", 
+        "soup", 
+        "broccoli", 
+        "soup", 
+        "broccoli", 
+        "soup"
+      ]
+    }, 
+    "498650002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "this is indian elephant", 
+      "prediction_unconditionally_normalized_for_diagnosis": "this is indian elephant", 
+      "references_after_actual_official_branch": [
+        "african", 
+        "african", 
+        "african", 
+        "indian", 
+        "african", 
+        "indian", 
+        "indian", 
+        "african", 
+        "indian", 
+        "indian"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "african", 
+        "african", 
+        "african", 
+        "indian", 
+        "african", 
+        "indian", 
+        "indian", 
+        "african", 
+        "indian", 
+        "indian"
+      ]
+    }, 
+    "500423000": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "subway is red and white", 
+      "prediction_unconditionally_normalized_for_diagnosis": "subway is red and white", 
+      "references_after_actual_official_branch": [
+        "white and orange", 
+        "red white", 
+        "gray", 
+        "red and white", 
+        "orange", 
+        "red", 
+        "orange and white", 
+        "white", 
+        "red and white", 
+        "white and orange"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "white and orange", 
+        "red white", 
+        "gray", 
+        "red and white", 
+        "orange", 
+        "red", 
+        "orange and white", 
+        "white", 
+        "red and white", 
+        "white and orange"
+      ]
+    }, 
+    "508541002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "There are two bikes in the image.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there are 2 bikes in image", 
+      "references_after_actual_official_branch": [
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2"
+      ]
+    }, 
+    "518701002": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "room appears to belong to teenager due to presence of colorful patterned blanket hanging over bed which adds vibrant and lively touch to space additionally room is furnished with", 
+      "prediction_unconditionally_normalized_for_diagnosis": "room appears to belong to teenager due to presence of colorful patterned blanket hanging over bed which adds vibrant and lively touch to space additionally room is furnished with", 
+      "references_after_actual_official_branch": [
+        "scarf", 
+        "decor", 
+        "tapestry", 
+        "backpack", 
+        "hanging blanket", 
+        "drink", 
+        "it is messy", 
+        "its messy", 
+        "messy", 
+        "thing hanging over bed"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "scarf", 
+        "decor", 
+        "tapestry", 
+        "backpack", 
+        "hanging blanket", 
+        "drink", 
+        "it is messy", 
+        "its messy", 
+        "messy", 
+        "thing hanging over bed"
+      ]
+    }, 
+    "523780002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "There are two people in the photo.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "there are 2 people in photo", 
+      "references_after_actual_official_branch": [
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2", 
+        "2"
+      ]
+    }, 
+    "526580030": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the group of men in the image are described as \"three boys,\" which suggests they might be a trio of friends or siblings.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes group of men in image are described as 3 boys which suggests they might be trio of friends or siblings", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "527219004": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "The plate is white.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "plate is white", 
+      "references_after_actual_official_branch": [
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white", 
+        "white"
+      ]
+    }, 
+    "539777003": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "yes 1 of fruits in white bowl looks overripe", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes 1 of fruits in white bowl looks overripe", 
+      "references_after_actual_official_branch": [
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "yes", 
+        "yes", 
+        "no", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "yes", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "543422012": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "in persons hand ski poles are visible", 
+      "prediction_unconditionally_normalized_for_diagnosis": "in persons hand ski poles are visible", 
+      "references_after_actual_official_branch": [
+        "ski poles", 
+        "ski pole", 
+        "ski poles", 
+        "ski poles", 
+        "ski poles", 
+        "ski poles", 
+        "ski pole", 
+        "poles", 
+        "poles", 
+        "ski poles"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "ski poles", 
+        "ski pole", 
+        "ski poles", 
+        "ski poles", 
+        "ski poles", 
+        "ski poles", 
+        "ski pole", 
+        "poles", 
+        "poles", 
+        "ski poles"
+      ]
+    }, 
+    "550666004": {
+      "official_normalization_branch_active": true, 
+      "prediction_after_actual_official_branch": "these men are standing in parking lot with several motorcycles parked around them and group of people nearby", 
+      "prediction_unconditionally_normalized_for_diagnosis": "these men are standing in parking lot with several motorcycles parked around them and group of people nearby", 
+      "references_after_actual_official_branch": [
+        "garage", 
+        "parking", 
+        "parking", 
+        "parking", 
+        "parking lot", 
+        "parking lot", 
+        "parking lot", 
+        "parking", 
+        "parking", 
+        "parking"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "garage", 
+        "parking", 
+        "parking", 
+        "parking", 
+        "parking lot", 
+        "parking lot", 
+        "parking lot", 
+        "parking", 
+        "parking", 
+        "parking"
+      ]
+    }, 
+    "573605002": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "Yes, the glasses are full and filled with wine.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "yes glasses are full and filled with wine", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }, 
+    "574350005": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "The umbrella in the foreground is blue.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "umbrella in foreground is blue", 
+      "references_after_actual_official_branch": [
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue", 
+        "blue"
+      ]
+    }, 
+    "575921015": {
+      "official_normalization_branch_active": false, 
+      "prediction_after_actual_official_branch": "No, the man in the image is looking upset while talking on his cell phone.", 
+      "prediction_unconditionally_normalized_for_diagnosis": "no man in image is looking upset while talking on his cell phone", 
+      "references_after_actual_official_branch": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ], 
+      "references_unconditionally_normalized_for_diagnosis": [
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no", 
+        "no"
+      ]
+    }
+  }
+}

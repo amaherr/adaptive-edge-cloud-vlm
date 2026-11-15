@@ -1,0 +1,12 @@
+{
+  "saved_attempts_verified": 8100,
+  "official_evaluations": 81,
+  "question_ids_per_evaluation": 100,
+  "warmups_excluded": 27,
+  "predictions_match_saved_raw_text": true,
+  "within_placement_text_and_tokens_stable_across_all_runs": true,
+  "official_score_vectors_stable_within_placement": true,
+  "provisional_formula_reproduced_for_every_attempt": true,
+  "question_and_reference_alignment": true,
+  "python3_analyzer_sha256": "a03076ca3b4a057bff6fd9bbcea2a26c9915928eb4b1ce0c1d3070a30e5eaaeb"
+}

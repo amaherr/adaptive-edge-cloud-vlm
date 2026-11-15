@@ -1,0 +1,4 @@
+left,right,difference_definition,paired_questions,mean_difference_pp,ci95_low_pp,ci95_high_pp,left_higher_questions,right_higher_questions,tied_score_questions,different_raw_answer_text_questions,different_token_sequence_questions
+edge,cloud,"left minus right, percentage points",100,0.0,0.0,0.0,0,0,100,19,19
+edge,distributed,"left minus right, percentage points",100,0.0,0.0,0.0,0,0,100,18,18
+cloud,distributed,"left minus right, percentage points",100,0.0,0.0,0.0,0,0,100,16,16

@@ -21,3 +21,5 @@ Figures are supplied as PNG for quick viewing and SVG for thesis editing/export:
 4. [Memory and vision timing](memory_and_vision.png)
 
 All original run results remain one directory above this analysis.
+
+Official quality follow-up: [raw-answer official scoring and diagnosis](../official_vqa/quality_report.md) reports 2.0% for all placements. This supersedes the earlier pending-official-evaluation status, while preserving the provisional scores used by the original run.
