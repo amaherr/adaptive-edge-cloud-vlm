@@ -74,6 +74,32 @@ The selection record (all metrics, the chosen ID, and the hashes of the calibrat
 
 **Executed 15 November 2026.** The rule selected **P1** at 56.7% official accuracy. P2 scored 57.2% and was also near-best; P1 won the tie-break on mean output tokens (1.47 against 1.50). No template hit the 32-token cap. See [results/prompt-calibration-20261115](../../results/prompt-calibration-20261115/README.md).
 
+### 3.5 Long-answer task (frozen 16 November 2026, before any candidate was run)
+
+**Why.** A pre-run estimate (`scripts/campaign/estimate_g2v2_winners.py`, from G2's per-stage timings and the W8 edge pilot) predicts that with P1's ~1.5-token answers the distributed placement never wins any cell. Its advantage, decoding on the cloud while the edge is loaded, needs answers long enough that the decode dominates. Measured edge decode cost is 24.7, 37.3 and 66.5 ms per token at L0, L1 and L2, against about 22.6 ms on the cloud. G2 v2 therefore adds a second task bucket, `vqa-long-answer-32-token-budget`: the same images and questions with a prompt that asks for a long answer. The generation contract is unchanged (greedy, 32-token cap), so the model contract hash is the same.
+
+**Scoring.** The long-answer bucket is timed only. Long answers cannot be scored by official VQA accuracy (P0 scored 1.0%), so its manifest uses `scoring: none`. Correctness still uses the per-GPU same-device references (section 8), built separately for the long-answer manifest.
+
+**Candidates** (`{question}` is the verbatim VQA question):
+
+| ID | Template |
+| --- | --- |
+| `D1` | `{question} Explain your answer in detail.` |
+| `D2` | `{question} Answer in a full sentence, then describe the relevant details of the image.` |
+| `D3` | `Describe the image in detail, then answer this question: {question}` |
+
+**Procedure.** Use the section 3.2 calibration set and the section 3.3 run setup: edge placement, swap residency, one warmup, one measured repetition. For each template, record the mean output tokens, the number of answers reaching the 32-token cap, the number of failed requests, and median edge latency.
+
+**Selection rule.**
+1. A template is eligible if it has no failed request and a mean of at least 24.0 output tokens.
+2. Among eligible templates, choose the one with the most 32-token cap hits. Break ties by higher mean output tokens, then by lowest template ID.
+3. **Floor:** if no template is eligible, none is selected, and the protocol must be amended with new candidates before the long-answer task can be added.
+
+**Long-answer request set.**
+- Each split's long-answer IDs are a subset of the same split's short-answer IDs: 30 training, 15 validation and 15 evaluation.
+- The subset is drawn with seed `3907`, stratified by crop count, so it keeps the 20% two-crop share (6/3/3 two-crop).
+- Long-answer request IDs are the short-answer IDs with `-long` appended, so the two buckets never share a key.
+
 ## 4. Dataset construction (frozen)
 
 ### 4.1 Candidate order (shared by the calibration set and the dataset)
