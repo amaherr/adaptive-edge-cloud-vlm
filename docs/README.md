@@ -11,13 +11,14 @@ Start with the [project README](../README.md) for setup and usage. This folder h
 | Physical G2 baseline: 8,100 requests over nine network blocks | Done | [G2 results](../results/physical-g2-20261110/README.md) |
 | Predictor V2 r1 (G3) | **Failed**: cloud error tails and edge memory coverage | [Validation report](predictor-v2/validation-report.md) |
 | Edge full-model memory | Fixed by swap residency, not yet used by the campaign scripts | [GPU placement and memory](physical-testbed/gpu-placement-and-memory.md#edge-full-model-swap-residency-15-november-2026) |
-| G2 v2 baseline (swap-residency edge, short-answer prompt, interleaved placements, edge-load factor) | Preparing off site: protocol drafted, prompt selected (P1), dataset and split frozen | [G2 v2 preparation](g2-v2-preparation.md), [prompt calibration](../results/prompt-calibration-20261115/README.md) |
+| G2 v2 baseline (swap-residency edge, short-answer prompt, interleaved placements, edge-load factor) | Off-site work done (W0–W9); next: on-site pilot, protocol freeze and the unattended run | [G2 v2 preparation](g2-v2-preparation.md), [runbook](runbooks/physical-campaign.md#g2-v2-campaign), [on-site checklist](runbooks/g2v2-onsite-checklist.md) |
 | Selector vs measured oracle (G4) and later phases | Not started; builds on G2 v2 | [Roadmap](roadmap.md) |
 
 ## Plan and runbook
 
 - [Roadmap](roadmap.md): the physical validation plan from repository cleanup to the final thesis matrix, with every gate.
 - [G2 v2 preparation](g2-v2-preparation.md): everything to finish off site and on site before the new unattended baseline run.
+- [G2 v2 on-site checklist](runbooks/g2v2-onsite-checklist.md): the printable list for the site visit.
 - [G2 v2 protocol](protocols/g2-v2-protocol.md): the baseline's design; the prompt selection rule and dataset construction are frozen, and the rest is a draft until the pilot.
 - [Physical campaign runbook](runbooks/physical-campaign.md): launching, monitoring, stopping and resuming the unattended edge/cloud campaign.
 

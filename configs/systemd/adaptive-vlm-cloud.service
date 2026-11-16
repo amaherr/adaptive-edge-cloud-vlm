@@ -1,14 +1,15 @@
 [Unit]
-Description=Physical VLM cloud GPU server
+Description=Physical VLM cloud GPU server (G2 v2: physical_vqa_v2.yaml, resource state)
 After=network-online.target
 Wants=network-online.target
 StartLimitIntervalSec=300
 StartLimitBurst=5
 
 [Service]
+# G2 v1 reproduction: use physical_vqa_v1.yaml and drop --report-resource-state.
 Type=simple
 WorkingDirectory=/REPLACE/absolute/repo/path
-ExecStart=/REPLACE/absolute/repo/path/.venv-model/bin/python -u scripts/campaign/run_physical_cloud_gpu.py adaptive-server --config configs/experiments/physical_vqa_v1.yaml --artifact-manifest configs/model/moondream2_artifact.yaml --cache-dir .model-cache --offline --device cuda:0 --bind-host 0.0.0.0
+ExecStart=/REPLACE/absolute/repo/path/.venv-model/bin/python -u scripts/campaign/run_physical_cloud_gpu.py adaptive-server --config configs/experiments/physical_vqa_v2.yaml --artifact-manifest configs/model/moondream2_artifact.yaml --cache-dir .model-cache --offline --device cuda:0 --bind-host 0.0.0.0 --report-resource-state
 Restart=on-failure
 RestartSec=10
 KillMode=control-group

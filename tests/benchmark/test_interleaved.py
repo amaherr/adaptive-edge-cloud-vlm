@@ -582,7 +582,9 @@ def test_cli_runs_edge_load_and_resource_state_hooks(
             events.append("windows-stop")
 
     monkeypatch.setattr(command, "EdgeLoadGenerator", FakeGenerator)
-    monkeypatch.setattr(command, "NvmlReader", FakeReader)
+    monkeypatch.setattr(
+        command, "gpu_state_source", lambda index: FakeReader(index).snapshot
+    )
     monkeypatch.setattr(command, "WindowsGpuCounterSampler", FakeWindows)
     levels = tmp_path / "levels.json"
     levels.write_text(

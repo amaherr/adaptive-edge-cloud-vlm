@@ -19,8 +19,8 @@ from adaptive_vlm.models.moondream.adapter import MoondreamAdapter
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.resource_state import (
     CachedSampler,
-    NvmlReader,
     combine,
+    gpu_state_source,
     host_memory_snapshot,
 )
 from adaptive_vlm.timing import perf_counter
@@ -79,7 +79,7 @@ def run_cloud_server_command(
     if report_resource_state:
         index = int(device.split(":", 1)[1]) if device.startswith("cuda:") else 0
         state_sampler = CachedSampler(
-            combine(NvmlReader(index).snapshot, host_memory_snapshot), period_s=0.5
+            combine(gpu_state_source(index), host_memory_snapshot), period_s=0.5
         )
         state_sampler.start()
         progress.info("Reporting resource state with every response")

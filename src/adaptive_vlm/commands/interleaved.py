@@ -42,10 +42,10 @@ from adaptive_vlm.models.fake import FakeModelAdapter, fake_tensor_payload
 from adaptive_vlm.process import exit_with_parent, terminate_on_sigterm
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.resource_state import (
-    NvmlReader,
     Snapshot,
     WindowsGpuCounterSampler,
     combine,
+    gpu_state_source,
     host_memory_snapshot,
 )
 from adaptive_vlm.transport.tensors import TensorPayload
@@ -184,7 +184,7 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
     windows: WindowsGpuCounterSampler | None = None
     if args.resource_state:
         index = _device_index(args.edge_device)
-        sources += [NvmlReader(index).snapshot, host_memory_snapshot]
+        sources += [gpu_state_source(index), host_memory_snapshot]
         try:
             windows = WindowsGpuCounterSampler()
         except FileNotFoundError:

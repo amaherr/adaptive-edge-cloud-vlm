@@ -187,3 +187,39 @@ def test_combine_merges_sources_under_a_prefix() -> None:
     probe = combine(lambda: {"a": 1}, lambda: {"b": None}, prefix="edge_")
     assert probe() == {"edge_a": 1, "edge_b": None}
     assert json.dumps(probe())
+
+
+def test_gpu_state_source_falls_back_when_the_probe_crashes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import adaptive_vlm.resource_state as module
+
+    monkeypatch.setattr(module, "nvml_usable", lambda index: False)
+    assert module.gpu_state_source(0)() == {"nvml_available": False}
+
+    class Reader:
+        def __init__(self, index: int) -> None:
+            self.index = index
+
+        def snapshot(self) -> dict[str, Any]:
+            return {"gpu_index": self.index}
+
+    monkeypatch.setattr(module, "nvml_usable", lambda index: True)
+    monkeypatch.setattr(module, "NvmlReader", Reader)
+    assert module.gpu_state_source(2)() == {"gpu_index": 2}
+
+
+def test_nvml_probe_survives_a_crashing_child(monkeypatch: pytest.MonkeyPatch) -> None:
+    import adaptive_vlm.resource_state as module
+
+    class Result:
+        returncode = -11  # SIGSEGV in the probe process
+
+    monkeypatch.setattr(module.subprocess, "run", lambda *a, **k: Result())
+    assert module.nvml_usable(0) is False
+
+    def timeout(*args: Any, **kwargs: Any) -> None:
+        raise module.subprocess.TimeoutExpired("probe", 30)
+
+    monkeypatch.setattr(module.subprocess, "run", timeout)
+    assert module.nvml_usable(0) is False

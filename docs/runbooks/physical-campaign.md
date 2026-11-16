@@ -1,6 +1,6 @@
 # Unattended physical campaign runbook
 
-> **G2 v2** uses its own supervisor, `scripts/campaign/run_g2v2_campaign.py` (see [G2 v2 campaign](#g2-v2-campaign) at the end). The sections before it describe the G2 v1 campaign, kept so that G2 can be reproduced.
+> **Running G2 v2? Go straight to [G2 v2 campaign](#g2-v2-campaign)** and print the [on-site checklist](g2v2-onsite-checklist.md). The sections before it describe the G2 v1 campaign (`run_physical_campaign.py`), kept so that G2 can be reproduced. The cloud service unit in `configs/systemd/` now serves the v2 config; for G2 v1, change it back as noted in the unit.
 
 This runs on the **edge laptop at university**, beside the physical cloud PC. The edge schedules all nine frozen network blocks, all three placements, 100 requests and three repetitions: **8,100 measured attempts and 27 excluded warmups**. Connect from home over SSH/Tailscale to monitor the edge. The inference and measurement addresses remain the university LAN addresses; the third device is outside the experiment path.
 
@@ -113,52 +113,245 @@ The final `state=completed` requires all nine validated blocks and exactly 8,100
 
 ## G2 v2 campaign
 
-The G2 v2 run is driven by `scripts/campaign/run_g2v2_campaign.py` with a settings file. Start from [g2v2_physical.example.json](../../configs/campaigns/g2v2_physical.example.json). The design is in the [protocol](../protocols/g2-v2-protocol.md), sections 5–8. W9 will finish this section with the on-site checklist.
+G2 v2 runs every request on all three placements back to back, under 22 shaped network conditions and three edge-load levels.
+- **Size:** 34 cells as 102 sub-blocks, giving 14,580 measured attempts and 306 warmups. The estimate is about 16–19 h; the on-site pilot replaces it with measured numbers.
+- **Design:** the [protocol](../protocols/g2-v2-protocol.md), sections 5–9.
+- **Status and decisions:** the [preparation notes](../g2-v2-preparation.md).
+- **Driver:** `scripts/campaign/run_g2v2_campaign.py`, on the **edge laptop**. It shapes both hosts, runs one sub-block at a time, validates each one, and reruns a sub-block that fails a check.
 
-**Rehearse on one machine first** (fake model, no shaping, real GPU load worker):
+Every command below runs from the repository root. Edge commands run in the edge's WSL and cloud commands in the cloud's WSL, unless the step says otherwise. The [on-site checklist](g2v2-onsite-checklist.md) is the same sequence as tick boxes.
+
+### 1. Freeze the code
+
+The correctness reference binds the source hashes, and preflight requires the same clean commit on both hosts. Finish all code changes first; any later change to `src/` means rebuilding the reference.
+
+On the edge, check the commit you will take and rehearse the full supervisor with injected faults:
 
 ```bash
-.venv-model/bin/adaptive-vlm adaptive-server --config configs/experiments/fake_g2v2_rehearsal.yaml --artifact-manifest configs/model/moondream2_artifact.yaml --bind-host 127.0.0.1 --report-resource-state
+.venv/bin/python -m ruff check . && .venv/bin/python -m mypy && .venv/bin/python -m pytest -q
 ```
 
 ```bash
-.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py run --settings configs/campaigns/g2v2_loopback_rehearsal.json
+.venv-model/bin/python scripts/campaign/rehearse_g2v2_faults.py --fresh
 ```
 
-**Physical run.** Copy the example settings, fill in the cloud SSH target, repository, Python, interface and the regenerated reference evidence, and decide `rate_fallback` from the pilot. Then:
+The rehearsal must end with every check `true`. It covers a hard kill and resume, a killed load generator, and the derived tables. Keep at least 15 GB free on the Windows C: drive; a crash dump once filled it.
+
+### 2. Cloud PC
+
+1. **Same commit:** pull the commit and set up `.venv-model`. The model cache must be the pinned offline cache, and the server refuses an unverified one.
+2. **Edge-to-cloud access:** key-based SSH from the edge must land in the cloud's **Linux/WSL**, not Windows, and `ssh CLOUD_ALIAS true` must work. Both hosts need passwordless `sudo -n tc` for qdisc show, replace and delete on the experiment interface.
+3. **Services:** use the units in `configs/systemd/`, as in [Keep cloud services running](#keep-cloud-services-running).
+   - `adaptive-vlm-cloud` now serves `physical_vqa_v2.yaml` with `--report-resource-state`, so each cloud and distributed response carries the cloud GPU state.
+   - This host's WSL NVML has crashed before. The server probes NVML in a separate process first; if the probe fails, it reports host memory only, with `nvml_available: false`, instead of crashing.
+   - If the units were installed for G2, copy the updated `adaptive-vlm-cloud.service` again, then run:
 
 ```bash
-.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py preflight --settings SETTINGS.json
+systemctl --user daemon-reload && systemctl --user restart adaptive-vlm-cloud adaptive-vlm-iperf adaptive-vlm-echo
 ```
 
 ```bash
-.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py start --settings SETTINGS.json
+journalctl --user -u adaptive-vlm-cloud -n 50
+```
+
+   The journal must show `"reports_resource_state": true` and both `raw_image` and `projected_synchronous` in `supported_paths`.
+4. **Keepalive:** keep a `sleep infinity` open in a cloud WSL terminal. Preflight checks for it when `require_cloud_wsl_keepalive` is set.
+
+### 3. Network
+
+- **Addresses and ports:** check the LAN IPs, and the Windows portproxy and firewall rules for TCP 5050 (inference), 5051 (iperf3) and 5052 (echo). If the cloud address changed, update the address in three places, then commit, push and pull on the cloud:
+  - `cloud_host` in `configs/profiles/physical_network_grid_v2.json`;
+  - `cloud_host` in `configs/profiles/pilot_grid_v2.json`;
+  - `transport.host` in `configs/experiments/physical_vqa_v2.yaml`.
+- **Top rate:** check that the uplink sustains 200 Mb/s in both directions, unshaped. If either direction falls outside ±20%, set `"rate_fallback": true` in both settings files (step 5). That applies the protocol's predeclared T08 → 150/5 and E04 → 140/50.
+
+```bash
+iperf3 -c CLOUD_IP -p 5051 -t 8 && iperf3 -c CLOUD_IP -p 5051 -t 8 -R
+```
+
+- **Baseline RTT:** nothing to record by hand. Preflight measures the unshaped echo RTT once, stores it in `network_baseline.json`, and reuses it on resume.
+
+### 4. Correctness reference
+
+Preflight and the profiles need a same-device reference for the v2 manifest, made with `scripts/campaign/build_g2v2_reference.py` on the frozen commit. The G2 bundle doesn't work: the source and the prompt changed.
+
+| Where | Command | Time |
+| --- | --- | --- |
+| edge | `.venv-model/bin/python scripts/campaign/build_g2v2_reference.py same-device --output artifacts/g2v2/reference/edge` | ~1 h (resident weights spill on 4 GiB; can run before travelling if the commit is final) |
+| edge | `.venv-model/bin/python scripts/campaign/build_g2v2_reference.py runtime --output artifacts/g2v2/reference/edge-runtime.json` | seconds |
+| cloud | `.venv-model/bin/python scripts/campaign/build_g2v2_reference.py same-device --output artifacts/g2v2/reference/cloud` | ~10–15 min (stop `adaptive-vlm-cloud` first to free the GPU, then restart it) |
+| cloud | `.venv-model/bin/python scripts/campaign/build_g2v2_reference.py runtime --output artifacts/g2v2/reference/cloud-runtime.json` | seconds |
+| edge | `.venv-model/bin/python scripts/campaign/build_g2v2_reference.py control --output artifacts/g2v2/reference/control` (cloud service running, no shaping) | ~15–20 min |
+
+Copy the cloud's `artifacts/g2v2/reference/cloud` folder and `cloud-runtime.json` to the same paths on the edge, with `scp`. Then bind and verify everything:
+
+```bash
+.venv-model/bin/python scripts/campaign/build_g2v2_reference.py bundle --output artifacts/g2v2/reference/bundle --edge artifacts/g2v2/reference/edge --cloud artifacts/g2v2/reference/cloud --control artifacts/g2v2/reference/control --edge-runtime artifacts/g2v2/reference/edge-runtime.json --cloud-runtime artifacts/g2v2/reference/cloud-runtime.json
+```
+
+The bundle step verifies everything exactly as preflight will, and prints the index path. Any same-device mismatch stops it. Don't edit the evidence; find the cause.
+
+Two places point at the bundle:
+- the settings (step 5), in `same_device_reference_evidence`;
+- `configs/predictor/g2v2_dataset_contract.json`, in `same_device_reference_evidence`. This is used by the derived tables. Commit it, push, and pull on the cloud.
+
+### 5. Settings files
+
+Keep machine-specific settings in ignored files:
+
+```bash
+mkdir -p artifacts/g2v2 && cp configs/campaigns/g2v2_pilot.example.json artifacts/g2v2/pilot-settings.json && cp configs/campaigns/g2v2_physical.example.json artifacts/g2v2/settings.json
+```
+
+In both files, set:
+- `cloud_ssh`, `cloud_repo` and `cloud_python`: absolute Linux paths on the cloud;
+- `cloud_interface`;
+- `same_device_reference_evidence`: the bundle index from step 4;
+- `rate_fallback`: from step 3.
+
+Leave the rest unless there is a reason. The main fields are:
+
+| Field | Meaning |
+| --- | --- |
+| `edge_residency` | `swap`, so edge/full fits in 4 GiB. Preflight requires 3,400 MiB of free VRAM. |
+| `max_restarts_per_subblock` | How many times a sub-block is resumed after a CUDA context failure (exit 75) or a dead load generator (exit 76). Default 3. |
+| `max_subblock_attempts` | How many times an *invalid* sub-block is moved to `invalid/` and rerun before the campaign stops. Default 2. |
+| `stall_seconds` | The child is stopped if no attempt is committed for this long. Allow for an edge model load of about 90 s. |
+| `min_free_gb`, `min_*_host_available_ram_mib` | Disk and host-memory reserves, checked at startup and during the run. |
+| `edge_dedicated_limit_mib`, `spill_margin_mib` | The L0 no-spill check: Windows dedicated usage must stay 128 MiB below 3,960 MiB. |
+
+`allow_unfrozen_protocol` is `true` only in the pilot settings. The real campaign refuses to start until the protocol is frozen (step 7).
+
+### 6. Pilot, then discard it
+
+The pilot grid runs 100/5, 100/100, 150/150, 35/20 and 200/5, each at L0 and L2, with one repetition over 10 training IDs. That is 10 sub-blocks and 300 attempts, about 1–1.5 h. It never measures validation or evaluation IDs.
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py preflight --settings artifacts/g2v2/pilot-settings.json
 ```
 
 ```bash
-.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py status --settings SETTINGS.json
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py start --settings artifacts/g2v2/pilot-settings.json
 ```
 
-`stop` sends SIGTERM to the supervisor, which removes netem from both hosts before exiting. Rerunning `start` resumes: finished sub-blocks are re-validated against their recorded hashes and skipped.
+When `status` reports `completed`, build the pilot's oracle table:
 
-The output folder (`output_root`) contains:
-- `campaign_plan.json`: the frozen contract, including the full sub-block order. A resume with changed inputs is refused.
-- `network_baseline.json`: the unshaped baseline.
-- `subblocks/<cell>-r<rep>/`, holding:
-  - `plan.json`;
-  - `network_pre.json` and `network_post.json`;
-  - `qdisc_before.json` and `qdisc_after.json`, with the drop counters;
-  - `run/` (`interleave.json` plus one folder per placement);
-  - `restarts.jsonl`;
-  - `validation_report.json`.
-- `invalid/`: sub-blocks that failed a gate and were rerun.
-- `status.json` and `campaign.log`.
+```bash
+.venv-model/bin/python scripts/campaign/derive_g2v2_tables.py profiles --campaign artifacts/g2v2/pilot --contract configs/predictor/g2v2_dataset_contract.json --output artifacts/g2v2/pilot-derived
+```
 
-**Derived tables.** After the campaign, build the Predictor V2 partitions and the training measured-oracle table:
+```bash
+.venv-model/bin/python scripts/campaign/derive_g2v2_tables.py oracle --campaign artifacts/g2v2/pilot --contract configs/predictor/g2v2_dataset_contract.json --output artifacts/g2v2/pilot-derived
+```
+
+**Go/no-go.** If any of these fails, stop. Fix the cause and record a dated amendment in the protocol before collecting anything.
+- **Valid sub-blocks:** every pilot sub-block is valid (`subblocks/*/validation_report.json`), which covers zero netem drops, probes within tolerance and no L0 spill.
+- **Every placement can win:** each of the three placements wins at least one pilot cell (`oracle-training/oracle_cells.csv`).
+- **L1 position:** the median cloud latency at 35/20 (cell `P04-L0`) is between 1.6 and 2.6 s. Otherwise, re-choose L1 and L2 from the [calibration curve](../../results/edge-load-calibration-20261116/README.md) (protocol section 6).
+- **Cloud state:** the cloud resource state is present. A cloud row in `subblocks/*/run/cloud/requests.jsonl` has `server_state_gpu_temperature_c`, or `server_state_nvml_available: false` if the probe failed.
+- **Timing:** record the per-sub-block wall time, the edge model load time (`Loading verified shared edge model … completed in` in `campaign.log`), and the probe and shaping time.
+
+### 7. Freeze the protocol
+
+In `docs/protocols/g2-v2-protocol.md`:
+1. Replace the run-length estimate with the pilot's measurements.
+2. Decide the open section 9 choice (lowercased primary VQA score).
+3. Change the status to frozen.
+
+Then pin its hash in the grid, and commit, push and pull on the cloud:
+
+```bash
+sha256sum docs/protocols/g2-v2-protocol.md
+```
+
+Put the hash in `protocol_sha256` in `configs/profiles/physical_network_grid_v2.json`. Preflight refuses the physical grid until this matches.
+
+### 8. Launch
+
+Before launching:
+- AC power on both hosts, with sleep and hibernate off, the lid action set to do nothing, and Windows Update paused.
+- Heavy GPU applications closed.
+- Remote access from the third device tested.
+
+Then:
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py preflight --settings artifacts/g2v2/settings.json
+```
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py start --settings artifacts/g2v2/settings.json
+```
+
+Preflight runs each time, including on resume. It checks:
+- the same clean commit on both hosts, `sudo tc`, the cloud ports and health;
+- free disk and VRAM, the reference evidence and runtime versions, and the frozen protocol hash;
+- the full test suite with zero skips, and the three-placement GPU correctness smoke.
+
+`start` detaches and logs to `artifacts/g2v2/physical-unattended/campaign.log`. Watch the first two sub-blocks finish and their `validation_report.json` show `"valid": true` before leaving.
+
+### 9. Monitor
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py status --settings artifacts/g2v2/settings.json
+```
+
+```bash
+tail -F artifacts/g2v2/physical-unattended/campaign.log
+```
+
+`status` reports:
+- `state` and `stage` (`sub-block i/102 attempt n`), and the current `subblock`;
+- measured attempts out of 14,580, and status counts;
+- `valid_subblocks`;
+- `supervisor_running`, read from the live lock rather than from the status file.
+
+A heartbeat line appears every 30 s while a sub-block runs. Each finished sub-block writes `subblocks/<id>/validation_report.json`.
+
+### 10. Stop, recover and resume
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py stop --settings artifacts/g2v2/settings.json
+```
+
+The supervisor stops its benchmark (which stops the load generator) and removes netem from both hosts. Wait for `supervisor_running: false`, then check `cleanup_errors`. To resume, rerun the same `start` command: finished sub-blocks are re-validated against their hashes and skipped, and the interrupted one resumes from its last committed attempt.
+
+What happens on its own, and what needs you:
+
+| Event | Automatic handling | Your action |
+| --- | --- | --- |
+| CUDA context failure on the edge | Attempt recorded; benchmark exits 75; sub-block resumed (up to `max_restarts_per_subblock`) | None, unless restarts run out |
+| Load generator died or stalled | Benchmark exits 76 before the next attempt; resumed with a new generator | None, unless restarts run out |
+| Sub-block fails a check (drops, probes, spill, failures > 1%, dead generator) | Moved to `invalid/<id>-<time>` and rerun whole | If it fails twice the campaign stops; read `reasons` in the report |
+| No committed attempt for `stall_seconds` | Child process tree stopped; campaign fails | Check the cloud service and network, then `start` |
+| Supervisor killed (OOM, `kill -9`) | Its children exit with it; any leftover process is stopped (`stray_processes.jsonl`) | `start` |
+| Power loss or reboot | Nothing runs | Restart cloud WSL and services, check `tc qdisc show dev eth0` on both hosts, then `start` |
+
+Netem left by a hard kill is replaced on resume, because `shaping_active.json` marks it as the campaign's own. A qdisc the campaign didn't create is never overwritten; remove it with `sudo tc qdisc del dev eth0 root` after checking what it is. Don't delete lock files, `shaping_active.json` or any journal to force progress.
+
+### 11. After the run
+
+1. Build the Predictor V2 partitions and the training measured-oracle table:
 
 ```bash
 .venv-model/bin/python scripts/campaign/derive_g2v2_tables.py all --campaign artifacts/g2v2/physical-unattended --contract configs/predictor/g2v2_dataset_contract.json --output artifacts/g2v2/derived
 ```
 
-Validation targets are written under `/tmp` with no read permission. Evaluation cells are opened only with `--splits evaluation --unseal-evaluation`, after the selector is frozen.
+   - Validation targets are sealed under `/tmp` with no read permission.
+   - Evaluation cells stay closed until the selector is frozen; then use `--splits evaluation --unseal-evaluation`.
+2. Archive the campaign folder, the reference bundle and the cloud service journal under `results/physical-g2v2-<date>/` with `SHA256SUMS`, following the G2 layout.
+3. Then follow "After the run" in the [preparation notes](../g2-v2-preparation.md#after-the-run).
 
+### Output layout
+
+`artifacts/g2v2/physical-unattended/` contains:
+- `campaign_plan.json`: the frozen contract, including the sub-block order. A resume with changed inputs is refused.
+- `network_baseline.json`, `host_preflight.json` and `preflights/`: the correctness smoke.
+- `subblocks/<cell>-r<rep>/`, holding:
+  - `plan.json`;
+  - `network_pre.json` and `network_post.json`;
+  - `qdisc_before.json` and `qdisc_after.json`, with the drop counters;
+  - `run/`, with `interleave.json` and one folder per placement (`plan.json`, `run_manifest.json`, `requests.jsonl`, `summary.json`);
+  - `.run-edge-load/`, the load generator's heartbeat and sessions;
+  - `restarts.jsonl` and `validation_report.json`.
+- `invalid/`, `stray_processes.jsonl`, `status.json` and `campaign.log`.

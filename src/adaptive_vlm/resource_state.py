@@ -20,6 +20,7 @@ import ctypes
 import json
 import shutil
 import subprocess
+import sys
 import threading
 import time
 from collections.abc import Callable, Mapping
@@ -121,6 +122,35 @@ class NvmlReader:
             else None
         )
         return state
+
+
+def nvml_usable(index: int = 0, *, timeout: float = 30.0) -> bool:
+    """Probe NVML once in a throwaway process before using it in-process.
+
+    The physical cloud host's WSL NVML library segfaults on some queries
+    (``scripts/campaign/run_physical_cloud_gpu.py``); a crash in the probe
+    cannot take down the inference server or benchmark that asked.
+    """
+
+    code = (
+        "from adaptive_vlm.resource_state import NvmlReader; "
+        f"NvmlReader({int(index)}).snapshot()"
+    )
+    try:
+        result = subprocess.run(
+            [sys.executable, "-c", code], capture_output=True, timeout=timeout
+        )
+    except subprocess.TimeoutExpired:
+        return False
+    return result.returncode == 0
+
+
+def gpu_state_source(index: int) -> Callable[[], Snapshot]:
+    """NVML snapshots if the probe survives, else a marker saying they're absent."""
+
+    if nvml_usable(index):
+        return NvmlReader(index).snapshot
+    return lambda: {"nvml_available": False}
 
 
 def host_memory_snapshot(path: str = "/proc/meminfo") -> Snapshot:
