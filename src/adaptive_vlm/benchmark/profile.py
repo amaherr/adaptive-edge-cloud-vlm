@@ -68,6 +68,26 @@ def _measurement_call_overhead_ms() -> float:
     return median(wrapped) - median(bare)
 
 
+def _interleave_fields(
+    plan: Mapping[str, Any], row: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Pre-request observations of an interleaved run (absent for fixed runs).
+
+    ``pre_request_state`` was read before the timer started, so it may be used
+    as a predictor input; cloud ``server_state_*`` metrics are outcomes.
+    """
+
+    if plan.get("interleave") is None:
+        return {}
+    conditions = plan.get("conditions") or {}
+    return {
+        "edge_load_level": conditions.get("edge_load_level", "L0"),
+        "interleave_position": row.get("interleave_position"),
+        "stage_prepare_ms": row.get("stage_prepare_ms"),
+        "pre_request_state": row.get("resource_state"),
+    }
+
+
 def _read_run(
     run_dir: Path,
 ) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
@@ -529,6 +549,7 @@ def build_profile(
                     "fields": fields,
                     "null_reasons": missing,
                     "raw_metrics": metrics,
+                    **_interleave_fields(plan, row),
                 }
             )
     counts: dict[str, Counter[str]] = defaultdict(Counter)

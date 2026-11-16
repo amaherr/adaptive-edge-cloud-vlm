@@ -1,4 +1,13 @@
-"""Deterministic, dependency-free adapter for infrastructure tests."""
+"""Deterministic, dependency-free adapter for infrastructure tests.
+
+Besides its outputs, the fake reports the same metric names Moondream reports
+(prompt tokens, image size, prefill, decode, end-to-end and edge vision
+times), so a rehearsal produces profile rows with the full field set the
+Predictor V2 dataset requires. Its "image size" and "prompt tokens" are
+deterministic stand-ins (it decodes no pixels and has no tokenizer); rehearsal
+task features use the same rules (``fake_image_geometry``,
+``fake_prompt_tokens``), so features and measured fields agree exactly.
+"""
 
 from __future__ import annotations
 
@@ -7,7 +16,7 @@ import sys
 from dataclasses import dataclass
 from typing import Literal
 
-from adaptive_vlm.contracts import InferenceRequest, InferenceResult
+from adaptive_vlm.contracts import InferenceRequest, InferenceResult, MetricValue
 from adaptive_vlm.models.base import ModelAdapter, ModelMetadata
 from adaptive_vlm.models.features import (
     MOONDREAM_HIDDEN_SIZE,
@@ -17,6 +26,8 @@ from adaptive_vlm.models.features import (
 )
 from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.tensors import TensorInferenceRequest, TensorPayload
+
+FAKE_OUTPUT_TOKENS = 8
 
 
 @dataclass(frozen=True)
@@ -53,6 +64,28 @@ def fake_tensor_payload(tensor: object) -> TensorPayload:
     return tensor.to_payload()
 
 
+def fake_image_geometry(image: bytes) -> tuple[int, int]:
+    """Deterministic stand-in image size derived from the bytes (not pixels)."""
+
+    digest = hashlib.sha256(image).digest()
+    return 64 + digest[0] * 4, 64 + digest[1] * 4
+
+
+def fake_prompt_tokens(prompt: str) -> int:
+    """Deterministic stand-in prompt length."""
+
+    return 5 + len(prompt.split())
+
+
+def _model_metrics(prompt: str, elapsed_ms: float) -> dict[str, MetricValue]:
+    return {
+        "prompt_tokens": fake_prompt_tokens(prompt),
+        "prompt_prefill_ms": elapsed_ms / 4,
+        "decode_ms": elapsed_ms / 2,
+        "output_tokens": FAKE_OUTPUT_TOKENS,
+    }
+
+
 class FakeModelAdapter(ModelAdapter):
     """Generate repeatable output from image bytes and prompt text."""
 
@@ -86,22 +119,27 @@ class FakeModelAdapter(ModelAdapter):
             raise FileNotFoundError(f"Image does not exist: {request.image_path}")
 
         started_ns = perf_counter_ns()
+        image = request.image_path.read_bytes()
         digest = hashlib.sha256()
-        digest.update(request.image_path.read_bytes())
+        digest.update(image)
         digest.update(b"\0")
         digest.update(request.prompt.encode("utf-8"))
         raw_digest = digest.digest()
         elapsed_ms = (perf_counter_ns() - started_ns) / 1_000_000
         self.active_stage = "text"
+        width, height = fake_image_geometry(image)
 
         return InferenceResult(
             request_id=request.request_id,
             output_text=f"fake-{digest.hexdigest()[:16]}",
-            output_token_ids=tuple(raw_digest[:8]),
+            output_token_ids=tuple(raw_digest[:FAKE_OUTPUT_TOKENS]),
             metrics={
                 "inference_ms": elapsed_ms,
-                "input_bytes": request.image_path.stat().st_size,
-                "output_tokens": 8,
+                "end_to_end_ms": elapsed_ms,
+                "input_bytes": len(image),
+                "image_width": width,
+                "image_height": height,
+                **_model_metrics(request.prompt, elapsed_ms),
             },
         )
 
@@ -111,25 +149,35 @@ class FakeModelAdapter(ModelAdapter):
         if not request.image_path.is_file():
             raise FileNotFoundError(f"Image does not exist: {request.image_path}")
         started_ns = perf_counter_ns()
-        image_digest = hashlib.sha256(request.image_path.read_bytes()).digest()
+        image = request.image_path.read_bytes()
+        image_digest = hashlib.sha256(image).digest()
         self.active_stage = "vision"
+        elapsed_ms = (perf_counter_ns() - started_ns) / 1_000_000
+        width, height = fake_image_geometry(image)
         return VisionEncoding(
             projected=ProjectedVisionFeatures.from_tensor(
                 FakeProjectedTensor(image_digest)
             ),
-            metrics={"edge_vision_ms": (perf_counter_ns() - started_ns) / 1_000_000},
+            metrics={
+                "edge_vision_ms": elapsed_ms,
+                "edge_vision_end_to_end_ms": elapsed_ms,
+                "image_width": width,
+                "image_height": height,
+            },
         )
 
     def generate_from_payload(self, request: TensorInferenceRequest) -> InferenceResult:
         """Cloud half of a fake distributed request."""
 
+        started_ns = perf_counter_ns()
         digest = hashlib.sha256(request.tensor.data[:32])
         digest.update(b"\0")
         digest.update(request.prompt.encode("utf-8"))
         raw_digest = digest.digest()
+        elapsed_ms = (perf_counter_ns() - started_ns) / 1_000_000
         return InferenceResult(
             request_id=request.request_id,
             output_text=f"fake-{digest.hexdigest()[:16]}",
-            output_token_ids=tuple(raw_digest[:8]),
-            metrics={"output_tokens": 8},
+            output_token_ids=tuple(raw_digest[:FAKE_OUTPUT_TOKENS]),
+            metrics=_model_metrics(request.prompt, elapsed_ms),
         )

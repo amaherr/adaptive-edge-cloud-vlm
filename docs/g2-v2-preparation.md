@@ -15,7 +15,8 @@ The original G2 ([results/physical-g2-20261110](../results/physical-g2-20261110/
 | W4 Resource-state logging | Done 16 November 2026: edge NVML, host memory and Windows GPU counters in every record; cloud state via `adaptive-server --report-resource-state`; deliberate spill visible |
 | W5 Edge-load generator | Done 16 November 2026: supervised worker with heartbeat; L1/L2 calibrated and reproduced over three runs ([results](../results/edge-load-calibration-20261116/README.md)) |
 | W6 Grid v2 and supervisor | Done 16 November 2026: `adaptive_vlm.campaign` and `scripts/campaign/run_g2v2_campaign.py`; loopback rehearsal of four sub-blocks (one loaded) completed 54/54 |
-| W7–W9 | Not started |
+| W7 Downstream compatibility | Done 16 November 2026: `derive_g2v2_tables.py` turns rehearsal output into Predictor V2 partitions and measured-oracle tables with no manual edits |
+| W8–W9 | Not started |
 
 ## Why a new baseline
 
@@ -182,6 +183,23 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
 3. Add tests so the dataset contract rejects mixed-split rows.
 
 *Done when* rehearsal output produces a valid Predictor V2 training table and an oracle table with no manual edits.
+
+**Done (16 November 2026).**
+- **Pipeline:** [`derive_g2v2_tables.py`](../scripts/campaign/derive_g2v2_tables.py) runs the steps `features`, `profiles`, `partitions` and `oracle`, or all four with `all`.
+- **Profiles:** each valid training and validation sub-block is profiled with `build_profile`. Evaluation sub-blocks are profiled only with `--splits evaluation --unseal-evaluation`. For an interleaved run, the profile rows now also carry the edge-load level, the snapshot taken before each request and the stage-switch cost. Fixed-placement (v1) profiles are unchanged.
+- **Partitions** (`prediction.v2.dataset.campaign_v2`) use a new input schema, version 3. Each row adds the sub-block, cell, condition, split, edge-load level and 19 edge-state readings taken before the timer started. Cloud `server_state_*` values arrive with the response, so they are treated as outcomes, not inputs.
+- **Split isolation:** request IDs and conditions are paired by split. A row whose request ID belongs to another split is rejected as a "mixed-split row". Validation targets are sealed with `000` permissions, and evaluation sub-blocks are counted from their plans and never opened.
+- **Contracts:** [g2v2_dataset_contract.json](../configs/predictor/g2v2_dataset_contract.json) pins the model, tokenizer, host pair, correctness protocol, controlled network and clean source. Its same-device reference path is filled in once that reference is regenerated. [rehearsal_dataset_contract.json](../configs/predictor/rehearsal_dataset_contract.json) is the rehearsal version.
+- **Measured oracle** (`evaluation.measured_oracle`): per attempt, the latency of each placement and the winner; per cell, the median, p90 and bootstrap 95% CI of the median (seed 1707, 2,000 resamples), the winner and whether it is a tie. It covers training by default, and evaluation needs explicit unsealing.
+- **Fake model:** it now reports Moondream's metric names, so rehearsal rows pass the Predictor V2 target checks. A new 32-token fake config (`configs/model/fake_vqa.yaml`) is used by the rehearsal.
+- **Rehearsal result:**
+  - 36 training rows (18 at L0, 18 at L1);
+  - 9 validation inputs, with targets sealed;
+  - the evaluation sub-block was not opened;
+  - a 2-cell training oracle table.
+
+  [`test_g2v2_campaign.py`](../tests/campaign/test_g2v2_campaign.py) runs the same pipeline and checks mixed-split rejection and changed-profile rejection.
+- **Not yet done:** Predictor V2 fitting itself still reads the G2 v1 schema-2 rows. Fitting r2 on schema-3 rows (adding load level and edge state as features) is model work for after the campaign, not campaign preparation.
 
 ### W8. Rehearsal and edge pilot (1 day)
 

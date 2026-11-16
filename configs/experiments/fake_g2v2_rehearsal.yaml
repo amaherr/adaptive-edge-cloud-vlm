@@ -1,7 +1,7 @@
 schema_version: 1
 name: g2v2-loopback-rehearsal
 mode: cloud
-model_config: ../model/fake.yaml
+model_config: ../model/fake_vqa.yaml
 edge_hardware_config: ../hardware/edge_rtx3050.yaml
 cloud_hardware_config: ../hardware/local_test_cloud.yaml
 dataset:

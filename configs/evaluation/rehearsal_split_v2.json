@@ -4,7 +4,7 @@
   "dataset_revision": "synthetic-fixtures-v1",
   "dataset_manifest_path": "../../data/manifests/correctness.jsonl",
   "dataset_manifest_sha256": "c5bc9df4a010dcefbcbb7fd60c9dd1e47dc0e0cf798acff579a1a004006ce8d1",
-  "model_contract_sha256": "5a0aad856794702dbafe7d63824d86f6fee595d286bf0ed60a7d62f9bc76400f",
+  "model_contract_sha256": "34697ee3d9c7dcad186bd2f42f9396675cb4dbb0f8f4863e7e8fc829559ea35a",
   "description": "Rehearsal only: synthetic fixtures and the fake model.",
   "training_request_ids": [
     "correctness-001",

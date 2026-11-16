@@ -154,3 +154,11 @@ The output folder (`output_root`) contains:
 - `invalid/`: sub-blocks that failed a gate and were rerun.
 - `status.json` and `campaign.log`.
 
+**Derived tables.** After the campaign, build the Predictor V2 partitions and the training measured-oracle table:
+
+```bash
+.venv-model/bin/python scripts/campaign/derive_g2v2_tables.py all --campaign artifacts/g2v2/physical-unattended --contract configs/predictor/g2v2_dataset_contract.json --output artifacts/g2v2/derived
+```
+
+Validation targets are written under `/tmp` with no read permission. Evaluation cells are opened only with `--splits evaluation --unseal-evaluation`, after the selector is frozen.
+

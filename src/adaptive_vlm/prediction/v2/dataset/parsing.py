@@ -107,7 +107,9 @@ def _skip_value(text: str, position: int) -> int:
     raise ValueError("unterminated JSON value")
 
 
-def routing_metadata(line: bytes) -> dict[str, Any]:
+def routing_metadata(
+    line: bytes, *, keys: frozenset[str] = ROUTING_KEYS
+) -> dict[str, Any]:
     """Decode only allowlisted envelope keys, never fields/raw_metrics/outcomes."""
     text = line.decode("utf-8").strip()
     if not text.startswith("{"):
@@ -136,7 +138,7 @@ def routing_metadata(line: bytes) -> dict[str, Any]:
         position += 1
         while text[position].isspace():
             position += 1
-        if key in ROUTING_KEYS:
+        if key in keys:
             result[key], position = decoder.raw_decode(text, position)
         else:
             position = _skip_value(text, position)

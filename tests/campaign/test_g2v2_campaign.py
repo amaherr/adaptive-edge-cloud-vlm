@@ -459,3 +459,146 @@ def test_shaping_failure_still_cleans_up(tmp_path: Path) -> None:
     assert supervisor.shaped
     assert supervisor.cleanup() == [] and cleared == [True]
     assert not (supervisor.output / "shaping_active.json").exists()
+
+
+# -- downstream: Predictor V2 partitions and measured-oracle tables ----------
+
+REHEARSAL_CONTRACT = ROOT / "configs/predictor/rehearsal_dataset_contract.json"
+
+
+def _derived(tmp_path: Path) -> tuple[Path, Path, Path]:
+    from adaptive_vlm.prediction.v2.dataset.campaign_v2 import (
+        profile_campaign,
+        write_feature_bundle,
+    )
+
+    _supervisor(tmp_path).execute(preflight_only=False)
+    campaign, derived = tmp_path / "campaign", tmp_path / "derived"
+    write_feature_bundle(campaign, REHEARSAL_CONTRACT, derived / "features.json")
+    profile_campaign(
+        campaign=campaign, contract_path=REHEARSAL_CONTRACT, output=derived / "profiles"
+    )
+    return campaign, derived, derived / "profiles"
+
+
+def test_rehearsal_produces_partitions_and_oracle_without_edits(
+    tmp_path: Path, fake_server: None, fake_edge: dict[str, Any]
+) -> None:
+    from adaptive_vlm.evaluation.measured_oracle import build_measured_oracle
+    from adaptive_vlm.prediction.v2.dataset.campaign_v2 import (
+        EDGE_STATE_KEYS,
+        prepare_campaign_partitions,
+    )
+
+    campaign, derived, profiles = _derived(tmp_path)
+    assert sorted(p.name for p in profiles.iterdir() if p.is_dir()) == [
+        "T01-L0-r0",
+        "T01-L1-r0",
+        "V01-L0-r0",
+    ]  # The evaluation sub-block is never profiled by default.
+    receipt = prepare_campaign_partitions(
+        campaign=campaign,
+        profiles=profiles,
+        contract_path=REHEARSAL_CONTRACT,
+        feature_path=derived / "features.json",
+        output=derived / "partitions",
+        sealed_root=tmp_path / "sealed",
+    )
+    assert receipt["classification"] == {
+        "train": 36,
+        "validation": 9,
+        "final_test_protected": 9,
+    }
+    assert receipt["training_load_levels"] == {"L0": 18, "L1": 18}
+    assert receipt["evaluation_profiles_opened"] == []
+    sealed = Path(receipt["sealed_validation_path"])
+    assert sealed.stat().st_mode & 0o777 == 0
+    rows = [
+        json.loads(line)
+        for line in (derived / "partitions/training.jsonl").read_text().splitlines()
+    ]
+    inputs = rows[0]["inputs"]
+    assert inputs["schema_version"] == 3 and inputs["split"] == "training"
+    assert set(inputs["edge_state"]) == set(EDGE_STATE_KEYS)
+    assert "server_state_gpu_temperature_c" not in json.dumps(inputs)
+    loaded = [r for r in rows if r["inputs"]["edge_load_level"] == "L1"]
+    assert loaded and all(r["inputs"]["edge_state"]["edge_load_alive"] for r in loaded)
+
+    summary = build_measured_oracle(
+        campaign=campaign, profiles=profiles, output=derived / "oracle"
+    )
+    assert summary["attempts"] == 12 and len(summary["cells"]) == 2
+    cell = summary["cells"][0]
+    assert cell["winner"] in cell["placements"]
+    assert all(s["ok"] == 6 for s in cell["placements"].values())
+    with pytest.raises(ValueError, match="sealed"):
+        build_measured_oracle(
+            campaign=campaign,
+            profiles=profiles,
+            output=derived / "oracle-eval",
+            splits=("evaluation",),
+        )
+
+
+def test_partitions_reject_a_mixed_split_row(
+    tmp_path: Path, fake_server: None, fake_edge: dict[str, Any]
+) -> None:
+    import hashlib
+
+    from adaptive_vlm.prediction.v2.dataset.campaign_v2 import (
+        prepare_campaign_partitions,
+    )
+
+    campaign, derived, profiles = _derived(tmp_path)
+    split = json.loads(
+        (ROOT / "configs/evaluation/rehearsal_split_v2.json").read_text()
+    )
+    path = profiles / "T01-L0-r0/profile/profile.jsonl"
+    lines = path.read_text().splitlines()
+    row = json.loads(lines[-1])
+    row["request_id"] = split["evaluation_request_ids"][0]
+    lines[-1] = json.dumps(row, sort_keys=True)
+    path.write_text("\n".join(lines) + "\n")
+    index_path = profiles / "profiles_index.json"
+    index = json.loads(index_path.read_text())
+    index["subblocks"]["T01-L0-r0"]["profile_sha256"] = hashlib.sha256(
+        path.read_bytes()
+    ).hexdigest()
+    index_path.write_text(json.dumps(index))
+    with pytest.raises(ValueError, match="mixed-split row"):
+        prepare_campaign_partitions(
+            campaign=campaign,
+            profiles=profiles,
+            contract_path=REHEARSAL_CONTRACT,
+            feature_path=derived / "features.json",
+            output=derived / "partitions",
+            sealed_root=tmp_path / "sealed",
+        )
+
+
+def test_partitions_refuse_changed_profiles_and_uncontrolled_physical_contract(
+    tmp_path: Path, fake_server: None, fake_edge: dict[str, Any]
+) -> None:
+    from adaptive_vlm.prediction.v2.dataset.campaign_v2 import (
+        prepare_campaign_partitions,
+        profile_campaign,
+    )
+
+    campaign, derived, profiles = _derived(tmp_path)
+    path = profiles / "V01-L0-r0/profile/profile.jsonl"
+    path.write_bytes(path.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="profile changed"):
+        prepare_campaign_partitions(
+            campaign=campaign,
+            profiles=profiles,
+            contract_path=REHEARSAL_CONTRACT,
+            feature_path=derived / "features.json",
+            output=derived / "partitions",
+            sealed_root=tmp_path / "sealed",
+        )
+    with pytest.raises(ValueError, match="physical"):
+        profile_campaign(
+            campaign=campaign,
+            contract_path=ROOT / "configs/predictor/g2v2_dataset_contract.json",
+            output=derived / "physical-profiles",
+        )
