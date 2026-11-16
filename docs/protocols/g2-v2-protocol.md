@@ -100,6 +100,26 @@ The selection record (all metrics, the chosen ID, and the hashes of the calibrat
 - The subset is drawn with seed `3907`, stratified by crop count, so it keeps the 20% two-crop share (6/3/3 two-crop).
 - Long-answer request IDs are the short-answer IDs with `-long` appended, so the two buckets never share a key.
 
+**Executed 16 November 2026: no template eligible.** All three ran 200/200 without failures, but none reached the 24-token floor:
+
+| ID | Mean output tokens | 32-token cap hits | Median edge latency |
+| --- | ---: | ---: | ---: |
+| `D1` | 17.45 | 46 | 1,447 ms |
+| `D2` | 16.11 | 20 | 1,384 ms |
+| `D3` | 13.05 | 21 | 1,313 ms |
+
+Moondream mostly answers the question in one sentence even when asked for detail. Under rule 3, the protocol is amended as follows.
+
+**Amendment A1 (16 November 2026, before any candidate below was run).** These three candidates replace D1–D3. The calibration set, procedure and selection rule above are unchanged.
+
+| ID | Template |
+| --- | --- |
+| `E1` | `Describe this image in detail.` (the question is not used: a detailed-description task on the same images) |
+| `E2` | `{question} Answer in at least three full sentences, describing everything in the image that relates to the question.` |
+| `E3` | `Write a detailed paragraph describing this image, including the answer to this question: {question}` |
+
+If no E template is eligible either, the long-answer task is dropped from G2 v2 and the run proceeds with the short-answer task only. Distributed is then reported as never winning on this hardware pair, with the pre-run estimate as the explanation.
+
 ## 4. Dataset construction (frozen)
 
 ### 4.1 Candidate order (shared by the calibration set and the dataset)
