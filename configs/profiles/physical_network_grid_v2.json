@@ -1,0 +1,157 @@
+{
+  "schema_version": 2,
+  "campaign_id": "physical-vqa-v2",
+  "description": "G2 v2 network and edge-load grid (docs/protocols/g2-v2-protocol.md sections 5-7). Added RTT is split evenly between both hosts' egress queues.",
+  "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
+  "protocol_sha256": null,
+  "split_path": "../evaluation/physical_vqa_split_v2.json",
+  "experiment_config_path": "../experiments/physical_vqa_v2.yaml",
+  "edge_load_levels_path": "../edge_load/levels_v1.json",
+  "correctness_protocol": "physical-heterogeneous-v2",
+  "cloud_host": "192.168.8.74",
+  "edge_interface": "eth0",
+  "iperf_port": 5051,
+  "echo_port": 5052,
+  "netem_limit_packets": 10000,
+  "order_seed": 5113,
+  "repetitions": [
+    0,
+    1,
+    2
+  ],
+  "warmups_per_subblock": 1,
+  "load_levels": [
+    "L1",
+    "L2"
+  ],
+  "loaded_conditions": [
+    "T02",
+    "T04",
+    "T06",
+    "T09",
+    "V03",
+    "E03"
+  ],
+  "conditions": {
+    "T01": {
+      "split": "training",
+      "rate_mbps": 5,
+      "added_rtt_ms": 20
+    },
+    "T02": {
+      "split": "training",
+      "rate_mbps": 15,
+      "added_rtt_ms": 20
+    },
+    "T03": {
+      "split": "training",
+      "rate_mbps": 25,
+      "added_rtt_ms": 20
+    },
+    "T04": {
+      "split": "training",
+      "rate_mbps": 45,
+      "added_rtt_ms": 20
+    },
+    "T05": {
+      "split": "training",
+      "rate_mbps": 80,
+      "added_rtt_ms": 20
+    },
+    "T06": {
+      "split": "training",
+      "rate_mbps": 150,
+      "added_rtt_ms": 20
+    },
+    "T07": {
+      "split": "training",
+      "rate_mbps": 100,
+      "added_rtt_ms": 5
+    },
+    "T08": {
+      "split": "training",
+      "rate_mbps": 200,
+      "added_rtt_ms": 5
+    },
+    "T09": {
+      "split": "training",
+      "rate_mbps": 100,
+      "added_rtt_ms": 100
+    },
+    "T10": {
+      "split": "training",
+      "rate_mbps": 45,
+      "added_rtt_ms": 100
+    },
+    "T11": {
+      "split": "training",
+      "rate_mbps": 150,
+      "added_rtt_ms": 150
+    },
+    "T12": {
+      "split": "training",
+      "rate_mbps": 25,
+      "added_rtt_ms": 150
+    },
+    "V01": {
+      "split": "validation",
+      "rate_mbps": 7,
+      "added_rtt_ms": 50
+    },
+    "V02": {
+      "split": "validation",
+      "rate_mbps": 35,
+      "added_rtt_ms": 20
+    },
+    "V03": {
+      "split": "validation",
+      "rate_mbps": 60,
+      "added_rtt_ms": 50
+    },
+    "V04": {
+      "split": "validation",
+      "rate_mbps": 120,
+      "added_rtt_ms": 20
+    },
+    "V05": {
+      "split": "validation",
+      "rate_mbps": 80,
+      "added_rtt_ms": 150
+    },
+    "E01": {
+      "split": "evaluation",
+      "rate_mbps": 20,
+      "added_rtt_ms": 50
+    },
+    "E02": {
+      "split": "evaluation",
+      "rate_mbps": 70,
+      "added_rtt_ms": 20
+    },
+    "E03": {
+      "split": "evaluation",
+      "rate_mbps": 120,
+      "added_rtt_ms": 100
+    },
+    "E04": {
+      "split": "evaluation",
+      "rate_mbps": 175,
+      "added_rtt_ms": 50
+    },
+    "E05": {
+      "split": "evaluation",
+      "rate_mbps": 50,
+      "added_rtt_ms": 150
+    }
+  },
+  "rate_fallback": {
+    "T08": {
+      "rate_mbps": 150,
+      "added_rtt_ms": 5
+    },
+    "E04": {
+      "rate_mbps": 140,
+      "added_rtt_ms": 50
+    }
+  }
+}

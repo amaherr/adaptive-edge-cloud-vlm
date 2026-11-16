@@ -1,0 +1,19 @@
+{
+  "mode": "loopback",
+  "grid": "configs/profiles/rehearsal_grid_v2.json",
+  "edge_load_levels": "configs/edge_load/levels_v1.json",
+  "output_root": "artifacts/g2v2-rehearsal",
+  "python": ".venv-model/bin/python",
+  "test_python": ".venv/bin/python",
+  "adaptive_vlm": ".venv-model/bin/adaptive-vlm",
+  "artifact_manifest": "configs/model/moondream2_artifact.yaml",
+  "cache_dir": ".model-cache",
+  "edge_residency": "swap",
+  "min_free_gb": 5,
+  "stall_seconds": 180,
+  "run_test_suite": false,
+  "correctness_smoke": false,
+  "allow_unfrozen_protocol": true,
+  "allow_dirty_tree": true,
+  "require_spill_evidence": false
+}

@@ -14,7 +14,8 @@ The original G2 ([results/physical-g2-20261110](../results/physical-g2-20261110/
 | W3 Interleaved runner | Done 15 November 2026: `interleaved-benchmark`, CUDA-failure exit and restart helper, core-dump guard, swap residency and free-VRAM preflight in the campaign scripts; checked on the real edge GPU |
 | W4 Resource-state logging | Done 16 November 2026: edge NVML, host memory and Windows GPU counters in every record; cloud state via `adaptive-server --report-resource-state`; deliberate spill visible |
 | W5 Edge-load generator | Done 16 November 2026: supervised worker with heartbeat; L1/L2 calibrated and reproduced over three runs ([results](../results/edge-load-calibration-20261116/README.md)) |
-| W6–W9 | Not started |
+| W6 Grid v2 and supervisor | Done 16 November 2026: `adaptive_vlm.campaign` and `scripts/campaign/run_g2v2_campaign.py`; loopback rehearsal of four sub-blocks (one loaded) completed 54/54 |
+| W7–W9 | Not started |
 
 ## Why a new baseline
 
@@ -164,6 +165,15 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
 3. Keep `shape`, cleanup, the stall watchdog, host memory checks and the preflight sequence as they are, and extend the tests.
 
 *Done when* the supervisor's tests cover the v2 grid, and a rehearsal runs at least two conditions (one loaded) end to end.
+
+**Done (16 November 2026).** The G2 v1 scripts were left unchanged so G2 can still be reproduced; G2 v2 has its own package and script.
+- **Grid:** [`physical_network_grid_v2.json`](../configs/profiles/physical_network_grid_v2.json) and `campaign.grid` give 34 cells and 102 sub-blocks, in a seeded order where no cell's sub-blocks are adjacent. Expected counts are computed from the split: 14,580 measured attempts and 306 warmups. The predeclared 200 Mb/s fallback is a setting (`rate_fallback`), and the protocol hash must be pinned in the grid before a physical run.
+- **Network:** `campaign.network` applies netem with `limit 10000` on both hosts. It refuses to replace a foreign qdisc and reads the drop counters from `tc -s`. Probes use G2's tolerances. The unshaped baseline RTT is measured once at preflight and reused on resume, so it isn't hand-entered.
+- **Sub-blocks:** `campaign.subblock` runs the protocol section 8 gates. An invalid sub-block is moved to `invalid/` and rerun, at most `max_subblock_attempts` times. Exit codes 75 and 76 are resumed up to `max_restarts_per_subblock` times, and each restart is logged in `restarts.jsonl`.
+- **Supervisor:** `campaign.supervisor` with [`run_g2v2_campaign.py`](../scripts/campaign/run_g2v2_campaign.py) provides start, run, preflight, status and stop, with locking. Preflight covers both hosts' commit and clean tree, `sudo tc`, the cloud ports, disk, free VRAM, the reference evidence and runtime versions, the test suite and the correctness smoke. A stall watchdog follows journal progress, and shaping is cleaned up on every exit.
+- **Tests:** [`test_g2v2_campaign.py`](../tests/campaign/test_g2v2_campaign.py) runs the supervisor over loopback with in-process children. It checks spill-triggered reruns, restarts, netem drops, a dead load generator and settings validation.
+- **Rehearsal:** [`g2v2_loopback_rehearsal.json`](../configs/campaigns/g2v2_loopback_rehearsal.json) ran the real script against a real `adaptive-server --report-resource-state` (fake model), with the real GPU load worker for T01-L1. All four sub-blocks were valid, 54/54 attempts, with edge and cloud resource state in the records.
+- **Not exercised yet:** the physical path (`tc`, SSH, iperf3) is covered only by unit tests with fake hosts. Its first real run is the on-site pilot.
 
 ### W7. Downstream compatibility (1 day)
 

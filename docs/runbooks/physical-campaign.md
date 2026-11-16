@@ -1,5 +1,7 @@
 # Unattended physical campaign runbook
 
+> **G2 v2** uses its own supervisor, `scripts/campaign/run_g2v2_campaign.py` (see [G2 v2 campaign](#g2-v2-campaign) at the end). The sections before it describe the G2 v1 campaign, kept so that G2 can be reproduced.
+
 This runs on the **edge laptop at university**, beside the physical cloud PC. The edge schedules all nine frozen network blocks, all three placements, 100 requests and three repetitions: **8,100 measured attempts and 27 excluded warmups**. Connect from home over SSH/Tailscale to monitor the edge. The inference and measurement addresses remain the university LAN addresses; the third device is outside the experiment path.
 
 The entry point is `scripts/campaign/run_physical_campaign.py`. It runs software/host checks and a separate three-placement GPU correctness campaign before any baseline work. It then applies each network setting to both Linux hosts, invokes the existing block runner, and requires its controlled profile gate to pass. A block failure stops the campaign. Completion means all nine profiles passed; scientific G2 closure still needs the aggregate report, official accuracy evaluation and reviewed cloud/edge memory evidence described in the existing physical protocol.
@@ -108,3 +110,47 @@ Every completed attempt is flushed and fsynced to `requests.jsonl` before advanc
 Recorded failures remain in the denominator and are **not retried or erased**. Three consecutive inference failures stop further work after saving those rows; process failures also stop immediately. This avoids consuming the remaining schedule during an outage. There is no unattended retry loop that could conceal an infrastructure problem. Resume needs an operator to repair the cause and relaunch; it retains all completed work. A failed controlled-profile gate also stops the next block; inspect the report rather than deleting rows to manufacture a passing result.
 
 The final `state=completed` requires all nine validated blocks and exactly 8,100 measured attempts. Preserve the whole output directory, both host/service logs, model/data provenance and memory evidence in a separate backup before any cleanup or machine move. Review the aggregate results before declaring physical G2 complete. A post-run qdisc cleanup failure reports `state=failed` even if all inference rows were collected.
+
+## G2 v2 campaign
+
+The G2 v2 run is driven by `scripts/campaign/run_g2v2_campaign.py` with a settings file. Start from [g2v2_physical.example.json](../../configs/campaigns/g2v2_physical.example.json). The design is in the [protocol](../protocols/g2-v2-protocol.md), sections 5–8. W9 will finish this section with the on-site checklist.
+
+**Rehearse on one machine first** (fake model, no shaping, real GPU load worker):
+
+```bash
+.venv-model/bin/adaptive-vlm adaptive-server --config configs/experiments/fake_g2v2_rehearsal.yaml --artifact-manifest configs/model/moondream2_artifact.yaml --bind-host 127.0.0.1 --report-resource-state
+```
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py run --settings configs/campaigns/g2v2_loopback_rehearsal.json
+```
+
+**Physical run.** Copy the example settings, fill in the cloud SSH target, repository, Python, interface and the regenerated reference evidence, and decide `rate_fallback` from the pilot. Then:
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py preflight --settings SETTINGS.json
+```
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py start --settings SETTINGS.json
+```
+
+```bash
+.venv-model/bin/python scripts/campaign/run_g2v2_campaign.py status --settings SETTINGS.json
+```
+
+`stop` sends SIGTERM to the supervisor, which removes netem from both hosts before exiting. Rerunning `start` resumes: finished sub-blocks are re-validated against their recorded hashes and skipped.
+
+The output folder (`output_root`) contains:
+- `campaign_plan.json`: the frozen contract, including the full sub-block order. A resume with changed inputs is refused.
+- `network_baseline.json`: the unshaped baseline.
+- `subblocks/<cell>-r<rep>/`, holding:
+  - `plan.json`;
+  - `network_pre.json` and `network_post.json`;
+  - `qdisc_before.json` and `qdisc_after.json`, with the drop counters;
+  - `run/` (`interleave.json` plus one folder per placement);
+  - `restarts.jsonl`;
+  - `validation_report.json`.
+- `invalid/`: sub-blocks that failed a gate and were rerun.
+- `status.json` and `campaign.log`.
+

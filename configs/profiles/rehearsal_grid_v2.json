@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "campaign_id": "g2v2-loopback-rehearsal",
+  "description": "Loopback rehearsal of the G2 v2 supervisor: one condition per split, T01 also under L1, one repetition (4 sub-blocks). Not a measurement grid.",
+  "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
+  "protocol_sha256": null,
+  "split_path": "../evaluation/rehearsal_split_v2.json",
+  "experiment_config_path": "../experiments/fake_g2v2_rehearsal.yaml",
+  "edge_load_levels_path": "../edge_load/levels_v1.json",
+  "correctness_protocol": "physical-heterogeneous-v2",
+  "cloud_host": "127.0.0.1",
+  "edge_interface": "eth0",
+  "iperf_port": 5051,
+  "echo_port": 5052,
+  "netem_limit_packets": 10000,
+  "order_seed": 5113,
+  "repetitions": [
+    0
+  ],
+  "warmups_per_subblock": 1,
+  "load_levels": [
+    "L1"
+  ],
+  "loaded_conditions": [
+    "T01"
+  ],
+  "conditions": {
+    "T01": {
+      "split": "training",
+      "rate_mbps": 5,
+      "added_rtt_ms": 20
+    },
+    "V01": {
+      "split": "validation",
+      "rate_mbps": 7,
+      "added_rtt_ms": 50
+    },
+    "E01": {
+      "split": "evaluation",
+      "rate_mbps": 20,
+      "added_rtt_ms": 50
+    }
+  },
+  "rate_fallback": {}
+}
