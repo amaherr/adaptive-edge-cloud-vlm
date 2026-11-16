@@ -16,7 +16,8 @@ The original G2 ([results/physical-g2-20261110](../results/physical-g2-20261110/
 | W5 Edge-load generator | Done 16 November 2026: supervised worker with heartbeat; L1/L2 calibrated and reproduced over three runs ([results](../results/edge-load-calibration-20261116/README.md)) |
 | W6 Grid v2 and supervisor | Done 16 November 2026: `adaptive_vlm.campaign` and `scripts/campaign/run_g2v2_campaign.py`; loopback rehearsal of four sub-blocks (one loaded) completed 54/54 |
 | W7 Downstream compatibility | Done 16 November 2026: `derive_g2v2_tables.py` turns rehearsal output into Predictor V2 partitions and measured-oracle tables with no manual edits |
-| W8–W9 | Not started |
+| W8 Rehearsal and edge pilot | Local part done 16 November 2026: fault-injection rehearsal passed and the real-model edge pilot passed ([results](../results/g2v2-local-rehearsal-20261116/README.md)). The on-site pilot, run-length update and protocol freeze are in the on-site checklist below |
+| W9 | Not started |
 
 ## Why a new baseline
 
@@ -34,11 +35,11 @@ Go on site only when all of these are true:
 
 - [ ] One tagged, CI-green commit contains everything below, pushed to `origin/main`.
 - [ ] The G2 v2 protocol document is frozen (committed and hash-recorded) before any G2 v2 measurement.
-- [ ] The new dataset manifest and split file are frozen, with validation and test IDs never seen by any earlier run.
-- [ ] The short-answer prompt was selected on a calibration set disjoint from the dataset, by a rule written down before scoring.
-- [ ] The interleaved runner, resource logging, edge-load generator and v2 grid support pass unit tests and a full local rehearsal (fake cloud), including a kill-and-resume.
-- [ ] An edge-only pilot on the real model (this laptop, swap residency, short prompt, each edge-load level) shows the expected timings and no shared-memory spill at zero load.
-- [ ] Downstream tools (profile builder, Predictor V2 dataset preparation, oracle) read a rehearsal campaign's output without errors.
+- [x] The new dataset manifest and split file are frozen, with validation and test IDs never seen by any earlier run.
+- [x] The short-answer prompt was selected on a calibration set disjoint from the dataset, by a rule written down before scoring.
+- [x] The interleaved runner, resource logging, edge-load generator and v2 grid support pass unit tests and a full local rehearsal (fake cloud), including a kill-and-resume.
+- [x] An edge-only pilot on the real model (this laptop, swap residency, short prompt, each edge-load level) shows the expected timings and no spill at zero load. Spill is judged on dedicated usage; see W4.
+- [x] Downstream tools (profile builder, Predictor V2 dataset preparation, oracle) read a rehearsal campaign's output without errors.
 - [ ] The runbook and an on-site checklist are updated for G2 v2.
 
 ## Decisions to freeze in the protocol
@@ -213,6 +214,12 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
 
 *Done when* every item in the definition of ready above is checked.
 
+**Local part done (16 November 2026).** See [results](../results/g2v2-local-rehearsal-20261116/README.md).
+- **Item 1:** [`rehearse_g2v2_faults.py`](../scripts/campaign/rehearse_g2v2_faults.py) ran the loopback campaign, hard-killed the supervisor mid-sub-block, restarted it, and killed the load worker during the loaded sub-block. All eight checks passed: completion, every attempt recorded, all sub-blocks valid, children exiting with the killed supervisor, the load failure resumed with exit 76, no stray processes, no reruns, and derived tables built.
+- **Gap fixed:** a supervisor killed outright used to leave its benchmark and GPU load worker running, which would have loaded later L0 sub-blocks undetected. Children now exit with their parent, SIGTERM runs cleanup, a run accepts one writer, and the supervisor stops stray campaign processes before each sub-block.
+- **Item 2, edge part:** the real model at L0/L1/L2 gave edge/full medians of 1.15, 1.62 and 2.42 s, and distributed's edge half 0.52, 0.82 and 1.36 s. There was no spill at L0, and edge answers were identical to calibration at every level.
+- **Still on site:** the network part of the pilot, item 3 (measured run length) and item 4 (freezing the protocol). They are in the checklist below, and [`g2v2_pilot.example.json`](../configs/campaigns/g2v2_pilot.example.json) with [`pilot_grid_v2.json`](../configs/profiles/pilot_grid_v2.json) is ready for the pilot.
+
 ### W9. Runbook and on-site checklist (0.5 day)
 
 1. Update `docs/runbooks/physical-campaign.md` for G2 v2, covering the settings file, the v2 grid, edge residency and the load generator.
@@ -225,26 +232,57 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
 
 ## On site, before the unattended run (about half a day)
 
-1. **Both hosts on the same commit.** Pull the tagged commit on the cloud PC; preflight already refuses a mismatched or dirty tree. Install or update `.venv-model` and check the pinned model cache hash.
-2. **Cloud services.** Install the updated systemd units, then restart `adaptive-vlm-cloud`, `-iperf` and `-echo`. Check `journalctl` and keep `sleep infinity` open in the cloud WSL.
-3. **Network baseline.**
-   - Check the LAN IPs and portproxy rules for TCP 5050–5052.
-   - Measure the unshaped echo RTT again and record it in the grid config. That is a commit, so do it on the edge first, then pull on the cloud.
-   - Check that the edge uplink sustains the grid's top rate. If it doesn't, apply the 150 Mb/s cap the protocol already defines.
-4. **Correctness references.** Regenerate the heterogeneous-correctness reference bundle for the v2 manifest and prompt on both GPUs. The old bundle is rejected because the refactor changed the source fingerprint, and the prompt changed anyway.
-5. **Pilot, then discard it** (1–2 h). Run about 10 requests at 100/5, 100/100, 150/150, 35/20 and 200/5, each at no load and high load. Check the following go/no-go conditions:
-   - zero netem drops;
-   - network evidence within tolerance;
-   - each of the three placements wins at least one pilot cell;
-   - no edge spill at zero load;
-   - the timings support the run-length estimate.
-   If any check fails, stop, fix it, and amend the protocol through a recorded amendment before collecting anything.
-6. **Host hygiene.**
-   - AC power on both hosts, sleep and hibernate off, the lid action set to do nothing, and Windows Update paused.
-   - Heavy applications closed.
-   - If possible, move the laptop display to the integrated GPU to free VRAM.
-   - Test remote access from the third device.
-7. **Start.** Run `run_physical_campaign.py preflight`, then `start`. Watch the first two sub-blocks before leaving.
+Print this list. Each step names the file or command to use. Items marked **(commit)** change tracked files: do all of them on the edge first, commit, push, and pull on the cloud **before** the final preflight, because preflight refuses mismatched or dirty trees.
+
+**Before leaving**
+- [ ] Run the local rehearsal once more on the commit you will take: `.venv-model/bin/python scripts/campaign/rehearse_g2v2_faults.py --fresh`. All checks must pass.
+- [ ] GitHub Actions is locked by a billing issue, so "CI-green" can't be shown. Either fix billing or accept the local suite (ruff, mypy, pytest without skips), which preflight runs anyway.
+- [ ] Free at least 15 GB on the edge C: drive. `%TEMP%\DiagOutputDir` alone held 20.7 GB of Remote Desktop traces.
+
+**1. Same commit on both hosts**
+- [ ] Pull the commit on the cloud PC, then install or update `.venv-model` and check the pinned model cache hash.
+
+**2. Cloud services** (W9 updates the systemd units for v2)
+- [ ] Install the updated units and restart `adaptive-vlm-cloud` (now `adaptive-server --report-resource-state` with `physical_vqa_v2.yaml`), `-iperf` and `-echo`.
+- [ ] Check `journalctl`, and keep `sleep infinity` open in the cloud WSL.
+
+**3. Network**
+- [ ] Check the LAN IPs and the portproxy rules for TCP 5050–5052. If the cloud IP changed, update `cloud_host` in [`physical_network_grid_v2.json`](../configs/profiles/physical_network_grid_v2.json) and [`pilot_grid_v2.json`](../configs/profiles/pilot_grid_v2.json), and `transport.host` in `physical_vqa_v2.yaml` **(commit)**.
+- [ ] Nothing to record for the unshaped baseline RTT: preflight now measures it once and stores it in `network_baseline.json`.
+- [ ] Check that the edge uplink sustains 200 Mb/s within ±20% in both directions (`iperf3`, 8 s, both directions). If it doesn't, set `"rate_fallback": true` in the settings. That applies the protocol's predeclared T08 → 150/5 and E04 → 140/50.
+
+**4. Correctness reference**
+- [ ] Regenerate the heterogeneous-correctness reference bundle for the v2 manifest and prompt P1 on both GPUs. The old bundle is rejected, because the source fingerprint and the prompt both changed.
+- [ ] Set its path in the settings (`same_device_reference_evidence`), and in [`g2v2_dataset_contract.json`](../configs/predictor/g2v2_dataset_contract.json) **(commit)**.
+
+**5. Settings**
+- [ ] Copy [`g2v2_physical.example.json`](../configs/campaigns/g2v2_physical.example.json) and [`g2v2_pilot.example.json`](../configs/campaigns/g2v2_pilot.example.json) to untracked files.
+- [ ] Fill in `cloud_ssh`, `cloud_repo`, `cloud_python`, `cloud_interface` and the reference path, and set `rate_fallback` from step 3.
+
+**6. Pilot, then discard it** (about 1–1.5 h; W8 items 2–3)
+- [ ] Run `run_g2v2_campaign.py preflight`, then `start`, with the pilot settings.
+  - The pilot grid runs 100/5, 100/100, 150/150, 35/20 and 200/5, each at L0 and L2, with one repetition over 10 training IDs: 10 sub-blocks and 300 attempts.
+  - No validation or evaluation ID is measured.
+- [ ] Then run `derive_g2v2_tables.py profiles` and `oracle` on `artifacts/g2v2/pilot`, with the physical dataset contract.
+- [ ] **Go/no-go.** Stop, fix, and record a dated protocol amendment before collecting anything if any of these fails:
+  - [ ] every pilot sub-block is valid, which covers zero netem drops, probes within tolerance and no L0 spill;
+  - [ ] each of the three placements wins at least one pilot cell;
+  - [ ] **L1 sits near the cloud/distributed range** (protocol section 6). Median cloud latency at 35/20 (pilot P04, the rate and RTT of V02) is between 1.6 and 2.6 s. Otherwise, re-choose the levels from the [calibration curve](../results/edge-load-calibration-20261116/README.md).
+  - [ ] the timings support the run length. Measure per sub-block: wall time, edge model load (78–90 s per sub-block in calibration, about 2.4 h over 102 sub-blocks, which the estimate below doesn't list separately), and probe and shaping time.
+
+**7. Freeze the protocol** (W8 item 4) **(commit)**
+- [ ] In [`g2-v2-protocol.md`](protocols/g2-v2-protocol.md), replace the run-length estimate with the pilot's measured numbers and settle the open section 9 choice (lowercased primary VQA score). Mark the document frozen.
+- [ ] Put its SHA-256 in `protocol_sha256` in `physical_network_grid_v2.json`. The physical run refuses to start until this matches.
+- [ ] Commit, push, and pull on the cloud.
+
+**8. Host hygiene**
+- [ ] AC power on both hosts, sleep and hibernate off, the lid action set to do nothing, and Windows Update paused.
+- [ ] Heavy applications closed. If possible, move the laptop display to the integrated GPU to free VRAM.
+- [ ] Remote access from the third device tested.
+
+**9. Start**
+- [ ] Run `run_g2v2_campaign.py preflight`, then `start`, with the campaign settings.
+- [ ] Watch the first two sub-blocks before leaving: `status`, `campaign.log` and the first `validation_report.json`.
 
 ## The run
 
@@ -253,8 +291,9 @@ Today `scripts/campaign/run_physical_profile_block.py` calls `adaptive-vlm bench
 | No-load grid: 22 conditions × 3 placements × 3 repetitions (60 train / 30 validation / 30 test IDs) | 9,180 | ~6.2 h |
 | Loaded conditions: 2 load levels × 6 conditions | ~5,400–6,500 | ~4.7–5.6 h |
 | Per-sub-block network probes, shaping and load start/stop | — | ~2–3 h |
+| Per-sub-block edge model load (78–90 s × 102, confirm at the pilot) | — | ~2.2–2.6 h |
 | Preflight and GPU correctness campaign | — | ~1 h |
-| **Total** | **~14,600–15,700** | **~14–16 h (range 13–20 h)** |
+| **Total** | **~14,600–15,700** | **~16–19 h (range 15–22 h)** |
 
 These are model-based estimates calibrated on G2 (the model reproduces G2's 14.3 h of inference). The edge pilot and the on-site pilot replace them with measured numbers. The supervisor resumes from validated checkpoints, so the run can be split over two sessions without losing data.
 

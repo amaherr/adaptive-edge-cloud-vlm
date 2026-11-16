@@ -602,3 +602,40 @@ def test_partitions_refuse_changed_profiles_and_uncontrolled_physical_contract(
             contract_path=ROOT / "configs/predictor/g2v2_dataset_contract.json",
             output=derived / "physical-profiles",
         )
+
+
+def test_supervisor_stops_stray_campaign_processes(tmp_path: Path) -> None:
+    import subprocess
+    import sys
+
+    supervisor = _supervisor(tmp_path)
+    marker = supervisor.output / "subblocks" / "T01-L0-r0" / "run"
+    stray = subprocess.Popen(
+        [sys.executable, "-c", "import time; time.sleep(60)", str(marker)]
+    )
+    unrelated = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    try:
+        supervisor.output.mkdir(parents=True)
+        assert supervisor.reap_strays() == [stray.pid]
+        assert stray.wait(timeout=20) != 0
+        assert unrelated.poll() is None
+        log = (supervisor.output / "stray_processes.jsonl").read_text()
+        assert str(stray.pid) in log
+        assert supervisor.reap_strays() == []
+    finally:
+        for process in (stray, unrelated):
+            process.kill()
+            process.wait()
+
+
+def test_a_second_writer_cannot_join_a_running_benchmark(tmp_path: Path) -> None:
+    from adaptive_vlm.benchmark.interleaved import run_interleaved_benchmark
+    from adaptive_vlm.process import exclusive_lock
+
+    run_dir = tmp_path / "run"
+    with (
+        exclusive_lock(tmp_path / ".run.writer.lock", "run writer"),
+        pytest.raises(RuntimeError, match="run writer lock"),
+    ):
+        run_interleaved_benchmark(run_dir=run_dir)
+    assert not run_dir.exists()

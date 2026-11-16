@@ -1,0 +1,44 @@
+{
+  "L0/edge": {
+    "n": 20,
+    "median_ms": 1153.3,
+    "p90_ms": 1184.5,
+    "max_dedicated_mib": 3271.1,
+    "answers_same": 20
+  },
+  "L0/distributed": {
+    "n": 20,
+    "median_ms": 517.8,
+    "p90_ms": 521.3,
+    "max_dedicated_mib": 3271.1,
+    "answers_same": null
+  },
+  "L1/edge": {
+    "n": 20,
+    "median_ms": 1615.9,
+    "p90_ms": 1643.0,
+    "max_dedicated_mib": 3861.8,
+    "answers_same": 20
+  },
+  "L1/distributed": {
+    "n": 20,
+    "median_ms": 821.1,
+    "p90_ms": 826.4,
+    "max_dedicated_mib": 3861.8,
+    "answers_same": null
+  },
+  "L2/edge": {
+    "n": 20,
+    "median_ms": 2424.7,
+    "p90_ms": 2496.5,
+    "max_dedicated_mib": 3861.8,
+    "answers_same": 20
+  },
+  "L2/distributed": {
+    "n": 20,
+    "median_ms": 1358.1,
+    "p90_ms": 1362.9,
+    "max_dedicated_mib": 3861.8,
+    "answers_same": null
+  }
+}

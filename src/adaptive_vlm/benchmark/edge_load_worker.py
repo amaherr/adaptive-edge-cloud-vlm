@@ -21,6 +21,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+from adaptive_vlm.process import exit_with_parent
+
 _MIB = 1024 * 1024
 
 
@@ -43,6 +45,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--level", default="")
     args = parser.parse_args(argv)
+    # Never outlive the benchmark that started us; SIGTERM stops us cleanly.
+    exit_with_parent()
     if args.working_set_mib < 1 or args.busy_ms < 0 or args.idle_ms < 0:
         parser.error("working set must be positive; busy and idle non-negative")
 

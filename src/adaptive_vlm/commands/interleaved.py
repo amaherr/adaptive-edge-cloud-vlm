@@ -39,6 +39,7 @@ from adaptive_vlm.execution.distributed import DistributedExecutionPolicy
 from adaptive_vlm.execution.local import LocalExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
 from adaptive_vlm.models.fake import FakeModelAdapter, fake_tensor_payload
+from adaptive_vlm.process import exit_with_parent, terminate_on_sigterm
 from adaptive_vlm.progress import ProgressReporter
 from adaptive_vlm.resource_state import (
     NvmlReader,
@@ -67,6 +68,10 @@ def _request_ids(args: argparse.Namespace, manifest_ids: list[str]) -> list[str]
 def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
     progress = ProgressReporter(args.verbose)
     disable_core_dumps()
+    # Die with the supervisor, and let SIGTERM run cleanup (stopping the load
+    # generator) instead of killing this process outright.
+    exit_with_parent()
+    terminate_on_sigterm()
     config = load_experiment_config(args.config)
     manifest = load_frozen_manifest(
         args.manifest or config.dataset.manifest_path,

@@ -1,0 +1,95 @@
+{
+  "delay_ms": 400,
+  "steps": [
+    {
+      "step": "fake server ready",
+      "time": 1794819095.759044
+    },
+    {
+      "step": "hard kill",
+      "time": 1794819116.330615,
+      "supervisor_pid": 649,
+      "subblock": "T01-L0-r0",
+      "committed_rows": 4
+    },
+    {
+      "step": "children exited with their supervisor",
+      "time": 1794819116.5320656
+    },
+    {
+      "step": "restarted",
+      "time": 1794819117.742958
+    },
+    {
+      "step": "load worker killed",
+      "time": 1794819222.1275988,
+      "pid": 1899,
+      "subblock": "T01-L1-r0",
+      "committed_rows": 4
+    }
+  ],
+  "status": {
+    "cleanup_errors": [],
+    "error": null,
+    "measured_attempts": 54,
+    "percent": 100.0,
+    "pid": 689,
+    "stage": "sub-block 4/4 attempt 1",
+    "state": "completed",
+    "status_counts": {
+      "ok": 54
+    },
+    "subblock": "T01-L1-r0",
+    "target_attempts": 54,
+    "updated_at_utc": "2026-11-16T08:54:18+00:00",
+    "valid_subblocks": 4,
+    "warmup_attempts": 12
+  },
+  "subblocks": {
+    "E01-L0-r0": {
+      "valid": true,
+      "reasons": [],
+      "attempts": 12,
+      "restart_exit_codes": []
+    },
+    "T01-L0-r0": {
+      "valid": true,
+      "reasons": [],
+      "attempts": 21,
+      "restart_exit_codes": []
+    },
+    "T01-L1-r0": {
+      "valid": true,
+      "reasons": [],
+      "attempts": 21,
+      "restart_exit_codes": [
+        76
+      ]
+    },
+    "V01-L0-r0": {
+      "valid": true,
+      "reasons": [],
+      "attempts": 12,
+      "restart_exit_codes": []
+    }
+  },
+  "stray_processes": [],
+  "derive_exit_code": 0,
+  "derive_stderr_tail": "",
+  "partition_counts": {
+    "final_test_protected": 9,
+    "train": 36,
+    "validation": 9
+  },
+  "checks": {
+    "campaign_completed": true,
+    "all_attempts_recorded": true,
+    "all_subblocks_valid": true,
+    "children_exited_with_supervisor": true,
+    "load_failure_restarted_with_76": true,
+    "no_stray_processes": true,
+    "no_invalid_reruns": true,
+    "derived_tables_built": true
+  },
+  "passed": true
+}

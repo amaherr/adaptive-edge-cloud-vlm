@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "campaign_id": "physical-vqa-v2-pilot",
+  "description": "On-site go/no-go pilot (protocol section 5 and the on-site checklist), discarded afterwards. Rates and RTTs of 100/5, 100/100, 150/150, 35/20 and 200/5, each at L0 and L2, one repetition, 10 training IDs.",
+  "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
+  "protocol_sha256": null,
+  "split_path": "../evaluation/pilot_split_v2.json",
+  "experiment_config_path": "../experiments/physical_vqa_v2.yaml",
+  "edge_load_levels_path": "../edge_load/levels_v1.json",
+  "correctness_protocol": "physical-heterogeneous-v2",
+  "cloud_host": "192.168.8.74",
+  "edge_interface": "eth0",
+  "iperf_port": 5051,
+  "echo_port": 5052,
+  "netem_limit_packets": 10000,
+  "order_seed": 5113,
+  "repetitions": [
+    0
+  ],
+  "warmups_per_subblock": 1,
+  "load_levels": [
+    "L2"
+  ],
+  "loaded_conditions": [
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05"
+  ],
+  "conditions": {
+    "P01": {
+      "split": "training",
+      "rate_mbps": 100,
+      "added_rtt_ms": 5
+    },
+    "P02": {
+      "split": "training",
+      "rate_mbps": 100,
+      "added_rtt_ms": 100
+    },
+    "P03": {
+      "split": "training",
+      "rate_mbps": 150,
+      "added_rtt_ms": 150
+    },
+    "P04": {
+      "split": "training",
+      "rate_mbps": 35,
+      "added_rtt_ms": 20
+    },
+    "P05": {
+      "split": "training",
+      "rate_mbps": 200,
+      "added_rtt_ms": 5
+    }
+  },
+  "rate_fallback": {
+    "P05": {
+      "rate_mbps": 150,
+      "added_rtt_ms": 5
+    }
+  }
+}

@@ -12,7 +12,9 @@ task features use the same rules (``fake_image_geometry``,
 from __future__ import annotations
 
 import hashlib
+import os
 import sys
+import time
 from dataclasses import dataclass
 from typing import Literal
 
@@ -28,6 +30,9 @@ from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.tensors import TensorInferenceRequest, TensorPayload
 
 FAKE_OUTPUT_TOKENS = 8
+# Optional per-call delay for fault-injection rehearsals, so a kill can land
+# inside a sub-block; unset (0) everywhere else.
+DELAY_ENVIRONMENT = "ADAPTIVE_VLM_FAKE_DELAY_MS"
 
 
 @dataclass(frozen=True)
@@ -99,6 +104,9 @@ class FakeModelAdapter(ModelAdapter):
     def __init__(self) -> None:
         self.active_stage: str | None = None
         self.stage_activations: list[str] = []
+        self.delay_s = float(os.environ.get(DELAY_ENVIRONMENT, "0")) / 1000
+        if self.delay_s < 0:
+            raise ValueError(f"{DELAY_ENVIRONMENT} must be non-negative")
 
     @property
     def metadata(self) -> ModelMetadata:
@@ -119,6 +127,7 @@ class FakeModelAdapter(ModelAdapter):
             raise FileNotFoundError(f"Image does not exist: {request.image_path}")
 
         started_ns = perf_counter_ns()
+        time.sleep(self.delay_s)
         image = request.image_path.read_bytes()
         digest = hashlib.sha256()
         digest.update(image)
@@ -149,6 +158,7 @@ class FakeModelAdapter(ModelAdapter):
         if not request.image_path.is_file():
             raise FileNotFoundError(f"Image does not exist: {request.image_path}")
         started_ns = perf_counter_ns()
+        time.sleep(self.delay_s)
         image = request.image_path.read_bytes()
         image_digest = hashlib.sha256(image).digest()
         self.active_stage = "vision"
@@ -170,6 +180,7 @@ class FakeModelAdapter(ModelAdapter):
         """Cloud half of a fake distributed request."""
 
         started_ns = perf_counter_ns()
+        time.sleep(self.delay_s)
         digest = hashlib.sha256(request.tensor.data[:32])
         digest.update(b"\0")
         digest.update(request.prompt.encode("utf-8"))

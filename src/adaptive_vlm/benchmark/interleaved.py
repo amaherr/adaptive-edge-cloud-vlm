@@ -44,6 +44,7 @@ from adaptive_vlm.contracts import InferenceStatus, RunManifest
 from adaptive_vlm.data.manifest import FrozenManifest
 from adaptive_vlm.execution.base import ExecutionPolicy
 from adaptive_vlm.execution.remote import RemoteInferenceError
+from adaptive_vlm.process import exclusive_lock
 from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.protocol import ProtocolError
 
@@ -185,7 +186,20 @@ def verify_interleave_parameters(parameters: Mapping[str, Any]) -> None:
         raise ValueError("interleave parameters do not reproduce their recorded order")
 
 
-def run_interleaved_benchmark(
+def run_interleaved_benchmark(**kwargs: Any) -> dict[str, Any]:
+    """Run every placement for each request in a seeded interleaved order.
+
+    One writer per run directory: a second process (for example a benchmark
+    orphaned by a killed supervisor) is refused instead of interleaving its
+    appends with ours. See ``_run_interleaved_benchmark`` for the arguments.
+    """
+
+    run_dir = Path(kwargs["run_dir"])
+    with exclusive_lock(run_dir.parent / f".{run_dir.name}.writer.lock", "run writer"):
+        return _run_interleaved_benchmark(**kwargs)
+
+
+def _run_interleaved_benchmark(
     *,
     config: ExperimentConfig,
     manifest: FrozenManifest,

@@ -49,6 +49,7 @@ from adaptive_vlm.environment import (
 )
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
+from adaptive_vlm.process import find_processes
 from adaptive_vlm.timing import monotonic
 
 MODES = ("physical", "loopback")
@@ -338,6 +339,34 @@ class CampaignSupervisor:
         finally:
             self.stop_child()
 
+    def reap_strays(self) -> list[int]:
+        """Stop benchmarks or load workers left by a killed supervisor.
+
+        Every campaign child names a path under ``subblocks/`` on its command
+        line, so this matches only this campaign's processes.
+        """
+
+        import time
+
+        pids = find_processes(str(self.output / "subblocks"))
+        if not pids:
+            return []
+        for pid in pids:
+            with suppress(ProcessLookupError):
+                os.kill(pid, signal.SIGTERM)
+        deadline = time.monotonic() + 15
+        while time.monotonic() < deadline and any(
+            Path(f"/proc/{pid}").exists() for pid in pids
+        ):
+            time.sleep(0.2)
+        for pid in pids:
+            with suppress(ProcessLookupError):
+                os.kill(pid, signal.SIGKILL)
+        with (self.output / "stray_processes.jsonl").open("a") as handle:
+            handle.write(json.dumps({"time": now(), "pids": pids}) + "\n")
+        log(f"stopped stray campaign processes: {pids}")
+        return pids
+
     def stop_child(self) -> None:
         child, self.child = self.child, None
         if child is None:
@@ -623,6 +652,7 @@ class CampaignSupervisor:
                 if report is not None and report["valid"]:
                     continue
                 for attempt in range(1, int(s["max_subblock_attempts"]) + 1):
+                    self.reap_strays()
                     if report is not None and not report["valid"]:
                         self._archive(directory, report)
                     self.stage = f"sub-block {index}/{len(order)} attempt {attempt}"
