@@ -1,9 +1,12 @@
 """Schema-2 network/load grid: cells, sub-blocks and their seeded order.
 
-Implements the G2 v2 protocol sections 5-7: every network condition runs at
-L0, the loaded conditions also run at each load level, and each cell runs once
-per repetition as its own sub-block. Sub-blocks are shuffled with a fixed seed,
-re-drawn until no two sub-blocks of the same cell are adjacent.
+Implements the G2 v2 protocol sections 3.5 and 5-7: every network condition
+runs at L0, the loaded conditions also run at each load level, and each cell
+runs once per repetition as its own sub-block. These cells use the primary
+(short-answer) task. Extra tasks (the long-answer bucket) name their own
+experiment config, split and cells as ``[condition, load level]`` pairs.
+Sub-blocks are shuffled with a fixed seed, re-drawn until no two sub-blocks of
+the same cell are adjacent.
 """
 
 from __future__ import annotations
@@ -21,6 +24,7 @@ from adaptive_vlm.benchmark.edge_load import NO_LOAD
 from adaptive_vlm.benchmark.interleaved import PLACEMENTS
 
 SPLITS = ("training", "validation", "evaluation")
+PRIMARY_TASK = "short"
 _MAX_ORDER_DRAWS = 10_000
 
 
@@ -39,14 +43,25 @@ class Condition:
 
 
 @dataclass(frozen=True)
+class Task:
+    name: str
+    task_bucket: str
+    experiment_config: Path
+    split: Path
+    cells: tuple[tuple[str, str], ...]  # empty for the primary task
+
+
+@dataclass(frozen=True)
 class SubBlock:
     condition: Condition
     load_level: str
     repetition: int
+    task: str = PRIMARY_TASK
 
     @property
     def cell_id(self) -> str:
-        return f"{self.condition.condition_id}-{self.load_level}"
+        base = f"{self.condition.condition_id}-{self.load_level}"
+        return base if self.task == PRIMARY_TASK else f"{base}-{self.task}"
 
     @property
     def subblock_id(self) -> str:
@@ -62,6 +77,7 @@ class Grid:
     load_levels: tuple[str, ...]
     loaded_conditions: tuple[str, ...]
     repetitions: tuple[int, ...]
+    tasks: Mapping[str, Task]
 
     @property
     def order_seed(self) -> int:
@@ -76,16 +92,24 @@ class Grid:
 
         return (self.path.parent / str(self.payload[name])).resolve()
 
-    def cells(self) -> list[tuple[Condition, str]]:
-        cells = [(self.conditions[c], NO_LOAD) for c in self.conditions]
+    def cells(self) -> list[tuple[Condition, str, str]]:
+        cells = [(self.conditions[c], NO_LOAD, PRIMARY_TASK) for c in self.conditions]
         for level in self.load_levels:
-            cells += [(self.conditions[c], level) for c in self.loaded_conditions]
+            cells += [
+                (self.conditions[c], level, PRIMARY_TASK)
+                for c in self.loaded_conditions
+            ]
+        for task in self.tasks.values():
+            cells += [(self.conditions[c], level, task.name) for c, level in task.cells]
         return cells
+
+    def all_load_levels(self) -> set[str]:
+        return {level for _, level, _ in self.cells()} - {NO_LOAD}
 
     def subblocks(self) -> list[SubBlock]:
         return [
-            SubBlock(condition, level, repetition)
-            for condition, level in self.cells()
+            SubBlock(condition, level, repetition, task)
+            for condition, level, task in self.cells()
             for repetition in self.repetitions
         ]
 
@@ -110,13 +134,28 @@ class Grid:
         digest = hashlib.sha256(f"{self.order_seed}:{block.subblock_id}".encode())
         return int(digest.hexdigest()[:8], 16)
 
-    def expected_attempts(self, split: Mapping[str, Sequence[str]]) -> dict[str, int]:
+    def load_split(self, task: str = PRIMARY_TASK) -> dict[str, Any]:
+        split: dict[str, Any] = json.loads(
+            self.tasks[task].split.read_text(encoding="utf-8")
+        )
+        return split
+
+    def expected_attempts(
+        self, splits: Mapping[str, Mapping[str, Sequence[str]]] | None = None
+    ) -> dict[str, int]:
+        """Measured attempts and warmups; ``splits`` maps task name to split."""
+
+        loaded = splits or {name: self.load_split(name) for name in self.tasks}
         measured = warmups = 0
         for block in self.subblocks():
-            ids = len(split[f"{block.condition.split}_request_ids"])
+            ids = len(loaded[block.task][f"{block.condition.split}_request_ids"])
             measured += ids * len(PLACEMENTS)
             warmups += self.warmups * len(PLACEMENTS)
         return {"measured": measured, "warmups": warmups}
+
+
+def _relative(grid_path: Path, value: str) -> Path:
+    return (grid_path.parent / value).resolve()
 
 
 def _sha256(path: Path) -> str:
@@ -168,6 +207,33 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
         raise ValueError("netem_limit_packets must be at least 1000")
     if int(payload["warmups_per_subblock"]) < 0:
         raise ValueError("warmups_per_subblock must be non-negative")
+    tasks = {
+        PRIMARY_TASK: Task(
+            name=PRIMARY_TASK,
+            task_bucket=str(
+                payload.get("task_bucket", "vqa-short-answer-32-token-budget")
+            ),
+            experiment_config=_relative(resolved, payload["experiment_config_path"]),
+            split=_relative(resolved, payload["split_path"]),
+            cells=(),
+        )
+    }
+    for name, values in payload.get("extra_tasks", {}).items():
+        if name in tasks:
+            raise ValueError(f"duplicate task name: {name}")
+        cells = tuple((str(c), str(level)) for c, level in values["cells"])
+        if len(set(cells)) != len(cells) or not cells:
+            raise ValueError(f"task {name} needs unique, non-empty cells")
+        missing = {c for c, _ in cells} - set(conditions)
+        if missing:
+            raise ValueError(f"task {name} names unknown conditions: {sorted(missing)}")
+        tasks[name] = Task(
+            name=name,
+            task_bucket=str(values["task_bucket"]),
+            experiment_config=_relative(resolved, values["experiment_config_path"]),
+            split=_relative(resolved, values["split_path"]),
+            cells=cells,
+        )
     grid = Grid(
         path=resolved,
         sha256=_sha256(resolved),
@@ -176,18 +242,43 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
         load_levels=levels,
         loaded_conditions=loaded,
         repetitions=repetitions,
+        tasks=tasks,
     )
     grid.execution_order()  # Fail early if the adjacency constraint is impossible.
     return grid
 
 
-def check_split(grid: Grid, split: Mapping[str, Any]) -> None:
-    """The split must list request IDs for every split and the same conditions."""
+def check_split(grid: Grid, split: Mapping[str, Any], task: str = PRIMARY_TASK) -> None:
+    """The split must list request IDs for every split and the same conditions.
 
+    For an extra task, the request IDs must be the primary task's IDs of the
+    same split with ``-<task>`` appended (the same questions and images).
+    """
+
+    if task == PRIMARY_TASK:
+        used = set(grid.conditions)
+    else:
+        used = {c for c, _ in grid.tasks[task].cells}
     for name in SPLITS:
         if not split.get(f"{name}_request_ids"):
-            raise ValueError(f"split has no {name} request IDs")
+            raise ValueError(f"{task} split has no {name} request IDs")
         listed = set(split.get(f"{name}_network_condition_ids", ()))
-        in_grid = {c for c, v in grid.conditions.items() if v.split == name}
+        in_grid = {
+            c for c, v in grid.conditions.items() if v.split == name and c in used
+        }
         if listed and listed != in_grid:
-            raise ValueError(f"split and grid disagree on {name} conditions")
+            raise ValueError(f"{task} split and grid disagree on {name} conditions")
+    if task != PRIMARY_TASK:
+        primary = grid.load_split()
+        for name in SPLITS:
+            base = {
+                rid.removesuffix(f"-{task}") for rid in split[f"{name}_request_ids"]
+            }
+            if not all(
+                rid.endswith(f"-{task}") for rid in split[f"{name}_request_ids"]
+            ):
+                raise ValueError(f"{task} request IDs must end with -{task}")
+            if not base <= set(primary[f"{name}_request_ids"]):
+                raise ValueError(
+                    f"{task} {name} IDs are not a subset of the primary split"
+                )

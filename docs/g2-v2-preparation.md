@@ -18,6 +18,7 @@ The original G2 ([results/physical-g2-20261110](../results/physical-g2-20261110/
 | W7 Downstream compatibility | Done 16 November 2026: `derive_g2v2_tables.py` turns rehearsal output into Predictor V2 partitions and measured-oracle tables with no manual edits |
 | W8 Rehearsal and edge pilot | Local part done 16 November 2026: fault-injection rehearsal passed and the real-model edge pilot passed ([results](../results/g2v2-local-rehearsal-20261116/README.md)). The on-site pilot, run-length update and protocol freeze are in the on-site checklist below |
 | W9 Runbook and on-site checklist | Done 16 November 2026: [runbook G2 v2 section](runbooks/physical-campaign.md#g2-v2-campaign), [printable checklist](runbooks/g2v2-onsite-checklist.md), v2 cloud unit, and tracked reference tooling |
+| Long-answer task (added after the W8 winner estimate) | Done 16 November 2026: predeclared rule; D1–D3 failed the floor, amendment A1 selected E1 (32 tokens on 200/200); long manifest, split, 14 grid cells and pilot cells; [estimate](protocols/g2-v2-protocol.md#6-edge-gpu-load-draft) predicts all three placements winning in every split |
 
 ## Why a new baseline
 
@@ -258,8 +259,9 @@ The steps are in the [runbook's G2 v2 section](runbooks/physical-campaign.md#g2-
 | Loaded conditions: 2 load levels × 6 conditions | ~5,400–6,500 | ~4.7–5.6 h |
 | Per-sub-block network probes, shaping and load start/stop | — | ~2–3 h |
 | Per-sub-block edge model load (78–90 s × 102, confirm at the pilot) | — | ~2.2–2.6 h |
+| Long-answer task (section 3.5): 14 cells, 42 sub-blocks, 2,970 attempts at ~2.8 s, plus model loads and probes | 2,970 | ~4.0–4.5 h |
 | Preflight and GPU correctness campaign | — | ~1 h |
-| **Total** | **~14,600–15,700** | **~16–19 h (range 15–22 h)** |
+| **Total** | **17,550** | **~20–23 h (range 19–27 h): plan two sessions** |
 
 These are model-based estimates calibrated on G2 (the model reproduces G2's 14.3 h of inference). The edge pilot and the on-site pilot replace them with measured numbers. The supervisor resumes from validated checkpoints, so the run can be split over two sessions without losing data.
 

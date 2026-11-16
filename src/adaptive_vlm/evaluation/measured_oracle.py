@@ -98,6 +98,7 @@ def build_measured_oracle(
                     "rate_mbps": block.condition.rate_mbps,
                     "added_rtt_ms": block.condition.added_rtt_ms,
                     "load_level": block.load_level,
+                    "task": block.task,
                     "repetition": block.repetition,
                     "request_id": request_id,
                     "latency_ms": latency,
@@ -150,6 +151,7 @@ def build_measured_oracle(
                 "rate_mbps": first["rate_mbps"],
                 "added_rtt_ms": first["added_rtt_ms"],
                 "load_level": first["load_level"],
+                "task": first["task"],
                 "attempts": len(members),
                 "placements": stats,
                 "winner": winner,
@@ -165,7 +167,15 @@ def build_measured_oracle(
     with (output / "oracle_cells.csv").open("w", newline="") as handle:
         writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(
-            ["cell_id", "split", "rate_mbps", "added_rtt_ms", "load_level", "attempts"]
+            [
+                "cell_id",
+                "split",
+                "rate_mbps",
+                "added_rtt_ms",
+                "load_level",
+                "task",
+                "attempts",
+            ]
             + [f"{c}_median_ms" for c in CONFIGURATIONS]
             + ["winner", "margin_ms", "tie"]
         )
@@ -177,6 +187,7 @@ def build_measured_oracle(
                     cell["rate_mbps"],
                     cell["added_rtt_ms"],
                     cell["load_level"],
+                    cell["task"],
                     cell["attempts"],
                 ]
                 + [cell["placements"][c]["median_ms"] for c in CONFIGURATIONS]

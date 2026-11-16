@@ -43,7 +43,7 @@ def main() -> None:
     if args.splits and "evaluation" in args.splits and not args.unseal_evaluation:
         parser.error("evaluation cells are sealed; add --unseal-evaluation")
     root = args.output
-    features = root / "task_features.json"
+    features = root / "task_features"
     profiles = root / "profiles"
     steps = (
         ("features", "profiles", "partitions", "oracle")
@@ -65,7 +65,7 @@ def main() -> None:
                 campaign=args.campaign,
                 profiles=profiles,
                 contract_path=args.contract,
-                feature_path=features,
+                feature_dir=features,
                 output=root / "partitions",
                 sealed_root=args.sealed_root,
             )

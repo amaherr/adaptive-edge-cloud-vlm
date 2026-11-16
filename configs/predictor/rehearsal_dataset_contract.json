@@ -4,12 +4,15 @@
   "campaign_id": "g2v2-loopback-rehearsal",
   "feature_source": "fake_adapter",
   "model_contract_sha256": "34697ee3d9c7dcad186bd2f42f9396675cb4dbb0f8f4863e7e8fc829559ea35a",
-  "supported_task_bucket": "vqa-short-answer-32-token-budget",
   "host_pair_id": "wsl-single-host-loopback-rehearsal",
   "cloud_device": "cpu",
   "correctness_protocol": "strict-v1",
   "same_device_reference_evidence": null,
   "require_controlled_network": false,
   "require_clean_source": false,
-  "max_probe_age_seconds": 3600
+  "max_probe_age_seconds": 3600,
+  "task_buckets": {
+    "short": "vqa-short-answer-32-token-budget",
+    "long": "vqa-long-answer-32-token-budget"
+  }
 }

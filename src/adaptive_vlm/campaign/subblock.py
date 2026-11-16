@@ -124,6 +124,7 @@ def run_subblock(
         "cell_id": block.cell_id,
         "condition": asdict(condition),
         "load_level": block.load_level,
+        "task": block.task,
         "repetition": block.repetition,
         "order_seed": grid.subblock_seed(block),
         "grid_sha256": grid.sha256,

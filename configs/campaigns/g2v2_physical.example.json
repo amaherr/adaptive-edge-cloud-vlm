@@ -5,7 +5,10 @@
   "cloud_repo": "/REPLACE/absolute/path/to/adaptive-edge-cloud-vlm",
   "cloud_python": "/REPLACE/absolute/path/to/adaptive-edge-cloud-vlm/.venv-model/bin/python",
   "cloud_interface": "eth0",
-  "same_device_reference_evidence": "REPLACE/path/to/regenerated/reference/index.json",
+  "same_device_reference_evidence": {
+    "short": "artifacts/g2v2/reference/bundle/index.json",
+    "long": "artifacts/g2v2/reference-long/bundle/index.json"
+  },
   "smoke_config": "configs/experiments/physical_pair_v1.yaml",
   "output_root": "artifacts/g2v2/physical-unattended",
   "python": ".venv-model/bin/python",

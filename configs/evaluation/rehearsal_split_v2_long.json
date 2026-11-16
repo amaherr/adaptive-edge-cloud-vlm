@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "campaign_id": "g2v2-loopback-rehearsal",
+  "task": "long",
+  "dataset_revision": "synthetic-fixtures-long-v1",
+  "dataset_manifest_path": "../../data/manifests/rehearsal_long.jsonl",
+  "dataset_manifest_sha256": "c1b4420720de5c13d0c4e2871819317205b66cfb154ff815c236ea33a4596cde",
+  "model_contract_sha256": "34697ee3d9c7dcad186bd2f42f9396675cb4dbb0f8f4863e7e8fc829559ea35a",
+  "description": "Rehearsal only: long-answer fixtures for the fake model.",
+  "training_request_ids": [
+    "correctness-001-long",
+    "correctness-002-long",
+    "correctness-003-long"
+  ],
+  "validation_request_ids": [
+    "correctness-007-long",
+    "correctness-008-long"
+  ],
+  "evaluation_request_ids": [
+    "correctness-010-long",
+    "correctness-011-long"
+  ],
+  "training_network_condition_ids": [
+    "T01"
+  ],
+  "validation_network_condition_ids": [],
+  "evaluation_network_condition_ids": [
+    "E01"
+  ]
+}

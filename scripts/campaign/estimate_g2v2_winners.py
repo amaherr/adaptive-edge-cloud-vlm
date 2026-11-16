@@ -23,7 +23,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-from itertools import product
+from itertools import pairwise, product
 from pathlib import Path
 from statistics import mean
 
@@ -31,6 +31,10 @@ ROOT = Path(__file__).resolve().parents[2]
 G2 = ROOT / "results/physical-g2-20261110/analysis"
 PILOT = ROOT / "results/g2v2-local-rehearsal-20261116/edge_pilot_summary.json"
 CALIBRATION = ROOT / "results/edge-load-calibration-20261116/runs.csv"
+LONG_EDGE = (
+    ROOT / "results/long-answer-calibration-20261116/edge_decode_under_load.json"
+)
+LONG_TOKENS = 32.0  # E1 reached the 32-token cap on all 200 calibration questions
 GRID = ROOT / "configs/profiles/physical_network_grid_v2.json"
 P0_TOKENS, P1_TOKENS = 12.28, 1.47
 BASELINE_RTT_MS = 4.0  # G2 N7: 5 ms added, 9.0 ms measured
@@ -75,8 +79,13 @@ def load_model() -> dict[str, object]:
         rate = float(network[block]["measured_uplink_mbps"])
         rtt = float(network[block]["measured_rtt_ms"])
         samples.append(
-            (block, rate, rtt, f(block, "cloud", "transport_residual_ms"),
-             f(block, "distributed", "transport_residual_ms"))
+            (
+                block,
+                rate,
+                rtt,
+                f(block, "cloud", "transport_residual_ms"),
+                f(block, "distributed", "transport_residual_ms"),
+            )
         )
     image = _solve3([(1 / r, t, y, 1.0) for _b, r, t, y, _d in samples])
     tensor = _solve3([(1 / r, t, d, 1.0) for _b, r, t, _y, d in samples])
@@ -84,7 +93,10 @@ def load_model() -> dict[str, object]:
     # the slow transfer leaves the cloud GPU idle (clock ramp-down), so keep
     # it as a function of rate, interpolated in log rate.
     prefill = sorted(
-        (float(network[b]["configured_rate_mbps"]), f(b, "distributed", "image_prefill_ms"))
+        (
+            float(network[b]["configured_rate_mbps"]),
+            f(b, "distributed", "image_prefill_ms"),
+        )
         for b in blocks
         if network[b]["configured_added_rtt_ms"] in ("20", "20.0")
     )
@@ -100,7 +112,10 @@ def load_model() -> dict[str, object]:
     )
     pilot = json.loads(PILOT.read_text())
     edge = {
-        level: (pilot[f"{level}/edge"]["median_ms"], pilot[f"{level}/distributed"]["median_ms"])
+        level: (
+            pilot[f"{level}/edge"]["median_ms"],
+            pilot[f"{level}/distributed"]["median_ms"],
+        )
         for level in ("L0", "L1", "L2")
     }
     return {
@@ -112,6 +127,8 @@ def load_model() -> dict[str, object]:
         "distributed_fixed_ms": distributed_fixed,
         "edge_by_level": edge,
         "decode_scale": scale,
+        "cloud_decode_per_token_ms": mean(f(b, "cloud", "decode_ms") for b in blocks)
+        / P0_TOKENS,
     }
 
 
@@ -122,7 +139,7 @@ def _interpolate_log(points: list[tuple[float, float]], rate: float) -> float:
         return points[0][1]
     if rate >= points[-1][0]:
         return points[-1][1]
-    for (r0, y0), (r1, y1) in zip(points, points[1:], strict=False):
+    for (r0, y0), (r1, y1) in pairwise(points):
         if r0 <= rate <= r1:
             w = (math.log(rate) - math.log(r0)) / (math.log(r1) - math.log(r0))
             return y0 + w * (y1 - y0)
@@ -164,15 +181,35 @@ def main() -> None:
     model = load_model()
     grid = json.loads(GRID.read_text())
     edge = model["edge_by_level"]  # type: ignore[assignment]
-    cells = [(cid, "L0") for cid in grid["conditions"]] + [
-        (cid, level) for level in grid["load_levels"] for cid in grid["loaded_conditions"]
+    cells = [(cid, "L0", "short") for cid in grid["conditions"]] + [
+        (cid, level, "short")
+        for level in grid["load_levels"]
+        for cid in grid["loaded_conditions"]
     ]
+    for task, spec in grid.get("extra_tasks", {}).items():
+        cells += [(cid, level, task) for cid, level in spec["cells"]]
+    # Long answers: edge timings measured at L0/L1/L2 with ~16-token answers,
+    # extrapolated to 32 tokens with the measured per-token decode cost; the
+    # cloud decodes the extra tokens at G2's per-token cost.
+    long_edge = json.loads(LONG_EDGE.read_text())
+    cloud_per_token = float(model["cloud_decode_per_token_ms"])  # type: ignore[arg-type]
     rows = []
-    for (cid, level), cloud_scale, transport_scale in product(
+    for (cid, level, task), cloud_scale, transport_scale in product(
         cells, (0.85, 1.0, 1.15), (0.8, 1.0, 1.2)
     ):
         condition = grid["conditions"][cid]
-        full, vision = edge[level]
+        if task == "short":
+            full, vision = edge[level]
+            extra_remote = 0.0
+        else:
+            measured = long_edge[level]
+            full = (
+                measured["edge_full_ms"]
+                + (LONG_TOKENS - measured["mean_tokens"])
+                * measured["decode_ms_per_token"]
+            )
+            vision = measured["vision_half_ms"]
+            extra_remote = (LONG_TOKENS - P1_TOKENS) * cloud_per_token * cloud_scale
         times = predict(
             model,
             condition["rate_mbps"],
@@ -182,10 +219,13 @@ def main() -> None:
             cloud_scale=cloud_scale,
             transport_scale=transport_scale,
         )
+        times["cloud"] += extra_remote
+        times["distributed"] += extra_remote
         ranked = sorted(times.items(), key=lambda kv: kv[1])
         rows.append(
             {
-                "cell": f"{cid}-{level}",
+                "cell": f"{cid}-{level}" + ("" if task == "short" else f"-{task}"),
+                "task": task,
                 "split": condition["split"],
                 "rate_mbps": condition["rate_mbps"],
                 "added_rtt_ms": condition["added_rtt_ms"],
@@ -205,7 +245,7 @@ def main() -> None:
         pts = sorted(pilot_points)
         if full <= pts[0][0]:
             return pts[0][1] * full / pts[0][0]
-        for (f0, v0), (f1, v1) in zip(pts, pts[1:], strict=False):
+        for (f0, v0), (f1, v1) in pairwise(pts):
             if f0 <= full <= f1:
                 return v0 + (full - f0) / (f1 - f0) * (v1 - v0)
         f0, v0 = pts[-2]
@@ -217,13 +257,17 @@ def main() -> None:
         vision = vision_for(full)
         winners = {}
         for cid, condition in grid["conditions"].items():
-            times = predict(model, condition["rate_mbps"], condition["added_rtt_ms"], full, vision)
+            times = predict(
+                model, condition["rate_mbps"], condition["added_rtt_ms"], full, vision
+            )
             winners[cid] = min(times, key=times.__getitem__)
         sweep.append(
             {
                 "edge_full_ms": full,
                 "edge_vision_ms": round(vision, 1),
-                "distributed_wins": sorted(c for c, w in winners.items() if w == "distributed"),
+                "distributed_wins": sorted(
+                    c for c, w in winners.items() if w == "distributed"
+                ),
                 "cloud_wins": sorted(c for c, w in winners.items() if w == "cloud"),
                 "edge_wins": sorted(c for c, w in winners.items() if w == "edge"),
             }
@@ -233,21 +277,37 @@ def main() -> None:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
-    central = [r for r in rows if r["cloud_scale"] == 1.0 and r["transport_scale"] == 1.0]
+    central = [
+        r for r in rows if r["cloud_scale"] == 1.0 and r["transport_scale"] == 1.0
+    ]
     summary = {
         "model": {
             k: v for k, v in model.items() if k not in ("distributed_prefill_by_rate",)
         },
         "central_winner_counts": {
-            w: sum(r["winner"] == w for r in central) for w in ("edge", "cloud", "distributed")
+            w: sum(r["winner"] == w for r in central)
+            for w in ("edge", "cloud", "distributed")
         },
-        "winner_counts_by_level": {
-            level: {
-                w: sum(r["winner"] == w and r["level"] == level for r in central)
+        "winner_counts_by_task_and_level": {
+            f"{task}/{level}": {
+                w: sum(
+                    r["winner"] == w and r["level"] == level and r["task"] == task
+                    for r in central
+                )
                 for w in ("edge", "cloud", "distributed")
             }
+            for task in sorted({r["task"] for r in central})
             for level in ("L0", "L1", "L2")
         },
+        "winners_by_split": {
+            split: sorted({r["winner"] for r in central if r["split"] == split})
+            for split in ("training", "validation", "evaluation")
+        },
+        "robust_cells": sorted(
+            cell
+            for cell in {r["cell"] for r in rows}
+            if len({r["winner"] for r in rows if r["cell"] == cell}) == 1
+        ),
         "any_scenario_distributed_wins": sorted(
             {r["cell"] for r in rows if r["winner"] == "distributed"}
         ),
@@ -255,15 +315,42 @@ def main() -> None:
         "edge_load_sweep": sweep,
     }
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
-    print(json.dumps({k: summary[k] for k in (
-        "central_winner_counts", "winner_counts_by_level", "any_scenario_distributed_wins")}, indent=2))
+    print(
+        json.dumps(
+            {
+                k: summary[k]
+                for k in (
+                    "central_winner_counts",
+                    "winner_counts_by_task_and_level",
+                    "winners_by_split",
+                    "any_scenario_distributed_wins",
+                )
+            },
+            indent=2,
+        )
+    )
     for r in central:
-        print(r["cell"], r["edge_ms"], r["cloud_ms"], r["distributed_ms"], r["winner"], r["margin_ms"])
+        print(
+            r["cell"],
+            r["edge_ms"],
+            r["cloud_ms"],
+            r["distributed_ms"],
+            r["winner"],
+            r["margin_ms"],
+        )
     print("sweep (edge/full ms -> distributed-winning conditions):")
     for s in sweep:
         if s["distributed_wins"] or s["edge_full_ms"] % 250 == 0:
-            print(s["edge_full_ms"], s["edge_vision_ms"], "D:", s["distributed_wins"],
-                  "C:", len(s["cloud_wins"]), "E:", len(s["edge_wins"]))
+            print(
+                s["edge_full_ms"],
+                s["edge_vision_ms"],
+                "D:",
+                s["distributed_wins"],
+                "C:",
+                len(s["cloud_wins"]),
+                "E:",
+                len(s["edge_wins"]),
+            )
 
 
 if __name__ == "__main__":

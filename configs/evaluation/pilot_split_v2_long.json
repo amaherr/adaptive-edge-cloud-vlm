@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "campaign_id": "physical-vqa-v2-pilot",
+  "task": "long",
+  "task_bucket": "vqa-long-answer-32-token-budget",
+  "template_id": "E1",
+  "template": "Describe this image in detail.",
+  "dataset_revision": "vqa-v2-val2014-physical-v2-long",
+  "dataset_manifest_path": "../../data/manifests/physical_vqa_v2/physical_vqa_v2_long.jsonl",
+  "dataset_manifest_sha256": "695d5ab1055d79ee8d7409db637683fa6e8c4365418a6449b6fece294dd25134",
+  "model_contract_sha256": "e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1",
+  "selection_seed": 3907,
+  "description": "On-site pilot only (discarded): the 5 long-answer training IDs whose questions are among the pilot's 10 short-answer training IDs. Validation and evaluation lists are kept only for the split format.",
+  "training_request_ids": [
+    "vqa-v2-val2014-101053025-long",
+    "vqa-v2-val2014-101223001-long",
+    "vqa-v2-val2014-115412003-long",
+    "vqa-v2-val2014-116517000-long",
+    "vqa-v2-val2014-128034009-long"
+  ],
+  "training_network_condition_ids": [
+    "P01",
+    "P05"
+  ],
+  "validation_request_ids": [
+    "vqa-v2-val2014-150320007-long",
+    "vqa-v2-val2014-183716015-long",
+    "vqa-v2-val2014-185125003-long",
+    "vqa-v2-val2014-217060000-long",
+    "vqa-v2-val2014-233915008-long",
+    "vqa-v2-val2014-240340007-long",
+    "vqa-v2-val2014-252133015-long",
+    "vqa-v2-val2014-312191000-long",
+    "vqa-v2-val2014-327590003-long",
+    "vqa-v2-val2014-334941014-long",
+    "vqa-v2-val2014-432898001-long",
+    "vqa-v2-val2014-478220003-long",
+    "vqa-v2-val2014-52232000-long",
+    "vqa-v2-val2014-527961002-long",
+    "vqa-v2-val2014-566049004-long"
+  ],
+  "validation_network_condition_ids": [],
+  "evaluation_request_ids": [
+    "vqa-v2-val2014-111789004-long",
+    "vqa-v2-val2014-138115001-long",
+    "vqa-v2-val2014-150872002-long",
+    "vqa-v2-val2014-315696000-long",
+    "vqa-v2-val2014-335644001-long",
+    "vqa-v2-val2014-344197000-long",
+    "vqa-v2-val2014-367929000-long",
+    "vqa-v2-val2014-412440006-long",
+    "vqa-v2-val2014-422833002-long",
+    "vqa-v2-val2014-463876009-long",
+    "vqa-v2-val2014-466565004-long",
+    "vqa-v2-val2014-476008002-long",
+    "vqa-v2-val2014-500765000-long",
+    "vqa-v2-val2014-520531000-long",
+    "vqa-v2-val2014-570171000-long"
+  ],
+  "evaluation_network_condition_ids": []
+}

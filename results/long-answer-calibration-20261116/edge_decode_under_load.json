@@ -1,0 +1,35 @@
+{
+  "L0": {
+    "n": 14,
+    "mean_tokens": 16.36,
+    "decode_ms_per_token": 24.7,
+    "decode_intercept_ms": -14.4,
+    "image_prefill_ms": 184.1,
+    "prompt_prefill_ms": 34.7,
+    "swap_to_text_ms": 298.2,
+    "edge_full_ms": 1432.7,
+    "vision_half_ms": 521.2
+  },
+  "L1": {
+    "n": 14,
+    "mean_tokens": 16.36,
+    "decode_ms_per_token": 37.3,
+    "decode_intercept_ms": 1.1,
+    "image_prefill_ms": 294.7,
+    "prompt_prefill_ms": 57.7,
+    "swap_to_text_ms": 301.8,
+    "edge_full_ms": 2050.2,
+    "vision_half_ms": 825.8
+  },
+  "L2": {
+    "n": 14,
+    "mean_tokens": 16.36,
+    "decode_ms_per_token": 66.5,
+    "decode_intercept_ms": 3.5,
+    "image_prefill_ms": 487.2,
+    "prompt_prefill_ms": 121.3,
+    "swap_to_text_ms": 304.8,
+    "edge_full_ms": 3179.8,
+    "vision_half_ms": 1364.8
+  }
+}

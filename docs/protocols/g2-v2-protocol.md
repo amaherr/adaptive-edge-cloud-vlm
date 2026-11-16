@@ -120,6 +120,11 @@ Moondream mostly answers the question in one sentence even when asked for detail
 
 If no E template is eligible either, the long-answer task is dropped from G2 v2 and the run proceeds with the short-answer task only. Distributed is then reported as never winning on this hardware pair, with the pre-run estimate as the explanation.
 
+**Executed 16 November 2026: E1 selected.** All three E templates were eligible. E1 reached the 32-token cap on all 200 questions; E2 on 168 (mean 31.02) and E3 on 177 (mean 29.84). See [results/long-answer-calibration-20261116](../../results/long-answer-calibration-20261116/selection.json). E1 does not use the question, so the long-answer bucket is a detailed-description task on the same images.
+- **Manifest:** [physical_vqa_v2_long.jsonl](../../data/manifests/physical_vqa_v2/physical_vqa_v2_long.jsonl), SHA-256 `695d5ab1055d79ee8d7409db637683fa6e8c4365418a6449b6fece294dd25134`, built by [`build_long_task.py`](../../scripts/vqa/build_long_task.py).
+- **Split:** [physical_vqa_split_v2_long.json](../../configs/evaluation/physical_vqa_split_v2_long.json), with 30/15/15 IDs and 6/3/3 of them two-crop.
+- **Config:** [physical_vqa_v2_long.yaml](../../configs/experiments/physical_vqa_v2_long.yaml). The model contract is unchanged.
+
 ## 4. Dataset construction (frozen)
 
 ### 4.1 Candidate order (shared by the calibration set and the dataset)
@@ -199,10 +204,29 @@ All conditions run at L0. L1 and L2 run on six conditions:
 
 Each split therefore contains cells where the best placement changes with load.
 
+**Long-answer cells (section 3.5).** The long-answer task runs on high-bandwidth conditions at all three levels, so each split has a cell where the predicted winner is edge (L0), distributed (L1) and cloud (L2). It also runs two low-margin L1 cells in training:
+
+| Split | Long-answer cells |
+| --- | --- |
+| training | T06 and T09 at L0, L1 and L2; T04 and T08 at L1 |
+| validation | V04 at L0, L1 and L2 |
+| evaluation | E04 at L0, L1 and L2 |
+
+**Pre-run winner estimate** (`scripts/campaign/estimate_g2v2_winners.py`, central case). The inputs are G2's per-stage timings, the W8 edge pilot, and edge decode costs measured at each level.
+
+| Task | L0 | L1 | L2 |
+| --- | --- | --- | --- |
+| short | edge (22/22) | edge (6/6) | cloud (6/6) |
+| long | edge (4/4) | distributed (4/6: T06, T08, V04, E04, by 134–286 ms); edge at T04 and T09 | cloud (4/4) |
+
+All three placements are predicted to win in every split. T08-L1-long stays a distributed win in all nine sensitivity scenarios (cloud time ±15%, transport ±20%). These are estimates; the measured winners are what counts.
+
 ## 7. Execution design (draft)
 
-- **Cell:** one condition at one load level. There are 34 cells: 22 at L0 and 12 at L1 or L2.
-- **Sub-blocks:** each cell runs as three sub-blocks, one per repetition (0, 1, 2), so every request ID is measured at three separate times. The 102 sub-blocks run in an order shuffled with seed `5113`, constrained so that the three sub-blocks of a cell are never adjacent.
+- **Cell:** one condition at one load level, for one task. There are 48 cells:
+  - 34 short-answer cells: 22 at L0 and 12 at L1 or L2;
+  - 14 long-answer cells.
+- **Sub-blocks:** each cell runs as three sub-blocks, one per repetition (0, 1, 2), so every request ID is measured at three separate times. The 144 sub-blocks run in an order shuffled with seed `5113`, constrained so that the three sub-blocks of a cell are never adjacent. A sub-block runs one task's manifest; long-answer sub-block IDs end in `-long`.
 - **Within a sub-block:**
   - one excluded warmup per placement;
   - then each request ID of the split, in a per-sub-block seeded order;
@@ -221,9 +245,10 @@ Each split therefore contains cells where the best placement changes with load.
 | L0 | 12×60 + 5×30 + 5×30 = 1,020 | × 3 × 3 | 9,180 |
 | L1 | 4×60 + 30 + 30 = 300 | × 3 × 3 | 2,700 |
 | L2 | 300 | × 3 × 3 | 2,700 |
-| **Total** | | | **14,580** |
+| Long-answer | 8×30 + 3×15 + 3×15 = 330 | × 3 × 3 | 2,970 |
+| **Total** | | | **17,550** |
 
-There are also 306 excluded warmups (102 sub-blocks × 3 placements).
+There are also 432 excluded warmups (144 sub-blocks × 3 placements).
 
 ## 8. Validity gates (draft)
 
@@ -240,7 +265,7 @@ An invalid sub-block is rerun as a whole. A dataset with any invalid sub-block l
 
 - **Latency.** For each cell and placement: median, p90 and the bootstrap 95% CI of the median end-to-end latency over all of the split's IDs and repetitions (seed `1707`, 2,000 resamples, as in G2).
 - **Measured winner.** For each cell, the placement with the lowest median latency, plus its margin over the runner-up. Cells where the CIs of the top two overlap are reported as ties.
-- **Quality.** Official VQA accuracy for each placement on each split, scored as in section 3.3. *Proposed, to be decided before freezing:* the primary score lowercases each answer before export. That is standard VQA submission practice, and it avoids the evaluator's case-sensitive comparison when all references agree; the [calibration](../../results/prompt-calibration-20261115/README.md#diagnostic-the-evaluators-case-handling) found that comparison costs about 22 points on capitalized "Yes"/"No" answers. The unchanged score is reported alongside. Placement quality parity: the accuracy difference between any two placements, on the same IDs, must be at most 2 percentage points. If not, the selector must treat quality as placement-dependent.
+- **Quality.** Official VQA accuracy for each placement on each split, scored as in section 3.3. This covers the short-answer task only; the long-answer task is timed only. Its placements are checked against the per-GPU same-device references (gate 2). *Proposed, to be decided before freezing:* the primary score lowercases each answer before export. That is standard VQA submission practice, and it avoids the evaluator's case-sensitive comparison when all references agree; the [calibration](../../results/prompt-calibration-20261115/README.md#diagnostic-the-evaluators-case-handling) found that comparison costs about 22 points on capitalized "Yes"/"No" answers. The unchanged score is reported alongside. Placement quality parity: the accuracy difference between any two placements, on the same IDs, must be at most 2 percentage points. If not, the selector must treat quality as placement-dependent.
 - **Isolation.** Training cells only, for anything fitted (Predictor V2 r2, G3). The validation cells are opened once for G3. The evaluation cells stay sealed until the selector is frozen for G4.
 
 ## Amendments

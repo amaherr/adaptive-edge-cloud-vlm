@@ -47,16 +47,26 @@ def test_grid_matches_the_protocol_counts_and_order_rules() -> None:
         (ROOT / "configs/evaluation/physical_vqa_split_v2.json").read_text()
     )
     check_split(grid, split)
-    assert len(grid.cells()) == 34
+    check_split(grid, grid.load_split("long"), "long")
+    assert len(grid.cells()) == 48  # 34 short-answer + 14 long-answer cells
     order = grid.execution_order()
-    assert len(order) == 102 == len({b.subblock_id for b in order})
+    assert len(order) == 144 == len({b.subblock_id for b in order})
     assert all(a.cell_id != b.cell_id for a, b in itertools.pairwise(order))
-    assert grid.expected_attempts(split) == {"measured": 14580, "warmups": 306}
+    assert sum(b.task == "long" for b in order) == 42
+    assert grid.expected_attempts() == {"measured": 17550, "warmups": 432}
+    short_only = {
+        "measured": sum(
+            len(split[f"{b.condition.split}_request_ids"]) * 3
+            for b in order
+            if b.task == "short"
+        )
+    }
+    assert short_only == {"measured": 14580}
     assert [b.subblock_id for b in order] == [
         b.subblock_id for b in load_grid(GRID).execution_order()
     ]
     seeds = {grid.subblock_seed(b) for b in order}
-    assert len(seeds) == 102
+    assert len(seeds) == 144
     t04 = grid.conditions["T04"]
     assert (t04.rate_mbps, t04.egress_delay_ms) == (45, 10)
 
@@ -316,15 +326,13 @@ def test_loopback_rehearsal_runs_every_subblock_and_skips_finished_ones(
     output = tmp_path / "campaign"
     status = json.loads((output / "status.json").read_text())
     assert status["state"] == "completed"
-    assert (
-        status["measured_attempts"] == status["target_attempts"] == 3 * (6 + 3 + 3 + 6)
-    )
-    assert status["valid_subblocks"] == 4
+    assert status["measured_attempts"] == status["target_attempts"] == 69
+    assert status["valid_subblocks"] == 6
     plan = json.loads((output / "campaign_plan.json").read_text())
     assert plan["protocol_pinned"] is False and plan["git_dirty"] in (True, False)
     loaded = json.loads((output / "subblocks/T01-L1-r0/run/edge/plan.json").read_text())
     assert loaded["conditions"]["edge_load_level"] == "L1"
-    assert fake_edge["starts"] == 1
+    assert fake_edge["starts"] == 2  # T01-L1 for the short and long tasks
     # A second run validates the finished evidence and does no new work.
     again = _supervisor(tmp_path)
     again.run_child = _in_process([99])  # type: ignore[method-assign]
@@ -476,7 +484,7 @@ def _derived(tmp_path: Path) -> tuple[Path, Path, Path]:
 
     _supervisor(tmp_path).execute(preflight_only=False)
     campaign, derived = tmp_path / "campaign", tmp_path / "derived"
-    write_feature_bundle(campaign, REHEARSAL_CONTRACT, derived / "features.json")
+    write_feature_bundle(campaign, REHEARSAL_CONTRACT, derived / "features")
     profile_campaign(
         campaign=campaign, contract_path=REHEARSAL_CONTRACT, output=derived / "profiles"
     )
@@ -495,6 +503,7 @@ def test_rehearsal_produces_partitions_and_oracle_without_edits(
     campaign, derived, profiles = _derived(tmp_path)
     assert sorted(p.name for p in profiles.iterdir() if p.is_dir()) == [
         "T01-L0-r0",
+        "T01-L1-long-r0",
         "T01-L1-r0",
         "V01-L0-r0",
     ]  # The evaluation sub-block is never profiled by default.
@@ -502,16 +511,17 @@ def test_rehearsal_produces_partitions_and_oracle_without_edits(
         campaign=campaign,
         profiles=profiles,
         contract_path=REHEARSAL_CONTRACT,
-        feature_path=derived / "features.json",
+        feature_dir=derived / "features",
         output=derived / "partitions",
         sealed_root=tmp_path / "sealed",
     )
     assert receipt["classification"] == {
-        "train": 36,
+        "train": 45,
         "validation": 9,
-        "final_test_protected": 9,
+        "final_test_protected": 15,
     }
-    assert receipt["training_load_levels"] == {"L0": 18, "L1": 18}
+    assert receipt["training_load_levels"] == {"L0": 18, "L1": 27}
+    assert receipt["training_tasks"] == {"short": 36, "long": 9}
     assert receipt["evaluation_profiles_opened"] == []
     sealed = Path(receipt["sealed_validation_path"])
     assert sealed.stat().st_mode & 0o777 == 0
@@ -529,7 +539,8 @@ def test_rehearsal_produces_partitions_and_oracle_without_edits(
     summary = build_measured_oracle(
         campaign=campaign, profiles=profiles, output=derived / "oracle"
     )
-    assert summary["attempts"] == 12 and len(summary["cells"]) == 2
+    assert summary["attempts"] == 15 and len(summary["cells"]) == 3
+    assert {c["task"] for c in summary["cells"]} == {"short", "long"}
     cell = summary["cells"][0]
     assert cell["winner"] in cell["placements"]
     assert all(s["ok"] == 6 for s in cell["placements"].values())
@@ -572,7 +583,7 @@ def test_partitions_reject_a_mixed_split_row(
             campaign=campaign,
             profiles=profiles,
             contract_path=REHEARSAL_CONTRACT,
-            feature_path=derived / "features.json",
+            feature_dir=derived / "features",
             output=derived / "partitions",
             sealed_root=tmp_path / "sealed",
         )
@@ -594,7 +605,7 @@ def test_partitions_refuse_changed_profiles_and_uncontrolled_physical_contract(
             campaign=campaign,
             profiles=profiles,
             contract_path=REHEARSAL_CONTRACT,
-            feature_path=derived / "features.json",
+            feature_dir=derived / "features",
             output=derived / "partitions",
             sealed_root=tmp_path / "sealed",
         )
@@ -641,3 +652,35 @@ def test_a_second_writer_cannot_join_a_running_benchmark(tmp_path: Path) -> None
     ):
         run_interleaved_benchmark(run_dir=run_dir)
     assert not run_dir.exists()
+
+
+def test_extra_task_cells_ids_and_split_rules(tmp_path: Path) -> None:
+    grid = load_grid(REHEARSAL_GRID)
+    long_blocks = [b for b in grid.subblocks() if b.task == "long"]
+    assert sorted(b.subblock_id for b in long_blocks) == [
+        "E01-L0-long-r0",
+        "T01-L1-long-r0",
+    ]
+    assert "T01-L0-r0" in {b.subblock_id for b in grid.subblocks()}  # unchanged IDs
+    assert grid.all_load_levels() == {"L1"}
+    long_split = json.loads(
+        (ROOT / "configs/evaluation/rehearsal_split_v2_long.json").read_text()
+    )
+    check_split(grid, long_split, "long")
+    renamed = {
+        **long_split,
+        "training_request_ids": [
+            r.removesuffix("-long") for r in long_split["training_request_ids"]
+        ],
+    }
+    with pytest.raises(ValueError, match="must end with -long"):
+        check_split(grid, renamed, "long")
+    foreign = {**long_split, "training_request_ids": ["correctness-999-long"]}
+    with pytest.raises(ValueError, match="not a subset"):
+        check_split(grid, foreign, "long")
+    payload = json.loads(REHEARSAL_GRID.read_text())
+    payload["extra_tasks"]["long"]["cells"] = [["T99", "L1"]]
+    path = tmp_path / "grid.json"
+    path.write_text(json.dumps(payload))
+    with pytest.raises(ValueError, match="unknown conditions"):
+        load_grid(path)

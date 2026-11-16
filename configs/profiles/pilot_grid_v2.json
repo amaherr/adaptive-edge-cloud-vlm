@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "campaign_id": "physical-vqa-v2-pilot",
-  "description": "On-site go/no-go pilot (protocol section 5 and the on-site checklist), discarded afterwards. Rates and RTTs of 100/5, 100/100, 150/150, 35/20 and 200/5, each at L0 and L2, one repetition, 10 training IDs.",
+  "description": "On-site go/no-go pilot (protocol sections 5-6 and the on-site checklist), discarded afterwards. Short task: 100/5, 100/100, 150/150, 35/20 and 200/5 at L0 and L2, 10 training IDs. Long task (E1): 100/5 and 200/5 at L1, 5 training IDs. One repetition.",
   "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
   "protocol_sha256": null,
   "split_path": "../evaluation/pilot_split_v2.json",
@@ -59,6 +59,23 @@
     "P05": {
       "rate_mbps": 150,
       "added_rtt_ms": 5
+    }
+  },
+  "extra_tasks": {
+    "long": {
+      "task_bucket": "vqa-long-answer-32-token-budget",
+      "experiment_config_path": "../experiments/physical_vqa_v2_long.yaml",
+      "split_path": "../evaluation/pilot_split_v2_long.json",
+      "cells": [
+        [
+          "P01",
+          "L1"
+        ],
+        [
+          "P05",
+          "L1"
+        ]
+      ]
     }
   }
 }

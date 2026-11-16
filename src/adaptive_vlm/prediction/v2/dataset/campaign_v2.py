@@ -34,7 +34,7 @@ from typing import Any
 from adaptive_vlm.artifacts import write_json_atomic
 from adaptive_vlm.benchmark.interleaved import PLACEMENTS
 from adaptive_vlm.benchmark.profile import build_profile
-from adaptive_vlm.campaign.grid import Grid, SubBlock, load_grid
+from adaptive_vlm.campaign.grid import PRIMARY_TASK, Grid, SubBlock, load_grid
 from adaptive_vlm.campaign.subblock import check_completed
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.prediction.v2.dataset.contract import (
@@ -91,6 +91,26 @@ PINNED_TOKENIZER = Path(
     "35192e10a54e36eabe0a7cc57a2c1aab371cafc5/tokenizer.json"
 )
 PINNED_TEMPLATE = Path(".model-cache/audit/moondream2-9a7d4024/config.py")
+
+
+def task_bucket(contract: dict[str, Any], grid: Grid, task: str) -> str:
+    """The task bucket the grid declares, cross-checked with the contract."""
+
+    bucket = grid.tasks[task].task_bucket
+    allowed = contract.get("task_buckets") or {
+        PRIMARY_TASK: contract["supported_task_bucket"]
+    }
+    if allowed.get(task) != bucket:
+        raise ValueError(f"contract and grid disagree on the {task} task bucket")
+    return bucket
+
+
+def _reference_for(contract: dict[str, Any], task: str) -> str | None:
+    value = contract.get("same_device_reference_evidence")
+    if isinstance(value, dict):
+        reference = value.get(task)
+        return None if reference is None else str(reference)
+    return str(value) if value and task == PRIMARY_TASK else None
 
 
 def _campaign_grid(campaign: Path) -> tuple[dict[str, Any], Grid]:
@@ -177,12 +197,12 @@ def profile_campaign(
             "campaign_id": f"{grid.payload['campaign_id']}:{block.subblock_id}",
             "host_pair_id": contract["host_pair_id"],
             "cloud_device": contract["cloud_device"],
-            "task_bucket": contract["supported_task_bucket"],
+            "task_bucket": task_bucket(contract, grid, block.task),
             "requested_max_new_tokens": 32,
             "correctness_protocol": contract["correctness_protocol"],
             "network_state": _network_state(block, directory, target, controlled),
         }
-        reference = contract.get("same_device_reference_evidence")
+        reference = _reference_for(contract, block.task)
         if reference:
             path = Path(reference).resolve(strict=True)
             spec["same_device_reference_evidence_path"] = os.path.relpath(path, target)
@@ -258,7 +278,7 @@ def prepare_campaign_partitions(
     campaign: Path,
     profiles: Path,
     contract_path: Path,
-    feature_path: Path,
+    feature_dir: Path,
     output: Path,
     sealed_root: Path = Path("/tmp"),
 ) -> dict[str, Any]:
@@ -266,25 +286,32 @@ def prepare_campaign_partitions(
         raise FileExistsError("refusing to overwrite a partition bundle")
     contract = strict_json(contract_path.read_bytes())
     plan, grid = _campaign_grid(campaign)
-    split_path = grid.resolve("split_path")
-    split = strict_json(split_path.read_bytes())
-    if split["model_contract_sha256"] != contract["model_contract_sha256"]:
-        raise ValueError("split and dataset contract name different models")
-    features = strict_json(feature_path.read_bytes())
-    if (
-        features["model_contract_sha256"] != contract["model_contract_sha256"]
-        or features["dataset_manifest_sha256"] != split["dataset_manifest_sha256"]
-        or features["feature_source"] != contract["feature_source"]
-    ):
-        raise ValueError("pre-execution feature provenance mismatch")
-    ids = {name: list(split[f"{name}_request_ids"]) for name in PARTITIONS}
-    every = [rid for group in ids.values() for rid in group]
+    splits: dict[str, dict[str, Any]] = {}
+    features: dict[str, dict[str, Any]] = {}
+    ids: dict[str, dict[str, list[str]]] = {}
+    every: list[str] = []
+    for name, task_spec in grid.tasks.items():
+        split = strict_json(task_spec.split.read_bytes())
+        if split["model_contract_sha256"] != contract["model_contract_sha256"]:
+            raise ValueError(f"{name} split and dataset contract name different models")
+        bundle = strict_json(feature_path(feature_dir, name).read_bytes())
+        if (
+            bundle["model_contract_sha256"] != contract["model_contract_sha256"]
+            or bundle["dataset_manifest_sha256"] != split["dataset_manifest_sha256"]
+            or bundle["feature_source"] != contract["feature_source"]
+            or bundle["task_bucket"] != task_bucket(contract, grid, name)
+        ):
+            raise ValueError(f"{name} pre-execution feature provenance mismatch")
+        ids[name] = {part: list(split[f"{part}_request_ids"]) for part in PARTITIONS}
+        task_ids = [rid for group in ids[name].values() for rid in group]
+        if set(bundle["tasks"]) != set(task_ids):
+            raise ValueError(f"{name} task features must cover exactly its split's IDs")
+        for value in bundle["tasks"].values():
+            validate_task_features(value)
+        every += task_ids
+        splits[name], features[name] = split, bundle
     if len(every) != len(set(every)):
         raise ValueError("request partitions overlap")
-    if set(features["tasks"]) != set(every):
-        raise ValueError("task features must cover exactly the split's IDs")
-    for task in features["tasks"].values():
-        validate_task_features(task)
     index = strict_json((profiles / "profiles_index.json").read_bytes())
     if index["campaign_plan_sha256"] != digest(campaign / "campaign_plan.json"):
         raise ValueError("profiles were built from a different campaign plan")
@@ -298,13 +325,14 @@ def prepare_campaign_partitions(
     for block in grid.execution_order():
         split_name = block.condition.split
         partition = PARTITIONS[split_name]
+        block_ids = ids[block.task][split_name]
         directory = campaign / "subblocks" / block.subblock_id
         report = check_completed(directory)
         if report is None or not report["valid"]:
             raise ValueError(f"sub-block is missing or invalid: {block.subblock_id}")
         schedule = strict_json((directory / "run" / "edge" / "plan.json").read_bytes())
         measured = [t for t in schedule["schedule"] if not t["warmup"]]
-        if {t["request_id"] for t in measured} != set(ids[split_name]):
+        if {t["request_id"] for t in measured} != set(block_ids):
             raise ValueError(f"{block.subblock_id} plan does not cover its split")
         classified[partition] += len(measured) * len(PLACEMENTS)
         if partition == "final_test_protected":
@@ -337,9 +365,7 @@ def prepare_campaign_partitions(
         member = profiles / block.subblock_id / "profile" / "profile.jsonl"
         opened.append(str(member.relative_to(profiles)))
         expected = {
-            (rid, cid)
-            for rid in ids[split_name]
-            for cid in CONFIGURATION_BY_MODE.values()
+            (rid, cid) for rid in block_ids for cid in CONFIGURATION_BY_MODE.values()
         }
         found: set[tuple[str, str]] = set()
         for line in member.read_bytes().splitlines():
@@ -347,24 +373,32 @@ def prepare_campaign_partitions(
             if meta.get("warmup") is True:
                 continue
             request_id = meta["request_id"]
-            if request_id not in ids[split_name]:
+            if request_id not in block_ids:
                 raise ValueError(
                     f"mixed-split row: {request_id} in {split_name} condition "
-                    f"{block.condition.condition_id}"
+                    f"{block.condition.condition_id} ({block.task} task)"
                 )
             cid = meta["configuration_id"]
             if cid not in CONFIGURATION_IDS or cid not in plans:
                 raise ValueError(f"unrecognized configuration: {cid}")
-            _check_envelope(meta, contract, split, plans[cid], block)
+            _check_envelope(
+                meta,
+                contract,
+                splits[block.task],
+                plans[cid],
+                block,
+                task_bucket(contract, grid, block.task),
+            )
             key = (request_id, block.subblock_id, cid)
             if key in seen:
                 raise ValueError("duplicate measured trial key")
             seen.add(key)
             found.add((request_id, cid))
-            task = features["tasks"][request_id]
+            task = features[block.task]["tasks"][request_id]
             snapshot = {
                 "schema_version": 3,
                 "request_id": request_id,
+                "task_name": block.task,
                 "subblock_id": block.subblock_id,
                 "cell_id": block.cell_id,
                 "condition_id": block.condition.condition_id,
@@ -396,7 +430,7 @@ def prepare_campaign_partitions(
 
     expected_counts = {
         PARTITIONS[name]: sum(
-            len(ids[name]) * len(PLACEMENTS)
+            len(ids[b.task][name]) * len(PLACEMENTS)
             for b in grid.subblocks()
             if b.condition.split == name
         )
@@ -432,8 +466,10 @@ def prepare_campaign_partitions(
         "campaign_mode": plan["mode"],
         "campaign_plan_sha256": digest(campaign / "campaign_plan.json"),
         "grid_sha256": grid.sha256,
-        "split_sha256": digest(split_path),
-        "features_sha256": digest(feature_path),
+        "split_sha256": {n: digest(t.split) for n, t in grid.tasks.items()},
+        "features_sha256": {
+            n: digest(feature_path(feature_dir, n)) for n in grid.tasks
+        },
         "contract_sha256": digest(contract_path),
         "classification": dict(classified),
         "training_attempts": len(training),
@@ -447,6 +483,7 @@ def prepare_campaign_partitions(
         "training_load_levels": dict(
             Counter(r["inputs"]["edge_load_level"] for r in training)
         ),
+        "training_tasks": dict(Counter(r["inputs"]["task_name"] for r in training)),
         "files": {
             "training.jsonl": digest(output / "training.jsonl"),
             "validation_inputs.jsonl": digest(output / "validation_inputs.jsonl"),
@@ -455,7 +492,8 @@ def prepare_campaign_partitions(
     }
     write_json_atomic(output / "partition_audit.json", receipt)
     write_json_atomic(output / "contract.json", contract)
-    (output / "split.json").write_bytes(split_path.read_bytes())
+    for name, task_spec in grid.tasks.items():
+        (output / f"split-{name}.json").write_bytes(task_spec.split.read_bytes())
     return receipt
 
 
@@ -465,6 +503,7 @@ def _check_envelope(
     split: dict[str, Any],
     plan: dict[str, Any],
     block: SubBlock,
+    bucket: str,
 ) -> None:
     expected = {
         "schema_version": 1,
@@ -473,7 +512,7 @@ def _check_envelope(
         "dataset_manifest_sha256": split["dataset_manifest_sha256"],
         "requested_max_new_tokens": 32,
         "plan_sha256": plan["plan_sha256"],
-        "task_bucket": contract["supported_task_bucket"],
+        "task_bucket": bucket,
     }
     mismatched = [k for k, v in expected.items() if meta.get(k) != v]
     if mismatched:
@@ -493,54 +532,66 @@ def _check_envelope(
         raise ValueError("profile repetition differs from the sub-block")
 
 
+def feature_path(feature_dir: Path, task: str) -> Path:
+    return feature_dir / f"task_features-{task}.json"
+
+
 def write_feature_bundle(
     campaign: Path,
     contract_path: Path,
-    output: Path,
+    feature_dir: Path,
     *,
     tokenizer: Path = PINNED_TOKENIZER,
     template_source: Path = PINNED_TEMPLATE,
-) -> None:
-    """Pre-execution task features for every request ID of the campaign's split."""
+) -> list[Path]:
+    """Pre-execution task features for every task's split, one file per task."""
 
-    if output.exists():
-        raise FileExistsError(f"feature file exists: {output}")
     contract = strict_json(contract_path.read_bytes())
     _, grid = _campaign_grid(campaign)
-    split = strict_json(grid.resolve("split_path").read_bytes())
-    manifest = load_frozen_manifest(
-        grid.resolve("split_path").parent / split["dataset_manifest_path"]
-    )
-    if manifest.sha256 != split["dataset_manifest_sha256"]:
-        raise ValueError("manifest differs from the split")
-    bucket = contract["supported_task_bucket"]
-    payload = {
-        "schema_version": 3,
-        "model_contract_sha256": contract["model_contract_sha256"],
-        "dataset_manifest_sha256": manifest.sha256,
-        "feature_source": contract["feature_source"],
-    }
-    if contract["feature_source"] == "pinned_tokenizer":
-        if (
-            digest(tokenizer) != contract["tokenizer_sha256"]
-            or digest(template_source) != contract["template_source_sha256"]
-        ):
-            raise ValueError("pinned tokenizer/template SHA mismatch")
-        tasks = pinned_task_features(
-            manifest,
-            tokenizer=tokenizer,
-            template_source=template_source,
-            bucket=bucket,
+    written = []
+    for name, task_spec in grid.tasks.items():
+        output = feature_path(feature_dir, name)
+        if output.exists():
+            raise FileExistsError(f"feature file exists: {output}")
+        split = strict_json(task_spec.split.read_bytes())
+        manifest = load_frozen_manifest(
+            task_spec.split.parent / split["dataset_manifest_path"]
         )
-        payload["tokenizer_sha256"] = digest(tokenizer)
-    elif contract["feature_source"] == "fake_adapter":
-        tasks = fake_task_features(manifest, bucket=bucket)
-    else:
-        raise ValueError(f"unknown feature source: {contract['feature_source']}")
-    wanted = {
-        rid
-        for key in ("training", "validation", "evaluation")
-        for rid in split[f"{key}_request_ids"]
-    }
-    payload["tasks"] = {rid: tasks[rid] for rid in sorted(wanted)}
-    write_json_atomic(output, payload)
+        if manifest.sha256 != split["dataset_manifest_sha256"]:
+            raise ValueError(f"{name} manifest differs from its split")
+        bucket = task_bucket(contract, grid, name)
+        payload: dict[str, Any] = {
+            "schema_version": 3,
+            "task": name,
+            "task_bucket": bucket,
+            "model_contract_sha256": contract["model_contract_sha256"],
+            "dataset_manifest_sha256": manifest.sha256,
+            "feature_source": contract["feature_source"],
+        }
+        if contract["feature_source"] == "pinned_tokenizer":
+            if (
+                digest(tokenizer) != contract["tokenizer_sha256"]
+                or digest(template_source) != contract["template_source_sha256"]
+            ):
+                raise ValueError("pinned tokenizer/template SHA mismatch")
+            tasks = pinned_task_features(
+                manifest,
+                tokenizer=tokenizer,
+                template_source=template_source,
+                bucket=bucket,
+            )
+            payload["tokenizer_sha256"] = digest(tokenizer)
+        elif contract["feature_source"] == "fake_adapter":
+            tasks = fake_task_features(manifest, bucket=bucket)
+        else:
+            raise ValueError(f"unknown feature source: {contract['feature_source']}")
+        wanted = {
+            rid
+            for key in ("training", "validation", "evaluation")
+            for rid in split[f"{key}_request_ids"]
+        }
+        payload["tasks"] = {rid: tasks[rid] for rid in sorted(wanted)}
+        feature_dir.mkdir(parents=True, exist_ok=True)
+        write_json_atomic(output, payload)
+        written.append(output)
+    return written

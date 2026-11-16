@@ -29,7 +29,7 @@ from xml.etree import ElementTree
 
 from adaptive_vlm.artifacts import write_json_atomic
 from adaptive_vlm.benchmark.edge_load import load_levels
-from adaptive_vlm.campaign.grid import Grid, check_split, load_grid
+from adaptive_vlm.campaign.grid import PRIMARY_TASK, Grid, check_split, load_grid
 from adaptive_vlm.campaign.network import (
     LoopbackNetwork,
     PhysicalNetwork,
@@ -146,8 +146,11 @@ def load_settings(path: Path, root: Path) -> dict[str, Any]:
         if value in (None, "") or (isinstance(value, str) and "REPLACE" in value):
             raise ValueError(f"set {name} in {path}")
     for name in _PATHS:
-        if settings.get(name):
-            settings[name] = str((root / settings[name]).resolve())
+        value = settings.get(name)
+        if isinstance(value, dict):  # Per-task paths, e.g. reference evidence.
+            settings[name] = {k: str((root / v).resolve()) for k, v in value.items()}
+        elif value:
+            settings[name] = str((root / value).resolve())
     for name in _EXECUTABLES:
         # Resolving a venv interpreter symlink would drop its packages.
         settings[name] = os.path.abspath(root / settings[name])
@@ -226,16 +229,18 @@ class CampaignSupervisor:
         self.grid: Grid = load_grid(
             Path(settings["grid"]), rate_fallback=bool(settings["rate_fallback"])
         )
-        self.config_path = (
-            Path(settings["config"])
-            if settings.get("config")
-            else self.grid.resolve("experiment_config_path")
+        # Per-task experiment config and split; settings may override the
+        # primary task's (rehearsals), never an extra task's.
+        self.task_paths: dict[str, tuple[Path, Path]] = {
+            name: (task.experiment_config, task.split)
+            for name, task in self.grid.tasks.items()
+        }
+        primary_config, primary_split = self.task_paths[PRIMARY_TASK]
+        self.task_paths[PRIMARY_TASK] = (
+            Path(settings["config"]) if settings.get("config") else primary_config,
+            Path(settings["split"]) if settings.get("split") else primary_split,
         )
-        self.split_path = (
-            Path(settings["split"])
-            if settings.get("split")
-            else self.grid.resolve("split_path")
-        )
+        self.config_path, self.split_path = self.task_paths[PRIMARY_TASK]
         self.levels_path = (
             Path(settings["edge_load_levels"])
             if settings.get("edge_load_levels")
@@ -398,21 +403,34 @@ class CampaignSupervisor:
                 "the grid does not pin the current protocol hash; freeze the "
                 "protocol first (or set allow_unfrozen_protocol for a rehearsal)"
             )
-        config = load_experiment_config(self.config_path)
-        manifest = load_frozen_manifest(
-            config.dataset.manifest_path, expected_revision=config.dataset.revision
-        )
-        split = json.loads(self.split_path.read_text(encoding="utf-8"))
-        if manifest.sha256 != split["dataset_manifest_sha256"] or (
-            model_contract_fingerprint(config.model) != split["model_contract_sha256"]
+        tasks: dict[str, tuple[Any, Any, dict[str, Any]]] = {}
+        for name, (config_path, split_path) in self.task_paths.items():
+            task_config = load_experiment_config(config_path)
+            task_manifest = load_frozen_manifest(
+                task_config.dataset.manifest_path,
+                expected_revision=task_config.dataset.revision,
+            )
+            task_split = json.loads(split_path.read_text(encoding="utf-8"))
+            if task_manifest.sha256 != task_split["dataset_manifest_sha256"] or (
+                model_contract_fingerprint(task_config.model)
+                != task_split["model_contract_sha256"]
+            ):
+                raise ValueError(f"{name} experiment config differs from its split")
+            check_split(self.grid, task_split, name)
+            tasks[name] = (task_config, task_manifest, task_split)
+        config = tasks[PRIMARY_TASK][0]
+        if any(
+            model_contract_fingerprint(c.model)
+            != model_contract_fingerprint(config.model)
+            or c.transport != config.transport
+            for c, _, _ in tasks.values()
         ):
-            raise ValueError("experiment config differs from the frozen split")
-        check_split(self.grid, split)
+            raise ValueError("all tasks must share the model contract and cloud server")
         levels = load_levels(self.levels_path)
-        missing = set(self.grid.load_levels) - set(levels)
+        missing = self.grid.all_load_levels() - set(levels)
         if missing:
             raise ValueError(f"edge-load levels missing: {sorted(missing)}")
-        expected = self.grid.expected_attempts(split)
+        expected = self.grid.expected_attempts({n: t[2] for n, t in tasks.items()})
         self.target = expected["measured"]
         policy = CloudExecutionPolicy(
             transport=config.transport,
@@ -436,7 +454,7 @@ class CampaignSupervisor:
                 )
         hosts: dict[str, Any] = {}
         if self.physical:
-            hosts = self._physical_preflight(commit, config, manifest, split)
+            hosts = self._physical_preflight(commit, config, tasks)
         if s["run_test_suite"]:
             self._run_test_suite()
         self.baseline_rtt_ms = self._network_baseline()
@@ -449,10 +467,16 @@ class CampaignSupervisor:
             "grid_sha256": self.grid.sha256,
             "protocol_sha256": sha256(protocol),
             "protocol_pinned": pinned == sha256(protocol),
-            "split_sha256": sha256(self.split_path),
-            "config_sha256": sha256(self.config_path),
+            "tasks": {
+                name: {
+                    "config_sha256": sha256(config_path),
+                    "split_sha256": sha256(split_path),
+                    "dataset_manifest_sha256": tasks[name][1].sha256,
+                    "task_bucket": self.grid.tasks[name].task_bucket,
+                }
+                for name, (config_path, split_path) in self.task_paths.items()
+            },
             "edge_load_levels_sha256": sha256(self.levels_path),
-            "dataset_manifest_sha256": manifest.sha256,
             "expected_attempts": expected,
             "subblock_order": [b.subblock_id for b in self.grid.execution_order()],
         }
@@ -465,8 +489,25 @@ class CampaignSupervisor:
         write_json_atomic(self.output / "host_preflight.json", {"time": now(), **hosts})
         return contract
 
+    def reference_for(self, task: str) -> Path:
+        """The same-device reference index for one task's manifest."""
+
+        value = self.settings.get("same_device_reference_evidence")
+        if isinstance(value, dict):
+            if task not in value:
+                raise ValueError(f"no same-device reference evidence for task {task}")
+            return Path(value[task])
+        if task != PRIMARY_TASK or not value:
+            raise ValueError(
+                f"same_device_reference_evidence needs a path per task ({task})"
+            )
+        return Path(value)
+
     def _physical_preflight(
-        self, commit: str, config: Any, manifest: Any, split: dict[str, Any]
+        self,
+        commit: str,
+        config: Any,
+        tasks: dict[str, tuple[Any, Any, dict[str, Any]]],
     ) -> dict[str, Any]:
         from adaptive_vlm.benchmark.heterogeneous_correctness import (
             PROTOCOL,
@@ -515,25 +556,31 @@ class CampaignSupervisor:
             raise ValueError(
                 "G2 v2 requires the heterogeneous-GPU correctness protocol"
             )
-        reference = Path(s["same_device_reference_evidence"])
-        verify_reference_evidence(
-            reference,
-            sha256(reference),
-            manifest,
-            split["model_contract_sha256"],
-            expected_devices={
-                host: config.to_dict()[host]["gpu"] for host in ("edge", "cloud")
-            },
-        )
         code = (
             "import json; from adaptive_vlm.benchmark.heterogeneous_correctness "
             "import runtime_versions; print(json.dumps(runtime_versions()))"
         )
-        pinned = json.loads(reference.read_text())["runtime_versions"]
-        if json.loads(checked([s["python"], "-c", code])) != pinned["edge"] or (
-            json.loads(ssh([s["cloud_python"], "-c", code])) != pinned["cloud"]
-        ):
-            raise RuntimeError("runtime versions differ from the reference evidence")
+        runtimes = {
+            "edge": json.loads(checked([s["python"], "-c", code])),
+            "cloud": json.loads(ssh([s["cloud_python"], "-c", code])),
+        }
+        references = {}
+        for name, (_task_config, task_manifest, task_split) in tasks.items():
+            reference = self.reference_for(name)
+            verify_reference_evidence(
+                reference,
+                sha256(reference),
+                task_manifest,
+                task_split["model_contract_sha256"],
+                expected_devices={
+                    host: config.to_dict()[host]["gpu"] for host in ("edge", "cloud")
+                },
+            )
+            if json.loads(reference.read_text())["runtime_versions"] != runtimes:
+                raise RuntimeError(
+                    f"runtime versions differ from the {name} reference evidence"
+                )
+            references[name] = sha256(reference)
         if (
             s["require_cloud_wsl_keepalive"]
             and "microsoft" in ssh(["uname", "-r"]).lower()
@@ -548,7 +595,7 @@ class CampaignSupervisor:
             "cloud_gpu": ssh(["nvidia-smi"]),
             "cloud_free_bytes": remote_free,
             "source_commit": commit,
-            "reference_evidence_sha256": sha256(reference),
+            "reference_evidence_sha256": references,
         }
 
     def _run_test_suite(self) -> None:
@@ -585,15 +632,16 @@ class CampaignSupervisor:
 
     # -- execution ----------------------------------------------------------
 
-    def command_prefix(self) -> list[str]:
+    def command_prefix(self, task: str = PRIMARY_TASK) -> list[str]:
         s = self.settings
+        config_path, split_path = self.task_paths[task]
         return [
             s["adaptive_vlm"],
             "interleaved-benchmark",
             "--config",
-            str(self.config_path),
+            str(config_path),
             "--split",
-            str(self.split_path),
+            str(split_path),
             "--artifact-manifest",
             s["artifact_manifest"],
             "--cache-dir",
@@ -665,7 +713,7 @@ class CampaignSupervisor:
                         output=directory,
                         network=self.network,
                         baseline_rtt_ms=self.baseline_rtt_ms,
-                        command_prefix=self.command_prefix(),
+                        command_prefix=self.command_prefix(block.task),
                         run_child=self.run_child,
                         gates=gates,
                         max_restarts=int(s["max_restarts_per_subblock"]),
@@ -760,7 +808,7 @@ class CampaignSupervisor:
             config.dataset.manifest_path, expected_revision=config.dataset.revision
         )
         experiment = load_experiment_config(self.config_path)
-        reference = Path(s["same_device_reference_evidence"])
+        reference = self.reference_for(PRIMARY_TASK)
         experiment_manifest = load_frozen_manifest(
             experiment.dataset.manifest_path,
             expected_revision=experiment.dataset.revision,

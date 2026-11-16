@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "rule": "protocol section 3.5 with amendment A1",
+  "round_1": {
+    "D1": {
+      "template": "{question} Explain your answer in detail.",
+      "manifest_sha256": "ed304a4b2b7a216a9e4a9e4adc4b3ca01dbf3da842645b2979474b24e3f8f483",
+      "measured": 200,
+      "failed": 0,
+      "mean_output_tokens": 17.45,
+      "cap_hits": 46,
+      "median_edge_ms": 1447.3,
+      "eligible": false
+    },
+    "D2": {
+      "template": "{question} Answer in a full sentence, then describe the relevant details of the image.",
+      "manifest_sha256": "d069ea8a574077dc0ae245624d183519b530ada75b1b7fa97a3c8b50ed2365c1",
+      "measured": 200,
+      "failed": 0,
+      "mean_output_tokens": 16.11,
+      "cap_hits": 20,
+      "median_edge_ms": 1384.0,
+      "eligible": false
+    },
+    "D3": {
+      "template": "Describe the image in detail, then answer this question: {question}",
+      "manifest_sha256": "6f5d1ff9192fa90edc0d9ca44f646b1b8a119137d8300edfa6ea0e5c28ec0d40",
+      "measured": 200,
+      "failed": 0,
+      "mean_output_tokens": 13.05,
+      "cap_hits": 21,
+      "median_edge_ms": 1312.5,
+      "eligible": false
+    }
+  },
+  "round_1_selected": null,
+  "round_2": {
+    "E1": {
+      "template": "Describe this image in detail.",
+      "manifest_sha256": "f43b7c81d27b6a03e2f764788d3536f25da5cac867f54e843b14231b3bf82ae0",
+      "measured": 200,
+      "failed": 0,
+      "mean_output_tokens": 32,
+      "cap_hits": 200,
+      "median_edge_ms": 1838.6,
+      "eligible": true
+    },
+    "E2": {
+      "template": "{question} Answer in at least three full sentences, describing everything in the image that relates to the question.",
+      "manifest_sha256": "e1f498eeedd7a87df3e0bf4434924f3581578f76e3d7fc2c7b4cd913c9bbd189",
+      "measured": 200,
+      "failed": 0,
+      "mean_output_tokens": 31.02,
+      "cap_hits": 168,
+      "median_edge_ms": 1835.8,
+      "eligible": true
+    },
+    "E3": {
+      "template": "Write a detailed paragraph describing this image, including the answer to this question: {question}",
+      "manifest_sha256": "ffab146bb78f870119a135f4ddc374b70d78c52ca2a4de70d1e873538f6f9ae7",
+      "measured": 200,
+      "failed": 0,
+      "mean_output_tokens": 29.84,
+      "cap_hits": 177,
+      "median_edge_ms": 1834.2,
+      "eligible": true
+    }
+  },
+  "selected": "E1",
+  "selected_template": "Describe this image in detail."
+}

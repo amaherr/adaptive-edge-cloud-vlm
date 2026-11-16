@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "campaign_id": "g2v2-loopback-rehearsal",
-  "description": "Loopback rehearsal of the G2 v2 supervisor: one condition per split, T01 also under L1, one repetition (4 sub-blocks). Not a measurement grid.",
+  "description": "Loopback rehearsal of the G2 v2 supervisor: one condition per split, T01 also under L1, plus long-answer cells T01-L1 and E01-L0; one repetition (6 sub-blocks). Not a measurement grid.",
   "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
   "protocol_sha256": null,
   "split_path": "../evaluation/rehearsal_split_v2.json",
@@ -41,5 +41,22 @@
       "added_rtt_ms": 50
     }
   },
-  "rate_fallback": {}
+  "rate_fallback": {},
+  "extra_tasks": {
+    "long": {
+      "task_bucket": "vqa-long-answer-32-token-budget",
+      "experiment_config_path": "../experiments/fake_g2v2_rehearsal_long.yaml",
+      "split_path": "../evaluation/rehearsal_split_v2_long.json",
+      "cells": [
+        [
+          "T01",
+          "L1"
+        ],
+        [
+          "E01",
+          "L0"
+        ]
+      ]
+    }
+  }
 }

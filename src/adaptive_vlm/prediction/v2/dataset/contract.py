@@ -26,6 +26,12 @@ IDS_KEYS = {
 CONFIGURATION_IDS = frozenset(c.id.value for c in CONFIGURATIONS)
 
 
+# G2 v2 adds a timed-only long-answer bucket (protocol section 3.5).
+TASK_BUCKETS = frozenset(
+    {"vqa-short-answer-32-token-budget", "vqa-long-answer-32-token-budget"}
+)
+
+
 TASK_KEYS = frozenset(
     {
         "task_bucket",
@@ -93,7 +99,7 @@ def validate_task_features(value: dict[str, Any]) -> None:
     if set(value) != TASK_KEYS:
         raise ValueError("task snapshot contains missing or forbidden features")
     if (
-        value["task_bucket"] != "vqa-short-answer-32-token-budget"
+        value["task_bucket"] not in TASK_BUCKETS
         or value["requested_max_new_tokens"] != 32
     ):
         raise ValueError("task/generation contract mismatch")

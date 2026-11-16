@@ -114,7 +114,7 @@ The final `state=completed` requires all nine validated blocks and exactly 8,100
 ## G2 v2 campaign
 
 G2 v2 runs every request on all three placements back to back, under 22 shaped network conditions and three edge-load levels.
-- **Size:** 34 cells as 102 sub-blocks, giving 14,580 measured attempts and 306 warmups. The estimate is about 16–19 h; the on-site pilot replaces it with measured numbers.
+- **Size:** 48 cells as 144 sub-blocks, giving 17,550 measured attempts and 432 warmups. That is 34 short-answer cells plus 14 long-answer cells (protocol section 3.5). The estimate is about 20–23 h, so plan two sessions; the on-site pilot replaces the estimate with measured numbers.
 - **Design:** the [protocol](../protocols/g2-v2-protocol.md), sections 5–9.
 - **Status and decisions:** the [preparation notes](../g2-v2-preparation.md).
 - **Driver:** `scripts/campaign/run_g2v2_campaign.py`, on the **edge laptop**. It shapes both hosts, runs one sub-block at a time, validates each one, and reruns a sub-block that fails a check.
@@ -173,7 +173,9 @@ iperf3 -c CLOUD_IP -p 5051 -t 8 && iperf3 -c CLOUD_IP -p 5051 -t 8 -R
 
 ### 4. Correctness reference
 
-Preflight and the profiles need a same-device reference for the v2 manifest, made with `scripts/campaign/build_g2v2_reference.py` on the frozen commit. The G2 bundle doesn't work: the source and the prompt changed.
+Preflight and the profiles need a same-device reference for **each task's manifest**, made with `scripts/campaign/build_g2v2_reference.py` on the frozen commit. The G2 bundle doesn't work: the source and the prompt changed.
+- **Short-answer task** (`physical_vqa_v2.yaml`, 120 requests): use the commands below as written.
+- **Long-answer task** (`physical_vqa_v2_long.yaml`, 60 requests of 32 tokens): repeat every step with `--config configs/experiments/physical_vqa_v2_long.yaml`, replacing `reference/` with `reference-long/` in every path. This takes about 30 min on the edge, 5 min on the cloud and 15 min for the control run.
 
 | Where | Command | Time |
 | --- | --- | --- |
@@ -191,8 +193,8 @@ Copy the cloud's `artifacts/g2v2/reference/cloud` folder and `cloud-runtime.json
 
 The bundle step verifies everything exactly as preflight will, and prints the index path. Any same-device mismatch stops it. Don't edit the evidence; find the cause.
 
-Two places point at the bundle:
-- the settings (step 5), in `same_device_reference_evidence`;
+Two places point at the two bundles, both as `{"short": …, "long": …}`:
+- the settings (step 5), in `same_device_reference_evidence`, already filled with these paths in the examples;
 - `configs/predictor/g2v2_dataset_contract.json`, in `same_device_reference_evidence`. This is used by the derived tables. Commit it, push, and pull on the cloud.
 
 ### 5. Settings files
@@ -206,7 +208,7 @@ mkdir -p artifacts/g2v2 && cp configs/campaigns/g2v2_pilot.example.json artifact
 In both files, set:
 - `cloud_ssh`, `cloud_repo` and `cloud_python`: absolute Linux paths on the cloud;
 - `cloud_interface`;
-- `same_device_reference_evidence`: the bundle index from step 4;
+- `same_device_reference_evidence`: the two bundle indexes from step 4, one per task;
 - `rate_fallback`: from step 3.
 
 Leave the rest unless there is a reason. The main fields are:
@@ -224,7 +226,11 @@ Leave the rest unless there is a reason. The main fields are:
 
 ### 6. Pilot, then discard it
 
-The pilot grid runs 100/5, 100/100, 150/150, 35/20 and 200/5, each at L0 and L2, with one repetition over 10 training IDs. That is 10 sub-blocks and 300 attempts, about 1–1.5 h. It never measures validation or evaluation IDs.
+The pilot grid runs:
+- the short-answer task at 100/5, 100/100, 150/150, 35/20 and 200/5, each at L0 and L2, over 10 training IDs;
+- the long-answer task at 100/5 and 200/5 at L1, over 5 training IDs.
+
+That is 12 sub-blocks and 330 attempts with one repetition, about 1.5 h. It never measures validation or evaluation IDs.
 
 ```bash
 .venv-model/bin/python scripts/campaign/run_g2v2_campaign.py preflight --settings artifacts/g2v2/pilot-settings.json
@@ -246,7 +252,7 @@ When `status` reports `completed`, build the pilot's oracle table:
 
 **Go/no-go.** If any of these fails, stop. Fix the cause and record a dated amendment in the protocol before collecting anything.
 - **Valid sub-blocks:** every pilot sub-block is valid (`subblocks/*/validation_report.json`), which covers zero netem drops, probes within tolerance and no L0 spill.
-- **Every placement can win:** each of the three placements wins at least one pilot cell (`oracle-training/oracle_cells.csv`).
+- **Every placement can win:** each of the three placements wins at least one pilot cell (`oracle-training/oracle_cells.csv`). The estimate expects edge at short L0, cloud at short L2, and distributed at the long-answer L1 cells (`P05-L1-long`, `P01-L1-long`).
 - **L1 position:** the median cloud latency at 35/20 (cell `P04-L0`) is between 1.6 and 2.6 s. Otherwise, re-choose L1 and L2 from the [calibration curve](../../results/edge-load-calibration-20261116/README.md) (protocol section 6).
 - **Cloud state:** the cloud resource state is present. A cloud row in `subblocks/*/run/cloud/requests.jsonl` has `server_state_gpu_temperature_c`, or `server_state_nvml_available: false` if the probe failed.
 - **Timing:** record the per-sub-block wall time, the edge model load time (`Loading verified shared edge model … completed in` in `campaign.log`), and the probe and shaping time.
@@ -301,8 +307,8 @@ tail -F artifacts/g2v2/physical-unattended/campaign.log
 ```
 
 `status` reports:
-- `state` and `stage` (`sub-block i/102 attempt n`), and the current `subblock`;
-- measured attempts out of 14,580, and status counts;
+- `state` and `stage` (`sub-block i/144 attempt n`), and the current `subblock`;
+- measured attempts out of 17,550, and status counts;
 - `valid_subblocks`;
 - `supervisor_running`, read from the live lock rather than from the status file.
 
