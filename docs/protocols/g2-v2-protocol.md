@@ -330,3 +330,5 @@ The rationale and work plan are in [g2-v2-plus-plan.md](../g2-v2-plus-plan.md) a
 12. **Shaping.** Netem is applied on both hosts only to traffic between the edge and cloud experiment addresses on ports 5050–5052. Management, S3 and SSM traffic is not shaped. Section 5 tolerances and the zero-drop gate apply to the shaped class.
 13. **Repetitions.** Two (0 and 1) instead of three.
 14. **Residency.** Resident if the model fits with peak reserved memory at most 90% of usable VRAM; otherwise swap. Decided from rule 10's fit runs.
+
+**A2a-1 (17 November 2026, before any AWS measurement).** The account's on-demand G/VT quota is 16 vCPU and its spot quota is 0. `g6f.4xlarge` (16 vCPU) therefore cannot run next to the cloud. The edge order in rule 1 becomes `g6f.2xlarge`, then `g4dn.xlarge`; `g6f.4xlarge` is tried only if the quota is raised. All instances are on demand.

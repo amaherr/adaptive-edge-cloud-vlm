@@ -1,6 +1,6 @@
 # G2 v2+ on AWS: roadmap
 
-**Status: plan, 17 November 2026.** The GPU quota appeal for the AWS pair was granted. This roadmap moves the G2 v2+ campaign ([plan, B0–B9](g2-v2-plus-plan.md)) from the physical RTX 3050 / RTX 2070 SUPER pair to two AWS VMs, built with the Terraform and container work on the `cloud-infrastructure` branch. It **reverses the earlier "AWS/Vultr out of scope" decision** recorded in the Predictor V2 specification; record that reversal in the protocol (amendment A2).
+**Status: plan, 17 November 2026; account inventory added the same day (section 8).** The GPU quota appeal for the AWS pair was granted. This roadmap moves the G2 v2+ campaign ([plan, B0–B9](g2-v2-plus-plan.md)) from the physical RTX 3050 / RTX 2070 SUPER pair to two AWS VMs, built with the Terraform and container work on the `cloud-infrastructure` branch. It **reverses the earlier "AWS/Vultr out of scope" decision** recorded in the Predictor V2 specification; record that reversal in the protocol (amendment A2).
 
 The physical results are unaffected: G2 and its analysis stay as they are, as the real-hardware baseline. The physical G2 v2 campaign is not run; its frozen prompt, long task, dataset, splits and tooling carry over unchanged.
 
@@ -8,7 +8,7 @@ The physical results are unaffected: G2 and its analysis stay as they are, as th
 
 | | Virtual edge | Cloud |
 | --- | --- | --- |
-| Instance | `g6f.2xlarge`: ¼ NVIDIA L4 (time-sliced vGPU, ~5.6 GiB usable), 8 vCPU, 32 GiB; fallbacks `g6f.4xlarge` (½ L4) or `g4dn.xlarge` (full T4), chosen in phase D | `g6.2xlarge`: full L4, 24 GiB, 8 vCPU, 32 GiB |
+| Instance | `g6f.2xlarge`: ¼ NVIDIA L4 (time-sliced vGPU, ~5.6 GiB usable), 8 vCPU, 32 GiB; fallback `g4dn.xlarge` (full T4, 4 vCPU). `g6f.4xlarge` needs 16 vCPU and doesn't fit the 16-vCPU quota next to the cloud (section 8) | `g6.2xlarge`: full L4, 24 GiB, 8 vCPU, 32 GiB |
 | Driver | GRID (required on G6f), baked into a reviewed AMI | Tesla/datacenter driver, baked into a reviewed AMI |
 | Software | One digest-pinned image from ECR, run as the edge and cloud roles | Same image |
 | Data | Encrypted data EBS volume per host, holding the model cache, images and manifests, seeded from S3 | Same |
@@ -37,14 +37,14 @@ Recommendations first; each becomes part of amendment A2.
 | # | Decision | Recommendation |
 | --- | --- | --- |
 | D1 | Region and AZ | The AZ where the quota was granted and both instance types are offered (`account-preflight` checks this) |
-| D2 | Edge instance | `g6f.2xlarge` if it passes the stability and fit criteria in phase D; otherwise `g6f.4xlarge`, then `g4dn.xlarge`. Write the criteria into A2 **before** measuring |
+| D2 | Edge instance | `g6f.2xlarge` if it passes the stability and fit criteria in phase D; otherwise `g4dn.xlarge`. `g6f.4xlarge` only if the quota is raised. Criteria are in A2a rule 10 |
 | D3 | Remote control from the supervisor | An **SSM runner**: `ssm send-command` to the cloud host, behind the same `Runner` interface as SSH. It keeps the no-SSH, no-public-IP design, and the edge role only needs `ssm:SendCommand` on the cloud instance. The alternative, intra-VPC SSH on port 22 from the edge security group only, is simpler but adds keys and a port |
 | D4 | Where the supervisor runs | In an **edge orchestrator container** with host networking and `NET_ADMIN`, scoped to the edge role. This is a revision of the container contract. It launches the benchmark as a subprocess in the same container (GPU attached), and shapes the edge host's interface directly |
 | D5 | "Same source on both hosts" check | Compare the **image digest and its `org.opencontainers.image.revision` label** on both hosts instead of `git status`. The image is built from a clean commit |
 | D6 | Checkpoints | Each validated sub-block (and the campaign plan, status and logs) is copied to S3 with SHA-256 receipts as soon as it validates. The data EBS volume remains the primary copy |
 | D7 | Budget | **A $180 ceiling for everything on AWS, including G5 later.** Alerts at $60, $110 and $150. An AWS Budgets action **stops all project instances at $165** (a Budgets action stops instances; it is not a billing cap) |
 | D9 | Network egress | **No interface endpoints**: they cost $0.07/h even with compute off, about $51 a month. Instead, an auto-assigned public IPv4 per instance ($0.005/h, only while running) with **no inbound rules**, plus the free S3 gateway endpoint. SSM, ECR and S3 keep working. The trade-off is that the hosts can reach the internet outbound, which the old design forbade; installation from the internet remains forbidden by procedure |
-| D10 | Paying only for what runs | Start only the VM a step needs (section 6). Stop instances whenever idle (watchdog idle stop after 15 min). Use **spot** for acceptance and calibration if a spot quota exists (spot quota is separate from on-demand). Run the pilot and campaign on demand |
+| D10 | Paying only for what runs | Start only the VM a step needs (section 6). Stop instances whenever idle (watchdog idle stop after 15 min). **No spot**: the spot G/VT quota is 0, and a request isn't worth the delay for the hours involved. Everything runs on demand |
 | D11 | Storage | Small volumes: a 30 GiB root and a 20 GiB data volume per host (100 GiB in all, about $8 a month), against the old 180 GiB. Scratch artifacts go to S3, and nothing large stays on EBS after archiving |
 | D8 | Watchdog ceilings | `experiment_max_runtime_hours` must cover one campaign session (about 14 h). Idle stop stays on; the supervisor writes the watchdog heartbeat on both hosts |
 
@@ -185,7 +185,6 @@ On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge
 | Contingency | ~$35 |
 | **Ceiling** | **$180** |
 
-With spot for D and E, G2 v2+ falls to about $80.
 
 **Rules that keep it under the ceiling:**
 - Phases A and B are built and tested **locally** (free); AWS only starts at C.
@@ -205,3 +204,20 @@ With spot for D and E, G2 v2+ falls to about $80.
 | Instance retired or interrupted mid-run | On-demand instances (not spot); resume from EBS and the S3 checkpoints |
 | Cost overrun | Budget alerts, the idle watchdog, stopping between sessions, teardown checklist |
 | Results not comparable with physical G2 | Expected: G2 v2+ is a new baseline. Report physical G2 as the real-hardware reference, and the hardware ratio explicitly |
+
+## 8. Account inventory (17 November 2026, read-only)
+
+| Item | Found | Cost | Action |
+| --- | --- | --- | --- |
+| EC2 instances, volumes, snapshots, AMIs, Elastic IPs, NAT gateways | none | — | — |
+| VPC `10.42.0.0/16` and its S3 gateway endpoint | present | free | keep (reused by C2) |
+| Interface endpoints | none | — | — |
+| S3: state bucket and artifact bucket (a few KB of old Vultr acceptance records) | present | cents | keep |
+| ECR `adaptive-vlm-cloud-v1`: two copies of a 4.0 GB image from 5 November | present | ~$0.80/month | delete after C4 pushes the new image (or now) |
+| Budget `adaptive-vlm-cloud-v1` ($20) and SNS alerts | present | free | replace with the $180 budget and stop action in C2 |
+| Old Vultr watchdog: Lambda every 5 min, EventBridge rule, CodeBuild teardown project, 2 alarms, SNS topic, SSM SecureString holding a **Vultr API key** | present | ~$0.20/month | delete once the Vultr account is confirmed empty; revoke the key at Vultr |
+| On-demand G/VT vCPU quota | **16** | — | exactly `g6f.2xlarge` (8) + `g6.2xlarge` (8) |
+| Spot G/VT vCPU quota | **0** | — | no spot |
+| Spend | October $0.00; 1–17 November **$0.20** (ECR $0.14, S3 $0.03, tax $0.03) | — | — |
+
+**Cheaper cloud, decided before any measurement.** `g6.xlarge` has the same full L4 with 4 vCPU and 16 GiB, at $0.805/h against $0.978/h. That saves about $11 over the campaign and frees 4 vCPU of quota. The cloud server needs about 4 GB of host RAM and little CPU. If adopted, this is recorded as a dated amendment before phase C.
