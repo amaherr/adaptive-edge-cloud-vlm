@@ -1,5 +1,8 @@
 services:
   inference:
+    # Fixed name: the edge supervisor checks this container's image and runs
+    # Python in it over SSM (docker inspect / docker exec on the host).
+    container_name: adaptive-vlm-inference
     image: ${APP_IMAGE:?Set the shared ECR repository@sha256 digest}
     environment:
       HF_HOME: /models

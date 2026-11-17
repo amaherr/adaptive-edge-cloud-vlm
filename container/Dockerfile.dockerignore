@@ -9,5 +9,8 @@
 !configs/**
 !scripts/
 !scripts/**
+!docs/
+!docs/protocols/
+!docs/protocols/**
 !container/
 !container/verify_image.py

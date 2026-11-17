@@ -59,6 +59,18 @@ C (Terraform, AMIs, image, data) ─ D (acceptance) ─ E (recalibration) ─ F 
 A, B-code and C can run in parallel. D needs C, plus enough of A to run the image. E needs D. F needs everything.
 
 ### Phase A: port and platform code (no GPUs; about 3 days)
+
+**Status (17 November 2026): done** on branch `feature/aws-phase-a`. Tested locally with fakes; not yet run on AWS.
+- **A1:** infrastructure ported (`infra/`, `container/`, `scripts/cloud/`, `docs/cloud/`).
+- **A2:** `campaign/remote.py` (SSM, SSH and local runners).
+- **A3:** `ClassifiedNetwork`.
+- **A4:** the `platform` setting (spill metric: Windows dedicated or NVML used memory; an L0 CUDA OOM invalidates a sub-block).
+- **A5:** image build record as source identity; same image digest on both hosts; `campaign/checkpoint.py` (S3 sync with receipts, edge and cloud heartbeats).
+- **A6:** `orchestrator` service; `adaptive-vlm-inference` container name; `iproute2` and `awscli` in the image; [runtime contract v2](cloud/container_runtime_contract_v2.md); `configs/campaigns/g2v2_aws.example.json`.
+- **A7:** tests.
+- **Also:** the correctness smoke now runs a few **training IDs of the campaign manifest** through the campaign config instead of the fixture config. The old version would have failed preflight: its fixture IDs aren't in the v2 reference, and it pointed at the physical cloud's IP.
+- **Still open:** the AWS grid (`configs/profiles/aws_network_grid_v2plus.json`) is created in B6.
+
 1. **A1 Port the branch.**
    - Bring `infra/`, `container/`, `.github/workflows/cloud-infrastructure.yml` and the cloud scripts (into `scripts/cloud/`) onto `main`.
    - Bring its docs into `docs/cloud/`, marked as historical where they describe the 8,100-attempt v1 campaign.

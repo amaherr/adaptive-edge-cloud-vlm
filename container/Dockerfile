@@ -20,13 +20,15 @@ COPY requirements/model-cu128.lock requirements/model-cu128.lock
 COPY src src
 COPY configs configs
 COPY scripts scripts
+# The grid pins the protocol's SHA-256; preflight checks it inside the image.
+COPY docs/protocols docs/protocols
 COPY container/verify_image.py /usr/local/bin/verify_image.py
 RUN apt-get update \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends iperf3 ca-certificates \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends iperf3 iproute2 awscli ca-certificates \
  && rm -rf /var/lib/apt/lists/* \
  && dpkg-query -W > /usr/local/share/os-packages.tsv \
  && pip install --no-cache-dir pip==25.1.1 setuptools==78.1.0 wheel==0.45.1 \
- && command -v iperf3 \
+ && command -v iperf3 && command -v tc && command -v aws \
  && python -c 'import sys; assert sys.version_info[:2] == (3,11)' \
  && python /usr/local/bin/verify_image.py build "$BASE_IMAGE" "$GIT_SHA" "$MODEL_CONTRACT_SHA" "$LOCK_SHA" \
  && pip install --no-cache-dir --no-build-isolation --report /usr/local/share/model-install-report.json -r requirements/model-cu128.lock \

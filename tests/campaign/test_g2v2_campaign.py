@@ -247,14 +247,19 @@ def fake_edge(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 
     import adaptive_vlm.commands.interleaved as command
 
-    state: dict[str, Any] = {"dedicated": 3200.0, "load_alive": True, "starts": 0}
+    state: dict[str, Any] = {
+        "used": 3000.0,
+        "dedicated": 3200.0,
+        "load_alive": True,
+        "starts": 0,
+    }
 
     class Reader:
         def __init__(self, index: int) -> None:
             pass
 
         def snapshot(self) -> dict[str, Any]:
-            return {"gpu_temperature_c": 55}
+            return {"gpu_temperature_c": 55, "gpu_memory_used_mib": state["used"]}
 
     class Windows:
         def start(self) -> None:
@@ -807,3 +812,33 @@ def test_classified_network_refuses_a_foreign_root_and_missing_filters() -> None
     network.remote = no_filters
     with pytest.raises(RuntimeError, match="filter for port 5050"):
         network.verify(rate_mbps=45, delay_ms=10)
+
+
+def test_linux_spill_gate_uses_nvml_memory(
+    tmp_path: Path, fake_server: None, fake_edge: dict[str, Any]
+) -> None:
+    grid = load_grid(REHEARSAL_GRID)
+    block = next(
+        b for b in grid.subblocks() if b.load_level == "L0" and b.task == "short"
+    )
+    arguments = {
+        **_block_args(tmp_path),
+        "block": block,
+        "gates": Gates(
+            spill_metric="edge_gpu_memory_used_mib",
+            edge_dedicated_limit_mib=4000,
+            spill_margin_mib=128,
+        ),
+    }
+    report = run_subblock(
+        network=LoopbackNetwork(), run_child=_in_process(), **arguments
+    )
+    assert report["valid"], report["reasons"]
+    fake_edge["used"] = 3950.0
+    report = run_subblock(
+        network=LoopbackNetwork(),
+        run_child=_in_process(),
+        **{**arguments, "output": tmp_path / "spill"},
+    )
+    assert not report["valid"]
+    assert "edge_gpu_memory_used_mib reached 3950" in report["reasons"][0]

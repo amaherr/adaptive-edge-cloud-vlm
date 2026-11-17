@@ -9,7 +9,6 @@
     "short": "artifacts/g2v2/reference/bundle/index.json",
     "long": "artifacts/g2v2/reference-long/bundle/index.json"
   },
-  "smoke_config": "configs/experiments/physical_pair_v1.yaml",
   "output_root": "artifacts/g2v2/pilot",
   "python": ".venv-model/bin/python",
   "test_python": ".venv/bin/python",

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import platform
 import socket
@@ -99,7 +100,40 @@ def _nvidia_gpu() -> dict[str, Any]:
     return {"available": bool(devices), "devices": devices}
 
 
+BUILD_RECORD = Path("/usr/local/share/adaptive-vlm-build.json")
+
+
+def image_identity(record: Path | None = None) -> dict[str, Any] | None:
+    """Commit and image of the running container, if this is the campaign image.
+
+    The image is built from a clean commit (``scripts/cloud/build_cloud_image.py``)
+    and records it at build time; ``APP_IMAGE`` holds the digest it runs as.
+    """
+
+    path = record or BUILD_RECORD
+    if not path.is_file():
+        return None
+    build = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        "commit": build.get("git_commit"),
+        "image": os.environ.get("APP_IMAGE"),
+        "base_image": build.get("base_image"),
+        "dependency_lock_sha256": build.get("dependency_lock_sha256"),
+    }
+
+
 def _git_state(workdir: Path) -> dict[str, Any]:
+    image = image_identity()
+    if image is not None and not (workdir / ".git").exists():
+        # Inside the campaign image there is no checkout; the image is the
+        # source identity and was built from a clean commit.
+        return {
+            "available": True,
+            "commit": image["commit"],
+            "dirty": False,
+            "source": "image",
+            "image": image["image"],
+        }
     commit_result = _run(["git", "rev-parse", "HEAD"], cwd=workdir)
     status_result = _run(["git", "status", "--porcelain"], cwd=workdir)
     if (

@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import shlex
 import shutil
 import signal
 import socket
@@ -29,6 +31,7 @@ from xml.etree import ElementTree
 
 from adaptive_vlm.artifacts import write_json_atomic
 from adaptive_vlm.benchmark.edge_load import load_levels
+from adaptive_vlm.campaign.checkpoint import Heartbeats, S3Checkpoint
 from adaptive_vlm.campaign.grid import PRIMARY_TASK, Grid, check_split, load_grid
 from adaptive_vlm.campaign.network import (
     ClassifiedNetwork,
@@ -47,6 +50,7 @@ from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.environment import (
     SWAP_RESIDENCY_MIN_FREE_VRAM_MIB,
     gpu_free_memory_mib,
+    image_identity,
 )
 from adaptive_vlm.execution.cloud import CloudExecutionPolicy
 from adaptive_vlm.models.base import ModelMetadata
@@ -62,11 +66,16 @@ _PATHS = (
     "config",
     "split",
     "edge_load_levels",
-    "smoke_config",
     "same_device_reference_evidence",
 )
 _EXECUTABLES = ("python", "test_python", "adaptive_vlm")
+PLATFORMS = {
+    # platform: (spill metric, source identity)
+    "physical-wsl": ("edge_windows_gpu_dedicated_mib", "git"),
+    "aws-linux": ("edge_gpu_memory_used_mib", "image"),
+}
 _DEFAULTS: dict[str, Any] = {
+    "platform": "physical-wsl",
     "edge_device": "cuda:0",
     "edge_residency": "swap",
     "rate_fallback": False,
@@ -83,6 +92,7 @@ _DEFAULTS: dict[str, Any] = {
     "min_host_available_ram_mib": 0,
     "min_runtime_host_available_ram_mib": 0,
     "require_cloud_wsl_keepalive": False,
+    "smoke_requests": 6,
 }
 _LOOPBACK_ONLY = ("allow_dirty_tree",)
 
@@ -138,7 +148,6 @@ def load_settings(path: Path, root: Path) -> dict[str, Any]:
             "cloud_repo",
             "cloud_python",
             "cloud_interface",
-            "smoke_config",
             "same_device_reference_evidence",
         ]
         for name in _LOOPBACK_ONLY:
@@ -157,6 +166,19 @@ def load_settings(path: Path, root: Path) -> dict[str, Any]:
     for name in _EXECUTABLES:
         # Resolving a venv interpreter symlink would drop its packages.
         settings[name] = os.path.abspath(root / settings[name])
+    if settings["platform"] not in PLATFORMS:
+        raise ValueError(f"platform must be one of {sorted(PLATFORMS)}")
+    if settings["edge_residency"] not in ("resident", "swap"):
+        raise ValueError(f"set edge_residency (resident or swap) in {path}")
+    for name in ("edge_dedicated_limit_mib", "spill_margin_mib"):
+        try:
+            settings[name] = float(settings[name])
+        except (TypeError, ValueError):
+            raise ValueError(f"set {name} to a number in {path}") from None
+    if settings["mode"] == "physical" and PLATFORMS[settings["platform"]][1] == "image":
+        for name in ("cloud_container",):
+            if not settings.get(name):
+                raise ValueError(f"set {name} in {path}")
     if float(settings["stall_seconds"]) < 180:
         raise ValueError("stall_seconds must be at least 180")
     return settings
@@ -264,6 +286,24 @@ class CampaignSupervisor:
         self.shaped = (self.output / "shaping_active.json").exists()
         self.target: int | None = None
         self.baseline_rtt_ms: float | None = None
+        checkpoint = settings.get("checkpoint") or {}
+        self.checkpoint = (
+            S3Checkpoint(
+                str(checkpoint["s3_uri"]),
+                region=checkpoint.get("region"),
+                profile=checkpoint.get("profile"),
+            )
+            if checkpoint.get("s3_uri")
+            else None
+        )
+        beats = settings.get("heartbeat") or {}
+        self.heartbeats = Heartbeats(
+            edge_path=beats.get("edge_path"),
+            cloud_path=beats.get("cloud_path"),
+            cloud_runner=remote,
+            cloud_every_s=float(beats.get("cloud_every_s", 300)),
+        )
+        self.warnings: list[str] = []
 
     def _network(self, settings: dict[str, Any], root: Path, remote: Any) -> Any:
         """Whole-interface netem (physical pair) or classified netem (AWS)."""
@@ -291,6 +331,10 @@ class CampaignSupervisor:
     # -- status and child processes -------------------------------------
 
     def status(self, state: str, **extra: Any) -> None:
+        warning = self.heartbeats.beat()
+        if warning:
+            self.warnings.append(f"{now()} {warning}")
+            log(warning)
         payload = {
             "updated_at_utc": now(),
             "pid": os.getpid(),
@@ -298,6 +342,7 @@ class CampaignSupervisor:
             "stage": self.stage,
             "subblock": self.block,
             **progress(self.output, self.target),
+            "warnings": self.warnings[-20:],
             **extra,
         }
         write_json_atomic(self.output / "status.json", payload)
@@ -407,8 +452,7 @@ class CampaignSupervisor:
         self.output.mkdir(parents=True, exist_ok=True)
         self.check_host_memory(startup=True)
         self.status("preflight")
-        commit = checked(["git", "rev-parse", "HEAD"])
-        dirty = checked(["git", "status", "--porcelain"])
+        commit, dirty = self._source_identity()
         if dirty and not s["allow_dirty_tree"]:
             raise RuntimeError("commit or stash source changes before the campaign")
         protocol = self.grid.resolve("protocol_path")
@@ -518,6 +562,22 @@ class CampaignSupervisor:
             )
         return Path(value)
 
+    def _source_identity(self) -> tuple[str, str]:
+        """(commit, dirty description): git checkout, or the campaign image."""
+
+        if PLATFORMS[self.settings["platform"]][1] == "git":
+            return (
+                checked(["git", "rev-parse", "HEAD"]),
+                checked(["git", "status", "--porcelain"]),
+            )
+        identity = image_identity()
+        image = os.environ.get("APP_IMAGE", "")
+        if identity is None or not identity.get("commit"):
+            raise RuntimeError("not running in the campaign image (no build record)")
+        if not re.fullmatch(r"[^\s@]+@sha256:[0-9a-f]{64}", image):
+            raise RuntimeError("APP_IMAGE must be the repository@sha256 digest")
+        return str(identity["commit"]), ""
+
     def _physical_preflight(
         self,
         commit: str,
@@ -531,17 +591,34 @@ class CampaignSupervisor:
 
         s, ssh = self.settings, self._ssh
         assert ssh is not None
-        for command in ("ssh", "tc", "sudo", "iperf3", "nvidia-smi"):
+        image_mode = PLATFORMS[s["platform"]][1] == "image"
+        required = (
+            ("tc", "iperf3", "nvidia-smi", "aws")
+            if image_mode
+            else ("ssh", "tc", "sudo", "iperf3", "nvidia-smi")
+        )
+        for command in required:
             if shutil.which(command) is None:
                 raise RuntimeError(f"missing edge command: {command}")
-        if ssh(["git", "-C", s["cloud_repo"], "rev-parse", "HEAD"]) != commit or ssh(
+        if image_mode:
+            cloud_image = ssh(
+                [
+                    "docker",
+                    "inspect",
+                    "--format",
+                    "{{.Config.Image}}",
+                    s["cloud_container"],
+                ]
+            )
+            if cloud_image != os.environ.get("APP_IMAGE"):
+                raise RuntimeError("cloud must run the same image digest as the edge")
+        elif ssh(["git", "-C", s["cloud_repo"], "rev-parse", "HEAD"]) != commit or ssh(
             ["git", "-C", s["cloud_repo"], "status", "--porcelain"]
         ):
             raise RuntimeError("cloud must use the same clean source commit as edge")
         checked(
             [
-                "sudo",
-                "-n",
+                *s.get("tc_privilege", ["sudo", "-n"]),
                 "tc",
                 "qdisc",
                 "show",
@@ -549,7 +626,16 @@ class CampaignSupervisor:
                 self.grid.payload["edge_interface"],
             ]
         )
-        ssh(["sudo", "-n", "tc", "qdisc", "show", "dev", s["cloud_interface"]])
+        ssh(
+            [
+                *s.get("tc_privilege", ["sudo", "-n"]),
+                "tc",
+                "qdisc",
+                "show",
+                "dev",
+                s["cloud_interface"],
+            ]
+        )
         if config.transport.host != self.grid.payload["cloud_host"]:
             raise ValueError("experiment config and grid name different cloud hosts")
         for port in (self.grid.payload["iperf_port"], self.grid.payload["echo_port"]):
@@ -558,7 +644,7 @@ class CampaignSupervisor:
         remote_free = int(
             ssh(
                 [
-                    s["cloud_python"],
+                    *shlex.split(s["cloud_python"]),
                     "-c",
                     "import shutil; print(shutil.disk_usage("
                     f"{s['cloud_repo']!r}).free)",
@@ -577,7 +663,7 @@ class CampaignSupervisor:
         )
         runtimes = {
             "edge": json.loads(checked([s["python"], "-c", code])),
-            "cloud": json.loads(ssh([s["cloud_python"], "-c", code])),
+            "cloud": json.loads(ssh([*shlex.split(s["cloud_python"]), "-c", code])),
         }
         references = {}
         for name, (_task_config, task_manifest, task_split) in tasks.items():
@@ -700,6 +786,7 @@ class CampaignSupervisor:
             edge_dedicated_limit_mib=float(s["edge_dedicated_limit_mib"]),
             spill_margin_mib=float(s["spill_margin_mib"]),
             require_spill_evidence=bool(s["require_spill_evidence"]),
+            spill_metric=PLATFORMS[s["platform"]][0],
         )
         try:
             self.preflight()
@@ -736,6 +823,13 @@ class CampaignSupervisor:
                         log=log,
                     )
                     if report["valid"]:
+                        if self.checkpoint is not None:
+                            error = self.checkpoint.push_subblock(
+                                self.output, block.subblock_id
+                            )
+                            if error:
+                                self.warnings.append(f"{now()} checkpoint {error}")
+                                log(f"checkpoint failed (data safe on EBS): {error}")
                         break
                     log(f"{block.subblock_id} invalid: {report['reasons']}")
                 else:
@@ -771,7 +865,13 @@ class CampaignSupervisor:
         log(f"moved invalid {directory.name} to {archive}: {report['reasons']}")
 
     def smoke(self) -> None:
-        """Three-placement GPU correctness smoke on the fixture config."""
+        """Three-placement GPU correctness smoke on a few training requests.
+
+        Uses the campaign's own config (so it reaches the right cloud on either
+        platform) and a subset of the primary task's training IDs, which the
+        same-device reference covers. Validation and evaluation IDs are never
+        touched; these preflight rows are not campaign data.
+        """
 
         from adaptive_vlm.benchmark.compare import compare_runs
         from adaptive_vlm.benchmark.heterogeneous_correctness import (
@@ -787,13 +887,45 @@ class CampaignSupervisor:
             self.output / "preflights" / datetime.now(UTC).strftime("%Y%m%dT%H%M%S%f")
         )
         output.mkdir(parents=True)
+        experiment = load_experiment_config(self.config_path)
+        experiment_manifest = load_frozen_manifest(
+            experiment.dataset.manifest_path,
+            expected_revision=experiment.dataset.revision,
+        )
+        split = json.loads(self.split_path.read_text(encoding="utf-8"))
+        chosen = set(sorted(split["training_request_ids"])[: int(s["smoke_requests"])])
+        source = {
+            row["request_id"]: row
+            for row in (
+                json.loads(line)
+                for line in experiment.dataset.manifest_path.read_text(
+                    encoding="utf-8"
+                ).splitlines()
+            )
+        }
+        rows = []
+        for item in experiment_manifest.items:
+            if item.request_id in chosen:
+                row = dict(source[item.request_id])
+                row["image_path"] = str(item.image_path.resolve())
+                rows.append(row)
+        subset = output / "smoke_manifest.jsonl"
+        subset.write_text(
+            "".join(json.dumps(r, sort_keys=True) + "\n" for r in rows),
+            encoding="utf-8",
+        )
+        manifest = load_frozen_manifest(
+            subset, expected_revision=experiment.dataset.revision
+        )
         modes = ("edge", "cloud", "distributed")
         for mode in modes:
             command = [
                 s["adaptive_vlm"],
                 "benchmark",
                 "--config",
-                s["smoke_config"],
+                str(self.config_path),
+                "--manifest",
+                str(subset),
                 "--mode",
                 mode,
                 "--run-dir",
@@ -819,16 +951,7 @@ class CampaignSupervisor:
             if self.run_child(command):
                 raise RuntimeError(f"correctness smoke {mode} failed")
         compare_runs([output / m for m in modes], output=output / "comparison.json")
-        config = load_experiment_config(Path(s["smoke_config"]))
-        manifest = load_frozen_manifest(
-            config.dataset.manifest_path, expected_revision=config.dataset.revision
-        )
-        experiment = load_experiment_config(self.config_path)
         reference = self.reference_for(PRIMARY_TASK)
-        experiment_manifest = load_frozen_manifest(
-            experiment.dataset.manifest_path,
-            expected_revision=experiment.dataset.revision,
-        )
         proof = verify_reference_evidence(
             reference,
             sha256(reference),

@@ -47,6 +47,11 @@ class Gates:
     edge_dedicated_limit_mib: float = 3960.0
     spill_margin_mib: float = 128.0
     require_spill_evidence: bool = True
+    # Which snapshot field shows edge GPU memory pressure at L0. On Windows/WSL
+    # a spill shows as WDDM dedicated usage reaching the adapter maximum; on
+    # Linux there is no spill, only NVML used memory approaching the usable
+    # limit, followed by CUDA OOM (counted as a failure either way).
+    spill_metric: str = "edge_windows_gpu_dedicated_mib"
 
 
 class SubBlockAborted(RuntimeError):
@@ -235,18 +240,27 @@ def run_subblock(
     ]
     if block.load_level == NO_LOAD:
         limit = gates.edge_dedicated_limit_mib - gates.spill_margin_mib
-        dedicated = [s.get("edge_windows_gpu_dedicated_mib") for s in snapshots]
+        dedicated = [s.get(gates.spill_metric) for s in snapshots]
         if any(value is None for value in dedicated):
             if gates.require_spill_evidence:
-                reasons.append("edge spill not verifiable: missing dedicated usage")
+                reasons.append(
+                    f"edge spill not verifiable: missing {gates.spill_metric}"
+                )
         elif (
             dedicated
             and (peak := max(float(v) for v in dedicated if v is not None)) >= limit
         ):
             reasons.append(
-                f"edge spill: dedicated usage reached {peak:.0f} MiB "
+                f"edge spill: {gates.spill_metric} reached {peak:.0f} MiB "
                 f"(limit {limit:.0f})"
             )
+        oom = sum(
+            row.get("status") == "oom"
+            for placement in PLACEMENTS
+            for row in _rows(run_dir / placement / "requests.jsonl")
+        )
+        if oom:
+            reasons.append(f"edge out of GPU memory in {oom} attempts at L0")
     elif snapshots:
         for label, state in (("first", snapshots[0]), ("last", snapshots[-1])):
             if state.get("edge_load_alive") is not True:
