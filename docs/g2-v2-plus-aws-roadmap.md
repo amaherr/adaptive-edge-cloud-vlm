@@ -213,9 +213,10 @@ On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge
 | VPC `10.42.0.0/16` and its S3 gateway endpoint | present | free | keep (reused by C2) |
 | Interface endpoints | none | — | — |
 | S3: state bucket and artifact bucket (a few KB of old Vultr acceptance records) | present | cents | keep |
-| ECR `adaptive-vlm-cloud-v1`: two copies of a 4.0 GB image from 5 November | present | ~$0.80/month | delete after C4 pushes the new image (or now) |
+| ECR `adaptive-vlm-cloud-v1`: two copies of a 4.0 GB image from 5 November | **deleted 17 November** (repository kept, now empty) | was ~$0.80/month | — |
 | Budget `adaptive-vlm-cloud-v1` ($20) and SNS alerts | present | free | replace with the $180 budget and stop action in C2 |
-| Old Vultr watchdog: Lambda every 5 min, EventBridge rule, CodeBuild teardown project, 2 alarms, SNS topic, SSM SecureString holding a **Vultr API key** | present | ~$0.20/month | delete once the Vultr account is confirmed empty; revoke the key at Vultr |
+| Old Vultr watchdog: Lambda every 5 min, EventBridge rule, CodeBuild teardown project, 2 alarms, SNS topic, SSM SecureString holding a **Vultr API key** | **deleted 17 November** | was ~$0.20/month | revoke the key in the Vultr account |
+| Vultr leftovers not deleted: IAM roles `adaptive-vlm-vultr-{image-pull,teardown,watchdog}`, two log groups (~0.6 MB), ~2,900 KB-sized acceptance records under `research/adaptive-vlm/vultr-v1/` in the artifact bucket | present | free or cents | optional cleanup |
 | On-demand G/VT vCPU quota | **16** | — | exactly `g6f.2xlarge` (8) + `g6.2xlarge` (8) |
 | Spot G/VT vCPU quota | **0** | — | no spot |
 | Spend | October $0.00; 1–17 November **$0.20** (ECR $0.14, S3 $0.03, tax $0.03) | — | — |
