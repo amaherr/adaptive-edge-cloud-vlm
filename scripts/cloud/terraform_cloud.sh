@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bridge native AWS CLI login/SSO into the pinned Terraform provider.
 set -euo pipefail
-repository=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+repository=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 mkdir -p "$repository/infra/local"
 export CLOUD_AWS_SOURCE_PROFILE=${CLOUD_AWS_SOURCE_PROFILE:-cloud-infrastructure}
 export AWS_CONFIG_FILE="$repository/infra/local/aws-config"

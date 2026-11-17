@@ -6,23 +6,16 @@ resource "aws_security_group" "node" {
   name_prefix = "cloud-v1-${each.key}-"
   vpc_id      = var.vpc_id
 }
-resource "aws_vpc_security_group_egress_rule" "https_vpc" {
+# Decision D9: HTTPS out to AWS public endpoints (SSM, ECR, S3, CloudWatch).
+# There is no inbound rule from the internet.
+resource "aws_vpc_security_group_egress_rule" "https" {
   for_each          = aws_security_group.node
   security_group_id = each.value.id
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_ipv4         = "10.42.0.0/16"
+  cidr_ipv4         = "0.0.0.0/0"
 }
-resource "aws_vpc_security_group_egress_rule" "https_s3" {
-  for_each          = aws_security_group.node
-  security_group_id = each.value.id
-  ip_protocol       = "tcp"
-  from_port         = 443
-  to_port           = 443
-  prefix_list_id    = data.aws_prefix_list.s3.id
-}
-data "aws_prefix_list" "s3" { name = "com.amazonaws.${data.aws_region.current.name}.s3" }
 data "aws_region" "current" {}
 resource "aws_security_group_rule" "inference" {
   for_each                 = toset(["5050", "5051", "5052"])
@@ -61,7 +54,19 @@ resource "aws_iam_role_policy" "app" {
     { Effect = "Allow", Action = ["ecr:GetAuthorizationToken"], Resource = "*" },
     { Effect = "Allow", Action = ["ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer", "ecr:BatchCheckLayerAvailability"], Resource = var.ecr_arn },
     { Effect = "Allow", Action = ["s3:ListBucket"], Resource = var.bucket_arn, Condition = { StringLike = { "s3:prefix" = ["cloud-v1/*"] } } },
-    { Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject"], Resource = "${var.bucket_arn}/cloud-v1/${each.key}/*" }
+    { Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject"], Resource = "${var.bucket_arn}/cloud-v1/${each.key}/*" },
+    # Phase C5: both hosts seed their data volume from the shared prefix.
+    { Effect = "Allow", Action = ["s3:GetObject"], Resource = "${var.bucket_arn}/cloud-v1/data/*" }
+  ] })
+}
+# Decision D3: the edge supervisor controls the cloud host through SSM
+# (tc, docker exec, cloud load, heartbeat), and nothing else.
+resource "aws_iam_role_policy" "edge_ssm" {
+  role = aws_iam_role.node["edge"].id
+  policy = jsonencode({ Version = "2012-10-17", Statement = [
+    { Effect = "Allow", Action = ["ssm:SendCommand"], Resource = "arn:aws:ssm:${data.aws_region.current.name}::document/AWS-RunShellScript" },
+    { Effect = "Allow", Action = ["ssm:SendCommand"], Resource = "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:instance/*", Condition = { StringEquals = { "ssm:resourceTag/Role" = "cloud", "ssm:resourceTag/Project" = "adaptive-edge-cloud-vlm" } } },
+    { Effect = "Allow", Action = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations"], Resource = "*" }
   ] })
 }
 resource "aws_iam_instance_profile" "node" {

@@ -133,6 +133,20 @@ Follow [g2-v2-plus-plan.md](g2-v2-plus-plan.md) for B1, B2, B4, B5, B7 and B8, w
   - Partitions record the configurations, C1 level and int8 decision. They refuse a grid with int8 unless the contract says `int8_admitted: true`.
 
 ### Phase C: infrastructure (about 1–1.5 days, mostly waiting on applies and builds)
+
+**Status (17 November 2026):**
+- **C1, done:**
+  - The inventory is in section 8. Spend is $0.21 to date, with nothing running.
+  - Terraform 1.10.5 is installed in WSL (`~/.local/bin`, checked against HashiCorp's SHA256SUMS).
+  - `scripts/cloud/terraform_cloud.sh` now finds the repository root again; the A1 move had broken it.
+  - Before any change, both stacks re-planned clean against the 5 November state.
+- **C2, applied:**
+  - **Retained stack:** the budget is now a $180 annual budget from 1 November 2026, so it accumulates instead of resetting. It alerts at actual $60, $110 and $150, and on a forecast above $180.
+  - **cloud-v1 stack:** an internet gateway and default route; HTTPS egress to 0.0.0.0/0, replacing the VPC and S3 prefix-list rules; no inbound rules. The edge role may run `AWS-RunShellScript` through SSM only on the instance tagged `Role=cloud`. Both roles may read `cloud-v1/data/*`.
+  - **Code changes:** interface endpoints are refused by validation (D9), and the root volume is 30 GiB. A budget action at $165 that stops both instances is created with compute (C6). The data volumes default to 20 GiB, provisioned in C5. The watchdog ceiling is 14 h (D8).
+  - Re-planned clean after apply. The Terraform tests pass (retained 2, cloud-v1 6, host-image 1).
+- **C3:** the host-image recipe is now 1.1.0, with a 30 GiB root. It is one AMI for both roles: GRID 580.159.03, which also drives the L4 on G6.
+
 1. **C1 Account preflight and inventory.** Run `account-preflight`: quota (on-demand **and spot**), both instance types offered in the chosen AZ, current prices.
    - **First, before anything else:** list what still exists from 5 November (endpoints, volumes, ECR, buckets, budgets) and **destroy whatever is accruing cost and not needed**. Seven forgotten interface endpoints alone cost about $1.68 a day.
 2. **C2 Foundation.** Refresh the `cloud-v1` plan:

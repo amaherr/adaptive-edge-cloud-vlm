@@ -35,7 +35,13 @@ variable "enable_private_endpoints" {
   type        = bool
   default     = false
   validation {
-    condition     = !var.enable_compute || var.enable_private_endpoints
-    error_message = "Private GPU nodes require SSM/ECR/logging endpoints."
+    # Decision D9: nodes reach SSM/ECR/S3 through their public IPv4 instead.
+    condition     = !var.enable_private_endpoints
+    error_message = "Interface endpoints are replaced by outbound public IPv4 (D9)."
   }
+}
+variable "budget_stop_usd" {
+  description = "Decision D7: AWS Budgets stops both instances above this actual spend."
+  type        = number
+  default     = 165
 }

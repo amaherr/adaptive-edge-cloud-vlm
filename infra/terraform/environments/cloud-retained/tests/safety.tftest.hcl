@@ -17,7 +17,7 @@ run "paired_encrypted_data_volumes" {
   command = plan
   variables { provision_data_volumes = true }
   assert {
-    condition     = length(aws_ebs_volume.data) == 2 && alltrue([for role, v in aws_ebs_volume.data : v.encrypted && v.size == 50 && v.type == "gp3" && v.availability_zone == "us-east-1a"])
-    error_message = "Provision exactly two encrypted 50 GiB gp3 volumes in the selected AZ."
+    condition     = length(aws_ebs_volume.data) == 2 && alltrue([for role, v in aws_ebs_volume.data : v.encrypted && v.size == 20 && v.type == "gp3" && v.availability_zone == "us-east-1a"])
+    error_message = "Provision exactly two encrypted 20 GiB gp3 volumes in the selected AZ (D11)."
   }
 }

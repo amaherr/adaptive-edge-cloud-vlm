@@ -12,7 +12,16 @@ resource "aws_subnet" "this" {
   availability_zone       = var.az
   map_public_ip_on_launch = false
 }
+# Decision D9: outbound through a public IPv4 per node instead of interface
+# endpoints ($0.07/h each, even with compute off). Security groups allow no
+# inbound from the internet.
+resource "aws_internet_gateway" "this" { vpc_id = aws_vpc.this.id }
 resource "aws_route_table" "this" { vpc_id = aws_vpc.this.id }
+resource "aws_route" "internet" {
+  route_table_id         = aws_route_table.this.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this.id
+}
 resource "aws_route_table_association" "this" {
   subnet_id      = aws_subnet.this.id
   route_table_id = aws_route_table.this.id

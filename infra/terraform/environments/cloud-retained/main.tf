@@ -9,11 +9,12 @@ variable "provision_data_volumes" {
   default = false
 }
 variable "data_volume_gib" {
+  # Decision D11: model cache (~4 GB), images, manifests and campaign output.
   type    = number
-  default = 50
+  default = 20
   validation {
-    condition     = var.data_volume_gib >= 30 && var.data_volume_gib == floor(var.data_volume_gib)
-    error_message = "Choose an integer data volume capacity of at least 30 GiB."
+    condition     = var.data_volume_gib >= 20 && var.data_volume_gib == floor(var.data_volume_gib)
+    error_message = "Choose an integer data volume capacity of at least 20 GiB."
   }
 }
 provider "aws" {
@@ -44,5 +45,6 @@ output "bucket_arn" { value = module.storage.bucket_arn }
 output "ecr_arn" { value = module.storage.ecr_arn }
 output "ecr_url" { value = module.storage.ecr_url }
 output "monthly_budget_usd" { value = var.monthly_budget_usd }
+output "budget_name" { value = module.budgets.name }
 output "availability_zone" { value = var.availability_zone }
 output "volume_ids" { value = { for role, volume in aws_ebs_volume.data : role => volume.id } }

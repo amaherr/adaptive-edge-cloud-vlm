@@ -9,7 +9,7 @@ variable "enable_build" {
 }
 variable "recipe_version" {
   type    = string
-  default = "1.0.0"
+  default = "1.1.0" # 1.1.0: 30 GiB root (decision D11)
 }
 variable "availability_zone" {
   type    = string
@@ -95,7 +95,7 @@ resource "aws_imagebuilder_image_recipe" "runtime" {
   block_device_mapping {
     device_name = "/dev/sda1"
     ebs {
-      volume_size           = 40
+      volume_size           = 30
       volume_type           = "gp3"
       encrypted             = true
       delete_on_termination = true

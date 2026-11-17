@@ -45,6 +45,42 @@ module "compute" {
   cloud_instance_type = var.cloud_instance_type
   depends_on          = [data.terraform_remote_state.retained]
 }
+# Decision D7: above budget_stop_usd of actual spend, AWS Budgets stops both
+# instances (it does not cap billing; EBS and S3 keep accruing).
+resource "aws_iam_role" "budget_action" {
+  count              = var.enable_compute ? 1 : 0
+  name_prefix        = "cloud-v1-budget-stop-"
+  assume_role_policy = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Principal = { Service = "budgets.amazonaws.com" }, Action = "sts:AssumeRole" }] })
+}
+resource "aws_iam_role_policy_attachment" "budget_action" {
+  count      = var.enable_compute ? 1 : 0
+  role       = aws_iam_role.budget_action[0].name
+  policy_arn = "arn:aws:iam::aws:policy/AWSBudgetsActions_RolePolicyForResourceAdministrationWithSSM"
+}
+resource "aws_budgets_budget_action" "stop" {
+  count              = var.enable_compute ? 1 : 0
+  budget_name        = data.terraform_remote_state.retained.outputs.budget_name
+  action_type        = "RUN_SSM_DOCUMENTS"
+  approval_model     = "AUTOMATIC"
+  notification_type  = "ACTUAL"
+  execution_role_arn = aws_iam_role.budget_action[0].arn
+  action_threshold {
+    action_threshold_type  = "ABSOLUTE_VALUE"
+    action_threshold_value = var.budget_stop_usd
+  }
+  definition {
+    ssm_action_definition {
+      action_sub_type = "STOP_EC2_INSTANCES"
+      region          = var.region
+      instance_ids    = values(module.compute.instance_ids)
+    }
+  }
+  subscriber {
+    address           = var.notification_email
+    subscription_type = "EMAIL"
+  }
+  depends_on = [aws_iam_role_policy_attachment.budget_action]
+}
 module "observability" {
   source       = "../../modules/observability"
   instances    = module.compute.instance_ids

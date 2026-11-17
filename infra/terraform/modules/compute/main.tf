@@ -44,7 +44,7 @@ resource "aws_instance" "node" {
   instance_type               = each.value
   subnet_id                   = var.subnet_id
   private_ip                  = each.key == "edge" ? "10.42.1.10" : "10.42.1.20"
-  associate_public_ip_address = false
+  associate_public_ip_address = true # D9: outbound only; no inbound rules
   vpc_security_group_ids      = [var.groups[each.key]]
   iam_instance_profile        = var.profiles[each.key]
   metadata_options {
@@ -55,7 +55,7 @@ resource "aws_instance" "node" {
   root_block_device {
     encrypted   = true
     volume_type = "gp3"
-    volume_size = 40
+    volume_size = 30 # D11
   }
   user_data = local.cloud_init[each.key]
   tags      = { Role = each.key }

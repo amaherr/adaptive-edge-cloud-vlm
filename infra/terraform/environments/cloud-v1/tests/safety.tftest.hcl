@@ -4,7 +4,7 @@ override_data {
   values = { outputs = {
     bucket_name        = "test-cloud-vlm-artifacts", bucket_arn = "arn:aws:s3:::test-cloud-vlm-artifacts",
     ecr_arn            = "arn:aws:ecr:us-east-1:123456789012:repository/test", ecr_url = "123456789012.dkr.ecr.us-east-1.amazonaws.com/test",
-    monthly_budget_usd = 50, availability_zone = "us-east-1a",
+    monthly_budget_usd = 50, availability_zone = "us-east-1a", budget_name = "test-budget",
     volume_ids         = { edge = "vol-0123456789abcdef0", cloud = "vol-0123456789abcdef1" }
   } }
 }
@@ -30,7 +30,13 @@ run "foundation_has_no_gpu" {
 run "launch_requires_approval" {
   command = plan
   variables { enable_compute = true }
-  expect_failures = [var.launch_approved, var.enable_private_endpoints]
+  expect_failures = [var.launch_approved]
+}
+
+run "interface_endpoints_are_refused" {
+  command = plan
+  variables { enable_private_endpoints = true }
+  expect_failures = [var.enable_private_endpoints]
 }
 
 run "foundation_has_no_hourly_endpoints" {
@@ -44,13 +50,16 @@ run "foundation_has_no_hourly_endpoints" {
 run "approved_pair_plan" {
   command = plan
   variables {
-    enable_compute           = true
-    enable_private_endpoints = true
-    launch_approved          = true
+    enable_compute  = true
+    launch_approved = true
   }
   assert {
-    condition     = length(module.compute.instance_ids) == 2 && module.network.interface_endpoint_count == 7
-    error_message = "Approved deployment requires exactly two nodes and seven private endpoints."
+    condition     = length(module.compute.instance_ids) == 2 && module.network.interface_endpoint_count == 0
+    error_message = "Approved deployment has exactly two nodes and no interface endpoints (D9)."
+  }
+  assert {
+    condition     = length(aws_budgets_budget_action.stop) == 1 && aws_budgets_budget_action.stop[0].action_threshold[0].action_threshold_value == 165
+    error_message = "A launched pair needs the budget stop action at $165 (D7)."
   }
 }
 run "runtime_templates_render" {
