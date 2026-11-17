@@ -426,7 +426,7 @@ def test_settings_validation(tmp_path: Path) -> None:
     )
     path = tmp_path / "settings.json"
     path.write_text(json.dumps(base))
-    with pytest.raises(ValueError, match="set cloud_ssh"):
+    with pytest.raises(ValueError, match="cloud_ssh"):
         load_settings(path, ROOT)
     filled = {
         **base,

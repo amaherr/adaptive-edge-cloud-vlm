@@ -34,8 +34,8 @@ from adaptive_vlm.campaign.network import (
     LoopbackNetwork,
     PhysicalNetwork,
     is_default_qdisc,
-    ssh_runner,
 )
+from adaptive_vlm.campaign.remote import Runner, runner_from_settings
 from adaptive_vlm.campaign.subblock import (
     Gates,
     check_completed,
@@ -130,8 +130,10 @@ def load_settings(path: Path, root: Path) -> dict[str, Any]:
         "min_free_gb",
     ]
     if settings["mode"] == "physical":
+        legacy = str(settings.get("cloud_ssh") or "")
+        if not settings.get("cloud_access") and (not legacy or "REPLACE" in legacy):
+            raise ValueError(f"set cloud_access (ssm or ssh) or cloud_ssh in {path}")
         required += [
-            "cloud_ssh",
             "cloud_repo",
             "cloud_python",
             "cloud_interface",
@@ -247,10 +249,12 @@ class CampaignSupervisor:
             else self.grid.resolve("edge_load_levels_path")
         )
         self.physical = settings["mode"] == "physical"
+        # The cloud runner is SSH on the physical pair and SSM on AWS.
+        remote: Runner | None = (
+            runner_from_settings(settings) if self.physical else None
+        )
         self._ssh = ssh or (
-            (lambda command: ssh_runner(settings["cloud_ssh"])(command).strip())
-            if self.physical
-            else None
+            (lambda command: remote(command).strip()) if remote is not None else None
         )
         self.network = network or (
             PhysicalNetwork(
@@ -261,9 +265,9 @@ class CampaignSupervisor:
                 echo_port=int(self.grid.payload["echo_port"]),
                 limit_packets=int(self.grid.payload["netem_limit_packets"]),
                 echo_script=root / "scripts/network/tcp_rtt_probe.py",
-                remote=ssh_runner(settings["cloud_ssh"]),
+                remote=remote,
             )
-            if self.physical
+            if remote is not None
             else LoopbackNetwork()
         )
         self.child: subprocess.Popen[Any] | None = None

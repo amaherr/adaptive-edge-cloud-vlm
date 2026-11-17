@@ -200,27 +200,9 @@ def _run(command: Sequence[str]) -> str:
 def ssh_runner(target: str, *, timeout: float = 90) -> Runner:
     """Run a command on the cloud Linux host over key-based SSH."""
 
-    import shlex
+    from adaptive_vlm.campaign.remote import SshRunner
 
-    def run(command: Sequence[str]) -> str:
-        result = subprocess.run(
-            [
-                "ssh",
-                "-oBatchMode=yes",
-                "-oConnectTimeout=10",
-                "-oServerAliveInterval=15",
-                "-oServerAliveCountMax=2",
-                target,
-                shlex.join(command),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-        return result.stdout
-
-    return run
+    return SshRunner(target, timeout=timeout)
 
 
 class PhysicalNetwork:
