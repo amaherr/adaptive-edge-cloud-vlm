@@ -40,6 +40,11 @@ variable "enable_private_endpoints" {
     error_message = "Interface endpoints are replaced by outbound public IPv4 (D9)."
   }
 }
+variable "build_http_egress" {
+  description = "Phase C4 only: let the edge reach Debian's HTTP mirrors while it builds the image; turn off after."
+  type        = bool
+  default     = false
+}
 variable "budget_stop_usd" {
   description = "Decision D7: AWS Budgets stops both instances above this actual spend."
   type        = number

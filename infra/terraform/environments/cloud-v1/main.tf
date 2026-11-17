@@ -26,6 +26,8 @@ module "security" {
   vpc_id     = module.network.vpc_id
   bucket_arn = data.terraform_remote_state.retained.outputs.bucket_arn
   ecr_arn    = data.terraform_remote_state.retained.outputs.ecr_arn
+
+  build_http_egress = var.build_http_egress
 }
 module "compute" {
   source              = "../../modules/compute"

@@ -62,10 +62,12 @@ write_files:
       [Install]
       WantedBy=timers.target
 runcmd:
-  - [bash, /usr/local/sbin/cloud-vlm-mount-data, "${data_volume_id}"]
-  - [mkdir, -p, /var/lib/adaptive-vlm]
+  # The cost guard comes first: Terraform may attach the data volume minutes
+  # after boot, and a failed mount must never leave the watchdog disabled.
   - [systemctl, daemon-reload]
   - [systemctl, enable, --now, cloud-vlm-watchdog.timer]
+  - [bash, /usr/local/sbin/cloud-vlm-mount-data, "${data_volume_id}"]
+  - [mkdir, -p, /var/lib/adaptive-vlm]
   - [nvidia-smi]
   - [nvidia-ctk, runtime, configure, --runtime=docker]
   - [systemctl, restart, docker]

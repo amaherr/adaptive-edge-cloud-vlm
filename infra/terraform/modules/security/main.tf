@@ -1,6 +1,11 @@
 variable "vpc_id" { type = string }
 variable "bucket_arn" { type = string }
 variable "ecr_arn" { type = string }
+variable "build_http_egress" {
+  description = "Open HTTP (80) out of the edge only while it builds the app image (Debian apt)."
+  type        = bool
+  default     = false
+}
 resource "aws_security_group" "node" {
   for_each    = toset(["edge", "cloud"])
   name_prefix = "cloud-v1-${each.key}-"
@@ -14,6 +19,14 @@ resource "aws_vpc_security_group_egress_rule" "https" {
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
+resource "aws_vpc_security_group_egress_rule" "build_http" {
+  count             = var.build_http_egress ? 1 : 0
+  security_group_id = aws_security_group.node["edge"].id
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
   cidr_ipv4         = "0.0.0.0/0"
 }
 data "aws_region" "current" {}
@@ -66,7 +79,10 @@ resource "aws_iam_role_policy" "edge_ssm" {
   policy = jsonencode({ Version = "2012-10-17", Statement = [
     { Effect = "Allow", Action = ["ssm:SendCommand"], Resource = "arn:aws:ssm:${data.aws_region.current.name}::document/AWS-RunShellScript" },
     { Effect = "Allow", Action = ["ssm:SendCommand"], Resource = "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:instance/*", Condition = { StringEquals = { "ssm:resourceTag/Role" = "cloud", "ssm:resourceTag/Project" = "adaptive-edge-cloud-vlm" } } },
-    { Effect = "Allow", Action = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations"], Resource = "*" }
+    { Effect = "Allow", Action = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations"], Resource = "*" },
+    # Phase C4: the edge builds the app image from a committed source archive
+    # and pushes it; both hosts then run it by digest (D5).
+    { Effect = "Allow", Action = ["ecr:InitiateLayerUpload", "ecr:UploadLayerPart", "ecr:CompleteLayerUpload", "ecr:PutImage"], Resource = var.ecr_arn }
   ] })
 }
 resource "aws_iam_instance_profile" "node" {

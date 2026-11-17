@@ -5,7 +5,9 @@ volume_id=${1:?Usage: mount-data.sh vol-ID}
 [[ "$volume_id" =~ ^vol-[0-9a-f]+$ ]] || exit 2
 serial=${volume_id//-/}
 device="/dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_$serial"
-for ((attempt=0; attempt<120; attempt++)); do
+# Terraform attaches the volume after the instance is running, which can be
+# minutes after boot (17 November 2026: about 10 minutes); wait up to 15.
+for ((attempt=0; attempt<450; attempt++)); do
   [ -b "$device" ] && break
   sleep 2
 done
