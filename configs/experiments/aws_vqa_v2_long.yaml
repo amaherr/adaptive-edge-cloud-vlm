@@ -3,7 +3,7 @@ name: aws-vqa-v2-long
 mode: cloud
 model_config: ../model/moondream2.yaml
 edge_hardware_config: ../hardware/aws_edge_g6f_2xlarge.yaml
-cloud_hardware_config: ../hardware/aws_cloud_g6_2xlarge.yaml
+cloud_hardware_config: ../hardware/aws_cloud_g6_xlarge.yaml
 dataset:
   manifest_path: ../../data/manifests/physical_vqa_v2/physical_vqa_v2_long.jsonl
   revision: vqa-v2-val2014-physical-v2-long

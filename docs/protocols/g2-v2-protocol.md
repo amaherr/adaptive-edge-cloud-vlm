@@ -332,3 +332,7 @@ The rationale and work plan are in [g2-v2-plus-plan.md](../g2-v2-plus-plan.md) a
 14. **Residency.** Resident if the model fits with peak reserved memory at most 90% of usable VRAM; otherwise swap. Decided from rule 10's fit runs.
 
 **A2a-1 (17 November 2026, before any AWS measurement).** The account's on-demand G/VT quota is 16 vCPU and its spot quota is 0. `g6f.4xlarge` (16 vCPU) therefore cannot run next to the cloud. The edge order in rule 1 becomes `g6f.2xlarge`, then `g4dn.xlarge`; `g6f.4xlarge` is tried only if the quota is raised. All instances are on demand.
+
+**A2a-2 (17 November 2026, before any AWS measurement).** The cloud is `g6.xlarge`: the same full L4 as `g6.2xlarge`, with 4 vCPU and 16 GiB instead of 8 and 32, at $0.805/h instead of $0.978/h.
+
+**CPU headroom guard.** In phase D, run 100 `cloud/raw_image` requests with the server, the probes and the C1 worker all running. If the cloud's median CPU utilization during requests exceeds 70%, or any request waits on CPU-bound preprocessing for more than 5% of its server time, the cloud becomes `g6.2xlarge` before any calibration. The guard's result is recorded in A2b.

@@ -28,20 +28,22 @@ module "security" {
   ecr_arn    = data.terraform_remote_state.retained.outputs.ecr_arn
 }
 module "compute" {
-  source         = "../../modules/compute"
-  region         = var.region
-  enabled        = var.enable_compute
-  approved       = var.launch_approved && data.terraform_remote_state.retained.outputs.monthly_budget_usd == var.monthly_budget_usd && data.terraform_remote_state.retained.outputs.bucket_name == var.artifact_bucket_name
-  subnet_id      = module.network.subnet_id
-  az             = var.availability_zone
-  amis           = { edge = var.edge_ami_id, cloud = var.cloud_ami_id }
-  groups         = module.security.groups
-  profiles       = module.security.profiles
-  volume_ids     = data.terraform_remote_state.retained.outputs.volume_ids
-  data_volume_az = data.terraform_remote_state.retained.outputs.availability_zone
-  max_hours      = var.experiment_max_runtime_hours
-  idle_minutes   = var.idle_timeout_minutes
-  depends_on     = [data.terraform_remote_state.retained]
+  source              = "../../modules/compute"
+  region              = var.region
+  enabled             = var.enable_compute
+  approved            = var.launch_approved && data.terraform_remote_state.retained.outputs.monthly_budget_usd == var.monthly_budget_usd && data.terraform_remote_state.retained.outputs.bucket_name == var.artifact_bucket_name
+  subnet_id           = module.network.subnet_id
+  az                  = var.availability_zone
+  amis                = { edge = var.edge_ami_id, cloud = var.cloud_ami_id }
+  groups              = module.security.groups
+  profiles            = module.security.profiles
+  volume_ids          = data.terraform_remote_state.retained.outputs.volume_ids
+  data_volume_az      = data.terraform_remote_state.retained.outputs.availability_zone
+  max_hours           = var.experiment_max_runtime_hours
+  idle_minutes        = var.idle_timeout_minutes
+  edge_instance_type  = var.edge_instance_type
+  cloud_instance_type = var.cloud_instance_type
+  depends_on          = [data.terraform_remote_state.retained]
 }
 module "observability" {
   source       = "../../modules/observability"

@@ -6,6 +6,14 @@ variable "notification_email" { type = string }
 variable "edge_ami_id" { type = string }
 variable "cloud_ami_id" { type = string }
 variable "experiment_max_runtime_hours" { type = number }
+variable "edge_instance_type" {
+  type    = string
+  default = "g6f.2xlarge"
+}
+variable "cloud_instance_type" {
+  type    = string
+  default = "g6.xlarge"
+}
 variable "idle_timeout_minutes" { type = number }
 variable "enable_compute" {
   type    = bool

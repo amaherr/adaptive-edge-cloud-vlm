@@ -33,7 +33,7 @@ def collect(aws: str, profile: str, region: str) -> dict:
         return json.loads(result.stdout)
 
     identity = call("sts", "get-caller-identity")
-    types = ("g6f.2xlarge", "g6.2xlarge")
+    types = ("g6f.2xlarge", "g4dn.xlarge", "g6.xlarge", "g6.2xlarge")
     offerings = {}
     prices = {}
     for instance_type in types:

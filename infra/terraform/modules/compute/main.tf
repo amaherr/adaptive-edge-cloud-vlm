@@ -21,7 +21,23 @@ variable "idle_minutes" {
     error_message = "Idle timeout must be at least five minutes."
   }
 }
-locals { nodes = var.enabled ? { edge = "g6f.2xlarge", cloud = "g6.2xlarge" } : {} }
+variable "edge_instance_type" {
+  type = string
+  validation {
+    # Protocol A2a rule 1 and note A2a-1: the edge order is g6f.2xlarge, then g4dn.xlarge.
+    condition     = contains(["g6f.2xlarge", "g4dn.xlarge"], var.edge_instance_type)
+    error_message = "Edge must be g6f.2xlarge or g4dn.xlarge (protocol A2a-1)."
+  }
+}
+variable "cloud_instance_type" {
+  type = string
+  validation {
+    # Note A2a-2: g6.xlarge unless phase D shows the CPU headroom guard failing.
+    condition     = contains(["g6.xlarge", "g6.2xlarge"], var.cloud_instance_type)
+    error_message = "Cloud must be g6.xlarge or g6.2xlarge (protocol A2a-2)."
+  }
+}
+locals { nodes = var.enabled ? { edge = var.edge_instance_type, cloud = var.cloud_instance_type } : {} }
 resource "aws_instance" "node" {
   for_each                    = local.nodes
   ami                         = var.amis[each.key]

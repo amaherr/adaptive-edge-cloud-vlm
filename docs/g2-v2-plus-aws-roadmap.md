@@ -8,7 +8,7 @@ The physical results are unaffected: G2 and its analysis stay as they are, as th
 
 | | Virtual edge | Cloud |
 | --- | --- | --- |
-| Instance | `g6f.2xlarge`: ¼ NVIDIA L4 (time-sliced vGPU, ~5.6 GiB usable), 8 vCPU, 32 GiB; fallback `g4dn.xlarge` (full T4, 4 vCPU). `g6f.4xlarge` needs 16 vCPU and doesn't fit the 16-vCPU quota next to the cloud (section 8) | `g6.2xlarge`: full L4, 24 GiB, 8 vCPU, 32 GiB |
+| Instance | `g6f.2xlarge`: ¼ NVIDIA L4 (time-sliced vGPU, ~5.6 GiB usable), 8 vCPU, 32 GiB; fallback `g4dn.xlarge` (full T4, 4 vCPU). `g6f.4xlarge` needs 16 vCPU and doesn't fit the 16-vCPU quota next to the cloud (section 8) | `g6.xlarge`: full L4, 24 GiB, 4 vCPU, 16 GiB (protocol A2a-2); `g6.2xlarge` only if phase D's CPU headroom guard fails |
 | Driver | GRID (required on G6f), baked into a reviewed AMI | Tesla/datacenter driver, baked into a reviewed AMI |
 | Software | One digest-pinned image from ECR, run as the edge and cloud roles | Same image |
 | Data | Encrypted data EBS volume per host, holding the model cache, images and manifests, seeded from S3 | Same |
@@ -152,7 +152,7 @@ That is about 12–14 working days, with the critical path through A → D → E
 
 ## 6. Cost: a $180 ceiling
 
-On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge` $0.475/h, `g6.2xlarge` $0.978/h. Spot is typically 50–70% lower where available.
+On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge` $0.475/h, `g6.xlarge` $0.805/h, so **$1.28/h for the pair**. Spot is typically 50–70% lower where available.
 
 **Which VM each step needs:**
 
@@ -174,15 +174,15 @@ On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge
 
 | Item | Cost |
 | --- | ---: |
-| Pair-hours (~50 h × $1.45) | ~$73 |
+| Pair-hours (~50 h × $1.28) | ~$64 |
 | Edge-only hours (~10 h × $0.475) | ~$5 |
-| Cloud-only hours (~2.5 h × $0.98) | ~$2.5 |
+| Cloud-only hours (~2.5 h × $0.81) | ~$2 |
 | Public IPv4 (~110 instance-hours × $0.005) | ~$0.6 |
 | EBS, 100 GiB gp3 for ~5 weeks | ~$10 |
 | S3, ECR and CloudWatch | ~$4 |
-| **G2 v2+ total** | **~$95** |
+| **G2 v2+ total** | **~$86** |
 | Reserved for G5, the dynamic evaluation (~24 h pair plus setup) | ~$50 |
-| Contingency | ~$35 |
+| Contingency | ~$44 |
 | **Ceiling** | **$180** |
 
 
@@ -217,8 +217,8 @@ On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge
 | Budget `adaptive-vlm-cloud-v1` ($20) and SNS alerts | present | free | replace with the $180 budget and stop action in C2 |
 | Old Vultr watchdog: Lambda every 5 min, EventBridge rule, CodeBuild teardown project, 2 alarms, SNS topic, SSM SecureString holding a **Vultr API key** | **deleted 17 November** | was ~$0.20/month | revoke the key in the Vultr account |
 | Vultr leftovers not deleted: IAM roles `adaptive-vlm-vultr-{image-pull,teardown,watchdog}`, two log groups (~0.6 MB), ~2,900 KB-sized acceptance records under `research/adaptive-vlm/vultr-v1/` in the artifact bucket | present | free or cents | optional cleanup |
-| On-demand G/VT vCPU quota | **16** | — | exactly `g6f.2xlarge` (8) + `g6.2xlarge` (8) |
+| On-demand G/VT vCPU quota | **16** | — | `g6f.2xlarge` (8) + `g6.xlarge` (4) uses 12 |
 | Spot G/VT vCPU quota | **0** | — | no spot |
 | Spend | October $0.00; 1–17 November **$0.20** (ECR $0.14, S3 $0.03, tax $0.03) | — | — |
 
-**Cheaper cloud, decided before any measurement.** `g6.xlarge` has the same full L4 with 4 vCPU and 16 GiB, at $0.805/h against $0.978/h. That saves about $11 over the campaign and frees 4 vCPU of quota. The cloud server needs about 4 GB of host RAM and little CPU. If adopted, this is recorded as a dated amendment before phase C.
+**Cheaper cloud, adopted 17 November (protocol A2a-2).** `g6.xlarge` has the same full L4 with 4 vCPU and 16 GiB, at $0.805/h against $0.978/h. That saves about $9–11 and frees 4 vCPU of quota. The instance types are Terraform variables restricted to the protocol's allowed types (`edge_instance_type`, `cloud_instance_type`).
