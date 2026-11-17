@@ -31,6 +31,7 @@ from adaptive_vlm.artifacts import write_json_atomic
 from adaptive_vlm.benchmark.edge_load import load_levels
 from adaptive_vlm.campaign.grid import PRIMARY_TASK, Grid, check_split, load_grid
 from adaptive_vlm.campaign.network import (
+    ClassifiedNetwork,
     LoopbackNetwork,
     PhysicalNetwork,
     is_default_qdisc,
@@ -256,26 +257,36 @@ class CampaignSupervisor:
         self._ssh = ssh or (
             (lambda command: remote(command).strip()) if remote is not None else None
         )
-        self.network = network or (
-            PhysicalNetwork(
-                edge_interface=self.grid.payload["edge_interface"],
-                cloud_interface=settings["cloud_interface"],
-                cloud_host=self.grid.payload["cloud_host"],
-                iperf_port=int(self.grid.payload["iperf_port"]),
-                echo_port=int(self.grid.payload["echo_port"]),
-                limit_packets=int(self.grid.payload["netem_limit_packets"]),
-                echo_script=root / "scripts/network/tcp_rtt_probe.py",
-                remote=remote,
-            )
-            if remote is not None
-            else LoopbackNetwork()
-        )
+        self.network = network or self._network(settings, root, remote)
         self.child: subprocess.Popen[Any] | None = None
         self.stage = "initializing"
         self.block: str | None = None
         self.shaped = (self.output / "shaping_active.json").exists()
         self.target: int | None = None
         self.baseline_rtt_ms: float | None = None
+
+    def _network(self, settings: dict[str, Any], root: Path, remote: Any) -> Any:
+        """Whole-interface netem (physical pair) or classified netem (AWS)."""
+
+        if remote is None:
+            return LoopbackNetwork()
+        common = {
+            "edge_interface": self.grid.payload["edge_interface"],
+            "cloud_interface": settings["cloud_interface"],
+            "cloud_host": self.grid.payload["cloud_host"],
+            "iperf_port": int(self.grid.payload["iperf_port"]),
+            "echo_port": int(self.grid.payload["echo_port"]),
+            "limit_packets": int(self.grid.payload["netem_limit_packets"]),
+            "echo_script": root / "scripts/network/tcp_rtt_probe.py",
+            "remote": remote,
+        }
+        if settings.get("shaping", "root") == "classified":
+            return ClassifiedNetwork(
+                edge_address=settings["edge_address"],
+                privilege=settings.get("tc_privilege", ["sudo", "-n"]),
+                **common,
+            )
+        return PhysicalNetwork(**common)
 
     # -- status and child processes -------------------------------------
 
@@ -632,7 +643,8 @@ class CampaignSupervisor:
                 raise RuntimeError(f"{name} has a foreign qdisc: {state.raw}")
         measurement = self.network.measure()
         write_json_atomic(path, measurement)
-        return measurement.get("echo_median_rtt_ms")
+        rtt = measurement.get("echo_median_rtt_ms")
+        return None if rtt is None else float(rtt)
 
     # -- execution ----------------------------------------------------------
 

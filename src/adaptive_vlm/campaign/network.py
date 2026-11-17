@@ -320,3 +320,196 @@ class LoopbackNetwork:
 
     def measure(self) -> dict[str, Any]:
         return {"collected_at_utc": datetime.now(UTC).isoformat(), "controlled": False}
+
+
+CLASSIFIED_ROOT = "7b00:"
+CLASSIFIED_NETEM = "7b01:"
+CLASSIFIED_CLASS = "7b00:3"
+
+
+def parse_qdiscs(output: str) -> list[tuple[str, str, QdiscState]]:
+    """All qdiscs in ``tc -s qdisc show`` output as (handle, parent, state).
+
+    ``parent`` is ``"root"`` for the root qdisc.
+    """
+
+    blocks: list[list[str]] = []
+    for line in output.splitlines():
+        if line.startswith("qdisc "):
+            blocks.append([line])
+        elif blocks and line.strip():
+            blocks[-1].append(line)
+    result = []
+    for block in blocks:
+        head = block[0]
+        handle = head.split()[2]
+        parent_match = re.search(r"\bparent\s+(\S+)", head)
+        parent = (
+            "root"
+            if " root " in f"{head} "
+            else (parent_match[1] if parent_match else "?")
+        )
+        result.append((handle, parent, parse_qdisc("\n".join(block))))
+    return result
+
+
+def classified_commands(
+    *,
+    interface: str,
+    peer_address: str,
+    ports: Sequence[int],
+    match_destination_port: bool,
+    rate_mbps: float,
+    delay_ms: float,
+    limit_packets: int,
+    privilege: Sequence[str] = ("sudo", "-n"),
+) -> list[list[str]]:
+    """netem only on TCP to ``peer_address`` on the experiment ports.
+
+    A prio root sends everything to band 1 (unshaped); flower filters move
+    the experiment flows to band 3, whose child is netem. The edge matches
+    destination ports (requests to the cloud's services); the cloud matches
+    source ports (its responses back to the edge).
+    """
+
+    tc = [*privilege, "tc"]
+    commands = [
+        [
+            *tc, "qdisc", "replace", "dev", interface, "root",
+            "handle", CLASSIFIED_ROOT, "prio", "bands", "3",
+            "priomap", *(["0"] * 16),
+        ],
+        [
+            *tc, "qdisc", "replace", "dev", interface,
+            "parent", CLASSIFIED_CLASS, "handle", CLASSIFIED_NETEM,
+            "netem", "delay", f"{delay_ms:g}ms", "rate", f"{rate_mbps:g}mbit",
+            "limit", str(limit_packets),
+        ],
+    ]  # fmt: skip
+    for preference, port in enumerate(ports, 10):
+        commands.append(
+            [
+                *tc, "filter", "replace", "dev", interface,
+                "parent", CLASSIFIED_ROOT, "protocol", "ip",
+                "pref", str(preference), "flower", "ip_proto", "tcp",
+                "dst_ip", peer_address,
+                "dst_port" if match_destination_port else "src_port", str(port),
+                "classid", CLASSIFIED_CLASS,
+            ]
+        )  # fmt: skip
+    return commands
+
+
+class ClassifiedNetwork(PhysicalNetwork):
+    """Shape only edge-cloud experiment traffic; management traffic is untouched.
+
+    Used on AWS, where SSM, S3 and administration share the interface with
+    the experiment. Drop accounting reads the netem child's counters.
+    """
+
+    def __init__(
+        self,
+        *,
+        edge_address: str,
+        privilege: Sequence[str] = ("sudo", "-n"),
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.edge_address = edge_address
+        self.privilege = tuple(privilege)
+        self.ports = (5050, self.iperf_port, self.echo_port)
+
+    def _all(self) -> dict[str, list[tuple[str, str, QdiscState]]]:
+        return {
+            name: parse_qdiscs(run(show_command(interface)))
+            for name, run, interface in self._peers()
+        }
+
+    def qdiscs(self) -> dict[str, QdiscState]:
+        return {
+            name: next(state for _, parent, state in entries if parent == "root")
+            for name, entries in self._all().items()
+        }
+
+    def _is_ours(self, entries: list[tuple[str, str, QdiscState]]) -> bool:
+        return any(
+            handle == CLASSIFIED_ROOT and parent == "root"
+            for handle, parent, _ in entries
+        )
+
+    def apply(self, *, rate_mbps: float, delay_ms: float, owned: bool) -> None:
+        for name, entries in self._all().items():
+            root = next(state for _, parent, state in entries if parent == "root")
+            if not is_default_qdisc(root) and not (owned and self._is_ours(entries)):
+                raise RuntimeError(
+                    f"unexpected {name} qdisc; inspect first: {root.raw}"
+                )
+        peers = {"edge": self.cloud_host, "cloud": self.edge_address}
+        for name, run, interface in self._peers():
+            for command in classified_commands(
+                interface=interface,
+                peer_address=peers[name],
+                ports=self.ports,
+                match_destination_port=name == "edge",
+                rate_mbps=rate_mbps,
+                delay_ms=delay_ms,
+                limit_packets=self.limit_packets,
+                privilege=self.privilege,
+            ):
+                run(command)
+
+    def verify(self, *, rate_mbps: float, delay_ms: float) -> dict[str, QdiscState]:
+        states: dict[str, QdiscState] = {}
+        all_entries = self._all()
+        for name, run, interface in self._peers():
+            entries = all_entries[name]
+            if not self._is_ours(entries):
+                raise RuntimeError(f"classified root missing on {name} ({interface})")
+            child = next(
+                (
+                    state
+                    for handle, parent, state in entries
+                    if handle == CLASSIFIED_NETEM and parent == CLASSIFIED_CLASS
+                ),
+                None,
+            )
+            if child is None:
+                raise RuntimeError(f"netem class missing on {name} ({interface})")
+            check_netem(
+                child,
+                interface=interface,
+                rate_mbps=rate_mbps,
+                delay_ms=delay_ms,
+                limit_packets=self.limit_packets,
+            )
+            filters = run(
+                ["tc", "filter", "show", "dev", interface, "parent", CLASSIFIED_ROOT]
+            )
+            key = "dst_port" if name == "edge" else "src_port"
+            for port in self.ports:
+                if not re.search(rf"\b{key}\s+{port}\b", filters):
+                    raise RuntimeError(f"{name} filter for port {port} is missing")
+            states[name] = child
+        return states
+
+    def clear(self) -> list[str]:
+        errors = []
+        for name, run, interface in self._peers():
+            try:
+                if self._is_ours(parse_qdiscs(run(show_command(interface)))):
+                    run(
+                        [
+                            *self.privilege,
+                            "tc",
+                            "qdisc",
+                            "del",
+                            "dev",
+                            interface,
+                            "root",
+                        ]
+                    )
+                if self._is_ours(parse_qdiscs(run(show_command(interface)))):
+                    raise RuntimeError("classified shaping remains after cleanup")
+            except Exception as exc:
+                errors.append(f"{name}: {exc}")
+        return errors

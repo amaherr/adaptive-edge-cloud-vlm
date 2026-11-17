@@ -684,3 +684,126 @@ def test_extra_task_cells_ids_and_split_rules(tmp_path: Path) -> None:
     path.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match="unknown conditions"):
         load_grid(path)
+
+
+# -- classified shaping (AWS) ---------------------------------------------------
+
+CLASSIFIED = (
+    "qdisc prio 7b00: root refcnt 2 bands 3 priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
+    " Sent 9000 bytes 40 pkt (dropped 0, overlimits 0 requeues 0)\n"
+    " backlog 0b 0p requeues 0\n"
+    "qdisc pfifo_fast 0: parent 7b00:1 bands 3 "
+    "priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1\n"
+    " Sent 100 bytes 2 pkt (dropped 0, overlimits 0 requeues 0)\n"
+    "qdisc netem 7b01: parent 7b00:3 limit 10000 delay 10ms rate 45Mbit\n"
+    " Sent 8000 bytes 30 pkt (dropped {dropped}, overlimits 0 requeues 0)\n"
+)
+
+
+class ClassifiedHost:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.shaped = False
+        self.commands: list[list[str]] = []
+        self.dropped = 0
+
+    def __call__(self, command: Any) -> str:
+        command = list(command)
+        self.commands.append(command)
+        if "filter" in command and "show" in command:
+            key = "dst_port" if self.name == "edge" else "src_port"
+            return "".join(f"  {key} {p}\n" for p in (5050, 5051, 5052))
+        if "qdisc" in command and "replace" in command:
+            self.shaped = True
+        if "qdisc" in command and "del" in command:
+            self.shaped = False
+        if "show" in command:
+            if self.shaped:
+                return CLASSIFIED.format(dropped=self.dropped)
+            return "qdisc mq 0: root\n Sent 1 bytes 1 pkt (dropped 0, overlimits 0)\n"
+        return ""
+
+
+def _classified(edge: ClassifiedHost, cloud: ClassifiedHost) -> Any:
+    from adaptive_vlm.campaign.network import ClassifiedNetwork
+
+    return ClassifiedNetwork(
+        edge_address="10.42.1.10",
+        privilege=[],
+        edge_interface="ens5",
+        cloud_interface="ens5",
+        cloud_host="10.42.1.20",
+        iperf_port=5051,
+        echo_port=5052,
+        limit_packets=10000,
+        echo_script=ROOT / "scripts/network/tcp_rtt_probe.py",
+        local=edge,
+        remote=cloud,
+    )
+
+
+def test_classified_shaping_targets_only_experiment_flows() -> None:
+    from adaptive_vlm.campaign.network import classified_commands, parse_qdiscs
+
+    commands = classified_commands(
+        interface="ens5",
+        peer_address="10.42.1.20",
+        ports=(5050, 5051, 5052),
+        match_destination_port=True,
+        rate_mbps=45,
+        delay_ms=10,
+        limit_packets=10000,
+    )
+    assert commands[0][:3] == ["sudo", "-n", "tc"] and "prio" in commands[0]
+    assert commands[1][-6:] == ["delay", "10ms", "rate", "45mbit", "limit", "10000"]
+    filters = [c for c in commands if "filter" in c]
+    assert [c[c.index("dst_port") + 1] for c in filters] == ["5050", "5051", "5052"]
+    assert all(c[c.index("dst_ip") + 1] == "10.42.1.20" for c in filters)
+    entries = parse_qdiscs(CLASSIFIED.format(dropped=4))
+    assert [(h, p) for h, p, _ in entries] == [
+        ("7b00:", "root"),
+        ("0:", "7b00:1"),
+        ("7b01:", "7b00:3"),
+    ]
+    assert entries[2][2].dropped == 4 and entries[2][2].limit_packets == 10000
+
+
+def test_classified_network_shapes_verifies_counts_drops_and_clears() -> None:
+    edge, cloud = ClassifiedHost("edge"), ClassifiedHost("cloud")
+    network = _classified(edge, cloud)
+    network.apply(rate_mbps=45, delay_ms=10, owned=False)
+    edge_filters = [c for c in edge.commands if "filter" in c and "replace" in c]
+    cloud_filters = [c for c in cloud.commands if "filter" in c and "replace" in c]
+    assert all("dst_port" in c and "10.42.1.20" in c for c in edge_filters)
+    assert all("src_port" in c and "10.42.1.10" in c for c in cloud_filters)
+    assert not any(
+        c[0] == "sudo" for c in edge.commands
+    )  # SSM and the container run as root
+    cloud.dropped = 7
+    states = network.verify(rate_mbps=45, delay_ms=10)
+    assert {k: v.dropped for k, v in states.items()} == {"edge": 0, "cloud": 7}
+    with pytest.raises(RuntimeError, match="rate"):
+        network.verify(rate_mbps=50, delay_ms=10)
+    network.apply(
+        rate_mbps=45, delay_ms=10, owned=True
+    )  # Our own root may be replaced.
+    assert network.clear() == []
+    assert not edge.shaped and not cloud.shaped
+
+
+def test_classified_network_refuses_a_foreign_root_and_missing_filters() -> None:
+    edge, cloud = ClassifiedHost("edge"), ClassifiedHost("cloud")
+    network = _classified(edge, cloud)
+    network.apply(rate_mbps=45, delay_ms=10, owned=False)
+    with pytest.raises(RuntimeError, match="unexpected"):
+        network.apply(rate_mbps=45, delay_ms=10, owned=False)
+    original = cloud.__call__
+
+    def no_filters(command: Any) -> str:
+        if "filter" in list(command) and "show" in list(command):
+            return ""
+        return original(command)
+
+    network.remote = no_filters
+    with pytest.raises(RuntimeError, match="filter for port 5050"):
+        network.verify(rate_mbps=45, delay_ms=10)
