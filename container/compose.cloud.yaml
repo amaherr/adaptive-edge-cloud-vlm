@@ -39,7 +39,7 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    command: ["adaptive-server", "--config", "configs/experiments/physical_vqa_v2.yaml", "--artifact-manifest", "configs/model/moondream2_artifact.yaml", "--cache-dir", "/models", "--device", "cuda:0", "--offline", "--bind-host", "10.42.1.20", "--report-resource-state", "--load-heartbeat", "/tmp/adaptive-vlm-cloud-load/heartbeat.json"]
+    command: ["adaptive-server", "--config", "configs/experiments/aws_vqa_v2.yaml", "--artifact-manifest", "configs/model/moondream2_artifact.yaml", "--cache-dir", "/models", "--device", "cuda:0", "--offline", "--bind-host", "10.42.1.20", "--report-resource-state", "--load-heartbeat", "/tmp/adaptive-vlm-cloud-load/heartbeat.json"]
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; socket.create_connection(('10.42.1.20',5050),timeout=3).close()"]
