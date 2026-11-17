@@ -1,0 +1,9 @@
+{
+  "schema_version": 2,
+  "description": "Inputs the container build verifies (container/verify_image.py). Regenerate at each freeze with scripts/cloud/write_image_provenance.py.",
+  "files": {
+    "configs/model/moondream2.yaml": "831f7255a11c5be66816e821497e2f54cb1c114ca34bfe8e043c5f95174f2d09",
+    "configs/model/moondream2_artifact.yaml": "369640ff5a46c7f11c6b3f20a22f780d9ae4501e34db80fe2eaa11263df3a650",
+    "requirements/model-cu128.lock": "96d07ba6bb6310b29d259c64652de18f4c5f72f2f0629a17844d09ffacedffbd"
+  }
+}

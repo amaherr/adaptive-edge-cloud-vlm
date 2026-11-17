@@ -235,3 +235,21 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Cloud infrastructure secrets, local state, plans and provider caches
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+*.pem
+*.key
+backend.hcl
+crash.log
+# Local nonsecret AWS profile bridge, deployment settings and old Vultr stacks
+/infra/local/
+/infra/terraform/vultr/
+/infra/terraform/bootstrap/backend.local.tf
+/infra/terraform/account-preflight/backend.local.tf
+/infra/terraform/environments/cloud-retained/imports.local.tf

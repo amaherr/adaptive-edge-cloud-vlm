@@ -1,0 +1,7 @@
+region = "us-east-1"
+availability_zone = "us-east-1a" # Verify account-specific paired offerings first.
+artifact_bucket_name = "REQUIRED-GLOBALLY-UNIQUE"
+monthly_budget_usd = 20
+notification_email = "REQUIRED"
+provision_data_volumes = false
+data_volume_gib = 50
