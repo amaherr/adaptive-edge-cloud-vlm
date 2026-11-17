@@ -270,4 +270,63 @@ An invalid sub-block is rerun as a whole. A dataset with any invalid sub-block l
 
 ## Amendments
 
-None.
+Amendment A1 (the long-answer candidates E1–E3) is recorded in section 3.5.
+
+### A2a: G2 v2+ on AWS (17 November 2026, before any int8, cloud-load or AWS measurement)
+
+The rationale and work plan are in [g2-v2-plus-plan.md](../g2-v2-plus-plan.md) and [g2-v2-plus-aws-roadmap.md](../g2-v2-plus-aws-roadmap.md). Everything below is fixed now. Values that depend on measurements are recorded later in **A2b**, before the pilot: hardware contract, residency, calibrated L1/L2/C1, final cells, counts and run estimate.
+
+1. **Platform.** The campaign runs on two AWS VMs in one AZ:
+   - virtual edge: the first instance passing rule 10, tried in the order `g6f.2xlarge`, `g6f.4xlarge`, `g4dn.xlarge`;
+   - cloud: `g6.2xlarge`.
+
+   This reverses the earlier exclusion of AWS. The physical G2 campaign stays the real-hardware reference, and the physical G2 v2 campaign is not run. Sections 3–4 (prompts, long task, dataset, splits) and the section 5 conditions are unchanged.
+2. **Configurations:**
+   - `edge/full`;
+   - `cloud/raw_image`;
+   - `distributed/projected/synchronous`;
+   - `distributed/projected/prompt_first`: the prompt is prepared on the cloud while the edge runs vision;
+   - `distributed/projected/int8`.
+
+   Every request runs every admitted configuration, back to back, in a seeded order.
+3. **int8 encoding.** Per-row symmetric int8 over the 729 × 2,048 projected tensor. Each row has one fp16 scale (its maximum absolute value / 127), and values round to the nearest integer. The tensor is dequantized to bf16 on the cloud before text generation.
+4. **int8 quality rule.** On the edge VM, the 200 section 3.2 calibration questions with prompt P1 run through lossless and through int8 (same process, quantize then dequantize). int8 is **admitted** only if both hold:
+   - official VQA accuracy is within 1.0 percentage point of lossless, scored both unchanged and lowercased (both must pass);
+   - at least 95% of answers are identical to lossless after stripping whitespace and case-folding.
+
+   On the 200 E1 calibration images, token agreement with lossless and the length distribution are reported, with no gate. If int8 is not admitted, it is removed from every grid and the campaign runs four configurations.
+5. **Oracle and selector.**
+   - The measured oracle reports the fastest configuration per cell with and without int8.
+   - The selector may choose int8 only if rule 4 admitted it.
+   - Quality claims compare each configuration with `distributed/projected/synchronous` on the same IDs.
+6. **Cloud load C1.** The edge-load worker runs on the cloud GPU. Calibration:
+   - On the cloud, unshaped, with the edge idle: 20 `cloud/raw_image` requests at C0, then at each candidate duty of the 512 MiB worker (25, 50, 75 and 100% busy).
+   - C1 is the smallest duty whose median cloud server time is **1.4–1.6×** the C0 median. If none reaches 1.4×, a dated amendment is needed before collecting.
+   - C1 cells: the short-task L2 cells (T02, T04, T06, T09, V03, E03) and the long-task L2 cells (T06, T09, V04, E04).
+7. **Cloud-load validity gate.**
+   - In a C1 sub-block, every cloud and distributed response reports the worker alive with a heartbeat younger than 5 s.
+   - In a C0 sub-block, no response reports it alive.
+   - A stray worker is stopped before every sub-block.
+8. **Correctness.**
+   - `prompt_first` outputs must equal the per-GPU synchronous control.
+   - `int8` outputs must equal a per-GPU int8 control: 1 warmup and 3 repetitions, repeatable, bound in the reference bundle.
+9. **Scheduler inputs.** Available before a request:
+   - task features;
+   - the edge snapshot taken before the timer;
+   - the previous response's cloud state in the same sub-block (null for the first request);
+   - the edge and cloud load levels;
+   - the pre-sub-block network probe.
+
+   The current response's cloud state is an outcome, never an input.
+10. **Edge-instance acceptance**, judged before any edge calibration:
+    - **Fit:** 200 consecutive edge/full requests run without OOM in resident or swap residency.
+    - **Stability:** three runs of 100 edge/full requests, at least 2 h apart, with the edge otherwise idle. The coefficient of variation of the three run medians must be at most 3%, and each run's p90/median at most 1.15.
+
+    The first instance in rule 1's order that passes both is used. Each switch is recorded as a new environment revision.
+11. **Edge-load targets on AWS**, calibrated like section 6, with the 512 MiB working set unless the edge's usable VRAM requires less (record the choice):
+    - L1: edge/full median within ±10% of the `cloud/raw_image` median at 35/20;
+    - L2: 1.5× that cloud median, ±10%;
+    - each reproduced within 2% over three runs.
+12. **Shaping.** Netem is applied on both hosts only to traffic between the edge and cloud experiment addresses on ports 5050–5052. Management, S3 and SSM traffic is not shaped. Section 5 tolerances and the zero-drop gate apply to the shaped class.
+13. **Repetitions.** Two (0 and 1) instead of three.
+14. **Residency.** Resident if the model fits with peak reserved memory at most 90% of usable VRAM; otherwise swap. Decided from rule 10's fit runs.
