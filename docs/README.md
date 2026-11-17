@@ -18,6 +18,8 @@ Start with the [project README](../README.md) for setup and usage. This folder h
 
 - [Roadmap](roadmap.md): the physical validation plan from repository cleanup to the final thesis matrix, with every gate.
 - [G2 v2 preparation](g2-v2-preparation.md): everything to finish off site and on site before the new unattended baseline run.
+- [G2 v2+ AWS roadmap](g2-v2-plus-aws-roadmap.md): migration to two AWS VMs (Terraform, container, SSM, classified shaping) combined with the G2 v2+ work, phases A–G.
+- [G2 v2+ plan](g2-v2-plus-plan.md): option B, adding the prompt-first and int8 configurations and cloud load, so one campaign covers the full aim.
 - [G2 v2 on-site checklist](runbooks/g2v2-onsite-checklist.md): the printable list for the site visit.
 - [G2 v2 protocol](protocols/g2-v2-protocol.md): the baseline's design; the prompt selection rule and dataset construction are frozen, and the rest is a draft until the pilot.
 - [Physical campaign runbook](runbooks/physical-campaign.md): launching, monitoring, stopping and resuming the unattended edge/cloud campaign.

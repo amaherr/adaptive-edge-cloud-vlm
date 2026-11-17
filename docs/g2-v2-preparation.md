@@ -6,6 +6,8 @@ The original G2 ([results/physical-g2-20261110](../results/physical-g2-20261110/
 
 ## Progress
 
+> **Superseded for the campaign by the [G2 v2+ plan](g2-v2-plus-plan.md)** (17 November 2026), which adds two configurations and cloud load. The work below is kept and reused.
+
 | Workstream | Status |
 | --- | --- |
 | W0 Source baseline | Done (`3bf33d8`, merged to `main`) |

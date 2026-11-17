@@ -1,0 +1,174 @@
+# G2 v2+ on AWS: roadmap
+
+**Status: plan, 17 November 2026.** The GPU quota appeal for the AWS pair was granted. This roadmap moves the G2 v2+ campaign ([plan, B0–B9](g2-v2-plus-plan.md)) from the physical RTX 3050 / RTX 2070 SUPER pair to two AWS VMs, built with the Terraform and container work on the `cloud-infrastructure` branch. It **reverses the earlier "AWS/Vultr out of scope" decision** recorded in the Predictor V2 specification; record that reversal in the protocol (amendment A2).
+
+The physical results are unaffected: G2 and its analysis stay as they are, as the real-hardware baseline. The physical G2 v2 campaign is not run; its frozen prompt, long task, dataset, splits and tooling carry over unchanged.
+
+## 1. Target environment
+
+| | Virtual edge | Cloud |
+| --- | --- | --- |
+| Instance | `g6f.2xlarge`: ¼ NVIDIA L4 (time-sliced vGPU, ~5.6 GiB usable), 8 vCPU, 32 GiB; fallbacks `g6f.4xlarge` (½ L4) or `g4dn.xlarge` (full T4), chosen in phase D | `g6.2xlarge`: full L4, 24 GiB, 8 vCPU, 32 GiB |
+| Driver | GRID (required on G6f), baked into a reviewed AMI | Tesla/datacenter driver, baked into a reviewed AMI |
+| Software | One digest-pinned image from ECR, run as the edge and cloud roles | Same image |
+| Data | Encrypted data EBS volume per host, holding the model cache, images and manifests, seeded from S3 | Same |
+| Network | Same VPC and AZ, private IPs, no public IP or NAT; experiment ports 5050–5052 open only from the edge security group | Same |
+| Management | SSM Session Manager and `ssm send-command`; S3 and ECR through VPC endpoints | Same |
+| Shaping | `tc` on the **host**, classified by peer IP and ports 5050–5052, so management, S3 and SSM bypass netem | Same, mirrored |
+
+Moondream2's BF16 weights are about 3.85 GB. The ¼-L4 edge may only fit the full model with **swap residency**, which we already built and verified for the 4 GiB RTX 3050. Phase D decides residency from measurements.
+
+This is *real distributed inference on two independent VMs, with a resource-constrained virtual edge and emulated network conditions*. It is not a physical edge device, and the thesis must say so. In exchange it gives a representative capability gap, with the cloud much stronger than the edge. The physical pair had that inverted: its Turing "cloud" was slower than the edge at vision and prefill.
+
+## 2. What carries over and what changes
+
+| Area | Status |
+| --- | --- |
+| Prompt P1, long task E1, dataset, splits, network grid conditions | **Unchanged** (protocol sections 3–5 stay frozen) |
+| Interleaved runner, supervisor, sub-block gates, references, derived tables, predictor and oracle pipeline | Reused; adapted in phase A |
+| Terraform, AMI recipe, container contract, watchdog, image publish and smoke scripts, classified shaping (branch `cloud-infrastructure`) | Reused; ported to `main`'s layout in phase A |
+| Edge-load levels, residency, spill gate, winner estimate inputs, references, int8 quality, cloud-load level, run estimate | **Redone on AWS** (phases D–E) |
+| Windows-specific code (PowerShell GPU counters, WSL NVML workaround, keepalive, portproxy) | Kept for the physical setup; switched off by a platform setting on AWS |
+
+## 3. Decisions
+
+Recommendations first; each becomes part of amendment A2.
+
+| # | Decision | Recommendation |
+| --- | --- | --- |
+| D1 | Region and AZ | The AZ where the quota was granted and both instance types are offered (`account-preflight` checks this) |
+| D2 | Edge instance | `g6f.2xlarge` if it passes the stability and fit criteria in phase D; otherwise `g6f.4xlarge`, then `g4dn.xlarge`. Write the criteria into A2 **before** measuring |
+| D3 | Remote control from the supervisor | An **SSM runner**: `ssm send-command` to the cloud host, behind the same `Runner` interface as SSH. It keeps the no-SSH, no-public-IP design, and the edge role only needs `ssm:SendCommand` on the cloud instance. The alternative, intra-VPC SSH on port 22 from the edge security group only, is simpler but adds keys and a port |
+| D4 | Where the supervisor runs | In an **edge orchestrator container** with host networking and `NET_ADMIN`, scoped to the edge role. This is a revision of the container contract. It launches the benchmark as a subprocess in the same container (GPU attached), and shapes the edge host's interface directly |
+| D5 | "Same source on both hosts" check | Compare the **image digest and its `org.opencontainers.image.revision` label** on both hosts instead of `git status`. The image is built from a clean commit |
+| D6 | Checkpoints | Each validated sub-block (and the campaign plan, status and logs) is copied to S3 with SHA-256 receipts as soon as it validates. The data EBS volume remains the primary copy |
+| D7 | Budget | A positive budget with alerts at 50/80/100%. The estimate is in section 6; the earlier $20 alert level is too low |
+| D8 | Watchdog ceilings | `experiment_max_runtime_hours` must cover one campaign session (about 14 h). Idle stop stays on; the supervisor writes the watchdog heartbeat on both hosts |
+
+## 4. Phases
+
+```
+A (port + platform code) ─┬─────────────────────────────┐
+B-code (B0a,B1,B2,B4,B5,B7,B8) ─┤                        │
+C (Terraform, AMIs, image, data) ─ D (acceptance) ─ E (recalibration) ─ F (freeze, refs, pilot, run) ─ G (after)
+```
+
+A, B-code and C can run in parallel. D needs C, plus enough of A to run the image. E needs D. F needs everything.
+
+### Phase A: port and platform code (no GPUs; about 3 days)
+1. **A1 Port the branch.**
+   - Bring `infra/`, `container/`, `.github/workflows/cloud-infrastructure.yml` and the cloud scripts (into `scripts/cloud/`) onto `main`.
+   - Bring its docs into `docs/cloud/`, marked as historical where they describe the 8,100-attempt v1 campaign.
+   - Re-implement its small `src` changes (`activity.py` heartbeat, `shutdown.py`, runner and benchmark hooks) against the current runner instead of merging them.
+   - Drop the superseded `cloud_vqa_v1` campaign files.
+2. **A2 Runner abstraction.** Add `campaign/remote.py` with `SshRunner`, `SsmRunner` (send, poll, stdout and exit code, timeout) and `LocalRunner`. Supervisor, network and cloud load take a runner, not an SSH target.
+3. **A3 Classified shaping.** Port the branch's peer- and port-classified netem into `campaign/network.py` as a `ClassifiedNetem` mode: a prio qdisc with filters on the peer IP and ports 5050–5052, feeding a netem child. Drop counters come from the netem child. Keep root netem for the physical pair.
+4. **A4 Platform setting** (`platform: physical-wsl | aws-linux` in the settings):
+   - AWS spill gate: NVML used memory below the usable limit, and no CUDA OOM, instead of the Windows dedicated counter;
+   - no PowerShell sampler;
+   - no WSL keepalive;
+   - Linux `MemAvailable` for the RAM checks.
+5. **A5 Source identity, checkpoints and watchdog:** D5 image identity in preflight; D6 S3 sync of validated sub-blocks; supervisor heartbeat for the host watchdog (D8).
+6. **A6 Container:**
+   - add `iproute2`, `iperf3` and the AWS CLI/SSM client to the image;
+   - define the edge orchestrator service (host network, `NET_ADMIN`, GPU) and the cloud services (adaptive server with `--report-resource-state`, the iperf3 and echo probes);
+   - update the runtime contract (D4).
+7. **A7 Tests.** Fake SSM runner, classified-shaping command generation and drop parsing, the platform switch, image-identity preflight, and S3 sync with a stub.
+
+*Done when* the loopback rehearsal passes in `aws-linux` platform mode with fake runners, and the physical mode is unchanged.
+
+### B-code: configuration space, int8, prompt-first, cloud load (no GPUs; about 5 days, alongside A)
+Follow [g2-v2-plus-plan.md](g2-v2-plus-plan.md) for B1, B2, B4, B5, B7 and B8, with these changes:
+- **B0 is split.**
+  - **B0a** (now, before any measurement): configuration space, int8 encoding and quality rule, C1 procedure and target, scheduler inputs, and the **edge-instance acceptance criteria (D2)**.
+  - **B0b** (after phase E): AWS hardware contract, calibrated levels, cells, counts and run estimate.
+- **B5 cloud load** uses the A2 runner. On AWS, the worker runs **inside the cloud container** (`docker exec` through SSM, or a dedicated `cloud-load` service), so the WSL `--detached` and NVML workarounds aren't needed there, but keep them for the physical pair.
+- **B3 int8 quality** moves to phase E, because it runs on the AWS edge GPU.
+
+### Phase C: infrastructure (about 1–1.5 days, mostly waiting on applies and builds)
+1. **C1 Account preflight and inventory.** Run `account-preflight`: quota, both instance types offered in the chosen AZ, current prices. List what the retained and experiment stacks still hold from 5 November (state bucket, ECR, data volumes, endpoints) **before** applying anything.
+2. **C2 Foundation.** Refresh the `cloud-v1` plan:
+   - set the budget (D7) and ceilings (D8);
+   - add the IAM permission for D3 and the ECR pull;
+   - review the plan, then apply.
+3. **C3 AMIs.** Rebuild the host images: the GRID driver for G6f, the datacenter driver for G6, Docker, the NVIDIA Container Toolkit, SSM agent, `iproute2` and `iperf3`. Record the driver and OS versions as provenance.
+4. **C4 Image.** Build from a clean commit, push to ECR, and record the digest.
+5. **C5 Data.** Upload the model cache, the 180 COCO images and the manifests to the artifact bucket with SHA-256 receipts, then seed both data volumes through SSM. The hosts have no internet.
+6. **C6 Compute.** Set `enable_compute` and `launch_approved`, review the plan, then apply. Export the outputs to `artifacts/infra/terraform_outputs.json`.
+
+*Done when* both instances are running the pinned image digest, the data volumes verify against the receipts, and the watchdog is live.
+
+### Phase D: acceptance on AWS (about 1 day; both VMs)
+1. **D1 Nodes:** `nvidia-smi`, a BF16 matrix operation and the model load on both nodes. On the edge, test **resident and swap residency**, and record peak memory and whether each fits.
+2. **D2 Paths:** edge/full, cloud/raw, distributed sync, plus prompt-first and int8 once B lands; outputs and wire bytes checked.
+3. **D3 Edge stability (decides D2).** Run 100 edge/full requests three times at different times of day, edge otherwise idle. Pass if the coefficient of variation of the per-run median is at most 3%, the within-run p90/median is at most 1.15, and the model fits. Otherwise move to the next edge instance and record a new environment revision.
+4. **D4 Network:**
+   - unshaped iperf3 and echo baseline;
+   - classified shaping at one grid condition, checking that rate and RTT land within tolerance, the drop counters work, and SSM, S3 and SSH traffic stay unshaped;
+   - the 200 Mb/s check.
+5. **D5 Resource state.** Check which NVML fields the GRID vGPU exposes (clocks, power and utilization may be missing), then adapt the edge-state input list in B8 to what exists.
+6. **D6 Fault drill on AWS:**
+   - kill the supervisor, the edge load worker and the cloud worker;
+   - stop and start the edge instance in the middle of a sub-block;
+   - resume, with no gaps, no duplicates and no stray load.
+
+### Phase E: recalibration on AWS (about 1.5 days)
+1. **E1 Residency**, from D1. Use resident if it fits with margin; otherwise swap.
+2. **E2 Edge load L1/L2**, using the W5 procedure on the chosen edge. Targets are re-derived for a strong cloud:
+   - L1: edge/full median about equal to the cloud/raw median at 35/20;
+   - L2: about 1.5× that;
+   - each reproduced within 2% over three runs.
+3. **E3 Cloud load C1** (B5 procedure, now off site): the smallest duty giving 1.4–1.6× the cloud server time.
+4. **E4 int8 quality (B3)** on the edge VM, under rule B0a.
+5. **E5 Stage profile and winner estimate.** Run a short profile (20 requests per configuration, at L0/L1/L2 and C0/C1, unshaped). Feed it into `estimate_g2v2_winners.py` with AWS inputs, then confirm or revise the long-task and C1 cells so each split keeps winner changes. Revising draft sections is allowed; sections 3–4 stay frozen.
+
+### Phase F: freeze, references, pilot, run
+1. **B6** grids and pilot; **B0b** amendment A2 with the AWS contract, calibrated values, cells, counts and run estimate.
+2. **B9** tests and the fault rehearsal (loopback, plus the D6 drill rerun on AWS).
+3. **Freeze:** commit, build and push the image, and deploy the digest on both hosts.
+4. **References:** per task, the same-device run on both VMs, the synchronous and int8 controls, then the bundles.
+5. **Pilot:** go/no-go per the plan's section 6, then freeze the protocol and pin its hash.
+6. **Run:** two sessions, about 11–12 h each. Stop the instances between sessions (EBS keeps the state). Validated sub-blocks go to S3 as they finish.
+7. **Teardown:** stop compute. Keep the data volumes, the artifact bucket and ECR until the analysis is archived, then destroy the disposable stack.
+
+### Phase G: after the run
+Derive the tables, then archive under `results/aws-g2v2plus-<date>/` with `SHA256SUMS` and the S3 receipts. Then G3 (Predictor V2 r2) and G4 (selector against the oracle). **G5, the dynamic evaluation, also runs on this AWS pair**: no site visit, the same images, and conditions switched during the run.
+
+## 5. Schedule
+
+| Week | Work |
+| --- | --- |
+| 1 | A1–A7 and B0a, B1, B2, B4, B5 (code), in parallel; C1–C5 (infrastructure) as applies allow |
+| 2 | C6, D1–D6, E1–E5; B7, B8; B6 and B0b |
+| 3 | B9, freeze, references, pilot, run (two sessions), teardown |
+
+That is about 12–14 working days, with the critical path through A → D → E → F. The run itself is 2–3 calendar days of wall time.
+
+## 6. Cost estimate
+
+On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge` $0.475/h, `g6.2xlarge` $0.978/h, so **$1.45/h for the pair**.
+
+| Item | Pair-hours or amount | Cost |
+| --- | ---: | ---: |
+| Acceptance, recalibration, B3 (D–E) | ~20 h | ~$29 |
+| References and pilot | ~6 h | ~$9 |
+| Campaign (two sessions) | ~24 h | ~$35 |
+| Debugging and reruns (allowance) | ~20 h | ~$29 |
+| VPC interface endpoints, while the stack exists (~3 weeks) | 7 × $0.01/h | ~$35 |
+| EBS, S3, ECR (one month) | | ~$20 |
+| **Total** | | **~$160** (budget $250 with alerts) |
+
+Stop instances whenever no job runs; the watchdog enforces this. The endpoints cost money even with compute off, so destroy the disposable stack once the run is archived.
+
+## 7. Risks
+
+| Risk | Mitigation |
+| --- | --- |
+| ¼-L4 timing noise from the time-sliced vGPU | D3 criteria, decided in advance; fallback edge instances |
+| Model doesn't fit in about 5.6 GiB | Swap residency (already built); then `g6f.4xlarge` |
+| GRID vGPU hides NVML fields | D5; the edge-state input list adapts; nothing gates on unavailable fields |
+| SSM command latency or limits during a run | Runner timeouts and retries; per-sub-block calls only (shape, check, load start and stop), never per request |
+| Shaping hits management traffic | Classified netem (A3); the D4 check that SSM, S3 and SSH bypass it |
+| Instance retired or interrupted mid-run | On-demand instances (not spot); resume from EBS and the S3 checkpoints |
+| Cost overrun | Budget alerts, the idle watchdog, stopping between sessions, teardown checklist |
+| Results not comparable with physical G2 | Expected: G2 v2+ is a new baseline. Report physical G2 as the real-hardware reference, and the hardware ratio explicitly |
