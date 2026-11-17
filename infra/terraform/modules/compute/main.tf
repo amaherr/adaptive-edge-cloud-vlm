@@ -60,6 +60,10 @@ resource "aws_instance" "node" {
   user_data = local.cloud_init[each.key]
   tags      = { Role = each.key }
   lifecycle {
+    # A stopped instance reports no public IPv4 association; without this, a
+    # plan while the pair is stopped (most of the time) would replace both
+    # nodes. The setting persists on the primary interface across stop/start.
+    ignore_changes = [associate_public_ip_address]
     precondition {
       condition     = var.az == var.data_volume_az && length(var.volume_ids) == 2
       error_message = "Both retained data volumes must exist in the selected Availability Zone."

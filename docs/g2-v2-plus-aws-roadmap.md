@@ -36,7 +36,7 @@ Recommendations first; each becomes part of amendment A2.
 
 | # | Decision | Recommendation |
 | --- | --- | --- |
-| D1 | Region and AZ | The AZ where the quota was granted and both instance types are offered (`account-preflight` checks this) |
+| D1 | Region and AZ | The AZ where the quota was granted and both instance types are offered (`account-preflight` checks this). **Now us-east-1d** (17 November): 1a–1c had no `g6.xlarge` capacity |
 | D2 | Edge instance | `g6f.2xlarge` if it passes the stability and fit criteria in phase D; otherwise `g4dn.xlarge`. `g6f.4xlarge` only if the quota is raised. Criteria are in A2a rule 10 |
 | D3 | Remote control from the supervisor | An **SSM runner**: `ssm send-command` to the cloud host, behind the same `Runner` interface as SSH. It keeps the no-SSH, no-public-IP design, and the edge role only needs `ssm:SendCommand` on the cloud instance. The alternative, intra-VPC SSH on port 22 from the edge security group only, is simpler but adds keys and a port |
 | D4 | Where the supervisor runs | In an **edge orchestrator container** with host networking and `NET_ADMIN`, scoped to the edge role. This is a revision of the container contract. It launches the benchmark as a subprocess in the same container (GPU attached), and shapes the edge host's interface directly |
@@ -145,7 +145,27 @@ Follow [g2-v2-plus-plan.md](g2-v2-plus-plan.md) for B1, B2, B4, B5, B7 and B8, w
   - **cloud-v1 stack:** an internet gateway and default route; HTTPS egress to 0.0.0.0/0, replacing the VPC and S3 prefix-list rules; no inbound rules. The edge role may run `AWS-RunShellScript` through SSM only on the instance tagged `Role=cloud`. Both roles may read `cloud-v1/data/*`.
   - **Code changes:** interface endpoints are refused by validation (D9), and the root volume is 30 GiB. A budget action at $165 that stops both instances is created with compute (C6). The data volumes default to 20 GiB, provisioned in C5. The watchdog ceiling is 14 h (D8).
   - Re-planned clean after apply. The Terraform tests pass (retained 2, cloud-v1 6, host-image 1).
-- **C3:** the host-image recipe is now 1.1.0, with a 30 GiB root. It is one AMI for both roles: GRID 580.159.03, which also drives the L4 on G6.
+- **C3, done:** the host image `ami-0a331de1e023447bf` (recipe 1.1.0, 30 GiB root) passed Image Builder's tests (`nvidia-smi`, driver 580.159.03, Docker Compose, container toolkit). It is one AMI for both roles: GRID 580.159.03 also drives the L4 on G6.
+- **AZ move (D1 revised, 17 November):**
+  - us-east-1a, 1b and 1c had no `g6.xlarge` capacity. The cloud failed to restart 44 times in 50 minutes.
+  - One-instance capacity reservations found room for both types in **us-east-1d**. The pair was relaunched into them, and the reservations were cancelled right after.
+  - The two (empty) data volumes were recreated there, and the subnet moved.
+  - Capacity is scarce: a stopped node may not restart. Plan phase D sessions to hold a reservation only while a session runs, or retry starts.
+- **C4, done:**
+  - The image is built on the edge from the committed source archive (`b9b45dd`, uploaded to S3 with its SHA-256) by `scripts/cloud/bootstrap_host.sh`, and pushed to ECR.
+  - It is `adaptive-vlm-cloud-v1@sha256:a96079080a1cca2e23c550f3d43648c004f8dfb4ab0a5261f64868fc15cc529f`.
+  - Debian's apt mirrors need HTTP, so `build_http_egress` opens port 80 from the edge only for the build. It is off again.
+- **C5, done:**
+  - The dataset (manifests plus the 320 referenced COCO images; 444 files, `SHA256SUMS` sha256 `588e5915…`) came from S3 and passed checksums on both hosts.
+  - The model cache was not uploaded from home. Each host downloads the pinned revision through the adapter (hash-checked), plus every remote-code file the artifact manifest pins, and `container/verify_cache.py` passes: 3,681 MiB.
+- **C6, done:**
+  - Edge `g6f.2xlarge` (NVIDIA L4-6Q, 6,144 MiB) at 10.42.1.10; cloud `g6.xlarge` (L4, 23,034 MiB) at 10.42.1.20.
+  - Both run the same image digest. CUDA and BF16 work inside the container, the watchdog is active, and the budget stop action is set at $165.
+  - The outputs are in `artifacts/infra/terraform_outputs.json` and `artifacts/infra/image-deployment.json`. Both nodes were stopped after the check.
+  - **Fixes found on the way:**
+    - cloud-init enables the watchdog before mounting, and the mount waits up to 15 minutes: the volume attached 10 minutes after boot.
+    - The compute module ignores `associate_public_ip_address` drift, which would otherwise replace stopped nodes.
+    - The edge reads the pushed digest from Docker instead of needing `ecr:DescribeImages`.
 
 1. **C1 Account preflight and inventory.** Run `account-preflight`: quota (on-demand **and spot**), both instance types offered in the chosen AZ, current prices.
    - **First, before anything else:** list what still exists from 5 November (endpoints, volumes, ECR, buckets, budgets) and **destroy whatever is accruing cost and not needed**. Seven forgotten interface endpoints alone cost about $1.68 a day.

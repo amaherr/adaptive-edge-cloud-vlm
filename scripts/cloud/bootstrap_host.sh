@@ -62,11 +62,9 @@ if [ "$role" = edge ]; then
     | docker login --username AWS --password-stdin "$registry" > /dev/null
   docker tag "$local_tag" "$repository:$commit"
   docker push "$repository:$commit" > /dev/null
-  digest=$(aws ecr describe-images --region us-east-1 \
-    --repository-name "${repository#*/}" --image-ids "imageTag=$commit" \
-    --query 'imageDetails[0].imageDigest' --output text)
-  image="$repository@$digest"
-  docker pull "$image" > /dev/null
+  # The registry digest Docker recorded for this push (no ECR read permission needed).
+  image=$(docker image inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' \
+    "$repository:$commit" | grep -m1 "^$repository@sha256:")
   rm -rf "$DOCKER_CONFIG"
   unset DOCKER_CONFIG
 else
@@ -88,6 +86,8 @@ docker run --rm --network host --user 10001:10001 \
   -v "$root/models:/models" -v "$source/container/verify_cache.py:/tmp/verify_cache.py:ro" \
   --entrypoint python "$image" -c '
 import subprocess, sys
+import yaml
+from huggingface_hub import hf_hub_download
 from adaptive_vlm.config import load_experiment_config
 from adaptive_vlm.models.moondream.adapter import MoondreamAdapter
 config = load_experiment_config("configs/experiments/aws_vqa_v2.yaml")
@@ -96,6 +96,12 @@ MoondreamAdapter.from_pretrained(
     artifact_manifest="configs/model/moondream2_artifact.yaml",
     vision_device="cpu", text_device="cpu", offline=False,
 )
+# The manifest pins hashes for every remote-code file at this revision,
+# including ones loading never imports; fetch them all so the check is complete.
+manifest = yaml.safe_load(open("configs/model/moondream2_artifact.yaml"))
+for name in manifest["remote_code_sha256"]:
+    hf_hub_download(manifest["repository"], name, revision=manifest["revision"],
+                    cache_dir="/models/hub")
 subprocess.run([sys.executable, "/tmp/verify_cache.py",
                 "--artifact", "configs/model/moondream2_artifact.yaml",
                 "--hub", "/models/hub"], check=True)
