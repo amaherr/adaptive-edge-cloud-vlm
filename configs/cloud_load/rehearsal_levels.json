@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "description": "Rehearsal only: a small cloud competitor on the local GPU.",
+  "levels": {
+    "C1": {
+      "working_set_mib": 64,
+      "busy_ms": 10,
+      "idle_ms": 10
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "description": "G2 v2+ cloud GPU load (amendment A2a rule 6). The C1 competitor is the edge-load worker on the cloud GPU. Candidates are swept in phase E3 (20 cloud/raw_image requests each, unshaped, edge idle); C1 is the smallest candidate whose median cloud server time is 1.4-1.6x the C0 median, copied into levels and committed before the pilot. Until then the grid's C1 cells cannot run.",
+  "candidates": {
+    "C25": {
+      "working_set_mib": 512,
+      "busy_ms": 5,
+      "idle_ms": 15
+    },
+    "C50": {
+      "working_set_mib": 512,
+      "busy_ms": 10,
+      "idle_ms": 10
+    },
+    "C75": {
+      "working_set_mib": 512,
+      "busy_ms": 15,
+      "idle_ms": 5
+    },
+    "C100": {
+      "working_set_mib": 512,
+      "busy_ms": 20,
+      "idle_ms": 0
+    }
+  },
+  "levels": {}
+}

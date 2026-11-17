@@ -20,8 +20,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from adaptive_vlm.benchmark.edge_load import NO_LOAD
+from adaptive_vlm.benchmark.cloud_load import NO_CLOUD_LOAD
+from adaptive_vlm.benchmark.edge_load import NO_LOAD, LoadLevel, load_levels
 from adaptive_vlm.benchmark.interleaved import PLACEMENTS
+from adaptive_vlm.scheduler.configuration import (
+    SPEC_BY_ID,
+    SPEC_BY_PLACEMENT,
+    ConfigurationId,
+)
 
 SPLITS = ("training", "validation", "evaluation")
 PRIMARY_TASK = "short"
@@ -57,11 +63,15 @@ class SubBlock:
     load_level: str
     repetition: int
     task: str = PRIMARY_TASK
+    cloud_load: str = NO_CLOUD_LOAD
 
     @property
     def cell_id(self) -> str:
         base = f"{self.condition.condition_id}-{self.load_level}"
-        return base if self.task == PRIMARY_TASK else f"{base}-{self.task}"
+        if self.task != PRIMARY_TASK:
+            base = f"{base}-{self.task}"
+        # C0 IDs are unchanged from G2 v2; cloud-loaded cells gain a suffix.
+        return base if self.cloud_load == NO_CLOUD_LOAD else f"{base}-{self.cloud_load}"
 
     @property
     def subblock_id(self) -> str:
@@ -78,6 +88,13 @@ class Grid:
     loaded_conditions: tuple[str, ...]
     repetitions: tuple[int, ...]
     tasks: Mapping[str, Task]
+    placements: tuple[str, ...] = PLACEMENTS
+    cloud_load_level: str | None = None
+    cloud_load_cells: tuple[tuple[str, str, str], ...] = ()
+
+    @property
+    def configurations(self) -> tuple[str, ...]:
+        return tuple(SPEC_BY_PLACEMENT[p].id.value for p in self.placements)
 
     @property
     def order_seed(self) -> int:
@@ -103,15 +120,50 @@ class Grid:
             cells += [(self.conditions[c], level, task.name) for c, level in task.cells]
         return cells
 
+    def cloud_load(self) -> LoadLevel | None:
+        """The calibrated cloud-load level, or None if the grid has no C1 cells.
+
+        Raises if the grid names a level the levels file does not define yet
+        (C1 is filled in only after calibration, A2a rule 6).
+        """
+
+        if self.cloud_load_level is None:
+            return None
+        path = (self.path.parent / self.payload["cloud_load"]["levels_path"]).resolve()
+        levels = load_levels(path, no_load=NO_CLOUD_LOAD)
+        if self.cloud_load_level not in levels:
+            raise ValueError(
+                f"cloud-load level {self.cloud_load_level} is not calibrated in {path}"
+            )
+        return levels[self.cloud_load_level]
+
+    def cells_by_id(self) -> list[tuple[str, str, str]]:
+        """C0 cells as ``(condition ID, edge load level, task)``."""
+
+        return [(c.condition_id, level, task) for c, level, task in self.cells()]
+
     def all_load_levels(self) -> set[str]:
         return {level for _, level, _ in self.cells()} - {NO_LOAD}
 
     def subblocks(self) -> list[SubBlock]:
-        return [
+        blocks = [
             SubBlock(condition, level, repetition, task)
             for condition, level, task in self.cells()
             for repetition in self.repetitions
         ]
+        if self.cloud_load_level is not None:
+            blocks += [
+                SubBlock(
+                    self.conditions[condition],
+                    level,
+                    repetition,
+                    task,
+                    self.cloud_load_level,
+                )
+                for condition, level, task in self.cloud_load_cells
+                for repetition in self.repetitions
+            ]
+        return blocks
 
     def execution_order(self) -> list[SubBlock]:
         """Seeded shuffle with no two sub-blocks of one cell back to back."""
@@ -149,8 +201,8 @@ class Grid:
         measured = warmups = 0
         for block in self.subblocks():
             ids = len(loaded[block.task][f"{block.condition.split}_request_ids"])
-            measured += ids * len(PLACEMENTS)
-            warmups += self.warmups * len(PLACEMENTS)
+            measured += ids * len(self.placements)
+            warmups += self.warmups * len(self.placements)
         return {"measured": measured, "warmups": warmups}
 
 
@@ -234,6 +286,48 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
             split=_relative(resolved, values["split_path"]),
             cells=cells,
         )
+    configurations = payload.get(
+        "configurations", [SPEC_BY_PLACEMENT[p].id.value for p in PLACEMENTS]
+    )
+    try:
+        specs = [SPEC_BY_ID[ConfigurationId(value)] for value in configurations]
+    except ValueError as exc:
+        raise ValueError(f"unknown configuration in grid: {exc}") from exc
+    if len(set(configurations)) != len(configurations):
+        raise ValueError("grid configurations must be unique")
+    if not {spec.placement for spec in specs} >= set(PLACEMENTS):
+        raise ValueError(
+            "grid configurations must include edge/full, cloud/raw_image and "
+            "distributed/projected/synchronous"
+        )
+    cloud = payload.get("cloud_load")
+    cloud_level: str | None = None
+    cloud_cells: tuple[tuple[str, str, str], ...] = ()
+    if cloud is not None:
+        cloud_level = str(cloud["level"])
+        if cloud_level == NO_CLOUD_LOAD:
+            raise ValueError("C0 is implicit; name the cloud-load level")
+        cloud_cells = tuple((str(c), str(e), str(t)) for c, e, t in cloud["cells"])
+        if not cloud_cells or len(set(cloud_cells)) != len(cloud_cells):
+            raise ValueError("cloud-load cells must be unique and non-empty")
+        base_cells = {
+            (condition, level, task)
+            for condition, level, task in Grid(
+                path=resolved,
+                sha256="",
+                payload=payload,
+                conditions=conditions,
+                load_levels=levels,
+                loaded_conditions=loaded,
+                repetitions=repetitions,
+                tasks=tasks,
+            ).cells_by_id()
+        }
+        uncovered = set(cloud_cells) - base_cells
+        if uncovered:
+            raise ValueError(
+                f"cloud-load cells need the same C0 cell: {sorted(uncovered)}"
+            )
     grid = Grid(
         path=resolved,
         sha256=_sha256(resolved),
@@ -243,6 +337,12 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
         loaded_conditions=loaded,
         repetitions=repetitions,
         tasks=tasks,
+        # Run directories in the canonical order, whatever order the grid lists.
+        placements=tuple(
+            p for p in SPEC_BY_PLACEMENT if p in {spec.placement for spec in specs}
+        ),
+        cloud_load_level=cloud_level,
+        cloud_load_cells=cloud_cells,
     )
     grid.execution_order()  # Fail early if the adjacency constraint is impossible.
     return grid

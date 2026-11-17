@@ -18,6 +18,16 @@ from adaptive_vlm.data.manifest import FrozenManifest
 from adaptive_vlm.models.moondream import adapter, artifact, residency
 
 PROTOCOL = "physical-heterogeneous-v2"
+# Which reference each placement's outputs must equal. prompt_first runs the
+# synchronous arithmetic; int8 is lossy and has its own control (A2a rule 8).
+REFERENCE_FOR = {
+    "edge": "edge",
+    "cloud": "cloud",
+    "distributed": "distributed",
+    "distributed_prompt_first": "distributed",
+    "distributed_int8": "distributed_int8",
+}
+LOSSY_PLACEMENTS = frozenset({"distributed_int8"})
 
 
 def semantic_manifest_sha256(manifest: FrozenManifest) -> str:
@@ -99,6 +109,70 @@ def _contained(base: Path, name: str) -> Path:
     if Path(name).is_absolute() or not path.is_relative_to(base.resolve()):
         raise ValueError("reference evidence paths must remain inside their bundle")
     return path
+
+
+def _control_outputs(
+    path: Path,
+    control: Mapping[str, Any],
+    hashes: Mapping[str, str],
+    manifest: FrozenManifest,
+    model_contract_sha256: str,
+    *,
+    payload: str | None,
+) -> dict[str, tuple[tuple[int, ...], str]]:
+    """Verify a bound distributed control run and return its outputs."""
+
+    images = {item.request_id: item.image_sha256 for item in manifest.items}
+    expected_ids = [item.request_id for item in manifest.items]
+    for key in ("plan", "journal"):
+        if control.get(key) not in hashes:
+            raise ValueError("missing bound mixed-placement control")
+    plan = _json(_contained(path.parent, control["plan"]))
+    saved_hash = plan.pop("plan_sha256", None)
+    actual_hash = hashlib.sha256(
+        json.dumps(plan, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    if saved_hash != actual_hash or (
+        plan.get("mode") != "distributed"
+        or plan.get("payload") != payload
+        or plan.get("model_contract_sha256") != model_contract_sha256
+        or plan.get("dataset_manifest_sha256") != manifest.sha256
+    ):
+        raise ValueError("mixed-placement control contract differs")
+    schedule = [
+        trial.to_dict()
+        for trial in make_schedule(
+            manifest, warmups=1, repetitions=3, seed=plan["config"]["runtime"]["seed"]
+        )
+    ]
+    if plan["schedule"] != schedule:
+        raise ValueError("mixed-placement control schedule differs")
+    content = _contained(path.parent, control["journal"]).read_bytes()
+    if not content.endswith(b"\n"):
+        raise ValueError("torn mixed-placement control journal")
+    controls = [json.loads(line) for line in content.splitlines()]
+    if len(controls) != len(schedule):
+        raise ValueError("incomplete mixed-placement control")
+    mixed: dict[str, set[tuple[tuple[int, ...], str]]] = defaultdict(set)
+    for row, trial in zip(controls, schedule, strict=True):
+        if (
+            any(row.get(key) != value for key, value in trial.items())
+            or row.get("plan_sha256") != saved_hash
+            or row.get("model_contract_sha256") != model_contract_sha256
+            or row.get("dataset_manifest_sha256") != manifest.sha256
+            or row.get("config_sha256") != plan["config_sha256"]
+            or row.get("mode") != "distributed"
+            or row.get("status") != "ok"
+            or row.get("image_sha256") != images.get(row.get("request_id"))
+        ):
+            raise ValueError("mixed-placement control row differs")
+        if not row["warmup"]:
+            mixed[row["request_id"]].add(
+                (tuple(row["output_token_ids"]), row["output_text"])
+            )
+    if set(mixed) != set(expected_ids) or any(len(v) != 1 for v in mixed.values()):
+        raise ValueError("mixed-placement control is not repeatable/complete")
+    return {key: next(iter(value)) for key, value in mixed.items()}
 
 
 def verify_reference_evidence(
@@ -205,57 +279,20 @@ def verify_reference_evidence(
                 or row.get("reference_text") != row.get("candidate_text")
             ):
                 raise ValueError(f"{host} same-device path equivalence failed")
-    control = index.get("distributed_control", {})
-    for key in ("plan", "journal"):
-        if control.get(key) not in hashes:
-            raise ValueError("missing bound mixed-placement control")
-    plan = _json(_contained(path.parent, control["plan"]))
-    saved_hash = plan.pop("plan_sha256", None)
-    actual_hash = hashlib.sha256(
-        json.dumps(plan, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
-    if saved_hash != actual_hash or (
-        plan.get("mode") != "distributed"
-        or plan.get("model_contract_sha256") != model_contract_sha256
-        or plan.get("dataset_manifest_sha256") != manifest.sha256
-    ):
-        raise ValueError("mixed-placement control contract differs")
-    schedule = [
-        trial.to_dict()
-        for trial in make_schedule(
-            manifest, warmups=1, repetitions=3, seed=plan["config"]["runtime"]["seed"]
+    expected_outputs["distributed"] = _control_outputs(
+        path,
+        index.get("distributed_control", {}),
+        hashes,
+        manifest,
+        model_contract_sha256,
+        payload=None,
+    )
+    # G2 v2+: the lossy int8 encoding has its own control (A2a rule 8).
+    int8 = (index.get("distributed_controls") or {}).get("int8")
+    if int8 is not None:
+        expected_outputs["distributed_int8"] = _control_outputs(
+            path, int8, hashes, manifest, model_contract_sha256, payload="int8"
         )
-    ]
-    if plan["schedule"] != schedule:
-        raise ValueError("mixed-placement control schedule differs")
-    content = _contained(path.parent, control["journal"]).read_bytes()
-    if not content.endswith(b"\n"):
-        raise ValueError("torn mixed-placement control journal")
-    controls = [json.loads(line) for line in content.splitlines()]
-    if len(controls) != len(schedule):
-        raise ValueError("incomplete mixed-placement control")
-    mixed: dict[str, set[tuple[tuple[int, ...], str]]] = defaultdict(set)
-    for row, trial in zip(controls, schedule, strict=True):
-        if (
-            any(row.get(key) != value for key, value in trial.items())
-            or row.get("plan_sha256") != saved_hash
-            or row.get("model_contract_sha256") != model_contract_sha256
-            or row.get("dataset_manifest_sha256") != manifest.sha256
-            or row.get("config_sha256") != plan["config_sha256"]
-            or row.get("mode") != "distributed"
-            or row.get("status") != "ok"
-            or row.get("image_sha256") != images.get(row.get("request_id"))
-        ):
-            raise ValueError("mixed-placement control row differs")
-        if not row["warmup"]:
-            mixed[row["request_id"]].add(
-                (tuple(row["output_token_ids"]), row["output_text"])
-            )
-    if set(mixed) != set(expected_ids) or any(len(v) != 1 for v in mixed.values()):
-        raise ValueError("mixed-placement control is not repeatable/complete")
-    expected_outputs["distributed"] = {
-        key: next(iter(value)) for key, value in mixed.items()
-    }
     return {
         "_expected_outputs": expected_outputs,
         "verified": True,
@@ -274,9 +311,15 @@ def evaluate_rows(
 ) -> dict[str, Any]:
     """Keep failures; require repeated exact local outputs and exact score control."""
     ids = {item.request_id for item in manifest.items}
-    if set(runs) != {"edge", "cloud", "distributed"}:
-        raise ValueError("heterogeneous correctness requires all three placements")
+    if not {"edge", "cloud", "distributed"} <= set(runs) <= set(REFERENCE_FOR):
+        raise ValueError(
+            "heterogeneous correctness requires edge, cloud and distributed "
+            "and only known placements"
+        )
     quality: dict[str, set[float]] = defaultdict(set)
+    lossy_quality: dict[str, dict[str, set[float]]] = defaultdict(
+        lambda: defaultdict(set)
+    )
     outputs: dict[str, set[tuple[tuple[int, ...], str]]] = defaultdict(set)
     insufficient: dict[str, list[str]] = {}
     repeatable = True
@@ -301,12 +344,16 @@ def evaluate_rows(
                 or not 0 <= score <= 1
             ):
                 valid_quality = False
+            elif mode in LOSSY_PLACEMENTS:
+                lossy_quality[mode][row["request_id"]].add(float(score))
             else:
                 quality[row["request_id"]].add(float(score))
             signature = (tuple(row["output_token_ids"]), str(row["output_text"]))
-            outputs[row["request_id"]].add(signature)
+            if mode not in LOSSY_PLACEMENTS:
+                outputs[row["request_id"]].add(signature)
             if expected_outputs is not None and (
-                signature != expected_outputs.get(mode, {}).get(row["request_id"])
+                signature
+                != expected_outputs.get(REFERENCE_FOR[mode], {}).get(row["request_id"])
             ):
                 reference_mismatches[mode].append(row["request_id"])
         insufficient[mode] = [
@@ -333,6 +380,12 @@ def evaluate_rows(
             key for key in sorted(ids) if len(outputs[key]) > 1
         ],
         "measured_status_counts": statuses,
+        "lossy_quality_mean": {
+            mode: (
+                sum(min(v) for v in scores.values()) / len(scores) if scores else None
+            )
+            for mode, scores in lossy_quality.items()
+        },
         "reference_output_mismatches": {
             mode: sorted(set(ids_)) for mode, ids_ in reference_mismatches.items()
         },

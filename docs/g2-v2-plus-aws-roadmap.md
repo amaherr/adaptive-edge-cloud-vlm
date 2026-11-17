@@ -100,6 +100,38 @@ Follow [g2-v2-plus-plan.md](g2-v2-plus-plan.md) for B1, B2, B4, B5, B7 and B8, w
 - **B5 cloud load** uses the A2 runner. On AWS, the worker runs **inside the cloud container** (`docker exec` through SSM, or a dedicated `cloud-load` service), so the WSL `--detached` and NVML workarounds aren't needed there, but keep them for the physical pair.
 - **B3 int8 quality** moves to phase E, because it runs on the AWS edge GPU.
 
+**Status (17 November 2026): code done** on branch `feature/aws-phase-b`. Tested locally with the fake model and the real GPU load worker; not yet run on AWS or with Moondream.
+
+- **B0a:** already covered by amendment A2a.
+- **B1, configuration space:**
+  - Two new configurations, `distributed/projected/prompt_first` and `distributed/projected/int8` (`ALL_CONFIGURATIONS`).
+  - The Phase 5–7 adaptive pipeline keeps the original three (`CONFIGURATIONS`) until G4/G5 update it.
+  - The runner keys run directories by placement, adding `distributed_prompt_first` and `distributed_int8`.
+  - A grid's `configurations` list sets what a sub-block measures; the default is G2 v2's three, and those plans and orders are unchanged.
+  - The profile builder, the sub-block gates, the dataset and the measured oracle follow the grid's list. The oracle reports every winner over all configurations and over the lossless ones.
+- **B2, int8:**
+  - `transport/quantization.py` works on the serialized bf16 bytes on the CPU: torch where the model runs, pure Python otherwise. The two are bit-identical on full-size tensors.
+  - Wire bytes are 0.5005× bf16. Quantizing takes about 5–10 ms on the CPU and dequantizing about 1.5 ms. The Moondream adapter is unchanged.
+- **B3:** `scripts/campaign/calibrate_int8.py` (`run` per calibration manifest, then `score`) and `evaluation/int8_quality.py` (rule A2a.4). It runs in phase E4.
+- **B4, prompt-first:** in the runner and the fake server. Outputs equal synchronous.
+  - Its profile `request_wire_bytes` covers the tensor exchange only.
+  - `total_wire_bytes` also counts the prompt exchange.
+- **B5, cloud load:**
+  - `benchmark/cloud_load.py` is the control command run on the cloud (`start`/`status`/`stop`/`reap`). It also supplies the server's `--load-heartbeat` probe.
+  - `campaign/cloud_load.py` is the supervisor side, using the A2 runner. On AWS it runs `docker exec adaptive-vlm-inference python -m …` through SSM.
+  - The worker is reaped before preflight, before every sub-block and at exit. The supervisor starts C1 after shaping and stops it after the benchmark, even after a crash.
+  - Grid cells come from a `cloud_load` section; their IDs get a `-C1` suffix.
+  - Gate A2a.7 is in `subblock.py`.
+  - `configs/cloud_load/levels_v1.json` holds the four candidate duties. C1 stays empty until E3, so C1 cells can't run before calibration.
+- **B6 (part):**
+  - A G2 v2+ rehearsal grid and settings (`rehearsal_grid_v2plus.json`: five configurations plus `T01-L1-C1`).
+  - The winner estimate models int8, prompt-first and C1 (`--grid`). It reproduces the G2 v2 cells exactly.
+  - The AWS grid, the pilot cells and B0b are still to do in phase F.
+- **B7:** `build_g2v2_reference.py control --payload int8` and `bundle --int8-control`. The verifier binds the int8 control, and `evaluate_rows` checks prompt-first against the synchronous control and int8 against its own.
+- **B8:**
+  - Inputs gain `cloud_load_level` and `previous_cloud_state`: the last remote response's `server_state_*`, recorded by the runner before the timer, null at first.
+  - Partitions record the configurations, C1 level and int8 decision. They refuse a grid with int8 unless the contract says `int8_admitted: true`.
+
 ### Phase C: infrastructure (about 1–1.5 days, mostly waiting on applies and builds)
 1. **C1 Account preflight and inventory.** Run `account-preflight`: quota (on-demand **and spot**), both instance types offered in the chosen AZ, current prices.
    - **First, before anything else:** list what still exists from 5 November (endpoints, volumes, ECR, buckets, budgets) and **destroy whatever is accruing cost and not needed**. Seven forgotten interface endpoints alone cost about $1.68 a day.

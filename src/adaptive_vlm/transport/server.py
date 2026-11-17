@@ -24,6 +24,7 @@ from adaptive_vlm.transport.protocol import (
     receive_frame,
     send_frame,
 )
+from adaptive_vlm.transport.quantization import dequantize, timed
 from adaptive_vlm.transport.tensors import TensorInferenceRequest, TensorPayload
 
 LOGGER = logging.getLogger(__name__)
@@ -96,7 +97,7 @@ class CloudRequestProcessor:
         if inference_function is not None:
             paths.append("raw_image")
         if tensor_inference_function is not None:
-            paths.append("projected_synchronous")
+            paths += ["projected_synchronous", "projected_int8"]
         if prepared_tensor_inference_function is not None:
             paths.append("projected_prompt_first")
         self.supported_paths = tuple(paths)
@@ -184,15 +185,19 @@ class CloudRequestProcessor:
             )
 
         if (
-            frame.message_type is MessageType.INFERENCE_REQUEST
-            and self._inference_function is None
-        ) or (
-            frame.message_type is MessageType.TENSOR_REQUEST
-            and self._tensor_inference_function is None
-            and self._prepared_tensor_inference_function is None
-        ) or (
-            frame.message_type is MessageType.PROMPT_REQUEST
-            and self._prompt_prepare_function is None
+            (
+                frame.message_type is MessageType.INFERENCE_REQUEST
+                and self._inference_function is None
+            )
+            or (
+                frame.message_type is MessageType.TENSOR_REQUEST
+                and self._tensor_inference_function is None
+                and self._prepared_tensor_inference_function is None
+            )
+            or (
+                frame.message_type is MessageType.PROMPT_REQUEST
+                and self._prompt_prepare_function is None
+            )
         ):
             self._increment("rejected")
             return self._error(
@@ -254,16 +259,18 @@ class CloudRequestProcessor:
             byte_order=cast(str, metadata["byte_order"]),
             layout=cast(str, metadata["layout"]),
             data=frame.payload,
+            quantization=cast(str | None, metadata.get("quantization")),
         )
+        started_ns = perf_counter_ns()
+        extra: dict[str, MetricValue] = {}
+        if tensor.quantization is not None:
+            tensor, extra["dequantize_ms"] = timed(dequantize, tensor)
         request = TensorInferenceRequest(
             request_id=frame.request_id,
             prompt=cast(str, metadata["prompt"]),
             tensor=tensor,
-            pipeline=cast(
-                Literal["synchronous", "prompt_first"], metadata["pipeline"]
-            ),
+            pipeline=cast(Literal["synchronous", "prompt_first"], metadata["pipeline"]),
         )
-        started_ns = perf_counter_ns()
         if request.pipeline == "synchronous":
             inference_function = self._tensor_inference_function
             if inference_function is None:
@@ -302,7 +309,7 @@ class CloudRequestProcessor:
                 )
             result = prepared_function(request, pending.prepared)
         server_total_ms = (perf_counter_ns() - started_ns) / 1_000_000
-        return self._response(received, result, server_total_ms)
+        return self._response(received, result, server_total_ms, extra)
 
     def _run_prompt_prepare(self, received: ReceivedFrame) -> Frame:
         frame = received.frame
@@ -353,6 +360,7 @@ class CloudRequestProcessor:
         received: ReceivedFrame,
         result: InferenceResult,
         server_total_ms: float,
+        extra: Mapping[str, MetricValue] | None = None,
     ) -> Frame:
         frame = received.frame
 
@@ -365,6 +373,7 @@ class CloudRequestProcessor:
             {
                 "server_total_ms": server_total_ms,
                 "server_request_wire_bytes": received.wire_bytes,
+                **{f"server_{key}": value for key, value in (extra or {}).items()},
             }
         )
         if self._state_provider is not None:

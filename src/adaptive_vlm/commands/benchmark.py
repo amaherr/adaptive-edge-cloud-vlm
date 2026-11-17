@@ -43,6 +43,9 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
         mode is not ExecutionMode.EDGE or config.model.adapter != "moondream2"
     ):
         raise ConfigError("--edge-residency swap applies only to Moondream edge runs")
+    payload = getattr(args, "payload", "bf16")
+    if payload != "bf16" and mode is not ExecutionMode.DISTRIBUTED:
+        raise ConfigError("--payload applies only to distributed runs")
     seeded = seed_everything(config.runtime.seed)
     environment = collect_environment()
     environment["seeded_providers"] = list(seeded)
@@ -52,6 +55,7 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
         "text_device": args.text_device,
         "weight_residency": args.edge_residency,
         "pipeline": args.pipeline,
+        "payload": payload,
         "remote": f"{config.transport.host}:{config.transport.port}",
     }
     lock_path = Path("requirements/model-cu128.lock")
@@ -109,6 +113,7 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
             transport=config.transport,
             model=model,
             pipeline=args.pipeline,
+            payload_format=payload,
         )
     if isinstance(policy, (CloudExecutionPolicy, DistributedExecutionPolicy)):
         with progress.phase("Checking remote model contract"):
@@ -129,6 +134,7 @@ def run_fixed_benchmark_command(args: argparse.Namespace) -> int:
             else config.runtime.measured_repetitions
         ),
         pipeline=args.pipeline,
+        payload=payload if payload != "bf16" else None,
         resume=args.resume,
         max_consecutive_failures=args.max_consecutive_failures,
     )

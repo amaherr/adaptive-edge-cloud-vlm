@@ -6,6 +6,10 @@ of every placement, the fastest successful one and its margin. Cell table: per
 95% CI of the median (seed 1707, 2,000 resamples, as in G2), the measured
 winner by median and whether the top two CIs overlap (a tie).
 
+G2 v2+ grids list five configurations. int8 is lossy, so every winner is
+reported twice (amendment A2a rule 5): over all configurations, and over the
+lossless ones only (``*_lossless``).
+
 Evaluation cells are sealed until the selector is frozen (G4); reading them
 needs ``unseal_evaluation=True``.
 """
@@ -22,13 +26,21 @@ from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
 from adaptive_vlm.prediction.v1.calibration import percentile
-from adaptive_vlm.prediction.v2.dataset.campaign_v2 import (
-    CONFIGURATION_BY_MODE,
-    _campaign_grid,
-)
+from adaptive_vlm.prediction.v2.dataset.campaign_v2 import _campaign_grid
 from adaptive_vlm.prediction.v2.dataset.parsing import digest, strict_json
+from adaptive_vlm.scheduler.configuration import ConfigurationId
 
-CONFIGURATIONS = tuple(CONFIGURATION_BY_MODE.values())
+LOSSY = frozenset({ConfigurationId.DISTRIBUTED_INT8.value})
+
+
+def _ranked(
+    values: dict[str, float | None], *, lossless: bool
+) -> list[tuple[float, str]]:
+    return sorted(
+        (value, cid)
+        for cid, value in values.items()
+        if value is not None and not (lossless and cid in LOSSY)
+    )
 
 
 def _median_interval(
@@ -58,6 +70,7 @@ def build_measured_oracle(
     if output.exists():
         raise FileExistsError("refusing to overwrite oracle tables")
     _, grid = _campaign_grid(campaign)
+    configurations = grid.configurations
     index = strict_json((profiles / "profiles_index.json").read_bytes())
     attempts: list[dict[str, Any]] = []
     for block in grid.execution_order():
@@ -76,7 +89,7 @@ def build_measured_oracle(
                 raise ValueError("duplicate configuration for one request")
             grouped[row["request_id"]][row["configuration_id"]] = row
         for request_id, rows in sorted(grouped.items()):
-            if set(rows) != set(CONFIGURATIONS):
+            if set(rows) != set(configurations):
                 raise ValueError(f"{block.subblock_id} {request_id} lacks a placement")
             latency = {
                 cid: (
@@ -84,11 +97,10 @@ def build_measured_oracle(
                     if rows[cid]["status"] == "ok"
                     else None
                 )
-                for cid in CONFIGURATIONS
+                for cid in configurations
             }
-            ranked = sorted(
-                (value, cid) for cid, value in latency.items() if value is not None
-            )
+            ranked = _ranked(latency, lossless=False)
+            lossless = _ranked(latency, lossless=True)
             attempts.append(
                 {
                     "subblock_id": block.subblock_id,
@@ -102,11 +114,12 @@ def build_measured_oracle(
                     "repetition": block.repetition,
                     "request_id": request_id,
                     "latency_ms": latency,
-                    "status": {cid: rows[cid]["status"] for cid in CONFIGURATIONS},
+                    "status": {cid: rows[cid]["status"] for cid in configurations},
                     "winner": ranked[0][1] if ranked else None,
                     "margin_ms": (
                         ranked[1][0] - ranked[0][0] if len(ranked) > 1 else None
                     ),
+                    "winner_lossless": lossless[0][1] if lossless else None,
                 }
             )
 
@@ -117,7 +130,7 @@ def build_measured_oracle(
     for cell_id, members in sorted(by_cell.items()):
         first = members[0]
         stats = {}
-        for cid in CONFIGURATIONS:
+        for cid in configurations:
             values = sorted(
                 a["latency_ms"][cid]
                 for a in members
@@ -132,17 +145,27 @@ def build_measured_oracle(
                 "median_ci_ms": list(interval) if interval else None,
                 "attempt_wins": sum(a["winner"] == cid for a in members),
             }
-        ranked = sorted(
-            (s["median_ms"], cid)
-            for cid, s in stats.items()
-            if s["median_ms"] is not None
-        )
-        winner = ranked[0][1] if ranked else None
-        runner = ranked[1][1] if len(ranked) > 1 else None
-        tie = False
-        if winner and runner:
-            a, b = stats[winner]["median_ci_ms"], stats[runner]["median_ci_ms"]
-            tie = a is None or b is None or a[1] >= b[0]
+
+        def decide(
+            lossless: bool, stats: dict[str, dict[str, Any]] = stats
+        ) -> dict[str, Any]:
+            ranked = _ranked(
+                {cid: s["median_ms"] for cid, s in stats.items()}, lossless=lossless
+            )
+            winner = ranked[0][1] if ranked else None
+            runner = ranked[1][1] if len(ranked) > 1 else None
+            tie = False
+            if winner and runner:
+                a, b = stats[winner]["median_ci_ms"], stats[runner]["median_ci_ms"]
+                tie = a is None or b is None or a[1] >= b[0]
+            return {
+                "winner": winner,
+                "runner_up": runner,
+                "margin_ms": ranked[1][0] - ranked[0][0] if runner else None,
+                "tie": tie,
+            }
+
+        overall, lossless_decision = decide(False), decide(True)
         cells.append(
             {
                 "cell_id": cell_id,
@@ -154,10 +177,8 @@ def build_measured_oracle(
                 "task": first["task"],
                 "attempts": len(members),
                 "placements": stats,
-                "winner": winner,
-                "runner_up": runner,
-                "margin_ms": ranked[1][0] - ranked[0][0] if runner else None,
-                "tie": tie,
+                **overall,
+                **{f"{k}_lossless": v for k, v in lossless_decision.items()},
             }
         )
     output.mkdir(parents=True)
@@ -176,8 +197,8 @@ def build_measured_oracle(
                 "task",
                 "attempts",
             ]
-            + [f"{c}_median_ms" for c in CONFIGURATIONS]
-            + ["winner", "margin_ms", "tie"]
+            + [f"{c}_median_ms" for c in configurations]
+            + ["winner", "margin_ms", "tie", "winner_lossless", "tie_lossless"]
         )
         for cell in cells:
             writer.writerow(
@@ -190,14 +211,16 @@ def build_measured_oracle(
                     cell["task"],
                     cell["attempts"],
                 ]
-                + [cell["placements"][c]["median_ms"] for c in CONFIGURATIONS]
+                + [cell["placements"][c]["median_ms"] for c in configurations]
                 + [cell["winner"], cell["margin_ms"], cell["tie"]]
+                + [cell["winner_lossless"], cell["tie_lossless"]]
             )
     summary = {
         "schema_version": 1,
         "splits": list(splits),
         "seed": seed,
         "bootstrap_resamples": resamples,
+        "configurations": list(configurations),
         "attempts": len(attempts),
         "cells": cells,
         "profiles_index_sha256": digest(profiles / "profiles_index.json"),

@@ -16,6 +16,12 @@ Transport is fitted as ``a + b / rate_mbps + c * rtt_ms`` separately for the
 raw image and the projected tensor. These are model-based estimates; the
 on-site pilot measures the real values. Sensitivity rows scale the cloud
 server time and the transport times by ±15% / ±20%.
+
+G2 v2+ (plan section 2.4) adds two distributed variants and cloud load:
+int8 halves the tensor's bandwidth term and adds 12 ms of quantization;
+prompt-first hides about 90 ms of cloud prompt work behind edge vision; C1
+cells scale the cloud's compute by 1.5. Placements a grid does not list are
+left out of the ranking.
 """
 
 from __future__ import annotations
@@ -38,6 +44,16 @@ LONG_TOKENS = 32.0  # E1 reached the 32-token cap on all 200 calibration questio
 GRID = ROOT / "configs/profiles/physical_network_grid_v2.json"
 P0_TOKENS, P1_TOKENS = 12.28, 1.47
 BASELINE_RTT_MS = 4.0  # G2 N7: 5 ms added, 9.0 ms measured
+INT8_QUANTIZE_MS = 12.0
+PROMPT_FIRST_HIDDEN_MS = 90.0
+C1_CLOUD_SCALE = 1.5
+PLACEMENT_BY_CONFIGURATION = {
+    "edge/full": "edge",
+    "cloud/raw_image": "cloud",
+    "distributed/projected/synchronous": "distributed",
+    "distributed/projected/prompt_first": "distributed_prompt_first",
+    "distributed/projected/int8": "distributed_int8",
+}
 
 
 def _rows(path: Path) -> list[dict[str, str]]:
@@ -155,6 +171,7 @@ def predict(
     *,
     cloud_scale: float = 1.0,
     transport_scale: float = 1.0,
+    cloud_load_scale: float = 1.0,
 ) -> dict[str, float]:
     rtt = BASELINE_RTT_MS + added_rtt
     a, b, c = model["image_transport"]  # type: ignore[misc]
@@ -162,39 +179,54 @@ def predict(
     effective = 0.96 * rate  # G2 measured ~96% of the configured rate
     image = max(0.0, a + b / effective + c * rtt) * transport_scale
     tensor = max(0.0, ta + tb / effective + tc * rtt) * transport_scale
+    tensor_int8 = max(0.0, ta + tb / 2 / effective + tc * rtt) * transport_scale
     prefill = _interpolate_log(model["distributed_prefill_by_rate"], rate)  # type: ignore[arg-type]
+    scale = cloud_scale * cloud_load_scale
+    remote_half = (prefill + float(model["distributed_fixed_ms"])) * scale  # type: ignore[arg-type]
+    distributed = edge_vision + tensor + remote_half
     return {
         "edge": edge_full,
-        "cloud": float(model["cloud_server_ms"]) * cloud_scale  # type: ignore[arg-type]
+        "cloud": float(model["cloud_server_ms"]) * scale  # type: ignore[arg-type]
         + float(model["cloud_client_ms"])  # type: ignore[arg-type]
         + image,
-        "distributed": edge_vision
-        + tensor
-        + (prefill + float(model["distributed_fixed_ms"])) * cloud_scale,  # type: ignore[arg-type]
+        "distributed": distributed,
+        "distributed_prompt_first": distributed
+        - min(PROMPT_FIRST_HIDDEN_MS * scale, remote_half),
+        "distributed_int8": edge_vision + INT8_QUANTIZE_MS + tensor_int8 + remote_half,
     }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--grid", type=Path, default=GRID)
     args = parser.parse_args()
     model = load_model()
-    grid = json.loads(GRID.read_text())
+    grid = json.loads(args.grid.read_text())
+    placements = [
+        PLACEMENT_BY_CONFIGURATION[c]
+        for c in grid.get("configurations", list(PLACEMENT_BY_CONFIGURATION)[:3])
+    ]
     edge = model["edge_by_level"]  # type: ignore[assignment]
-    cells = [(cid, "L0", "short") for cid in grid["conditions"]] + [
-        (cid, level, "short")
+    cells = [(cid, "L0", "short", "C0") for cid in grid["conditions"]] + [
+        (cid, level, "short", "C0")
         for level in grid["load_levels"]
         for cid in grid["loaded_conditions"]
     ]
     for task, spec in grid.get("extra_tasks", {}).items():
-        cells += [(cid, level, task) for cid, level in spec["cells"]]
+        cells += [(cid, level, task, "C0") for cid, level in spec["cells"]]
+    cloud = grid.get("cloud_load")
+    if cloud:
+        cells += [
+            (cid, level, task, cloud["level"]) for cid, level, task in cloud["cells"]
+        ]
     # Long answers: edge timings measured at L0/L1/L2 with ~16-token answers,
     # extrapolated to 32 tokens with the measured per-token decode cost; the
     # cloud decodes the extra tokens at G2's per-token cost.
     long_edge = json.loads(LONG_EDGE.read_text())
     cloud_per_token = float(model["cloud_decode_per_token_ms"])  # type: ignore[arg-type]
     rows = []
-    for (cid, level, task), cloud_scale, transport_scale in product(
+    for (cid, level, task, cloud_level), cloud_scale, transport_scale in product(
         cells, (0.85, 1.0, 1.15), (0.8, 1.0, 1.2)
     ):
         condition = grid["conditions"][cid]
@@ -218,13 +250,21 @@ def main() -> None:
             vision,
             cloud_scale=cloud_scale,
             transport_scale=transport_scale,
+            cloud_load_scale=C1_CLOUD_SCALE if cloud_level != "C0" else 1.0,
         )
-        times["cloud"] += extra_remote
-        times["distributed"] += extra_remote
+        load = C1_CLOUD_SCALE if cloud_level != "C0" else 1.0
+        times = {
+            name: value + (extra_remote * load if name != "edge" else 0.0)
+            for name, value in times.items()
+            if name in placements
+        }
         ranked = sorted(times.items(), key=lambda kv: kv[1])
         rows.append(
             {
-                "cell": f"{cid}-{level}" + ("" if task == "short" else f"-{task}"),
+                "cell": f"{cid}-{level}"
+                + ("" if task == "short" else f"-{task}")
+                + ("" if cloud_level == "C0" else f"-{cloud_level}"),
+                "cloud_load": cloud_level,
                 "task": task,
                 "split": condition["split"],
                 "rate_mbps": condition["rate_mbps"],
@@ -260,7 +300,10 @@ def main() -> None:
             times = predict(
                 model, condition["rate_mbps"], condition["added_rtt_ms"], full, vision
             )
-            winners[cid] = min(times, key=times.__getitem__)
+            winners[cid] = min(
+                (name for name in times if name in placements[:3]),
+                key=times.__getitem__,
+            )
         sweep.append(
             {
                 "edge_full_ms": full,
@@ -284,9 +327,9 @@ def main() -> None:
         "model": {
             k: v for k, v in model.items() if k not in ("distributed_prefill_by_rate",)
         },
+        "placements": placements,
         "central_winner_counts": {
-            w: sum(r["winner"] == w for r in central)
-            for w in ("edge", "cloud", "distributed")
+            w: sum(r["winner"] == w for r in central) for w in placements
         },
         "winner_counts_by_task_and_level": {
             f"{task}/{level}": {
@@ -294,10 +337,14 @@ def main() -> None:
                     r["winner"] == w and r["level"] == level and r["task"] == task
                     for r in central
                 )
-                for w in ("edge", "cloud", "distributed")
+                for w in placements
             }
             for task in sorted({r["task"] for r in central})
             for level in ("L0", "L1", "L2")
+        },
+        "winner_counts_c1": {
+            w: sum(r["winner"] == w and r["cloud_load"] != "C0" for r in central)
+            for w in placements
         },
         "winners_by_split": {
             split: sorted({r["winner"] for r in central if r["split"] == split})
@@ -334,7 +381,7 @@ def main() -> None:
             r["cell"],
             r["edge_ms"],
             r["cloud_ms"],
-            r["distributed_ms"],
+            *(r[f"{p}_ms"] for p in placements[2:]),
             r["winner"],
             r["margin_ms"],
         )

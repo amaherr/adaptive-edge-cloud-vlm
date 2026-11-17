@@ -30,8 +30,9 @@ from typing import Any
 from xml.etree import ElementTree
 
 from adaptive_vlm.artifacts import write_json_atomic
-from adaptive_vlm.benchmark.edge_load import load_levels
+from adaptive_vlm.benchmark.edge_load import LoadLevel, load_levels
 from adaptive_vlm.campaign.checkpoint import Heartbeats, S3Checkpoint
+from adaptive_vlm.campaign.cloud_load import CloudLoad, CloudLoadFailure
 from adaptive_vlm.campaign.grid import PRIMARY_TASK, Grid, check_split, load_grid
 from adaptive_vlm.campaign.network import (
     ClassifiedNetwork,
@@ -39,7 +40,7 @@ from adaptive_vlm.campaign.network import (
     PhysicalNetwork,
     is_default_qdisc,
 )
-from adaptive_vlm.campaign.remote import Runner, runner_from_settings
+from adaptive_vlm.campaign.remote import LocalRunner, Runner, runner_from_settings
 from adaptive_vlm.campaign.subblock import (
     Gates,
     check_completed,
@@ -304,6 +305,18 @@ class CampaignSupervisor:
             cloud_every_s=float(beats.get("cloud_every_s", 300)),
         )
         self.warnings: list[str] = []
+        # Cloud GPU load (C1): the same runner as shaping; locally in loopback.
+        self.cloud_level: LoadLevel | None = None
+        self.cloud_load: CloudLoad | None = None
+        if self.grid.cloud_load_level is not None:
+            self.cloud_load = CloudLoad(
+                remote if remote is not None else LocalRunner(timeout=180),
+                shlex.split(settings["cloud_python"])
+                if self.physical
+                else [settings["python"]],
+                heartbeat=settings.get("cloud_load_heartbeat"),
+                device=settings.get("cloud_device", "cuda:0"),
+            )
 
     def _network(self, settings: dict[str, Any], root: Path, remote: Any) -> Any:
         """Whole-interface netem (physical pair) or classified netem (AWS)."""
@@ -452,6 +465,12 @@ class CampaignSupervisor:
         self.output.mkdir(parents=True, exist_ok=True)
         self.check_host_memory(startup=True)
         self.status("preflight")
+        # Fails until C1 is calibrated (A2a rule 6) if the grid has C1 cells.
+        self.cloud_level = self.grid.cloud_load()
+        if self.cloud_load is not None:
+            reaped = self.cloud_load.reap()
+            if reaped:
+                log(f"stopped leftover cloud load before preflight: {reaped}")
         commit, dirty = self._source_identity()
         if dirty and not s["allow_dirty_tree"]:
             raise RuntimeError("commit or stash source changes before the campaign")
@@ -821,6 +840,8 @@ class CampaignSupervisor:
                         gates=gates,
                         max_restarts=int(s["max_restarts_per_subblock"]),
                         log=log,
+                        cloud_load=self.cloud_load,
+                        cloud_level=self.cloud_level,
                     )
                     if report["valid"]:
                         if self.checkpoint is not None:
@@ -846,6 +867,11 @@ class CampaignSupervisor:
         finally:
             self.stop_child()
             errors = self.cleanup()
+            if self.cloud_load is not None:
+                try:
+                    self.cloud_load.reap()
+                except CloudLoadFailure as exc:
+                    errors.append(f"cloud load: {exc}")
             self.status(
                 "failed" if errors else terminal,
                 error=str(failure) if failure else None,

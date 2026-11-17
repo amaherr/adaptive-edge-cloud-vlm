@@ -16,6 +16,8 @@ class ConfigurationId(StrEnum):
     EDGE_FULL = "edge/full"
     CLOUD_RAW_IMAGE = "cloud/raw_image"
     DISTRIBUTED_PROJECTED = "distributed/projected/synchronous"
+    DISTRIBUTED_PROMPT_FIRST = "distributed/projected/prompt_first"
+    DISTRIBUTED_INT8 = "distributed/projected/int8"
 
 
 @dataclass(frozen=True)
@@ -25,16 +27,32 @@ class ConfigurationSpec:
     split_id: str | None
     pipeline: str | None
     remote_path: str | None
+    placement: str
+    payload: str | None = None
+
+    @property
+    def prepared_stage(self) -> str | None:
+        """Edge stage a run of this configuration alone would leave active."""
+
+        return {
+            ExecutionMode.EDGE: "text",
+            ExecutionMode.DISTRIBUTED: "vision",
+        }.get(self.mode)
 
 
+# The configurations the Phase 5-7 adaptive pipeline (selector, monitor,
+# trace evaluation) knows. G2 v2+ measures ALL_CONFIGURATIONS.
 CONFIGURATIONS = (
-    ConfigurationSpec(ConfigurationId.EDGE_FULL, ExecutionMode.EDGE, None, None, None),
+    ConfigurationSpec(
+        ConfigurationId.EDGE_FULL, ExecutionMode.EDGE, None, None, None, "edge"
+    ),
     ConfigurationSpec(
         ConfigurationId.CLOUD_RAW_IMAGE,
         ExecutionMode.CLOUD,
         None,
         None,
         "raw_image",
+        "cloud",
     ),
     ConfigurationSpec(
         ConfigurationId.DISTRIBUTED_PROJECTED,
@@ -42,8 +60,33 @@ CONFIGURATIONS = (
         "projected",
         "synchronous",
         "projected_synchronous",
+        "distributed",
+        "bf16",
     ),
 )
+ALL_CONFIGURATIONS = (
+    *CONFIGURATIONS,
+    ConfigurationSpec(
+        ConfigurationId.DISTRIBUTED_PROMPT_FIRST,
+        ExecutionMode.DISTRIBUTED,
+        "projected",
+        "prompt_first",
+        "projected_prompt_first",
+        "distributed_prompt_first",
+        "bf16",
+    ),
+    ConfigurationSpec(
+        ConfigurationId.DISTRIBUTED_INT8,
+        ExecutionMode.DISTRIBUTED,
+        "projected",
+        "synchronous",
+        "projected_int8",
+        "distributed_int8",
+        "int8",
+    ),
+)
+SPEC_BY_ID = {spec.id: spec for spec in ALL_CONFIGURATIONS}
+SPEC_BY_PLACEMENT = {spec.placement: spec for spec in ALL_CONFIGURATIONS}
 
 
 @dataclass(frozen=True)
@@ -115,7 +158,8 @@ class CapabilityRegistry:
         if spec.remote_path is not None:
             if self.remote is None:
                 return CapabilityStatus(
-                    spec.id, False,
+                    spec.id,
+                    False,
                     f"remote_unavailable: {self.remote_error or 'not_checked'}",
                 )
             if self.remote.model_fingerprint != self.expected_model_fingerprint:

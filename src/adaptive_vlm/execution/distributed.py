@@ -22,6 +22,7 @@ from adaptive_vlm.models.features import VisionEncoding
 from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.client import exchange_frame
 from adaptive_vlm.transport.protocol import Frame, MessageType, ProtocolError
+from adaptive_vlm.transport.quantization import quantize_int8_rows, timed
 from adaptive_vlm.transport.tensors import TensorPayload
 
 TensorSerializer = Callable[[object], TensorPayload]
@@ -43,11 +44,15 @@ class DistributedExecutionPolicy(ExecutionPolicy):
         model: ModelMetadata,
         tensor_serializer: TensorSerializer = TensorPayload.from_torch,
         pipeline: str = "synchronous",
+        payload_format: str = "bf16",
     ) -> None:
         if encoder.component_role not in {"vision", "full"}:
             raise ValueError("distributed edge adapter must retain vision")
         if pipeline not in {"synchronous", "prompt_first"}:
             raise ValueError(f"unsupported distributed pipeline: {pipeline}")
+        if payload_format not in {"bf16", "int8"}:
+            raise ValueError(f"unsupported payload format: {payload_format}")
+        self._payload_format = payload_format
         self._encoder = encoder
         self._transport = transport
         self._model = model
@@ -57,6 +62,14 @@ class DistributedExecutionPolicy(ExecutionPolicy):
     @property
     def mode(self) -> ExecutionMode:
         return ExecutionMode.DISTRIBUTED
+
+    @property
+    def pipeline(self) -> str:
+        return self._pipeline
+
+    @property
+    def payload_format(self) -> str:
+        return self._payload_format
 
     def health(self) -> HealthStatus:
         return check_remote_health(self._transport, self._model)
@@ -79,13 +92,14 @@ class DistributedExecutionPolicy(ExecutionPolicy):
 
         serialization_started_ns = perf_counter_ns()
         tensor = self._tensor_serializer(encoding.projected.tensor)
-        serialization_ms = (
-            perf_counter_ns() - serialization_started_ns
-        ) / 1_000_000
+        serialization_ms = (perf_counter_ns() - serialization_started_ns) / 1_000_000
         if tensor.shape != encoding.projected.shape:
             raise ValueError("serialized tensor shape differs from projected features")
         if tensor.dtype != encoding.projected.dtype:
             raise ValueError("serialized tensor dtype differs from projected features")
+        quantize_ms: float | None = None
+        if self._payload_format == "int8":
+            tensor, quantize_ms = timed(quantize_int8_rows, tensor)
 
         metadata = {
             "prompt": request.prompt,
@@ -104,9 +118,7 @@ class DistributedExecutionPolicy(ExecutionPolicy):
                 payload=tensor.data,
             ),
         )
-        network_round_trip_ms = (
-            perf_counter_ns() - network_started_ns
-        ) / 1_000_000
+        network_round_trip_ms = (perf_counter_ns() - network_started_ns) / 1_000_000
         remote = parse_inference_response(
             exchange,
             request_id=request.request_id,
@@ -129,10 +141,7 @@ class DistributedExecutionPolicy(ExecutionPolicy):
                 "network_connect_ms": exchange.connect_ms,
                 "network_send_ms": exchange.send_ms,
                 "network_receive_ms": exchange.receive_ms,
-                "client_end_to_end_ms": (
-                    perf_counter_ns() - started_ns
-                )
-                / 1_000_000,
+                "client_end_to_end_ms": (perf_counter_ns() - started_ns) / 1_000_000,
                 "request_wire_bytes": exchange.request_wire_bytes,
                 "response_wire_bytes": exchange.response_wire_bytes,
                 "total_request_wire_bytes": exchange.request_wire_bytes
@@ -145,11 +154,14 @@ class DistributedExecutionPolicy(ExecutionPolicy):
                 + prompt_response_bytes,
                 "projected_payload_bytes": len(tensor.data),
                 "distributed_pipeline": self._pipeline,
+                "payload_format": self._payload_format,
                 "request_metadata_and_framing_bytes": (
                     exchange.request_wire_bytes - len(tensor.data)
                 ),
             }
         )
+        if quantize_ms is not None:
+            metrics["quantize_ms"] = quantize_ms
         return InferenceResult(
             request_id=remote.request_id,
             output_text=remote.output_text,

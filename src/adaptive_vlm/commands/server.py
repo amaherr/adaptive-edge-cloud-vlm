@@ -6,6 +6,7 @@ import json
 from collections.abc import Callable
 from pathlib import Path
 
+from adaptive_vlm.benchmark.cloud_load import heartbeat_source
 from adaptive_vlm.config import (
     ConfigError,
     ExecutionMode,
@@ -38,6 +39,7 @@ def run_cloud_server_command(
     verbose: bool,
     dual_paths: bool = False,
     report_resource_state: bool = False,
+    load_heartbeat: Path | None = None,
 ) -> int:
     progress = ProgressReporter(verbose)
     progress.detail(f"Loading experiment configuration from {config_path.resolve()}")
@@ -76,23 +78,28 @@ def run_cloud_server_command(
             )
     model_load_ms = (perf_counter() - load_started) * 1000
     state_sampler: CachedSampler | None = None
+    if load_heartbeat is not None and not report_resource_state:
+        raise ConfigError("--load-heartbeat needs --report-resource-state")
     if report_resource_state:
         index = int(device.split(":", 1)[1]) if device.startswith("cuda:") else 0
-        state_sampler = CachedSampler(
-            combine(gpu_state_source(index), host_memory_snapshot), period_s=0.5
-        )
+        sources = [gpu_state_source(index), host_memory_snapshot]
+        if load_heartbeat is not None:
+            sources.append(heartbeat_source(load_heartbeat))
+        state_sampler = CachedSampler(combine(*sources), period_s=0.5)
         state_sampler.start()
         progress.info("Reporting resource state with every response")
     contract_fingerprint = model_contract_fingerprint(config.model)
     progress.detail(f"Model contract fingerprint: {contract_fingerprint}")
 
     if dual_paths and config.model.adapter == "fake":
-        # Raw-image and synchronous projected paths only; no prompt-first state.
         processor = CloudRequestProcessor(
             protocol_version=config.transport.protocol_version,
             model_fingerprint=contract_fingerprint,
             inference_function=inference_function,
             tensor_inference_function=fake_adapter.generate_from_payload,
+            prompt_prepare_function=fake_adapter.prepare_prompt,
+            prepared_tensor_inference_function=fake_adapter.generate_from_payload,
+            pending_timeout_seconds=config.transport.timeout_seconds,
             event_callback=progress.info,
             state_provider=state_sampler.latest if state_sampler else None,
         )

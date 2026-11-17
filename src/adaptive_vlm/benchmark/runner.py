@@ -156,10 +156,15 @@ def run_benchmark(
     warmups: int,
     repetitions: int,
     pipeline: str,
+    payload: str | None = None,
     resume: bool = False,
     max_consecutive_failures: int = 0,
 ) -> dict[str, Any]:
-    """Execute one policy and persist each attempt before advancing."""
+    """Execute one policy and persist each attempt before advancing.
+
+    ``payload`` names a non-default distributed encoding (``int8``); bf16
+    plans omit it, so they hash as before.
+    """
 
     if manifest.revision != config.dataset.revision:
         raise ValueError("request manifest revision differs from experiment config")
@@ -178,6 +183,8 @@ def run_benchmark(
         "pipeline": pipeline,
         "schedule": [trial.to_dict() for trial in schedule],
     }
+    if payload is not None:
+        plan["payload"] = payload
     plan_hash = hashlib.sha256(
         json.dumps(plan, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()

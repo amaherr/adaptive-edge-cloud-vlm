@@ -9,7 +9,11 @@ The validity gates are the protocol's section 8:
 4. at L0 the edge never spills: Windows dedicated usage on the CUDA adapter
    stays ``spill_margin_mib`` below its maximum at every request snapshot;
 5. at L1/L2 the load generator was alive at the first and last measured
-   request snapshots.
+   request snapshots;
+6. (G2 v2+, amendment A2a rule 7) in a C1 sub-block every successful cloud
+   and distributed response reports the cloud-load worker alive with a
+   heartbeat younger than 5 s; in a C0 sub-block of a grid with cloud load,
+   no response reports it alive.
 
 An invalid sub-block is reported, not silently accepted; the supervisor moves
 it aside and reruns it as a whole.
@@ -27,8 +31,10 @@ from statistics import median
 from typing import Any, Protocol
 
 from adaptive_vlm.artifacts import write_json_atomic
-from adaptive_vlm.benchmark.edge_load import NO_LOAD
+from adaptive_vlm.benchmark.cloud_load import NO_CLOUD_LOAD
+from adaptive_vlm.benchmark.edge_load import NO_LOAD, LoadLevel
 from adaptive_vlm.benchmark.interleaved import PLACEMENTS, RESTARTABLE_EXIT_CODES
+from adaptive_vlm.campaign.cloud_load import CloudLoad
 from adaptive_vlm.campaign.grid import Grid, SubBlock
 from adaptive_vlm.campaign.network import QdiscState, measurement_failures
 
@@ -52,6 +58,7 @@ class Gates:
     # Linux there is no spill, only NVML used memory approaching the usable
     # limit, followed by CUDA OOM (counted as a failure either way).
     spill_metric: str = "edge_windows_gpu_dedicated_mib"
+    cloud_load_max_age_s: float = 5.0
 
 
 class SubBlockAborted(RuntimeError):
@@ -95,11 +102,83 @@ def benchmark_arguments(
         "--edge-load-level",
         block.load_level,
     ]
+    if grid.placements != PLACEMENTS:
+        arguments += ["--placements", *grid.placements]
+    if grid.cloud_load_level is not None:
+        arguments += ["--cloud-load-level", block.cloud_load]
     return [*arguments, "--resume"] if resume else arguments
+
+
+def cloud_load_reasons(
+    rows: Sequence[Mapping[str, Any]], block: SubBlock, *, max_age_s: float
+) -> list[str]:
+    """Gate A2a rule 7 over the successful remote responses of a sub-block."""
+
+    remote = [
+        row.get("metrics") or {}
+        for row in rows
+        if row.get("status") == "ok" and row.get("mode") != "edge"
+    ]
+    if block.cloud_load == NO_CLOUD_LOAD:
+        alive = sum(m.get("server_state_load_alive") is True for m in remote)
+        return [f"cloud load alive in {alive} C0 responses"] if alive else []
+    if not remote:
+        return ["no successful remote response to show the cloud load"]
+    unreported = sum("server_state_load_alive" not in m for m in remote)
+    if unreported:
+        return [f"cloud load state missing from {unreported} responses"]
+    reasons = []
+    dead = sum(
+        m.get("server_state_load_alive") is not True
+        or m.get("server_state_load_level") != block.cloud_load
+        for m in remote
+    )
+    if dead:
+        reasons.append(f"cloud load {block.cloud_load} not alive in {dead} responses")
+    ages = [m.get("server_state_load_heartbeat_age_s") for m in remote]
+    stale = sum(age is None or float(age) >= max_age_s for age in ages)
+    if stale:
+        reasons.append(f"cloud load heartbeat {max_age_s:.0f}s+ old in {stale}")
+    return reasons
+
+
+def _append(path: Path, value: Mapping[str, Any]) -> None:
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({"time": _now(), **value}, sort_keys=True) + "\n")
 
 
 def _drops(states: Mapping[str, QdiscState]) -> dict[str, int | None]:
     return {name: state.dropped for name, state in states.items()}
+
+
+def _run_benchmark(
+    *,
+    grid: Grid,
+    block: SubBlock,
+    run_dir: Path,
+    restarts_path: Path,
+    restarts: int,
+    command_prefix: Sequence[str],
+    run_child: Callable[[list[str], Path], int],
+    max_restarts: int,
+    log: Callable[[str], None],
+) -> None:
+    while True:
+        command = [
+            *command_prefix,
+            *benchmark_arguments(grid, block, run_dir, resume=run_dir.exists()),
+        ]
+        log(f"{block.subblock_id}: {'resuming' if run_dir.exists() else 'starting'}")
+        code = run_child(command, run_dir)
+        if code == 0:
+            break
+        if code in RESTARTABLE_EXIT_CODES and restarts < max_restarts:
+            restarts += 1
+            with restarts_path.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps({"time": _now(), "exit_code": code}) + "\n")
+            log(f"{block.subblock_id}: exit {code}; restart {restarts}/{max_restarts}")
+            continue
+        raise SubBlockAborted(f"{block.subblock_id}: benchmark exited {code}")
 
 
 def run_subblock(
@@ -114,8 +193,15 @@ def run_subblock(
     gates: Gates,
     max_restarts: int,
     log: Callable[[str], None] = print,
+    cloud_load: CloudLoad | None = None,
+    cloud_level: LoadLevel | None = None,
 ) -> dict[str, Any]:
-    """Run (or resume) one sub-block and return its validation report."""
+    """Run (or resume) one sub-block and return its validation report.
+
+    With ``cloud_load``, any leftover cloud worker is stopped first; a C1
+    sub-block starts ``cloud_level`` before the benchmark and stops it after,
+    whatever happens in between.
+    """
 
     output.mkdir(parents=True, exist_ok=True)
     condition = block.condition
@@ -129,6 +215,7 @@ def run_subblock(
         "cell_id": block.cell_id,
         "condition": asdict(condition),
         "load_level": block.load_level,
+        "cloud_load": block.cloud_load,
         "task": block.task,
         "repetition": block.repetition,
         "order_seed": grid.subblock_seed(block),
@@ -155,22 +242,38 @@ def run_subblock(
     run_dir = output / "run"
     restarts_path = output / "restarts.jsonl"
     restarts = sum(1 for _ in _rows(restarts_path))
-    while True:
-        command = [
-            *command_prefix,
-            *benchmark_arguments(grid, block, run_dir, resume=run_dir.exists()),
-        ]
-        log(f"{block.subblock_id}: {'resuming' if run_dir.exists() else 'starting'}")
-        code = run_child(command, run_dir)
-        if code == 0:
-            break
-        if code in RESTARTABLE_EXIT_CODES and restarts < max_restarts:
-            restarts += 1
-            with restarts_path.open("a", encoding="utf-8") as handle:
-                handle.write(json.dumps({"time": _now(), "exit_code": code}) + "\n")
-            log(f"{block.subblock_id}: exit {code}; restart {restarts}/{max_restarts}")
-            continue
-        raise SubBlockAborted(f"{block.subblock_id}: benchmark exited {code}")
+    cloud_log = output / "cloud_load.jsonl"
+    loaded = block.cloud_load != NO_CLOUD_LOAD
+    if loaded and (cloud_load is None or cloud_level is None):
+        raise RuntimeError(f"{block.subblock_id} needs a cloud-load controller")
+    if cloud_load is not None:
+        reaped = cloud_load.reap()
+        if reaped:
+            log(f"{block.subblock_id}: stopped leftover cloud load {reaped}")
+            _append(cloud_log, {"event": "reaped", "pids": reaped})
+    if loaded:
+        assert cloud_load is not None and cloud_level is not None
+        started = cloud_load.start(cloud_level)
+        _append(cloud_log, {"event": "started", **started})
+        log(f"{block.subblock_id}: cloud load {cloud_level.name} running")
+    try:
+        _run_benchmark(
+            grid=grid,
+            block=block,
+            run_dir=run_dir,
+            restarts_path=restarts_path,
+            restarts=restarts,
+            command_prefix=command_prefix,
+            run_child=run_child,
+            max_restarts=max_restarts,
+            log=log,
+        )
+    finally:
+        if loaded:
+            assert cloud_load is not None
+            stopped = cloud_load.stop()
+            _append(cloud_log, {"event": "stopped", **stopped})
+    restarts = sum(1 for _ in _rows(restarts_path))
 
     after = network.verify(**shaped)
     write_json_atomic(
@@ -202,7 +305,7 @@ def run_subblock(
                 reasons.append(f"{host} netem dropped packets ({start} -> {dropped})")
 
     placements = {}
-    for placement in PLACEMENTS:
+    for placement in grid.placements:
         directory = run_dir / placement
         planned = json.loads((directory / "plan.json").read_text())["schedule"]
         rows = _rows(directory / "requests.jsonl")
@@ -231,7 +334,7 @@ def run_subblock(
         for row in sorted(
             (
                 row
-                for placement in PLACEMENTS
+                for placement in grid.placements
                 for row in _rows(run_dir / placement / "requests.jsonl")
                 if not row["warmup"]
             ),
@@ -256,7 +359,7 @@ def run_subblock(
             )
         oom = sum(
             row.get("status") == "oom"
-            for placement in PLACEMENTS
+            for placement in grid.placements
             for row in _rows(run_dir / placement / "requests.jsonl")
         )
         if oom:
@@ -265,6 +368,17 @@ def run_subblock(
         for label, state in (("first", snapshots[0]), ("last", snapshots[-1])):
             if state.get("edge_load_alive") is not True:
                 reasons.append(f"load generator not alive at the {label} request")
+    if grid.cloud_load_level is not None:
+        reasons += cloud_load_reasons(
+            [
+                row
+                for placement in grid.placements
+                for row in _rows(run_dir / placement / "requests.jsonl")
+                if not row["warmup"]
+            ],
+            block,
+            max_age_s=gates.cloud_load_max_age_s,
+        )
 
     report = {
         "schema_version": 1,

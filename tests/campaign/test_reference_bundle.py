@@ -139,3 +139,102 @@ def test_a_single_mismatch_fails_the_proof_and_the_bundle(tmp_path: Path) -> Non
             script_path=SCRIPT,
             output=tmp_path / "bundle",
         )
+
+
+class StubInt8(StubDistributed):
+    def infer(self, request: InferenceRequest) -> InferenceResult:
+        return InferenceResult(request.request_id, "answer8", _tokens(request), {})
+
+
+def test_bundle_with_an_int8_control_binds_its_outputs(tmp_path: Path) -> None:
+    from adaptive_vlm.benchmark.heterogeneous_correctness import (
+        evaluate_rows,
+        verify_reference_evidence,
+    )
+
+    paths = _evidence(tmp_path)
+    config = load_experiment_config(CONFIG)
+    manifest = load_frozen_manifest(config.dataset.manifest_path)
+    run_benchmark(
+        config=config,
+        manifest=manifest,
+        policy=StubInt8(),
+        run_manifest=create_run_manifest(
+            config, {}, dataset_manifest_sha256=manifest.sha256
+        ),
+        run_dir=tmp_path / "control-int8",
+        warmups=1,
+        repetitions=3,
+        pipeline="synchronous",
+        payload="int8",
+    )
+    common = {
+        "config_path": CONFIG,
+        "edge": paths["edge"],
+        "cloud": paths["cloud"],
+        "control": paths["control"],
+        "edge_runtime": paths["edge_runtime"],
+        "cloud_runtime": paths["cloud_runtime"],
+        "script_path": SCRIPT,
+    }
+    index, proof = build_bundle(
+        **common, output=tmp_path / "bundle", int8_control=tmp_path / "control-int8"
+    )
+    assert proof["verified"]
+    import hashlib
+
+    outputs = verify_reference_evidence(
+        index,
+        hashlib.sha256(index.read_bytes()).hexdigest(),
+        manifest,
+        json.loads(index.read_text())["model_contract_sha256"],
+    )["_expected_outputs"]
+    first = manifest.items[0].request_id
+    assert outputs["distributed_int8"][first][1] == "answer8"
+    assert outputs["distributed"][first][1] == "answer"
+
+    def rows(text: str) -> list[dict[str, Any]]:
+        return [
+            {
+                "request_id": item.request_id,
+                "warmup": False,
+                "repetition": repetition,
+                "status": "ok",
+                "quality_score": 1.0,
+                "output_token_ids": list(outputs["distributed"][item.request_id][0]),
+                "output_text": text,
+            }
+            for item in manifest.items
+            for repetition in (0, 1)
+        ]
+
+    runs = {
+        "edge": rows("answer"),
+        "cloud": rows("answer"),
+        "distributed": rows("answer"),
+        "distributed_prompt_first": rows("answer"),
+        "distributed_int8": rows("answer8"),
+    }
+    expected = {
+        **outputs,
+        "edge": outputs["distributed"],
+        "cloud": outputs["distributed"],
+    }
+    assert (
+        evaluate_rows(runs, manifest, expected_outputs=expected)[
+            "reference_output_mismatches"
+        ]
+        == {}
+    )
+    wrong = evaluate_rows(
+        {**runs, "distributed_int8": rows("answer")},
+        manifest,
+        expected_outputs=expected,
+    )
+    assert set(wrong["reference_output_mismatches"]) == {"distributed_int8"}
+
+    # A bf16 control cannot stand in for the int8 one.
+    with pytest.raises(ValueError, match="control contract differs"):
+        build_bundle(
+            **common, output=tmp_path / "bundle2", int8_control=paths["control"]
+        )

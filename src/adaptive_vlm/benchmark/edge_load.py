@@ -40,8 +40,11 @@ class LoadLevel:
         return asdict(self)
 
 
-def load_levels(path: Path) -> dict[str, LoadLevel]:
-    """Read ``{"schema_version": 1, "levels": {"L1": {...}, ...}}``."""
+def load_levels(path: Path, *, no_load: str = NO_LOAD) -> dict[str, LoadLevel]:
+    """Read ``{"schema_version": 1, "levels": {"L1": {...}, ...}}``.
+
+    Cloud-load levels use the same format with ``no_load="C0"``.
+    """
 
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("schema_version") != 1 or not isinstance(
@@ -50,8 +53,10 @@ def load_levels(path: Path) -> dict[str, LoadLevel]:
         raise ValueError("edge-load levels need schema_version 1 and a levels map")
     levels: dict[str, LoadLevel] = {}
     for name, values in payload["levels"].items():
-        if name == NO_LOAD:
-            raise ValueError("L0 means no load generator and must not be configured")
+        if name == no_load:
+            raise ValueError(
+                f"{no_load} means no load generator and must not be configured"
+            )
         level = LoadLevel(
             name=name,
             working_set_mib=int(values["working_set_mib"]),

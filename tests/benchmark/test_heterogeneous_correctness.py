@@ -87,9 +87,7 @@ class PlacementPolicy(ExecutionPolicy):
 
 @pytest.fixture
 def evidence(tmp_path: Path) -> tuple[FrozenManifest, dict[str, Path], Path, Path]:
-    config = load_experiment_config(
-        ROOT / "configs/experiments/local_campaign.yaml"
-    )
+    config = load_experiment_config(ROOT / "configs/experiments/local_campaign.yaml")
     original = config.dataset.manifest_path
     records = [json.loads(line) for line in original.read_text().splitlines()]
     records = [r for r in records if r["scoring"] != "none"][:4]
@@ -299,7 +297,7 @@ def test_quality_repeatability_and_reference_changes_block(
 def test_unknown_placement_and_request_rejected(evidence: tuple) -> None:
     frozen, dirs, _, _ = evidence
     rows = raw_rows(dirs)
-    with pytest.raises(ValueError, match="all three"):
+    with pytest.raises(ValueError, match="edge, cloud and distributed"):
         evaluate_rows({"edge": rows["edge"]}, frozen)
     rows["edge"][1]["request_id"] = "unknown"
     with pytest.raises(ValueError, match="unknown request"):

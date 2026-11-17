@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, Final
 
+from adaptive_vlm.transport.tensors import tensor_nbytes
+
 DEFAULT_MAX_HEADER_BYTES: Final = 64 * 1024
 DEFAULT_MAX_PAYLOAD_BYTES: Final = 32 * 1024 * 1024
 MAX_REQUEST_ID_BYTES: Final = 128
@@ -234,9 +236,17 @@ def _validate_message(frame: Frame) -> None:
         _require_type(metadata, "ready", bool)
         _require_fingerprint(metadata)
         paths = _require_type(metadata, "paths", list)
-        allowed = {"raw_image", "projected_synchronous", "projected_prompt_first"}
-        if not paths or any(not isinstance(path, str) or path not in allowed
-                            for path in paths) or len(paths) != len(set(paths)):
+        allowed = {
+            "raw_image",
+            "projected_synchronous",
+            "projected_prompt_first",
+            "projected_int8",
+        }
+        if (
+            not paths
+            or any(not isinstance(path, str) or path not in allowed for path in paths)
+            or len(paths) != len(set(paths))
+        ):
             raise ProtocolError("capability paths are invalid")
         _require_empty_payload(frame)
     elif frame.message_type is MessageType.INFERENCE_REQUEST:
@@ -280,9 +290,7 @@ def _validate_message(frame: Frame) -> None:
         _require_fingerprint(metadata)
         _require_empty_payload(frame)
     elif frame.message_type is MessageType.PROMPT_RESPONSE:
-        _require_keys(
-            metadata, {"accepted", "model_fingerprint", "prompt_prepare_ms"}
-        )
+        _require_keys(metadata, {"accepted", "model_fingerprint", "prompt_prepare_ms"})
         _require_type(metadata, "accepted", bool)
         _require_fingerprint(metadata)
         prepare_ms = metadata.get("prompt_prepare_ms")
@@ -307,19 +315,21 @@ def _validate_message(frame: Frame) -> None:
 
 def _validate_tensor_request(frame: Frame) -> None:
     metadata = frame.metadata
-    _require_keys(
-        metadata,
-        {
-            "prompt",
-            "model_fingerprint",
-            "shape",
-            "dtype",
-            "byte_order",
-            "layout",
-            "nbytes",
-            "pipeline",
-        },
-    )
+    keys = {
+        "prompt",
+        "model_fingerprint",
+        "shape",
+        "dtype",
+        "byte_order",
+        "layout",
+        "nbytes",
+        "pipeline",
+    }
+    # Unquantized frames keep the original field set exactly.
+    _require_keys(metadata, keys | ({"quantization"} & set(metadata)))
+    quantization = metadata.get("quantization")
+    if quantization is not None and not isinstance(quantization, str):
+        raise ProtocolError("tensor quantization must be a string")
     prompt = _require_type(metadata, "prompt", str)
     if not prompt.strip() or len(prompt) > MAX_PROMPT_CHARACTERS:
         raise ProtocolError("prompt is empty or too long")
@@ -334,9 +344,10 @@ def _validate_tensor_request(frame: Frame) -> None:
     ):
         raise ProtocolError("tensor shape is invalid")
     dtype = _require_type(metadata, "dtype", str)
-    dtype_sizes = {"bfloat16": 2, "float16": 2, "float32": 4}
-    if dtype not in dtype_sizes:
-        raise ProtocolError("tensor dtype is unsupported")
+    try:
+        expected_nbytes = tensor_nbytes(tuple(shape), dtype, quantization)
+    except ValueError as exc:
+        raise ProtocolError("tensor dtype or quantization is unsupported") from exc
     byte_order = _require_type(metadata, "byte_order", str)
     if byte_order not in {"little", "big"}:
         raise ProtocolError("tensor byte_order is unsupported")
@@ -346,7 +357,7 @@ def _validate_tensor_request(frame: Frame) -> None:
     nbytes = _require_type(metadata, "nbytes", int)
     if isinstance(nbytes, bool) or nbytes != len(frame.payload):
         raise ProtocolError("tensor nbytes does not match payload")
-    if nbytes != math.prod(shape) * dtype_sizes[dtype]:
+    if nbytes != expected_nbytes:
         raise ProtocolError("tensor shape, dtype, and nbytes are inconsistent")
     if not frame.payload:
         raise ProtocolError("tensor payload is empty")

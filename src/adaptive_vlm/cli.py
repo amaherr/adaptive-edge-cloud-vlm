@@ -96,6 +96,12 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("synchronous", "prompt_first"),
         default="synchronous",
     )
+    benchmark_parser.add_argument(
+        "--payload",
+        choices=("bf16", "int8"),
+        default="bf16",
+        help="Distributed projected-tensor encoding (int8: amendment A2a rule 3)",
+    )
     benchmark_parser.add_argument("--resume", action="store_true")
     benchmark_parser.add_argument("--max-consecutive-failures", type=int, default=0)
     benchmark_parser.add_argument("-v", "--verbose", action="store_true")
@@ -351,6 +357,14 @@ def _add_resource_state_argument(parser: argparse.ArgumentParser) -> None:
             "server_state_* metrics."
         ),
     )
+    parser.add_argument(
+        "--load-heartbeat",
+        type=Path,
+        help=(
+            "Cloud-load worker heartbeat file; with --report-resource-state, "
+            "adds load_level, load_alive, load_heartbeat_age_s and load_duty"
+        ),
+    )
 
 
 def _add_edge_residency_argument(parser: argparse.ArgumentParser) -> None:
@@ -426,6 +440,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 verbose=args.verbose,
                 dual_paths=args.command == "adaptive-server",
                 report_resource_state=args.report_resource_state,
+                load_heartbeat=args.load_heartbeat,
             )
         if args.command == "adaptive-infer":
             return adaptive.run_adaptive_infer_command(args)

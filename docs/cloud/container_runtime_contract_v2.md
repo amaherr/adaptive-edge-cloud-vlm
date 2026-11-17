@@ -35,6 +35,10 @@ It starts the interleaved benchmark and the edge load worker as child processes,
 All cloud control runs through SSM `AWS-RunShellScript` on the cloud **host**, as root:
 - `tc` (no `sudo`);
 - `docker inspect` and `docker exec adaptive-vlm-inference python …`;
+- the cloud-load control (`docker exec adaptive-vlm-inference python -m adaptive_vlm.benchmark.cloud_load start|status|stop|reap`).
+  - The C1 worker runs detached inside the inference container, as user 10001 on its GPU.
+  - It writes its heartbeat to the container's tmpfs `/tmp/adaptive-vlm-cloud-load/heartbeat.json`.
+  - The server reads that file (`--load-heartbeat`) and reports it with every response;
 - heartbeat `touch`.
 
 Commands are sent per sub-block or per heartbeat interval, never per request.

@@ -8,7 +8,8 @@ Run every step from the repository root, on the commit the campaign will use
                spill on 4 GiB; cloud ~15 min)
   runtime      on EACH host: record the runtime package versions
   control      on the edge, with the cloud server running: the distributed
-               control run (1 warmup + 3 repetitions over the manifest)
+               control run (1 warmup + 3 repetitions over the manifest);
+               G2 v2+ runs it twice, the second time with --payload int8
   bundle       on the edge, after copying the cloud's same-device folder and
                runtime file across: bind and verify everything; prints the
                index path to put in the campaign settings
@@ -43,6 +44,15 @@ def main() -> None:
     parser.add_argument("--edge", type=Path, help="bundle: edge same-device folder")
     parser.add_argument("--cloud", type=Path, help="bundle: cloud same-device folder")
     parser.add_argument("--control", type=Path, help="bundle: control run folder")
+    parser.add_argument(
+        "--payload",
+        choices=("bf16", "int8"),
+        default="bf16",
+        help="control: projected-tensor encoding",
+    )
+    parser.add_argument(
+        "--int8-control", type=Path, help="bundle: int8 control run folder (G2 v2+)"
+    )
     parser.add_argument("--edge-runtime", type=Path)
     parser.add_argument("--cloud-runtime", type=Path)
     args = parser.parse_args()
@@ -109,6 +119,8 @@ def main() -> None:
             "cpu",
             "--max-consecutive-failures",
             "3",
+            "--payload",
+            args.payload,
         ]
         raise SystemExit(subprocess.run(command, check=False).returncode)
     else:
@@ -130,6 +142,7 @@ def main() -> None:
             cloud_runtime=args.cloud_runtime,
             script_path=SCRIPT,
             output=args.output,
+            int8_control=args.int8_control,
         )
         print(json.dumps(proof, indent=2))
         print(f"reference index: {index}", file=sys.stderr)

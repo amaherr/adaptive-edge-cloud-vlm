@@ -16,7 +16,11 @@ or mislabelled campaign, and accepting it would leak data across splits.
 
 Input snapshots extend schema 2 with the edge-load level and the edge state
 read before the timer started (``pre_request_state``). Cloud ``server_state_*``
-values arrive with the response, so they are outcomes and never inputs.
+values arrive with the response, so they are outcomes and never inputs of
+that request. G2 v2+ (amendment A2a rule 9) adds the cloud-load level and the
+previous remote response's cloud state in the same sub-block
+(``previous_cloud_state``, null for the first), which the runner recorded
+before the timer started.
 """
 
 from __future__ import annotations
@@ -32,13 +36,11 @@ from pathlib import Path
 from typing import Any
 
 from adaptive_vlm.artifacts import write_json_atomic
-from adaptive_vlm.benchmark.interleaved import PLACEMENTS
 from adaptive_vlm.benchmark.profile import build_profile
 from adaptive_vlm.campaign.grid import PRIMARY_TASK, Grid, SubBlock, load_grid
 from adaptive_vlm.campaign.subblock import check_completed
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.prediction.v2.dataset.contract import (
-    CONFIGURATION_IDS,
     validate_target,
     validate_task_features,
 )
@@ -53,12 +55,14 @@ from adaptive_vlm.prediction.v2.dataset.parsing import (
     routing_metadata,
     strict_json,
 )
+from adaptive_vlm.scheduler.configuration import SPEC_BY_PLACEMENT
 
 PARTITIONS = {
     "training": "train",
     "validation": "validation",
     "evaluation": "final_test_protected",
 }
+INT8 = "distributed/projected/int8"
 CONFIGURATION_BY_MODE = {
     "edge": "edge/full",
     "cloud": "cloud/raw_image",
@@ -85,7 +89,12 @@ EDGE_STATE_KEYS = (
     "edge_load_duty",
     "edge_load_heartbeat_age_s",
 )
-_INPUT_KEYS = ROUTING_KEYS | {"edge_load_level", "pre_request_state"}
+_INPUT_KEYS = ROUTING_KEYS | {
+    "edge_load_level",
+    "pre_request_state",
+    "cloud_load_level",
+    "previous_cloud_state",
+}
 PINNED_TOKENIZER = Path(
     ".model-cache/hub/models--moondream--starmie-v1/snapshots/"
     "35192e10a54e36eabe0a7cc57a2c1aab371cafc5/tokenizer.json"
@@ -210,7 +219,7 @@ def profile_campaign(
         spec_path = target / "profile_specification.json"
         write_json_atomic(spec_path, spec)
         summaries[block.subblock_id] = build_profile(
-            run_dirs=[directory / "run" / mode for mode in PLACEMENTS],
+            run_dirs=[directory / "run" / p for p in grid.placements],
             specification=spec_path,
             output_dir=target / "profile",
         )
@@ -229,6 +238,18 @@ def profile_campaign(
     }
     write_json_atomic(output / "profiles_index.json", index)
     return index
+
+
+def _cloud_state(state: Any) -> dict[str, Any] | None:
+    """The previous response's cloud state: numeric/boolean fields, or None."""
+
+    if not isinstance(state, dict):
+        return None
+    return {
+        key: value
+        for key, value in sorted(state.items())
+        if value is None or isinstance(value, (bool, int, float))
+    }
 
 
 def _edge_state(state: Any) -> dict[str, Any]:
@@ -286,6 +307,13 @@ def prepare_campaign_partitions(
         raise FileExistsError("refusing to overwrite a partition bundle")
     contract = strict_json(contract_path.read_bytes())
     plan, grid = _campaign_grid(campaign)
+    # A2a rules 4-5: the scheduler may see int8 only if its quality was admitted.
+    admitted = contract.get("int8_admitted")
+    if INT8 in grid.configurations and admitted is not True:
+        raise ValueError(
+            "the grid measures int8 but the dataset contract does not record "
+            "int8_admitted: true (amendment A2a rule 4)"
+        )
     splits: dict[str, dict[str, Any]] = {}
     features: dict[str, dict[str, Any]] = {}
     ids: dict[str, dict[str, list[str]]] = {}
@@ -334,7 +362,7 @@ def prepare_campaign_partitions(
         measured = [t for t in schedule["schedule"] if not t["warmup"]]
         if {t["request_id"] for t in measured} != set(block_ids):
             raise ValueError(f"{block.subblock_id} plan does not cover its split")
-        classified[partition] += len(measured) * len(PLACEMENTS)
+        classified[partition] += len(measured) * len(grid.placements)
         if partition == "final_test_protected":
             continue  # Never open an evaluation profile or journal.
         if digest(profiles / block.subblock_id / "profile" / "profile.jsonl") != index[
@@ -357,16 +385,14 @@ def prepare_campaign_partitions(
         ):
             raise ValueError("probe evidence changed")
         plans = {
-            CONFIGURATION_BY_MODE[mode]: strict_json(
-                (directory / "run" / mode / "plan.json").read_bytes()
+            SPEC_BY_PLACEMENT[placement].id.value: strict_json(
+                (directory / "run" / placement / "plan.json").read_bytes()
             )
-            for mode in PLACEMENTS
+            for placement in grid.placements
         }
         member = profiles / block.subblock_id / "profile" / "profile.jsonl"
         opened.append(str(member.relative_to(profiles)))
-        expected = {
-            (rid, cid) for rid in block_ids for cid in CONFIGURATION_BY_MODE.values()
-        }
+        expected = {(rid, cid) for rid in block_ids for cid in grid.configurations}
         found: set[tuple[str, str]] = set()
         for line in member.read_bytes().splitlines():
             meta = routing_metadata(line, keys=_INPUT_KEYS)
@@ -379,7 +405,7 @@ def prepare_campaign_partitions(
                     f"{block.condition.condition_id} ({block.task} task)"
                 )
             cid = meta["configuration_id"]
-            if cid not in CONFIGURATION_IDS or cid not in plans:
+            if cid not in plans:
                 raise ValueError(f"unrecognized configuration: {cid}")
             _check_envelope(
                 meta,
@@ -415,7 +441,11 @@ def prepare_campaign_partitions(
                 ),
                 "edge_load_level": meta["edge_load_level"],
                 "edge_state": _edge_state(meta.get("pre_request_state")),
+                "cloud_load_level": meta.get("cloud_load_level", "C0"),
+                "previous_cloud_state": _cloud_state(meta.get("previous_cloud_state")),
             }
+            if snapshot["cloud_load_level"] != block.cloud_load:
+                raise ValueError("profile cloud-load level differs from the sub-block")
             if meta["edge_load_level"] != block.load_level:
                 raise ValueError("profile load level differs from the sub-block")
             if partition == "train":
@@ -430,7 +460,7 @@ def prepare_campaign_partitions(
 
     expected_counts = {
         PARTITIONS[name]: sum(
-            len(ids[b.task][name]) * len(PLACEMENTS)
+            len(ids[b.task][name]) * len(grid.placements)
             for b in grid.subblocks()
             if b.condition.split == name
         )
@@ -471,6 +501,9 @@ def prepare_campaign_partitions(
             n: digest(feature_path(feature_dir, n)) for n in grid.tasks
         },
         "contract_sha256": digest(contract_path),
+        "configurations": list(grid.configurations),
+        "int8_admitted": admitted,
+        "cloud_load_level": grid.cloud_load_level,
         "classification": dict(classified),
         "training_attempts": len(training),
         "validation_attempts": len(validation_inputs),

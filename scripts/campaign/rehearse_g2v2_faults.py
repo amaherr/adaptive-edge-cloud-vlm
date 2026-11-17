@@ -7,7 +7,10 @@ Runs the loopback rehearsal campaign (fake model, real GPU load worker) and:
 2. restarts the campaign, which resumes the interrupted sub-block;
 3. kills the edge-load worker (SIGKILL) during the loaded sub-block, which
    must end that attempt with exit code 76 and be resumed automatically;
-4. waits for completion and verifies every sub-block's journals (no gaps, no
+4. with a G2 v2+ grid (``g2v2plus_loopback_rehearsal.json``), kills the
+   real cloud-load worker (SIGKILL) during the C1 sub-block, which the cloud
+   gate must invalidate and the supervisor must rerun;
+5. waits for completion and verifies every sub-block's journals (no gaps, no
    duplicates, one record per planned attempt), the restart log, the absence
    of stray processes, and that the derived Predictor V2 and oracle tables
    build without manual edits.
@@ -29,6 +32,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from adaptive_vlm.benchmark import cloud_load
+from adaptive_vlm.campaign.grid import load_grid
 from adaptive_vlm.campaign.supervisor import load_settings
 from adaptive_vlm.models.fake import DELAY_ENVIRONMENT
 from adaptive_vlm.process import find_processes
@@ -80,7 +85,9 @@ def campaign(action: str, settings: Path, env: dict[str, str]) -> None:
 def verify_subblock(directory: Path) -> dict[str, Any]:
     report = json.loads((directory / "validation_report.json").read_text())
     positions: list[int] = []
-    for placement in ("edge", "cloud", "distributed"):
+    for placement in sorted(
+        path.parent.name for path in (directory / "run").glob("*/plan.json")
+    ):
         plan = json.loads((directory / "run" / placement / "plan.json").read_text())
         rows = [
             json.loads(line)
@@ -133,6 +140,10 @@ def main() -> None:
         shutil.rmtree(output, ignore_errors=True)
         shutil.rmtree(derived, ignore_errors=True)
     output.mkdir(parents=True)
+    cloud_cells = load_grid(Path(settings["grid"])).cloud_load_level is not None
+    cloud_heartbeat = Path(
+        settings.get("cloud_load_heartbeat") or cloud_load.DEFAULT_HEARTBEAT
+    )
     env = {**os.environ, DELAY_ENVIRONMENT: str(args.delay_ms)}
     report: dict[str, Any] = {"delay_ms": args.delay_ms, "steps": []}
 
@@ -152,6 +163,8 @@ def main() -> None:
             "--bind-host",
             "127.0.0.1",
             "--report-resource-state",
+            "--load-heartbeat",
+            str(cloud_heartbeat),
         ],
         stdout=server_log,
         stderr=subprocess.STDOUT,
@@ -201,28 +214,38 @@ def main() -> None:
 
         campaign("start", args.settings, env)
         step("restarted")
-        heartbeat = wait(
-            lambda: next(
-                (
-                    path
-                    for path in first.glob("*-L1-*/.run-edge-load/heartbeat.json")
-                    if json.loads(path.read_text() or "{}").get("status") == "running"
-                    and committed(path.parent.parent / "run") >= 4
-                ),
-                None,
-            ),
-            900,
-            "the loaded sub-block",
-            interval=0.1,
-        )
-        worker = int(json.loads(heartbeat.read_text())["pid"])
-        os.kill(worker, signal.SIGKILL)
-        step(
-            "load worker killed",
-            pid=worker,
-            subblock=heartbeat.parent.parent.name,
-            committed_rows=committed(heartbeat.parent.parent / "run"),
-        )
+        # Kill the edge-load worker (and, with C1 cells, the cloud worker)
+        # in whichever sub-block reaches them first.
+        edge_killed = cloud_killed = False
+        deadline = time.monotonic() + 1800
+        while supervisor_running(output) and time.monotonic() < deadline:
+            if not edge_killed:
+                for path in first.glob("*-L1-*/.run-edge-load/heartbeat.json"):
+                    try:
+                        beat = json.loads(path.read_text() or "{}")
+                    except ValueError:
+                        continue
+                    run = path.parent.parent / "run"
+                    if beat.get("status") == "running" and committed(run) >= 4:
+                        os.kill(int(beat["pid"]), signal.SIGKILL)
+                        edge_killed = True
+                        step(
+                            "load worker killed",
+                            pid=beat["pid"],
+                            subblock=run.parent.name,
+                            committed_rows=committed(run),
+                        )
+                        break
+            if cloud_cells and not cloud_killed:
+                beat = cloud_load.read_heartbeat(cloud_heartbeat) or {}
+                runs = [d / "run" for d in first.glob("*-C1-*")]
+                if beat.get("status") == "running" and any(
+                    committed(run) >= 4 for run in runs
+                ):
+                    os.kill(int(beat["pid"]), signal.SIGKILL)
+                    cloud_killed = True
+                    step("cloud worker killed", pid=beat["pid"])
+            time.sleep(0.1)
         wait(lambda: not supervisor_running(output), 1800, "the campaign to finish", 1)
     finally:
         server.terminate()
@@ -233,7 +256,14 @@ def main() -> None:
     subblocks = {
         d.name: verify_subblock(d) for d in sorted((output / "subblocks").iterdir())
     }
-    strays = find_processes(str(output / "subblocks"))
+    strays = find_processes(str(output / "subblocks")) + find_processes(
+        f"--heartbeat {cloud_heartbeat} "
+    )
+    invalid = (
+        sorted(d.name for d in (output / "invalid").iterdir())
+        if (output / "invalid").exists()
+        else []
+    )
     derive = subprocess.run(
         [
             sys.executable,
@@ -242,7 +272,15 @@ def main() -> None:
             "--campaign",
             str(output),
             "--contract",
-            str(ROOT / "configs/predictor/rehearsal_dataset_contract.json"),
+            str(
+                ROOT
+                / "configs/predictor"
+                / (
+                    "rehearsal_dataset_contract_v2plus.json"
+                    if cloud_cells
+                    else "rehearsal_dataset_contract.json"
+                )
+            ),
             "--output",
             str(derived),
             "--sealed-root",
@@ -253,21 +291,33 @@ def main() -> None:
     )
     audit_path = derived / "partitions" / "partition_audit.json"
     audit = json.loads(audit_path.read_text()) if audit_path.exists() else {}
+    # Include attempts moved aside: both kills can land in the same sub-block.
     restart_codes = Counter(
         code for block in subblocks.values() for code in block["restart_exit_codes"]
+    ) + Counter(
+        json.loads(line)["exit_code"]
+        for path in (output / "invalid").glob("*/restarts.jsonl")
+        for line in path.read_text().splitlines()
     )
     checks = {
         "campaign_completed": status["state"] == "completed",
         "all_attempts_recorded": status["measured_attempts"]
         == status["target_attempts"],
         "all_subblocks_valid": all(b["valid"] for b in subblocks.values()),
+        "cloud_worker_kill_invalidated_and_rerun": not cloud_cells
+        or (
+            any(s["step"] == "cloud worker killed" for s in report["steps"])
+            and any("-C1-" in name for name in invalid)
+        ),
         "children_exited_with_supervisor": any(
             s["step"] == "children exited with their supervisor"
             for s in report["steps"]
         ),
         "load_failure_restarted_with_76": restart_codes.get(76, 0) >= 1,
         "no_stray_processes": not strays,
-        "no_invalid_reruns": not (output / "invalid").exists(),
+        # Only the cloud-worker kill may invalidate (and rerun) a sub-block.
+        "no_invalid_reruns": all("-C1-" in name for name in invalid)
+        and (bool(invalid) or not cloud_cells),
         "derived_tables_built": derive.returncode == 0
         and audit.get("evaluation_profiles_opened") == []
         and (derived / "oracle-training" / "oracle_cells.json").exists(),

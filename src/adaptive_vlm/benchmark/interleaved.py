@@ -1,6 +1,7 @@
 """Per-request interleaving of placements with untimed edge state preparation.
 
-G2 v2 measures edge/full, cloud and distributed for the same request back to
+G2 v2 measures edge/full, cloud and distributed (G2 v2+ also the prompt-first
+and int8 distributed variants) for the same request back to
 back in a seeded random order, so slow drift (temperature, clocks, background
 load) affects every placement alike instead of being confounded with one of
 them. Edge/full and the edge half of distributed share one edge adapter. Before
@@ -45,14 +46,16 @@ from adaptive_vlm.data.manifest import FrozenManifest
 from adaptive_vlm.execution.base import ExecutionPolicy
 from adaptive_vlm.execution.remote import RemoteInferenceError
 from adaptive_vlm.process import exclusive_lock
+from adaptive_vlm.scheduler.configuration import ALL_CONFIGURATIONS, SPEC_BY_PLACEMENT
 from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.protocol import ProtocolError
 
+# G2 v2's three placements (the default); G2 v2+ adds the prompt-first and
+# int8 variants of the distributed split. A placement names a run directory.
 PLACEMENTS = ("edge", "cloud", "distributed")
+ALL_PLACEMENTS = tuple(spec.placement for spec in ALL_CONFIGURATIONS)
 PREPARED_STAGE: Mapping[str, str | None] = {
-    "edge": "text",
-    "distributed": "vision",
-    "cloud": None,
+    spec.placement: spec.prepared_stage for spec in ALL_CONFIGURATIONS
 }
 DEVICE_RESTART_EXIT_CODE = 75
 ENVIRONMENT_RESTART_EXIT_CODE = 76
@@ -107,7 +110,7 @@ def make_interleaved_order(
         raise ValueError("repetition indices must be non-negative")
     if not placements or len(set(placements)) != len(placements):
         raise ValueError("placements must be non-empty and unique")
-    unknown = set(placements) - set(PLACEMENTS)
+    unknown = set(placements) - set(ALL_PLACEMENTS)
     if unknown:
         raise ValueError(f"unknown placements: {sorted(unknown)}")
     rng = random.Random(seed)
@@ -186,6 +189,20 @@ def verify_interleave_parameters(parameters: Mapping[str, Any]) -> None:
         raise ValueError("interleave parameters do not reproduce their recorded order")
 
 
+def cloud_state(row: Mapping[str, Any]) -> dict[str, Any] | None:
+    """The ``server_state_*`` a successful remote response carried, if any."""
+
+    if row.get("status") != InferenceStatus.OK.value:
+        return None
+    metrics = row.get("metrics") or {}
+    state = {
+        key.removeprefix("server_state_"): value
+        for key, value in metrics.items()
+        if key.startswith("server_state_")
+    }
+    return state or None
+
+
 def run_interleaved_benchmark(**kwargs: Any) -> dict[str, Any]:
     """Run every placement for each request in a seeded interleaved order.
 
@@ -210,7 +227,6 @@ def _run_interleaved_benchmark(
     repetitions: Sequence[int],
     warmups: int,
     seed: int,
-    pipeline: str = "synchronous",
     prepare_stage: StagePreparer | None = None,
     state_probe: StateProbe | None = None,
     precondition: Callable[[], None] | None = None,
@@ -232,12 +248,21 @@ def _run_interleaved_benchmark(
         raise ValueError("request manifest revision differs from experiment config")
     if max_consecutive_failures < 0:
         raise ValueError("max_consecutive_failures must be non-negative")
-    placements = [p for p in PLACEMENTS if p in policies]
+    placements = [p for p in ALL_PLACEMENTS if p in policies]
     if set(policies) != set(placements) or set(run_manifests) != set(placements):
         raise ValueError("policies and run manifests must name the same placements")
+    specs = {p: SPEC_BY_PLACEMENT[p] for p in placements}
     for placement, policy in policies.items():
-        if policy.mode.value != placement:
+        spec = specs[placement]
+        if policy.mode is not spec.mode:
             raise ValueError(f"{placement} policy reports mode {policy.mode.value}")
+        for name, wanted in (
+            ("pipeline", spec.pipeline),
+            ("payload_format", spec.payload),
+        ):
+            actual = getattr(policy, name, wanted)
+            if wanted is not None and actual != wanted:
+                raise ValueError(f"{placement} policy has {name} {actual}")
     items = {item.request_id: item for item in manifest.items}
     missing = [rid for rid in request_ids if rid not in items]
     if missing:
@@ -266,8 +291,11 @@ def _run_interleaved_benchmark(
             "config_sha256": semantic_config_sha256(config.to_dict()),
             "model_contract_sha256": model_contract_fingerprint(config.model),
             "dataset_manifest_sha256": manifest.sha256,
-            "mode": placement,
-            "pipeline": pipeline if placement == "distributed" else "synchronous",
+            "mode": specs[placement].mode.value,
+            "pipeline": specs[placement].pipeline or "synchronous",
+            "payload": specs[placement].payload,
+            "placement": placement,
+            "configuration_id": specs[placement].id.value,
             "schedule": schedule,
             "interleave": parameters,
             "conditions": dict(conditions or {}),
@@ -340,12 +368,21 @@ def _run_interleaved_benchmark(
                 or saved_row.get("repetition") != planned["repetition"]
                 or saved_row.get("plan_sha256") != plan["plan_sha256"]
                 or saved_row.get("run_id") != run_ids[placement]
-                or saved_row.get("mode") != placement
+                or saved_row.get("mode") != plan["mode"]
+                or saved_row.get("placement") != placement
                 or saved_row.get("dataset_manifest_sha256") != manifest.sha256
             ):
                 raise ValueError(f"{placement} result does not match plan: {trial_id}")
             completed.add((placement, str(trial_id)))
 
+    # The previous response's cloud state (amendment A2a rule 9): an input
+    # observed before the timer, lagged by one remote response, None at first.
+    previous_cloud: dict[str, Any] | None = None
+    for saved in sorted(
+        (row for placement in placements for row in rows[placement]),
+        key=lambda row: int(row["interleave_position"]),
+    ):
+        previous_cloud = cloud_state(saved) or previous_cloud
     consecutive_failures = 0
     for position, (placement, trial) in enumerate(order, 1):
         if (placement, trial.trial_id) in completed:
@@ -367,13 +404,16 @@ def _run_interleaved_benchmark(
             "model_contract_sha256": plan["model_contract_sha256"],
             "dataset_manifest_sha256": manifest.sha256,
             "run_id": run_ids[placement],
-            "mode": placement,
+            "mode": plan["mode"],
+            "placement": placement,
+            "configuration_id": plan["configuration_id"],
             "image_sha256": item.image_sha256,
             "scoring": item.scoring,
             "interleave_position": position,
             "prepared_stage": PREPARED_STAGE[placement],
             "stage_prepare_ms": None,
             "resource_state": None,
+            "previous_cloud_state": previous_cloud,
         }
         failure: Exception | None = None
         started = perf_counter_ns()
@@ -409,6 +449,7 @@ def _run_interleaved_benchmark(
         row["observed_end_to_end_ms"] = (perf_counter_ns() - started) / 1_000_000
         append_jsonl(run_dir / placement / "requests.jsonl", row)
         rows[placement].append(row)
+        previous_cloud = cloud_state(row) or previous_cloud
         if failure is not None and is_device_context_failure(failure):
             raise DeviceContextFailure(
                 f"local device context failed at {placement} {trial.trial_id}; "
@@ -429,7 +470,7 @@ def _run_interleaved_benchmark(
         summary = summarize(
             rows[placement],
             manifest,
-            ExecutionMode(placement),
+            ExecutionMode(plans[placement]["mode"]),
             plans[placement]["plan_sha256"],
         )
         write_json_atomic(run_dir / placement / "summary.json", summary)

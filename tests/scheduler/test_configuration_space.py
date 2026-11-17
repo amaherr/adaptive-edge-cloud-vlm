@@ -97,7 +97,11 @@ def test_dual_server_reports_paths_and_routes_both_requests() -> None:
             )
         )
     )
-    assert capabilities.metadata["paths"] == ["raw_image", "projected_synchronous"]
+    assert capabilities.metadata["paths"] == [
+        "raw_image",
+        "projected_synchronous",
+        "projected_int8",
+    ]
     image_result = processor.handle(
         _received(
             Frame(
@@ -247,9 +251,7 @@ def test_adaptive_infer_writes_decision_and_request(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     policies = _policies()
-    config = load_experiment_config(
-        ROOT / "configs/experiments/local_campaign.yaml"
-    )
+    config = load_experiment_config(ROOT / "configs/experiments/local_campaign.yaml")
     remote = RemoteCapabilities(
         True, model_contract_fingerprint(config.model), REMOTE.paths
     )
@@ -335,9 +337,7 @@ def test_phase1_loader_shares_one_resident_full_adapter(
         return Adapter()
 
     monkeypatch.setattr(MoondreamAdapter, "from_pretrained", loader)
-    config = load_experiment_config(
-        ROOT / "configs/experiments/local_campaign.yaml"
-    )
+    config = load_experiment_config(ROOT / "configs/experiments/local_campaign.yaml")
     policies = load_phase1_policies(
         config,
         artifact_manifest=ROOT / "configs/model/moondream2_artifact.yaml",
@@ -347,7 +347,7 @@ def test_phase1_loader_shares_one_resident_full_adapter(
         text_device="cpu",
         edge_components="full",
     )
-    assert set(policies) == set(ConfigurationId)
+    assert set(policies) == {spec.id for spec in CONFIGURATIONS}
     assert len(loaded) == 1
     assert loaded[0]["components"] == "full"
 
@@ -407,6 +407,7 @@ def test_adaptive_server_exposes_all_paths(
     assert ready["supported_paths"] == [
         "raw_image",
         "projected_synchronous",
+        "projected_int8",
         "projected_prompt_first",
     ]
     assert processors[0].supported_paths == tuple(ready["supported_paths"])

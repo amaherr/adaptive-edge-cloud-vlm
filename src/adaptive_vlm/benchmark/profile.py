@@ -23,13 +23,25 @@ from adaptive_vlm.benchmark.interleaved import (
 from adaptive_vlm.benchmark.runner import make_schedule
 from adaptive_vlm.data.manifest import load_frozen_manifest
 from adaptive_vlm.measurement import measure_call
+from adaptive_vlm.scheduler.configuration import ALL_CONFIGURATIONS
 from adaptive_vlm.timing import perf_counter_ns
 
 _CONFIGURATIONS = {
-    ("edge", "synchronous"): "edge/full",
-    ("cloud", "synchronous"): "cloud/raw_image",
-    ("distributed", "synchronous"): "distributed/projected/synchronous",
+    (spec.mode.value, spec.pipeline or "synchronous", spec.payload): spec.id.value
+    for spec in ALL_CONFIGURATIONS
 }
+_PROJECTED_BYTES = {"bf16": 729 * 2048 * 2, "int8": 729 * 2048 + 729 * 2}
+
+
+def _configuration(plan: Mapping[str, Any]) -> str | None:
+    """Configuration of a run plan; G2 v2 plans predate the payload field."""
+
+    payload = plan.get("payload", "bf16" if plan["mode"] == "distributed" else None)
+    return _CONFIGURATIONS.get((plan["mode"], plan["pipeline"], payload))
+
+
+def _placement(plan: Mapping[str, Any]) -> str:
+    return str(plan.get("placement", plan["mode"]))
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -74,7 +86,8 @@ def _interleave_fields(
     """Pre-request observations of an interleaved run (absent for fixed runs).
 
     ``pre_request_state`` was read before the timer started, so it may be used
-    as a predictor input; cloud ``server_state_*`` metrics are outcomes.
+    as a predictor input; cloud ``server_state_*`` metrics are outcomes. The
+    previous remote response's cloud state is an input (lagged by one).
     """
 
     if plan.get("interleave") is None:
@@ -85,6 +98,8 @@ def _interleave_fields(
         "interleave_position": row.get("interleave_position"),
         "stage_prepare_ms": row.get("stage_prepare_ms"),
         "pre_request_state": row.get("resource_state"),
+        "cloud_load_level": conditions.get("cloud_load_level", "C0"),
+        "previous_cloud_state": row.get("previous_cloud_state"),
     }
 
 
@@ -189,9 +204,9 @@ def build_profile(
     reference = runs[0][0]
     modes: set[str] = set()
     for plan, _, _ in runs:
-        if plan["mode"] in modes:
-            raise ValueError(f"duplicate configuration mode: {plan['mode']}")
-        modes.add(plan["mode"])
+        if _placement(plan) in modes:
+            raise ValueError(f"duplicate configuration mode: {_placement(plan)}")
+        modes.add(_placement(plan))
         for name in (
             "config_sha256",
             "model_contract_sha256",
@@ -202,7 +217,7 @@ def build_profile(
         ):
             if plan.get(name) != reference.get(name):
                 raise ValueError(f"benchmark runs differ on {name}")
-        if (plan["mode"], plan["pipeline"]) not in _CONFIGURATIONS:
+        if _configuration(plan) is None:
             raise ValueError("unsupported configuration or pipeline")
     config = reference["config"]
     if config["model"]["max_new_tokens"] != spec["requested_max_new_tokens"]:
@@ -226,7 +241,7 @@ def build_profile(
             raise ValueError("interleaved request IDs are not in the frozen manifest")
         if planned != placement_schedule(interleave):
             raise ValueError("benchmark schedule differs from frozen interleaved order")
-        if {plan["mode"] for plan, _, _ in runs} != set(interleave["placements"]):
+        if {_placement(plan) for plan, _, _ in runs} != set(interleave["placements"]):
             raise ValueError("interleaved profile must include every placement")
     warmups = sum(bool(trial["warmup"]) for trial in planned)
     repetitions = (
@@ -251,7 +266,7 @@ def build_profile(
     for plan, run_manifest, rows in runs:
         mode = plan["mode"]
         remote = mode != "edge"
-        configuration_id = _CONFIGURATIONS[(mode, plan["pipeline"])]
+        configuration_id = _configuration(plan)
         placement = run_manifest.get("environment", {}).get("execution_placement", {})
         for row in rows:
             item = items[row["request_id"]]
@@ -334,7 +349,11 @@ def build_profile(
                 and remote
                 and metrics.get("total_wire_bytes") is not None
                 and metrics["total_wire_bytes"]
-                != cast(int, request_wire) + cast(int, response_wire)
+                != cast(int, request_wire)
+                + cast(int, response_wire)
+                # Prompt-first also exchanges the prompt before the tensor.
+                + int(metrics.get("prompt_request_wire_bytes", 0))
+                + int(metrics.get("prompt_response_wire_bytes", 0))
             ):
                 raise ValueError(
                     f"total wire-byte accounting differs: {row['trial_id']}"
@@ -343,7 +362,7 @@ def build_profile(
                 success
                 and mode == "distributed"
                 and config["model"]["adapter"] == "moondream2"
-                and payload != 729 * 2048 * 2
+                and payload != _PROJECTED_BYTES[str(plan.get("payload", "bf16"))]
             ):
                 raise ValueError(f"projected tensor payload differs: {row['trial_id']}")
             token_ids = row.get("output_token_ids", [])
@@ -580,7 +599,7 @@ def build_profile(
     complete_triplets = [
         trio
         for trio in by_trial.values()
-        if len(trio) == 3 and all(row["status"] == "ok" for row in trio)
+        if len(trio) == len(runs) and all(row["status"] == "ok" for row in trio)
     ]
     prompt_tokens_equal = all(
         len({row["fields"]["prompt_tokens"] for row in trio}) == 1
@@ -601,7 +620,7 @@ def build_profile(
         for row in rows_out
     )
     common_passed = (
-        len(coverage) == 3
+        len(coverage) == len(runs)
         and all(value["covered"] for value in coverage.values())
         and len(complete_triplets) >= 10
         and prompt_tokens_equal
@@ -634,7 +653,7 @@ def build_profile(
             expected_devices=expected_devices,
         )
         correctness = evaluate_rows(
-            {plan["mode"]: rows for plan, _, rows in runs},
+            {_placement(plan): rows for plan, _, rows in runs},
             frozen,
             expected_outputs=proof.pop("_expected_outputs"),
         )

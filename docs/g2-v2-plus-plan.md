@@ -2,7 +2,7 @@
 
 > **Platform:** this campaign now runs on AWS. Phases, platform work and retargeted steps are in the [AWS roadmap](g2-v2-plus-aws-roadmap.md); its section 4 overrides the off-site and on-site steps below where they differ (B0 is split, B3 moves to AWS, section 6 "on site" becomes phases D–F).
 
-**Status: plan, 17 November 2026. Nothing here is built yet.** This extends the frozen G2 v2 design (commit `bb6b48d`, [preparation notes](g2-v2-preparation.md)) so that one on-site campaign covers everything the thesis aim names, except the dynamic run, which needs the fitted selector (section 8). It replaces G2 v2 as the campaign to run; G2 v2's frozen dataset, prompts, load levels and tooling are all kept.
+**Status: plan, 17 November 2026; the B-code (B1, B2, B4, B5, B7, B8 and the B3 script) is built on `feature/aws-phase-b`, see the [AWS roadmap](g2-v2-plus-aws-roadmap.md) phase B status.** This extends the frozen G2 v2 design (commit `bb6b48d`, [preparation notes](g2-v2-preparation.md)) so that one on-site campaign covers everything the thesis aim names, except the dynamic run, which needs the fitted selector (section 8). It replaces G2 v2 as the campaign to run; G2 v2's frozen dataset, prompts, load levels and tooling are all kept.
 
 ## 1. Why
 

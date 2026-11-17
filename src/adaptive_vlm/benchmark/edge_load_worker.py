@@ -7,6 +7,10 @@ GPU, then repeats: launch in-place additions over the whole buffer for
 atomically rewrites a JSON heartbeat with its achieved duty cycle, so a
 supervisor can verify it is alive and loading the GPU as configured. SIGTERM
 or SIGINT stops it cleanly with a final ``"status": "stopped"`` heartbeat.
+
+The same worker is the cloud competitor (C1, amendment A2a rule 6). Started on
+the cloud by ``adaptive_vlm.benchmark.cloud_load``, it runs ``--detached``:
+it must outlive the short-lived control command that launched it.
 """
 
 from __future__ import annotations
@@ -15,6 +19,7 @@ import argparse
 import importlib
 import json
 import os
+import platform
 import signal
 import tempfile
 import time
@@ -44,13 +49,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--heartbeat-s", type=float, default=1.0)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--level", default="")
+    parser.add_argument(
+        "--detached",
+        action="store_true",
+        help="Keep running after the launching process exits (cloud load)",
+    )
     args = parser.parse_args(argv)
-    # Never outlive the benchmark that started us; SIGTERM stops us cleanly.
-    exit_with_parent()
+    if not args.detached:
+        # Never outlive the benchmark that started us; SIGTERM stops us cleanly.
+        exit_with_parent()
     if args.working_set_mib < 1 or args.busy_ms < 0 or args.idle_ms < 0:
         parser.error("working set must be positive; busy and idle non-negative")
 
     torch: Any = importlib.import_module("torch")  # Model environment only.
+    if "microsoft" in platform.release().lower():
+        # WSL's NVML device count crashes CUDA initialization in a second
+        # process on the same GPU; fall back to the CUDA runtime's count.
+        torch.cuda._device_count_nvml = lambda: -1
 
     stopping = False
 

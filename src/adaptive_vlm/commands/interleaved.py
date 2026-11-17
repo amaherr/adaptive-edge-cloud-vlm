@@ -1,4 +1,4 @@
-"""Interleaved three-placement benchmark command (G2 v2)."""
+"""Interleaved benchmark command: G2 v2's three placements or G2 v2+'s five."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from adaptive_vlm.benchmark.edge_load import (
     load_levels,
 )
 from adaptive_vlm.benchmark.interleaved import (
+    ALL_PLACEMENTS,
     DEVICE_RESTART_EXIT_CODE,
     ENVIRONMENT_RESTART_EXIT_CODE,
     PLACEMENTS,
@@ -26,6 +27,7 @@ from adaptive_vlm.benchmark.interleaved import (
 )
 from adaptive_vlm.config import (
     ConfigError,
+    ExecutionMode,
     load_experiment_config,
     model_contract_fingerprint,
 )
@@ -48,6 +50,7 @@ from adaptive_vlm.resource_state import (
     gpu_state_source,
     host_memory_snapshot,
 )
+from adaptive_vlm.scheduler.configuration import SPEC_BY_PLACEMENT
 from adaptive_vlm.transport.tensors import TensorPayload
 
 
@@ -77,12 +80,13 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
         args.manifest or config.dataset.manifest_path,
         expected_revision=config.dataset.revision,
     )
-    placements = [p for p in PLACEMENTS if p in args.placements]
+    placements = [p for p in ALL_PLACEMENTS if p in args.placements]
     if len(placements) != len(args.placements):
         raise ConfigError("--placements must not repeat a placement")
     if config.model.adapter not in {"fake", "moondream2"}:
         raise ConfigError(f"unsupported model adapter: {config.model.adapter}")
-    remote = [p for p in placements if p != "edge"]
+    specs = {p: SPEC_BY_PLACEMENT[p] for p in placements}
+    remote = [p for p in placements if specs[p].mode is not ExecutionMode.EDGE]
     if remote and config.cloud.status == "pending":
         raise ConfigError("remote placements require declared cloud hardware")
     request_ids = _request_ids(args, [item.request_id for item in manifest.items])
@@ -98,7 +102,7 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
     seeded = seed_everything(config.runtime.seed)
     environment = collect_environment()
     environment["seeded_providers"] = list(seeded)
-    edge_uses_gpu = any(p in placements for p in ("edge", "distributed"))
+    edge_uses_gpu = any(spec.mode is not ExecutionMode.CLOUD for spec in specs.values())
     model = ModelMetadata(
         model_id=config.model.model_id,
         revision=config.model.revision,
@@ -135,10 +139,11 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
     policies: dict[str, ExecutionPolicy] = {}
     run_manifests: dict[str, RunManifest] = {}
     for placement in placements:
+        spec = specs[placement]
         policy: ExecutionPolicy
-        if placement == "edge":
+        if spec.mode is ExecutionMode.EDGE:
             policy = LocalExecutionPolicy(adapter)
-        elif placement == "cloud":
+        elif spec.mode is ExecutionMode.CLOUD:
             policy = CloudExecutionPolicy(transport=config.transport, model=model)
         else:
             policy = DistributedExecutionPolicy(
@@ -146,23 +151,33 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
                 transport=config.transport,
                 model=model,
                 tensor_serializer=serializer,
-                pipeline="synchronous",
+                pipeline=spec.pipeline or "synchronous",
+                payload_format=spec.payload or "bf16",
             )
         if isinstance(policy, (CloudExecutionPolicy, DistributedExecutionPolicy)):
             with progress.phase(f"Checking remote model contract for {placement}"):
                 if not policy.health().ready:
                     raise RuntimeError("remote server is not ready")
+                if spec.remote_path not in policy.capabilities().paths:
+                    raise RuntimeError(
+                        f"remote server does not offer {spec.remote_path}"
+                    )
         policies[placement] = policy
         placement_environment = dict(environment)
+        is_edge = spec.mode is ExecutionMode.EDGE
         placement_environment["execution_placement"] = {
-            "mode": placement,
-            "vision_device": "remote" if placement == "cloud" else args.edge_device,
-            "text_device": args.edge_device if placement == "edge" else "remote",
-            "weight_residency": (
-                args.edge_residency if placement == "edge" else "resident"
+            "mode": spec.mode.value,
+            "placement": placement,
+            "configuration_id": spec.id.value,
+            "vision_device": (
+                "remote" if spec.mode is ExecutionMode.CLOUD else args.edge_device
             ),
-            "shared_edge_adapter": edge_uses_gpu and placement != "cloud",
-            "pipeline": "synchronous",
+            "text_device": args.edge_device if is_edge else "remote",
+            "weight_residency": args.edge_residency if is_edge else "resident",
+            "shared_edge_adapter": edge_uses_gpu
+            and spec.mode is not ExecutionMode.CLOUD,
+            "pipeline": spec.pipeline or "synchronous",
+            "payload": spec.payload,
             "remote": f"{config.transport.host}:{config.transport.port}",
             "interleaved": True,
         }
@@ -216,7 +231,14 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
             prepare_stage=prepare if callable(prepare) else None,
             state_probe=state_probe,
             precondition=generator.check if generator is not None else None,
-            conditions=level_conditions(load_level),
+            conditions=(
+                {
+                    **level_conditions(load_level),
+                    "cloud_load_level": args.cloud_load_level,
+                }
+                if args.cloud_load_level
+                else level_conditions(load_level)
+            ),
             resume=args.resume,
             max_consecutive_failures=args.max_consecutive_failures,
         )
@@ -249,7 +271,11 @@ def add_interleaved_parser(
     parser.add_argument("--split", type=Path, help="Split file with *_request_ids")
     parser.add_argument("--split-name", help="training, validation or evaluation")
     parser.add_argument(
-        "--placements", nargs="+", choices=PLACEMENTS, default=list(PLACEMENTS)
+        "--placements",
+        nargs="+",
+        choices=ALL_PLACEMENTS,
+        default=list(PLACEMENTS),
+        help="Run directories to measure (default: G2 v2's three)",
     )
     parser.add_argument("--order-seed", required=True, type=int)
     parser.add_argument(
@@ -281,6 +307,13 @@ def add_interleaved_parser(
         "--edge-load-level",
         default=NO_LOAD,
         help="L0 (no load, default) or a level from --edge-load-config",
+    )
+    parser.add_argument(
+        "--cloud-load-level",
+        help=(
+            "Cloud-load level the campaign runs this sub-block under (C0, C1); "
+            "recorded in the plan only, the supervisor drives the cloud worker"
+        ),
     )
     parser.add_argument("-v", "--verbose", action="store_true")
     return parser

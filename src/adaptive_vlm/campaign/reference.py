@@ -9,7 +9,8 @@ GPUs. Its evidence bundle, checked by ``verify_reference_evidence``, needs:
    tokens and text (``same_device_proof``);
 2. a distributed control run over the full manifest (1 warmup, 3 repetitions)
    whose outputs repeat exactly (``adaptive-vlm benchmark --mode
-   distributed``);
+   distributed``); G2 v2+ adds a second control with ``--payload int8``,
+   whose outputs the lossy int8 configuration must reproduce;
 3. both hosts' runtime package versions;
 4. an index binding all of it, plus the script that produced the proofs, by
    SHA-256 (``build_bundle``).
@@ -124,6 +125,7 @@ def build_bundle(
     cloud_runtime: Path,
     script_path: Path,
     output: Path,
+    int8_control: Path | None = None,
 ) -> tuple[Path, dict[str, Any]]:
     """Copy and bind the evidence, then verify it exactly as preflight will."""
 
@@ -157,6 +159,15 @@ def build_bundle(
         "journal": copy(control / "requests.jsonl", "control/requests.jsonl"),
     }
     copy(control / "run_manifest.json", "control/run_manifest.json")
+    controls = {}
+    if int8_control is not None:
+        controls["int8"] = {
+            "plan": copy(int8_control / "plan.json", "control-int8/plan.json"),
+            "journal": copy(
+                int8_control / "requests.jsonl", "control-int8/requests.jsonl"
+            ),
+        }
+        copy(int8_control / "run_manifest.json", "control-int8/run_manifest.json")
     edge_report = json.loads((edge / "report.json").read_text())
     index = {
         "schema_version": 1,
@@ -170,6 +181,7 @@ def build_bundle(
         "reference_script": script,
         "hosts": hosts,
         "distributed_control": distributed,
+        **({"distributed_controls": controls} if controls else {}),
         "runtime_versions": {
             "edge": json.loads(edge_runtime.read_text()),
             "cloud": json.loads(cloud_runtime.read_text()),

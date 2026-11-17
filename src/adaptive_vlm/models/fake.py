@@ -52,12 +52,19 @@ class FakeProjectedTensor:
 
     def to_payload(self) -> TensorPayload:
         size = self.numel() * self.element_size()
+        # Clear the top exponent bit of every bf16 value so the digest reads
+        # as finite numbers (|x| < 2), which the int8 encoding requires.
+        high = 1 if sys.byteorder == "little" else 0
+        digest = bytes(
+            byte & 0xBF if index % 2 == high else byte
+            for index, byte in enumerate(self.image_digest)
+        )
         return TensorPayload(
             shape=self.shape,
             dtype=self.dtype,
             byte_order=sys.byteorder,
             layout="contiguous",
-            data=self.image_digest + bytes(size - len(self.image_digest)),
+            data=digest + bytes(size - len(digest)),
         )
 
 
@@ -176,9 +183,24 @@ class FakeModelAdapter(ModelAdapter):
             },
         )
 
-    def generate_from_payload(self, request: TensorInferenceRequest) -> InferenceResult:
-        """Cloud half of a fake distributed request."""
+    def prepare_prompt(self, prompt: str) -> tuple[int, ...]:
+        """Prompt-first preparation: deterministic stand-in token IDs."""
 
+        if not prompt.strip():
+            raise ValueError("prompt must not be empty")
+        return tuple(range(fake_prompt_tokens(prompt)))
+
+    def generate_from_payload(
+        self,
+        request: TensorInferenceRequest,
+        prepared_prompt_ids: object | None = None,
+    ) -> InferenceResult:
+        """Cloud half of a fake distributed request (prompt-first gives the same)."""
+
+        if prepared_prompt_ids is not None and prepared_prompt_ids != (
+            self.prepare_prompt(request.prompt)
+        ):
+            raise ValueError("prepared prompt differs from the request prompt")
         started_ns = perf_counter_ns()
         time.sleep(self.delay_s)
         digest = hashlib.sha256(request.tensor.data[:32])
