@@ -12,8 +12,8 @@ The physical results are unaffected: G2 and its analysis stay as they are, as th
 | Driver | GRID (required on G6f), baked into a reviewed AMI | Tesla/datacenter driver, baked into a reviewed AMI |
 | Software | One digest-pinned image from ECR, run as the edge and cloud roles | Same image |
 | Data | Encrypted data EBS volume per host, holding the model cache, images and manifests, seeded from S3 | Same |
-| Network | Same VPC and AZ, private IPs, no public IP or NAT; experiment ports 5050–5052 open only from the edge security group | Same |
-| Management | SSM Session Manager and `ssm send-command`; S3 and ECR through VPC endpoints | Same |
+| Network | Same VPC and AZ; experiment ports 5050–5052 open only from the edge security group; **no inbound from the internet**; outbound through an auto-assigned public IPv4 instead of interface endpoints (D9) | Same |
+| Management | SSM Session Manager and `ssm send-command` over outbound HTTPS; S3 through the free gateway endpoint | Same |
 | Shaping | `tc` on the **host**, classified by peer IP and ports 5050–5052, so management, S3 and SSM bypass netem | Same, mirrored |
 
 Moondream2's BF16 weights are about 3.85 GB. The ¼-L4 edge may only fit the full model with **swap residency**, which we already built and verified for the 4 GiB RTX 3050. Phase D decides residency from measurements.
@@ -42,7 +42,10 @@ Recommendations first; each becomes part of amendment A2.
 | D4 | Where the supervisor runs | In an **edge orchestrator container** with host networking and `NET_ADMIN`, scoped to the edge role. This is a revision of the container contract. It launches the benchmark as a subprocess in the same container (GPU attached), and shapes the edge host's interface directly |
 | D5 | "Same source on both hosts" check | Compare the **image digest and its `org.opencontainers.image.revision` label** on both hosts instead of `git status`. The image is built from a clean commit |
 | D6 | Checkpoints | Each validated sub-block (and the campaign plan, status and logs) is copied to S3 with SHA-256 receipts as soon as it validates. The data EBS volume remains the primary copy |
-| D7 | Budget | A positive budget with alerts at 50/80/100%. The estimate is in section 6; the earlier $20 alert level is too low |
+| D7 | Budget | **A $180 ceiling for everything on AWS, including G5 later.** Alerts at $60, $110 and $150. An AWS Budgets action **stops all project instances at $165** (a Budgets action stops instances; it is not a billing cap) |
+| D9 | Network egress | **No interface endpoints**: they cost $0.07/h even with compute off, about $51 a month. Instead, an auto-assigned public IPv4 per instance ($0.005/h, only while running) with **no inbound rules**, plus the free S3 gateway endpoint. SSM, ECR and S3 keep working. The trade-off is that the hosts can reach the internet outbound, which the old design forbade; installation from the internet remains forbidden by procedure |
+| D10 | Paying only for what runs | Start only the VM a step needs (section 6). Stop instances whenever idle (watchdog idle stop after 15 min). Use **spot** for acceptance and calibration if a spot quota exists (spot quota is separate from on-demand). Run the pilot and campaign on demand |
+| D11 | Storage | Small volumes: a 30 GiB root and a 20 GiB data volume per host (100 GiB in all, about $8 a month), against the old 180 GiB. Scratch artifacts go to S3, and nothing large stays on EBS after archiving |
 | D8 | Watchdog ceilings | `experiment_max_runtime_hours` must cover one campaign session (about 14 h). Idle stop stays on; the supervisor writes the watchdog heartbeat on both hosts |
 
 ## 4. Phases
@@ -86,9 +89,12 @@ Follow [g2-v2-plus-plan.md](g2-v2-plus-plan.md) for B1, B2, B4, B5, B7 and B8, w
 - **B3 int8 quality** moves to phase E, because it runs on the AWS edge GPU.
 
 ### Phase C: infrastructure (about 1–1.5 days, mostly waiting on applies and builds)
-1. **C1 Account preflight and inventory.** Run `account-preflight`: quota, both instance types offered in the chosen AZ, current prices. List what the retained and experiment stacks still hold from 5 November (state bucket, ECR, data volumes, endpoints) **before** applying anything.
+1. **C1 Account preflight and inventory.** Run `account-preflight`: quota (on-demand **and spot**), both instance types offered in the chosen AZ, current prices.
+   - **First, before anything else:** list what still exists from 5 November (endpoints, volumes, ECR, buckets, budgets) and **destroy whatever is accruing cost and not needed**. Seven forgotten interface endpoints alone cost about $1.68 a day.
 2. **C2 Foundation.** Refresh the `cloud-v1` plan:
-   - set the budget (D7) and ceilings (D8);
+   - set the budget, alerts and stop action (D7), and the ceilings (D8);
+   - remove the interface endpoints, keep the S3 gateway endpoint, and enable public IPv4 with no inbound rules (D9);
+   - shrink the volumes (D11);
    - add the IAM permission for D3 and the ECR pull;
    - review the plan, then apply.
 3. **C3 AMIs.** Rebuild the host images: the GRID driver for G6f, the datacenter driver for G6, Docker, the NVIDIA Container Toolkit, SSM agent, `iproute2` and `iperf3`. Record the driver and OS versions as provenance.
@@ -144,21 +150,48 @@ Derive the tables, then archive under `results/aws-g2v2plus-<date>/` with `SHA25
 
 That is about 12–14 working days, with the critical path through A → D → E → F. The run itself is 2–3 calendar days of wall time.
 
-## 6. Cost estimate
+## 6. Cost: a $180 ceiling
 
-On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge` $0.475/h, `g6.2xlarge` $0.978/h, so **$1.45/h for the pair**.
+On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge` $0.475/h, `g6.2xlarge` $0.978/h. Spot is typically 50–70% lower where available.
 
-| Item | Pair-hours or amount | Cost |
-| --- | ---: | ---: |
-| Acceptance, recalibration, B3 (D–E) | ~20 h | ~$29 |
-| References and pilot | ~6 h | ~$9 |
-| Campaign (two sessions) | ~24 h | ~$35 |
-| Debugging and reruns (allowance) | ~20 h | ~$29 |
-| VPC interface endpoints, while the stack exists (~3 weeks) | 7 × $0.01/h | ~$35 |
-| EBS, S3, ECR (one month) | | ~$20 |
-| **Total** | | **~$160** (budget $250 with alerts) |
+**Which VM each step needs:**
 
-Stop instances whenever no job runs; the watchdog enforces this. The endpoints cost money even with compute off, so destroy the disposable stack once the run is archived.
+| Step | Edge | Cloud | Hours (estimate) |
+| --- | :---: | :---: | ---: |
+| D1–D2 fit and paths | ✓ | ✓ | 3 |
+| D3 edge stability (3 runs, 2 h apart; stop the edge in between) | ✓ | — | 3 |
+| D4 network, D6 fault drill | ✓ | ✓ | 3 |
+| E2 edge load | ✓ | — | 3 |
+| E3 cloud load (client runs on the cloud host) | — | ✓ | 1.5 |
+| E4 int8 quality (single process on the edge) | ✓ | — | 2 |
+| E5 stage profile | ✓ | ✓ | 1.5 |
+| References: same-device per host, then the controls | ✓ / ✓ | ✓ | 2 + 1 + 1.5 |
+| Pilot | ✓ | ✓ | 2 |
+| Campaign, two sessions | ✓ | ✓ | 24 |
+| Debugging and reruns allowance | ✓ | ✓ | 12 |
+
+**Estimate (on demand, all of G2 v2+):**
+
+| Item | Cost |
+| --- | ---: |
+| Pair-hours (~50 h × $1.45) | ~$73 |
+| Edge-only hours (~10 h × $0.475) | ~$5 |
+| Cloud-only hours (~2.5 h × $0.98) | ~$2.5 |
+| Public IPv4 (~110 instance-hours × $0.005) | ~$0.6 |
+| EBS, 100 GiB gp3 for ~5 weeks | ~$10 |
+| S3, ECR and CloudWatch | ~$4 |
+| **G2 v2+ total** | **~$95** |
+| Reserved for G5, the dynamic evaluation (~24 h pair plus setup) | ~$50 |
+| Contingency | ~$35 |
+| **Ceiling** | **$180** |
+
+With spot for D and E, G2 v2+ falls to about $80.
+
+**Rules that keep it under the ceiling:**
+- Phases A and B are built and tested **locally** (free); AWS only starts at C.
+- Nothing runs while a person isn't working or a job isn't active: the watchdog stops idle instances after 15 min, and the supervisor's heartbeat keeps them up during runs.
+- Stop instances between sessions, and destroy the disposable stack as soon as the run is archived. EBS snapshots are not kept.
+- Check the spend on the console before every phase. If actual spend exceeds the phase's line in this table by 30%, pause and replan before continuing.
 
 ## 7. Risks
 
