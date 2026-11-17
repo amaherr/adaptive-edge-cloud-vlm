@@ -94,6 +94,10 @@ _DEFAULTS: dict[str, Any] = {
     "min_runtime_host_available_ram_mib": 0,
     "require_cloud_wsl_keepalive": False,
     "smoke_requests": 6,
+    # Phase D6 fault drill on the real pair before the references exist: the
+    # reference checks are skipped, the plan says so, and the dataset builder
+    # refuses the campaign. Never set for a measurement.
+    "acceptance_drill": False,
 }
 _LOOPBACK_ONLY = ("allow_dirty_tree",)
 
@@ -145,12 +149,9 @@ def load_settings(path: Path, root: Path) -> dict[str, Any]:
         legacy = str(settings.get("cloud_ssh") or "")
         if not settings.get("cloud_access") and (not legacy or "REPLACE" in legacy):
             raise ValueError(f"set cloud_access (ssm or ssh) or cloud_ssh in {path}")
-        required += [
-            "cloud_repo",
-            "cloud_python",
-            "cloud_interface",
-            "same_device_reference_evidence",
-        ]
+        required += ["cloud_repo", "cloud_python", "cloud_interface"]
+        if not settings.get("acceptance_drill"):
+            required.append("same_device_reference_evidence")
         for name in _LOOPBACK_ONLY:
             if settings[name]:
                 raise ValueError(f"{name} is allowed only in loopback rehearsals")
@@ -541,6 +542,7 @@ class CampaignSupervisor:
             "mode": s["mode"],
             "git_sha": commit,
             "git_dirty": bool(dirty),
+            "acceptance_drill": bool(s["acceptance_drill"]),
             "settings": s,
             "grid_sha256": self.grid.sha256,
             "protocol_sha256": sha256(protocol),
@@ -685,6 +687,9 @@ class CampaignSupervisor:
             "cloud": json.loads(ssh([*shlex.split(s["cloud_python"]), "-c", code])),
         }
         references = {}
+        if s["acceptance_drill"]:
+            log("acceptance drill: reference evidence not checked; not campaign data")
+            tasks = {}
         for name, (_task_config, task_manifest, task_split) in tasks.items():
             reference = self.reference_for(name)
             verify_reference_evidence(

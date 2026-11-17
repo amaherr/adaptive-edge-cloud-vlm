@@ -184,3 +184,29 @@ def test_aws_settings_template_validation(tmp_path: Path) -> None:
     path.write_text(json.dumps({**filled, "cloud_container": ""}))
     with pytest.raises(ValueError, match="cloud_container"):
         load_settings(path, ROOT)
+
+
+def test_acceptance_drill_needs_no_references_and_is_never_data(
+    tmp_path: Path,
+) -> None:
+    from adaptive_vlm.prediction.v2.dataset.campaign_v2 import _campaign_grid
+
+    template = json.loads(
+        (ROOT / "configs/campaigns/aws_drill.example.json").read_text()
+    )
+    template["cloud_access"]["instance_id"] = "i-0abc"
+    path = tmp_path / "drill.json"
+    path.write_text(json.dumps(template))
+    settings = load_settings(path, ROOT)
+    assert settings["acceptance_drill"] is True
+    assert "same_device_reference_evidence" not in template
+    path.write_text(json.dumps({**template, "acceptance_drill": False}))
+    with pytest.raises(ValueError, match="same_device_reference_evidence"):
+        load_settings(path, ROOT)
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    (campaign / "campaign_plan.json").write_text(
+        json.dumps({"acceptance_drill": True, "settings": settings})
+    )
+    with pytest.raises(ValueError, match="not campaign data"):
+        _campaign_grid(campaign)

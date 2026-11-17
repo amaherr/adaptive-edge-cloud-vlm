@@ -124,6 +124,8 @@ def _reference_for(contract: dict[str, Any], task: str) -> str | None:
 
 def _campaign_grid(campaign: Path) -> tuple[dict[str, Any], Grid]:
     plan = strict_json((campaign / "campaign_plan.json").read_bytes())
+    if plan.get("acceptance_drill"):
+        raise ValueError("an acceptance-drill campaign is not campaign data")
     grid = load_grid(
         Path(plan["settings"]["grid"]),
         rate_fallback=bool(plan["settings"].get("rate_fallback")),

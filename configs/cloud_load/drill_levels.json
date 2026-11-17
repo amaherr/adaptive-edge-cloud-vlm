@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "description": "Phase D6 fault drill only: the C50 candidate stands in for the uncalibrated C1.",
+  "levels": {
+    "C1": {
+      "working_set_mib": 512,
+      "busy_ms": 10,
+      "idle_ms": 10
+    }
+  }
+}

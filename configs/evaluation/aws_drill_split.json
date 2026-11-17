@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "campaign_id": "aws-acceptance-drill",
+  "dataset_revision": "vqa-v2-val2014-physical-v2",
+  "dataset_manifest_path": "../../data/manifests/physical_vqa_v2/physical_vqa_v2.jsonl",
+  "dataset_manifest_sha256": "4f8bfe63f245db948274d7e0717bde3bab388e5ffe65505a3f841a35e3f9b89d",
+  "model_contract_sha256": "e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1",
+  "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
+  "request_split_seed": 3907,
+  "training_request_ids": [
+    "vqa-v2-val2014-101053025",
+    "vqa-v2-val2014-101223001",
+    "vqa-v2-val2014-10694023",
+    "vqa-v2-val2014-107751002",
+    "vqa-v2-val2014-111683003",
+    "vqa-v2-val2014-115412003",
+    "vqa-v2-val2014-116517000",
+    "vqa-v2-val2014-121457004"
+  ],
+  "validation_request_ids": [
+    "vqa-v2-val2014-120826005",
+    "vqa-v2-val2014-132136002",
+    "vqa-v2-val2014-150320007",
+    "vqa-v2-val2014-156445006"
+  ],
+  "evaluation_request_ids": [
+    "vqa-v2-val2014-10192002",
+    "vqa-v2-val2014-111789004",
+    "vqa-v2-val2014-138115001",
+    "vqa-v2-val2014-150872002"
+  ],
+  "max_new_tokens": 32,
+  "sla_ms": 60000,
+  "bootstrap_seed": 1707,
+  "bootstrap_resamples": 2000,
+  "confidence_level": 0.95,
+  "task_type": "vqa_short_answer",
+  "description": "Phase D6 fault drill only: a small subset of the G2 v2 split (8/4/4 IDs). Not a measurement split."
+}
