@@ -438,7 +438,8 @@ class ClassifiedNetwork(PhysicalNetwork):
         )
 
     def apply(self, *, rate_mbps: float, delay_ms: float, owned: bool) -> None:
-        for name, entries in self._all().items():
+        all_entries = self._all()
+        for name, entries in all_entries.items():
             root = next(state for _, parent, state in entries if parent == "root")
             if not is_default_qdisc(root) and not (owned and self._is_ours(entries)):
                 raise RuntimeError(
@@ -446,6 +447,12 @@ class ClassifiedNetwork(PhysicalNetwork):
                 )
         peers = {"edge": self.cloud_host, "cloud": self.edge_address}
         for name, run, interface in self._peers():
+            if self._is_ours(all_entries[name]):
+                # The kernel refuses to "replace" an existing flower filter at
+                # the same priority (found on AWS, phase D4). Remove our root,
+                # and its filters with it, then build the new condition. The
+                # supervisor only reshapes between sub-blocks.
+                run([*self.privilege, "tc", "qdisc", "del", "dev", interface, "root"])
             for command in classified_commands(
                 interface=interface,
                 peer_address=peers[name],

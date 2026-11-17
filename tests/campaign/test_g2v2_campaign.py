@@ -711,10 +711,18 @@ class ClassifiedHost:
         self.shaped = False
         self.commands: list[list[str]] = []
         self.dropped = 0
+        self.filters: set[str] = set()
 
     def __call__(self, command: Any) -> str:
         command = list(command)
         self.commands.append(command)
+        if "filter" in command and "replace" in command:
+            # Like the kernel: an existing flower filter cannot be "replaced".
+            preference = command[command.index("pref") + 1]
+            if preference in self.filters:
+                raise RuntimeError("RTNETLINK answers: File exists")
+            self.filters.add(preference)
+            return ""
         if "filter" in command and "show" in command:
             key = "dst_port" if self.name == "edge" else "src_port"
             return "".join(f"  {key} {p}\n" for p in (5050, 5051, 5052))
@@ -722,6 +730,7 @@ class ClassifiedHost:
             self.shaped = True
         if "qdisc" in command and "del" in command:
             self.shaped = False
+            self.filters.clear()
         if "show" in command:
             if self.shaped:
                 return CLASSIFIED.format(dropped=self.dropped)
@@ -789,9 +798,13 @@ def test_classified_network_shapes_verifies_counts_drops_and_clears() -> None:
     assert {k: v.dropped for k, v in states.items()} == {"edge": 0, "cloud": 7}
     with pytest.raises(RuntimeError, match="rate"):
         network.verify(rate_mbps=50, delay_ms=10)
-    network.apply(
-        rate_mbps=45, delay_ms=10, owned=True
-    )  # Our own root may be replaced.
+    # Changing condition: our own root is removed, then rebuilt.
+    before = len(edge.commands)
+    network.apply(rate_mbps=175, delay_ms=25, owned=True)
+    changed = edge.commands[before:]
+    first_del = next(i for i, c in enumerate(changed) if "del" in c)
+    first_filter = next(i for i, c in enumerate(changed) if "filter" in c)
+    assert first_del < first_filter
     assert network.clear() == []
     assert not edge.shaped and not cloud.shaped
 
