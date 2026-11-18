@@ -282,7 +282,25 @@ D6 fault drill results:
 5. **E5 Stage profile and winner estimate.** Run a short profile (20 requests per configuration, at L0/L1/L2 and C0/C1, unshaped). Feed it into `estimate_g2v2_winners.py` with AWS inputs, then confirm or revise the long-task and C1 cells so each split keeps winner changes. Revising draft sections is allowed; sections 3–4 stay frozen.
 
 ### Phase F: freeze, references, pilot, run
-1. **B6** grids and pilot; **B0b** amendment A2b with the AWS contract, calibrated values, cells, counts and run estimate. **A2b and the campaign grid are done (18 November 2026); the AWS pilot grid is still to do.**
+**Status (18 November 2026): ready to run.** Steps 1–5 are done. Both instances are stopped.
+- **Frozen image:** `sha256:4049c069dc79…` (commit `d5e116c`), on both hosts. The protocol is frozen, and the campaign grid pins its hash (`a972ecdc…`).
+- **Tests and rehearsal:**
+  - ruff, mypy and pytest pass (423);
+  - the G2 v2+ loopback fault rehearsal passes all 9 checks: kill and resume, a load-worker kill, a cloud-worker kill invalidated and rerun, and the derived tables.
+  - The D6 drill was not rerun on AWS. Since D6, the only change on the fault paths is in-process edge load, which ends with the benchmark process. The pilot exercised it.
+- **References** (image `sha256:75d2f734…`, commit `b360d6b`; the inference source and runtime versions are unchanged in the final image):
+  - same-device runs on both GPUs: 120/120 short and 60/60 long, no mismatches;
+  - synchronous and int8 controls per task;
+  - both bundles verified. They are on the edge volume under `/artifacts/g2v2/` and in S3 under `cloud-v1/edge/g2v2/`.
+- **Pilot:** go on all six A2b rule 9 checks ([results](../results/aws-pilot-20261118/README.md)). The run is estimated at about 22 h.
+- **Campaign preflight** on the final image, into a separate output folder: passed. It checked the pinned protocol, the same digest on both hosts, both reference bundles and the GPU correctness smoke, with 196 sub-blocks and 43,200 attempts planned.
+- **Open for the analysis (G3):** the per-sub-block `heterogeneous_correctness.passed` flag is scoped to the whole manifest, so it reads false for every sub-block (see the pilot results).
+- **Starting a session:**
+  1. Start both instances.
+  2. Run the keepalive and refresh the cloud services (`prep`).
+  3. On the edge, run the orchestrator with `/artifacts/settings/g2v2_aws_campaign.json`, made from `configs/campaigns/g2v2_aws.example.json` with the cloud instance ID.
+- **Ending a session:** stop the orchestrator container (SIGTERM, 180 s grace), then stop the instances. Rerunning the same command resumes: preflight runs again and must match the campaign contract.
+1. **B6** grids and pilot; **B0b** amendment A2b with the AWS contract, calibrated values, cells, counts and run estimate. **Done (18 November 2026): A2b, the campaign grid and the AWS pilot grid.**
 2. **B9** tests and the fault rehearsal (loopback, plus the D6 drill rerun on AWS).
 3. **Freeze:** commit, build and push the image, and deploy the digest on both hosts.
 4. **References:** per task, the same-device run on both VMs, the synchronous and int8 controls, then the bundles.
