@@ -52,6 +52,9 @@ class LoadLevel:
     busy_ms: float
     idle_ms: float
     generator: str = PROCESS
+    # In-process only: split each pass over the working set into kernels of
+    # this size, so the model's kernels interleave with the load (A2a-3).
+    kernel_mib: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -87,9 +90,18 @@ def load_levels(path: Path, *, no_load: str = NO_LOAD) -> dict[str, LoadLevel]:
             busy_ms=float(values["busy_ms"]),
             idle_ms=float(values["idle_ms"]),
             generator=generator,
+            kernel_mib=(int(values["kernel_mib"]) if "kernel_mib" in values else None),
         )
         if level.working_set_mib < 1 or level.busy_ms < 0 or level.idle_ms < 0:
             raise ValueError(f"invalid edge-load level {name}")
+        if level.kernel_mib is not None and (
+            generator != IN_PROCESS
+            or not 1 <= level.kernel_mib <= level.working_set_mib
+        ):
+            raise ValueError(
+                f"edge-load level {name}: kernel_mib needs the in-process "
+                "generator and must be between 1 and the working set"
+            )
         levels[name] = level
     return levels
 
@@ -239,9 +251,12 @@ class TorchWorkload:
     """In-place additions over a float32 working set on a dedicated stream.
 
     The buffer is allocated through the model's caching allocator, so it adds
-    only its own size. ``step`` launches one addition on the side stream and
-    waits for that stream alone, which releases the GIL; the model's stream is
-    never synchronized by the load.
+    only its own size. ``step`` is one pass over the working set: one addition
+    per ``kernel_mib`` slice (one for the whole buffer by default) on the side
+    stream, then a wait for that stream alone, which releases the GIL. The
+    model's stream is never synchronized by the load. Small slices let the
+    GPU run the model's kernels between them; one whole-buffer kernel on a
+    fractional vGPU lasts about 20 ms per 512 MiB and starves decoding.
     """
 
     def __init__(self, level: LoadLevel, device: str) -> None:
@@ -255,22 +270,30 @@ class TorchWorkload:
             self._buffer.add_(1.0)  # Touch once so the working set is resident.
         self._stream.synchronize()
         self.allocated_mib = self._buffer.numel() * 4 / _MIB
+        self._slices: list[Any] = (
+            list(self._buffer.split(level.kernel_mib * _MIB // 4))
+            if level.kernel_mib is not None
+            else [self._buffer]
+        )
 
     def step(self) -> None:
         with self._torch.cuda.stream(self._stream):
-            self._buffer.add_(1.0)
+            for part in self._slices:
+                part.add_(1.0)
         self._stream.synchronize()
 
     def release(self) -> None:
         self._stream.synchronize()
+        self._slices = []
         self._buffer = None
 
 
 class InProcessEdgeLoad:
     """Run a level's busy/idle cycle in a thread of this process (A2a-3).
 
-    The thread repeats what ``edge_load_worker`` does: launch kernels for
-    ``busy_ms`` (each followed by a wait on its own stream), then sleep
+    The thread repeats what ``edge_load_worker`` does: run passes over the
+    working set for ``busy_ms`` (each followed by a wait on its own stream;
+    a pass is several kernels if the level sets ``kernel_mib``), then sleep
     ``idle_ms``. Its state is the heartbeat, refreshed every ``heartbeat_s``.
     A thread that dies, or a heartbeat older than ``stale_after_s``, fails
     ``check`` with :class:`LoadGeneratorFailure`, like a dead worker process.
@@ -329,6 +352,7 @@ class InProcessEdgeLoad:
             working_set_mib=level.working_set_mib,
             busy_ms=level.busy_ms,
             idle_ms=level.idle_ms,
+            kernel_mib=level.kernel_mib,
             allocated_mib=work.allocated_mib,
             started_unix_s=started,
             updated_unix_s=started,

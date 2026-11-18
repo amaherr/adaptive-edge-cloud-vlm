@@ -217,6 +217,19 @@ def test_levels_choose_the_generator(tmp_path: Path) -> None:
     assert isinstance(make_generator(LEVEL, directory=tmp_path), EdgeLoadGenerator)
     with pytest.raises(ValueError, match="only edge load"):
         load_levels(path, no_load="C0")
+    levels["L1"]["kernel_mib"] = 16
+    path.write_text(
+        json.dumps({"schema_version": 1, "generator": IN_PROCESS, "levels": levels})
+    )
+    assert load_levels(path)["L1"].kernel_mib == 16
+    for generator, kernel_mib in ((IN_PROCESS, 512), ("process", 16)):
+        levels["L1"]["kernel_mib"] = kernel_mib
+        path.write_text(
+            json.dumps({"schema_version": 1, "generator": generator, "levels": levels})
+        )
+        with pytest.raises(ValueError, match="kernel_mib"):
+            load_levels(path)
+    del levels["L1"]["kernel_mib"]
     path.write_text(
         json.dumps({"schema_version": 1, "generator": "thread", "levels": levels})
     )

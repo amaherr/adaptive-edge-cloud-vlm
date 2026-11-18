@@ -226,6 +226,20 @@ D6 fault drill results:
   1. **Chosen:** generate the load inside the benchmark process (no extra context). That is a design change to section 6 and needs an amendment.
   2. Move the edge to `g4dn.xlarge` (T4, 16 GB). That needs an amendment, because rule 10 passed for `g6f.2xlarge`.
   3. Drop edge GPU load on AWS and keep cloud load and network as the system factors.
+- Fit check of the in-process generator (18 November 2026). This was a development check, not campaign data: 20 edge/full requests per setting, resident, with prompt-calibration questions 100–119. Results are in `/srv/adaptive-vlm/artifacts/e2fit/` on the edge.
+
+  | Working set | Kernel | Busy / idle (ms) | OK / OOM | Median | Achieved duty |
+  | ---: | ---: | --- | --- | ---: | ---: |
+  | none (L0) | none | none | 20 / 0 | 1,015 ms | none |
+  | 512 MiB | whole | 20 / 0 | 2 / 18 | — | 1.00 |
+  | 512 MiB | whole | 10 / 10 | 2 / 18 | — | 0.70 |
+  | 256 MiB | whole | 20 / 0 | 20 / 0 | 10,111 ms | 1.00 |
+  | 256 MiB | 8 MiB | 20 / 0 | 20 / 0 | 2,377 ms | 1.00 |
+  | 256 MiB | 8 MiB | 10 / 10 | 20 / 0 | 1,423 ms | 0.67 |
+  | 256 MiB | 8 MiB | 5 / 15 | 20 / 0 | 1,419 ms | 0.50 |
+  | 256 MiB | 32 MiB | 20 / 0 | 20 / 0 | 4,009 ms | 1.00 |
+
+  The working set for E2 is 256 MiB, which leaves 64 MiB free. The kernel size is 8 MiB, and E2 places L1 and L2 within this range. At 8 MiB, 5/15 and 10/10 give the same latency, because one 256 MiB pass lasts longer than 10 ms. Finer duty steps need a smaller kernel or longer idle periods. Only edge/full was checked. E2 must also run every configuration at each chosen level with no OOM (A2a-3, difference 3).
 1. **D1 Nodes:** `nvidia-smi`, a BF16 matrix operation and the model load on both nodes. On the edge, test **resident and swap residency**, and record peak memory and whether each fits.
 2. **D2 Paths:** edge/full, cloud/raw, distributed sync, plus prompt-first and int8 once B lands; outputs and wire bytes checked.
 3. **D3 Edge stability (decides D2).** Run 100 edge/full requests three times at different times of day, edge otherwise idle. Pass if the coefficient of variation of the per-run median is at most 3%, the within-run p90/median is at most 1.15, and the model fits. Otherwise move to the next edge instance and record a new environment revision.
