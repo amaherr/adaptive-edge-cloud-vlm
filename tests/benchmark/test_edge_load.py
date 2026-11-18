@@ -12,11 +12,14 @@ from pathlib import Path
 import pytest
 
 from adaptive_vlm.benchmark.edge_load import (
+    IN_PROCESS,
     EdgeLoadGenerator,
+    InProcessEdgeLoad,
     LoadGeneratorFailure,
     LoadLevel,
     level_conditions,
     load_levels,
+    make_generator,
 )
 
 LEVEL = LoadLevel("L1", working_set_mib=512, busy_ms=8.0, idle_ms=12.0)
@@ -159,3 +162,159 @@ def test_generator_reports_a_failed_start(
     monkeypatch.setenv("FAKE_WORKER_MODE", "crash")
     with pytest.raises(LoadGeneratorFailure, match="did not start"):
         _generator(tmp_path).start()
+
+
+class FakeWorkload:
+    """Stands in for TorchWorkload: each step sleeps one millisecond."""
+
+    def __init__(self, level: LoadLevel, device: str, fail_after: int = -1) -> None:
+        self.allocated_mib = float(level.working_set_mib)
+        self.steps = 0
+        self.released = False
+        self.fail_after = fail_after
+
+    def step(self) -> None:
+        if self.steps == self.fail_after:
+            raise RuntimeError("CUDA error: an illegal memory access")
+        self.steps += 1
+        time.sleep(0.001)
+
+    def release(self) -> None:
+        self.released = True
+
+
+def _in_process(
+    tmp_path: Path, level: LoadLevel = LEVEL, **kwargs: object
+) -> tuple[InProcessEdgeLoad, list[FakeWorkload]]:
+    made: list[FakeWorkload] = []
+    fail_after = int(kwargs.pop("fail_after", -1))  # type: ignore[call-overload]
+
+    def workload(level: LoadLevel, device: str) -> FakeWorkload:
+        made.append(FakeWorkload(level, device, fail_after))
+        return made[-1]
+
+    generator = InProcessEdgeLoad(
+        level,
+        directory=tmp_path / "load",
+        workload=workload,
+        start_timeout_s=10,
+        heartbeat_s=0.01,
+        **kwargs,  # type: ignore[arg-type]
+    )
+    return generator, made
+
+
+def test_levels_choose_the_generator(tmp_path: Path) -> None:
+    path = tmp_path / "levels.json"
+    levels = {"L1": {"working_set_mib": 256, "busy_ms": 8, "idle_ms": 12}}
+    path.write_text(
+        json.dumps({"schema_version": 1, "generator": IN_PROCESS, "levels": levels})
+    )
+    level = load_levels(path)["L1"]
+    assert level.generator == IN_PROCESS
+    assert level_conditions(level)["edge_load"]["generator"] == IN_PROCESS
+    assert isinstance(make_generator(level, directory=tmp_path), InProcessEdgeLoad)
+    assert isinstance(make_generator(LEVEL, directory=tmp_path), EdgeLoadGenerator)
+    with pytest.raises(ValueError, match="only edge load"):
+        load_levels(path, no_load="C0")
+    path.write_text(
+        json.dumps({"schema_version": 1, "generator": "thread", "levels": levels})
+    )
+    with pytest.raises(ValueError, match="generator"):
+        load_levels(path)
+
+
+def test_in_process_load_runs_checks_and_stops(tmp_path: Path) -> None:
+    generator, made = _in_process(tmp_path)
+    beat = generator.start()
+    assert beat["status"] == "running" and beat["generator"] == IN_PROCESS
+    assert beat["pid"] == os.getpid() and beat["allocated_mib"] == 512
+    deadline = time.monotonic() + 10
+    while (generator.heartbeat() or {}).get("kernels", 0) < 5:
+        assert time.monotonic() < deadline, "load thread made no progress"
+        time.sleep(0.01)
+    generator.check()
+    snapshot = generator.snapshot()
+    assert snapshot["load_alive"] is True and snapshot["load_level"] == "L1"
+    assert 0 < float(snapshot["load_duty"] or 0) <= 1
+    final = generator.stop()
+    assert final is not None and final["status"] == "stopped"
+    assert made[0].released and final["kernels"] == made[0].steps
+    assert generator.stop() is not None  # Idempotent, no second session entry.
+    sessions = (tmp_path / "load" / "sessions.jsonl").read_text().splitlines()
+    assert len(sessions) == 1 and json.loads(sessions[0])["status"] == "stopped"
+    with pytest.raises(LoadGeneratorFailure, match="not running"):
+        generator.check()
+    assert generator.snapshot()["load_alive"] is False
+
+
+def test_in_process_load_failure_is_detected(tmp_path: Path) -> None:
+    generator, made = _in_process(tmp_path, fail_after=3)
+    generator.start()
+    try:
+        deadline = time.monotonic() + 10
+        while True:
+            try:
+                generator.check()
+            except LoadGeneratorFailure as exc:
+                assert "illegal memory access" in str(exc)
+                break
+            assert time.monotonic() < deadline, "failed load thread not detected"
+            time.sleep(0.01)
+        assert generator.snapshot()["load_alive"] is False
+        assert made[0].released
+    finally:
+        final = generator.stop()
+    assert final is not None and final["status"] == "failed"
+
+
+def test_in_process_load_reports_a_failed_start(tmp_path: Path) -> None:
+    def out_of_memory(level: LoadLevel, device: str) -> FakeWorkload:
+        raise MemoryError("CUDA out of memory. Tried to allocate 512.00 MiB")
+
+    generator = InProcessEdgeLoad(
+        LEVEL, directory=tmp_path / "load", workload=out_of_memory
+    )
+    with pytest.raises(LoadGeneratorFailure, match="did not start: MemoryError"):
+        generator.start()
+    assert generator.snapshot()["load_alive"] is False
+
+
+def test_in_process_load_detects_a_stalled_thread(tmp_path: Path) -> None:
+    import threading
+
+    now = [time.time()]
+    hang = threading.Event()
+    stepped = threading.Event()
+
+    class Stalling(FakeWorkload):
+        def step(self) -> None:
+            stepped.set()
+            hang.wait(10)  # A kernel that never finishes.
+
+    generator = InProcessEdgeLoad(
+        LEVEL,
+        directory=tmp_path / "load",
+        workload=Stalling,
+        clock=lambda: now[0],
+        stale_after_s=5,
+    )
+    generator.start()
+    try:
+        assert stepped.wait(10)
+        generator.check()
+        now[0] += 60
+        with pytest.raises(LoadGeneratorFailure, match="old"):
+            generator.check()
+    finally:
+        hang.set()
+        generator.stop()
+
+
+def test_memory_only_level_launches_no_kernels(tmp_path: Path) -> None:
+    memory_only = LoadLevel("L1", working_set_mib=64, busy_ms=0.0, idle_ms=5.0)
+    generator, made = _in_process(tmp_path, memory_only)
+    with generator:
+        time.sleep(0.05)
+        generator.check()
+    assert made[0].steps == 0 and made[0].released

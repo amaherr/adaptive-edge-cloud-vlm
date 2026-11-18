@@ -11,11 +11,11 @@ from typing import Any
 from adaptive_vlm.artifacts import create_run_manifest
 from adaptive_vlm.benchmark.edge_load import (
     NO_LOAD,
-    EdgeLoadGenerator,
     LoadGeneratorFailure,
     LoadLevel,
     level_conditions,
     load_levels,
+    make_generator,
 )
 from adaptive_vlm.benchmark.interleaved import (
     ALL_PLACEMENTS,
@@ -188,9 +188,10 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
     prepare = getattr(adapter, "activate_stage", None) if adapter is not None else None
     load_level = _load_level(args)
     generator = (
-        EdgeLoadGenerator(
+        make_generator(
             load_level,
             directory=args.run_dir.parent / f".{args.run_dir.name}-edge-load",
+            device=args.edge_device,
         )
         if load_level is not None
         else None

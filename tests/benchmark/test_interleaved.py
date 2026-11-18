@@ -545,11 +545,11 @@ def test_cli_runs_edge_load_and_resource_state_hooks(
     events: list[str] = []
 
     class FakeGenerator:
-        def __init__(self, level: Any, *, directory: Path) -> None:
+        def __init__(self, level: Any, *, directory: Path, device: str) -> None:
             self.level = level
 
         def start(self) -> None:
-            events.append(f"start:{self.level.name}")
+            events.append(f"start:{self.level.name}:{self.level.generator}")
 
         def check(self) -> None:
             events.append("check")
@@ -581,7 +581,7 @@ def test_cli_runs_edge_load_and_resource_state_hooks(
         def stop(self) -> None:
             events.append("windows-stop")
 
-    monkeypatch.setattr(command, "EdgeLoadGenerator", FakeGenerator)
+    monkeypatch.setattr(command, "make_generator", FakeGenerator)
     monkeypatch.setattr(
         command, "gpu_state_source", lambda index: FakeReader(index).snapshot
     )
@@ -591,6 +591,7 @@ def test_cli_runs_edge_load_and_resource_state_hooks(
         json.dumps(
             {
                 "schema_version": 1,
+                "generator": "in_process",
                 "levels": {"L1": {"working_set_mib": 512, "busy_ms": 8, "idle_ms": 12}},
             }
         )
@@ -631,7 +632,7 @@ def test_cli_runs_edge_load_and_resource_state_hooks(
         "edge_load_level",
         "edge_load_alive",
     } <= {"edge_host_memory_available_mib", "edge_host_swap_used_mib"}
-    assert events[0] == "windows" and events[1] == "start:L1"
+    assert events[0] == "windows" and events[1] == "start:L1:in_process"
     assert events.count("check") == len(rows)
     assert events[-2:] == ["stop", "windows-stop"]
     plan = json.loads((tmp_path / "run" / "edge" / "plan.json").read_text())

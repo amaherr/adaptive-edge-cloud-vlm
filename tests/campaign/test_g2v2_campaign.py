@@ -275,7 +275,7 @@ def fake_edge(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
             pass
 
     class Generator:
-        def __init__(self, level: Any, *, directory: Path) -> None:
+        def __init__(self, level: Any, *, directory: Path, device: str) -> None:
             self.level = level
 
         def start(self) -> None:
@@ -294,7 +294,7 @@ def fake_edge(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         command, "gpu_state_source", lambda index: Reader(index).snapshot
     )
     monkeypatch.setattr(command, "WindowsGpuCounterSampler", Windows)
-    monkeypatch.setattr(command, "EdgeLoadGenerator", Generator)
+    monkeypatch.setattr(command, "make_generator", Generator)
     return state
 
 

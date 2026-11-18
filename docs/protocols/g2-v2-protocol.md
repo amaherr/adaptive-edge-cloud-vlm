@@ -193,7 +193,7 @@ Every validation and evaluation condition lies inside the training rate and RTT 
 
 [Calibrated 15–16 November 2026](../../results/edge-load-calibration-20261116/README.md). Both levels reproduced within 1.5% over three separate runs. They load the GPU with compute on a fixed 512 MiB working set. The draft's 1 GiB L2 was dropped: it sat within about 50 MiB of the edge's dedicated-memory limit, made latency insensitive to the duty cycle, and gave a p90 about 55% above the median. That is uncontrolled memory pressure rather than load.
 
-The competitor (`python -m adaptive_vlm.benchmark.edge_load_worker`) runs in its own process. `interleaved-benchmark --edge-load-config … --edge-load-level L1|L2` starts it after the model has loaded. It verifies the heartbeat before every attempt; if the generator is not alive, the command exits with code 76 and the supervisor resumes. It stops the generator at the end. Its level, liveness, heartbeat age and achieved duty are in every record.
+The competitor (`python -m adaptive_vlm.benchmark.edge_load_worker`) runs in its own process. `interleaved-benchmark --edge-load-config … --edge-load-level L1|L2` starts it after the model has loaded. It verifies the heartbeat before every attempt; if the generator is not alive, the command exits with code 76 and the supervisor resumes. It stops the generator at the end. Its level, liveness, heartbeat age and achieved duty are in every record. On the AWS edge the competitor runs inside the benchmark process instead (amendment A2a-3).
 
 **Pilot check.** If the pilot shows the median cloud latency at 35 Mb/s / 20 ms (V02) below 1.6 s or above 2.6 s, L1 does not sit near the cloud/distributed range. The levels are then re-chosen from the calibration curve by a dated amendment, before any G2 v2 data is collected.
 
@@ -336,3 +336,25 @@ The rationale and work plan are in [g2-v2-plus-plan.md](../g2-v2-plus-plan.md) a
 **A2a-2 (17 November 2026, before any AWS measurement).** The cloud is `g6.xlarge`: the same full L4 as `g6.2xlarge`, with 4 vCPU and 16 GiB instead of 8 and 32, at $0.805/h instead of $0.978/h.
 
 **CPU headroom guard.** In phase D, run 100 `cloud/raw_image` requests with the server, the probes and the C1 worker all running. If the cloud's median CPU utilization during requests exceeds 70%, or any request waits on CPU-bound preprocessing for more than 5% of its server time, the cloud becomes `g6.2xlarge` before any calibration. The guard's result is recorded in A2b.
+
+**A2a-3 (18 November 2026, after phase D, before any edge-load calibration).** On the AWS edge, the section 6 competitor runs inside the benchmark process, not as a separate worker.
+
+*Why.* In phase D, the resident model in the interleaved benchmark used about 5.5 GiB of the 5.78 GiB that the `g6f.2xlarge` vGPU gives PyTorch. A second process needs about 200 MiB of CUDA context before its working set. The worker could not allocate a 512 MiB working set. With 256 MiB (473 MiB in total) the model ran out of memory on its next request. Inside the benchmark process there is no second context, and the working set comes from the model's own caching allocator.
+
+*What it is.* A thread of `interleaved-benchmark` repeats the section 6 cycle: in-place additions over a float32 working set for `busy_ms`, then a sleep of `idle_ms`. It launches on its own CUDA stream and waits only for that stream, which releases the GIL. The levels file selects it with `"generator": "in_process"` (`adaptive_vlm.benchmark.edge_load.InProcessEdgeLoad`). The file's SHA-256 is already in the dataset contract, and the generator is recorded in every plan.
+
+*What does not change:*
+- a level is still a working set plus a busy/idle cycle, and L0 means no generator;
+- the generator starts after the model has loaded and stops at the end; its final state goes to `sessions.jsonl`;
+- it is checked before every attempt. A dead thread or a heartbeat older than 5 s exits with code 76, and the supervisor resumes;
+- every record carries the same fields: level, liveness, heartbeat age, achieved duty, kernels and allocated MiB;
+- rule 11's targets, the three-run reproduction and the L0 spill/OOM gate.
+
+*Differences, and how they are handled:*
+1. **Synchronization.** The model's stage timers synchronize the whole device, so they also wait for the load kernel in flight (one pass over the working set). That is part of the load, as time-slicing is for a separate process. Calibration measures it.
+2. **Memory accounting.** The working set comes from the model's allocator. Peak-memory fields at L1 and L2 include it.
+3. **Fit.** A level is admitted only if its calibration runs, and a short run of all admitted configurations at that level, have no out-of-memory attempt. Rule 11's 512 MiB working set is tried first. If it does not fit, the largest working set that does is used for both levels and recorded in A2b.
+4. **CPU.** The thread shares the GIL with the model. It holds it only to launch a kernel and update its counters.
+5. **Fault drill.** No separate worker exists to kill. The phase F drill rerun instead kills the benchmark process during an L1 sub-block, which stops the load with it, and checks that resume restarts both. A failing load thread is covered by unit tests.
+
+The physical G2 v2 edge keeps the separate worker (`"generator": "process"`, the default). Reports name the generator in use.

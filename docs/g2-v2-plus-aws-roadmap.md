@@ -218,12 +218,12 @@ D6 fault drill results:
   - Every session needs a keepalive right after start.
   - `g6.xlarge` start-ups in us-east-1d hit `InsufficientInstanceCapacity` 2–4 times. Starting through a short capacity reservation, cancelled once running, works.
 
-**Open decision: edge GPU load (section 6) does not fit on `g6f.2xlarge`.**
+**Decided (18 November 2026): edge GPU load (section 6) did not fit on `g6f.2xlarge` as a separate process. It now runs inside the benchmark process (amendment A2a-3, option 1 below).**
 - In the interleaved benchmark, the resident model uses about 5.5 GiB of the 5.78 GiB the vGPU gives PyTorch.
 - A separate load process needs about 200 MiB of CUDA context plus its working set.
 - With 512 MiB the worker could not allocate; with 256 MiB (473 MiB in total) the model ran out of memory on its next request.
-- Options for phase E2:
-  1. Generate the load inside the benchmark process (no extra context). That is a design change to section 6 and needs an amendment.
+- Options considered for phase E2:
+  1. **Chosen:** generate the load inside the benchmark process (no extra context). That is a design change to section 6 and needs an amendment.
   2. Move the edge to `g4dn.xlarge` (T4, 16 GB). That needs an amendment, because rule 10 passed for `g6f.2xlarge`.
   3. Drop edge GPU load on AWS and keep cloud load and network as the system factors.
 1. **D1 Nodes:** `nvidia-smi`, a BF16 matrix operation and the model load on both nodes. On the edge, test **resident and swap residency**, and record peak memory and whether each fits.
@@ -241,7 +241,7 @@ D6 fault drill results:
 
 ### Phase E: recalibration on AWS (about 1.5 days)
 1. **E1 Residency**, from D1. Use resident if it fits with margin; otherwise swap.
-2. **E2 Edge load L1/L2**, using the W5 procedure on the chosen edge. Targets are re-derived for a strong cloud:
+2. **E2 Edge load L1/L2**, using the W5 procedure on the chosen edge, with the in-process generator (A2a-3). Targets are re-derived for a strong cloud:
    - L1: edge/full median about equal to the cloud/raw median at 35/20;
    - L2: about 1.5× that;
    - each reproduced within 2% over three runs.
