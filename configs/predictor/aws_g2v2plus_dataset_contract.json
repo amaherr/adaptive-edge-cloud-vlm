@@ -1,0 +1,25 @@
+{
+  "schema_version": 3,
+  "description": "Predictor V2 dataset contract for the G2 v2+ campaign on the AWS pair (amendments A2a, A2b). Reference indexes are the paths inside the campaign image's /artifacts volume.",
+  "campaign_id": "aws-vqa-v2plus",
+  "feature_source": "pinned_tokenizer",
+  "model_contract_sha256": "e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1",
+  "tokenizer_sha256": "0512fdcac4a5f9e7746cbefce4a468dc93bf0f93f11e701b84f8b31bff199e9c",
+  "template_source_sha256": "ee7707c9b4d091dd6d3441ceebc54a36be4023e97d0504e59b5ea7d71147854b",
+  "host_pair_id": "edge-g6f-2xlarge-l4-6q-cloud-g6-xlarge-l4-v1",
+  "cloud_device": "cuda",
+  "correctness_protocol": "physical-heterogeneous-v2",
+  "same_device_reference_evidence": {
+    "short": "/artifacts/g2v2/reference/bundle/index.json",
+    "long": "/artifacts/g2v2/reference-long/bundle/index.json"
+  },
+  "require_controlled_network": true,
+  "require_clean_source": true,
+  "max_probe_age_seconds": 3600,
+  "task_buckets": {
+    "short": "vqa-short-answer-32-token-budget",
+    "long": "vqa-long-answer-32-token-budget"
+  },
+  "int8_admitted": true,
+  "int8_admission_evidence": "results/int8-quality-20261118/decision.json"
+}

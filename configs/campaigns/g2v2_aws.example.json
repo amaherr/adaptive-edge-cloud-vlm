@@ -10,7 +10,7 @@
   "cloud_container": "adaptive-vlm-inference",
   "cloud_python": "docker exec adaptive-vlm-inference python",
   "cloud_repo": "/artifacts",
-  "cloud_interface": "REPLACE-cloud-interface-from-ip-route",
+  "cloud_interface": "enp39s0",
   "shaping": "classified",
   "edge_address": "10.42.1.10",
   "tc_privilege": [],
@@ -36,7 +36,7 @@
   "edge_dedicated_limit_mib": 6144,
   "spill_margin_mib": 128,
   "checkpoint": {
-    "s3_uri": "s3://REPLACE-artifact-bucket/research/adaptive-vlm/g2v2plus",
+    "s3_uri": "s3://adaptive-vlm-artifacts-444704506592-us-east-1/cloud-v1/edge/g2v2plus",
     "region": "us-east-1"
   },
   "heartbeat": {

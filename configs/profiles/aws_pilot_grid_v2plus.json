@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "campaign_id": "aws-vqa-v2plus-pilot",
+  "description": "G2 v2+ pilot on the AWS pair (amendment A2b rule 9), discarded afterwards. Short task over 10 training IDs: P01-P05 at L0 / C0 and L0 / C2, and P02 and P03 also at L1 / C0 and L1 / C2. Long task (E1) over 5 training IDs: P01 at L0 and P05 at L1, both C0. One repetition, 16 sub-blocks.",
+  "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
+  "protocol_sha256": null,
+  "split_path": "../evaluation/pilot_split_v2.json",
+  "experiment_config_path": "../experiments/aws_vqa_v2.yaml",
+  "edge_load_levels_path": "../edge_load/aws_levels_v1.json",
+  "correctness_protocol": "physical-heterogeneous-v2",
+  "cloud_host": "10.42.1.20",
+  "edge_interface": "enp39s0",
+  "iperf_port": 5051,
+  "echo_port": 5052,
+  "netem_limit_packets": 10000,
+  "order_seed": 7219,
+  "repetitions": [
+    0
+  ],
+  "warmups_per_subblock": 1,
+  "configurations": [
+    "edge/full",
+    "cloud/raw_image",
+    "distributed/projected/synchronous",
+    "distributed/projected/prompt_first",
+    "distributed/projected/int8"
+  ],
+  "load_levels": [
+    "L1"
+  ],
+  "loaded_conditions": [
+    "P02",
+    "P03"
+  ],
+  "conditions": {
+    "P01": {
+      "split": "training",
+      "rate_mbps": 100,
+      "added_rtt_ms": 5
+    },
+    "P02": {
+      "split": "training",
+      "rate_mbps": 100,
+      "added_rtt_ms": 100
+    },
+    "P03": {
+      "split": "training",
+      "rate_mbps": 150,
+      "added_rtt_ms": 150
+    },
+    "P04": {
+      "split": "training",
+      "rate_mbps": 35,
+      "added_rtt_ms": 20
+    },
+    "P05": {
+      "split": "training",
+      "rate_mbps": 200,
+      "added_rtt_ms": 5
+    }
+  },
+  "rate_fallback": {},
+  "cloud_load": {
+    "levels_path": "../cloud_load/levels_v1.json",
+    "levels": {
+      "C2": [
+        [
+          "P01",
+          "L0",
+          "short"
+        ],
+        [
+          "P02",
+          "L0",
+          "short"
+        ],
+        [
+          "P03",
+          "L0",
+          "short"
+        ],
+        [
+          "P04",
+          "L0",
+          "short"
+        ],
+        [
+          "P05",
+          "L0",
+          "short"
+        ],
+        [
+          "P02",
+          "L1",
+          "short"
+        ],
+        [
+          "P03",
+          "L1",
+          "short"
+        ]
+      ]
+    }
+  },
+  "extra_tasks": {
+    "long": {
+      "task_bucket": "vqa-long-answer-32-token-budget",
+      "experiment_config_path": "../experiments/aws_vqa_v2_long.yaml",
+      "split_path": "../evaluation/pilot_split_v2_long.json",
+      "cells": [
+        [
+          "P01",
+          "L0"
+        ],
+        [
+          "P05",
+          "L1"
+        ]
+      ]
+    }
+  }
+}

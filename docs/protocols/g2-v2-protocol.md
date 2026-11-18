@@ -420,3 +420,16 @@ These are the measured values that A2a deferred to A2b. Phase D and phase E resu
    - **Requests:** the E5 estimate gives 18.6 h of request time (short 17.1 h, long 1.4 h).
    - **Overhead:** the phase D drill measured 1–2.5 min per sub-block for probes, shaping, model load and validation, adding 3.3–8.2 h.
    - **Total:** 22–27 h. The run is split into **three sessions of at most 12 h each**, amending A2a-5 rule 3's two sessions. The instances stop between sessions, and the seeded order runs across the session boundaries.
+9. **AWS pilot** ([aws_pilot_grid_v2plus.json](../../configs/profiles/aws_pilot_grid_v2plus.json)), discarded afterwards.
+   - **Cells:** the section 6 pilot conditions P01–P05, with one repetition and only training IDs, 16 sub-blocks:
+     - short task, 10 IDs: every condition at L0 / C0 and L0 / C2; P02 (100 Mb/s / 100 ms) and P03 (150 / 150) also at L1 / C0 and L1 / C2;
+     - long task, 5 IDs: P01 at L0 and P05 at L1, both C0.
+   - **Estimate at P02:** `cloud/raw_image` at L0 / C0 (by 410 ms), `edge/full` at L0 / C2 (by 216 ms), `cloud/raw_image` again at L1 / C2 (by 184 ms).
+   - **Go/no-go.** If any check fails, stop, fix, and record a dated amendment before collecting.
+     1. Every pilot sub-block is valid: probes within tolerance, no netem drops, no L0 OOM, NVML used memory below the limit at L0, the cloud-load gate (rule 7) at C0 and C2, and edge load alive at L1.
+     2. C2 changes the measured winner relative to C0 at L0 in at least one of P02 and P03.
+     3. L1 changes the measured winner relative to L0 at C2 in at least one of P02 and P03.
+     4. The pilot profiles derive with every configuration verified against its reference. `prompt_first` matches the synchronous control and `int8` the int8 control (rule 8).
+     5. Cloud and distributed rows carry `server_state_*` fields.
+     6. Scaled to the campaign's sub-blocks and requests, the pilot's measured time per sub-block keeps the run within three sessions of at most 12 h.
+   - **Replaced checks.** Section 6's pilot check (cloud median at 35/20 between 1.6 and 2.6 s) and the requirement that each placement wins a pilot cell do not apply on AWS. A2a-5 replaced rule 11's targets, and the E5 estimate predicts no distributed win.

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -41,6 +42,12 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=CONFIG)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=CACHE,
+        help="pinned model cache (/models inside the campaign image)",
+    )
     parser.add_argument("--edge", type=Path, help="bundle: edge same-device folder")
     parser.add_argument("--cloud", type=Path, help="bundle: cloud same-device folder")
     parser.add_argument("--control", type=Path, help="bundle: control run folder")
@@ -73,7 +80,7 @@ def main() -> None:
         seed_everything(config.runtime.seed)
         adapter = MoondreamAdapter.from_pretrained(
             config.model,
-            cache_dir=CACHE,
+            cache_dir=args.cache_dir,
             artifact_manifest=ARTIFACT,
             vision_device=args.device,
             text_device=args.device,
@@ -95,8 +102,13 @@ def main() -> None:
         if not report["passed"]:
             raise SystemExit(1)
     elif args.step == "control":
+        # The checkout's model venv, or the campaign image's installed CLI.
+        venv = ROOT / ".venv-model/bin/adaptive-vlm"
+        cli = str(venv) if venv.exists() else shutil.which("adaptive-vlm")
+        if cli is None:
+            parser.error("control needs the adaptive-vlm command")
         command = [
-            str(ROOT / ".venv-model/bin/adaptive-vlm"),
+            cli,
             "benchmark",
             "--config",
             str(args.config),
@@ -107,7 +119,7 @@ def main() -> None:
             "--artifact-manifest",
             str(ARTIFACT),
             "--cache-dir",
-            str(CACHE),
+            str(args.cache_dir),
             "--offline",
             "--warmups",
             "1",

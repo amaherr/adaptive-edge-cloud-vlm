@@ -165,8 +165,21 @@ def test_aws_settings_template_validation(tmp_path: Path) -> None:
     assert PLATFORMS[template["platform"]] == ("edge_gpu_memory_used_mib", "image")
     path = tmp_path / "settings.json"
     path.write_text(json.dumps(template))
-    with pytest.raises(ValueError, match=r"cloud_interface|edge_residency"):
+    with pytest.raises(ValueError, match=r"cloud_access"):
         load_settings(path, ROOT)
+    pilot = json.loads(
+        (ROOT / "configs/campaigns/g2v2_aws_pilot.example.json").read_text()
+    )
+    path.write_text(
+        json.dumps(
+            {
+                **pilot,
+                "cloud_access": {**pilot["cloud_access"], "instance_id": "i-0abc"},
+            }
+        )
+    )
+    assert load_settings(path, ROOT)["allow_unfrozen_protocol"] is True
+    path.write_text(json.dumps(template))
     filled = {
         **template,
         "cloud_interface": "ens5",

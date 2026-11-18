@@ -147,8 +147,11 @@ def load_settings(path: Path, root: Path) -> dict[str, Any]:
     ]
     if settings["mode"] == "physical":
         legacy = str(settings.get("cloud_ssh") or "")
-        if not settings.get("cloud_access") and (not legacy or "REPLACE" in legacy):
+        access = settings.get("cloud_access")
+        if not access and (not legacy or "REPLACE" in legacy):
             raise ValueError(f"set cloud_access (ssm or ssh) or cloud_ssh in {path}")
+        if access and "REPLACE" in json.dumps(access):
+            raise ValueError(f"set cloud_access (the cloud instance ID) in {path}")
         required += ["cloud_repo", "cloud_python", "cloud_interface"]
         if not settings.get("acceptance_drill"):
             required.append("same_device_reference_evidence")
