@@ -20,7 +20,7 @@ There is no `.git` in the image. The run manifests take the commit from the buil
 | cloud | `inference` (container `adaptive-vlm-inference`): `adaptive-server --report-resource-state` | 10001 | none | host | yes |
 | cloud | `iperf`, `echo` probes | 10001 | none | host | no |
 | edge | `benchmark` (smoke and diagnostics) | 10001 | none | host | yes |
-| edge | **`orchestrator`**: `run_g2v2_campaign.py run` | **0** | **`NET_ADMIN`, `DAC_OVERRIDE` only** | host | yes |
+| edge | **`orchestrator`** (`compose.orchestrator.yaml`): `run_g2v2_campaign.py run` | **0** | **`NET_ADMIN`, `DAC_OVERRIDE` only** | host | yes |
 
 The orchestrator is the one exception to v1's "no `NET_ADMIN`":
 - it shapes the edge interface with `tc` (classified netem, experiment traffic only);

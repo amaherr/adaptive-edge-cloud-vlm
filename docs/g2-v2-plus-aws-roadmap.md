@@ -183,6 +183,49 @@ Follow [g2-v2-plus-plan.md](g2-v2-plus-plan.md) for B1, B2, B4, B5, B7 and B8, w
 *Done when* both instances are running the pinned image digest, the data volumes verify against the receipts, and the watchdog is live.
 
 ### Phase D: acceptance on AWS (about 1 day; both VMs)
+
+**Status (17–18 November 2026): done.** One open decision, edge GPU load, is listed under D6. Results are in `artifacts/phase-d/` and in S3 under `cloud-v1/{edge,cloud}/phase-d/`. Images used: `sha256:a96079080a1c…` (C4) for D1–D5, then `sha256:b7459da3754a…` (commit `826a42a`, which includes the D4 shaping fix) for D6 and D3 run 3.
+
+| Step | Result |
+| --- | --- |
+| D1 nodes, fit (A2a rule 10) | Edge `NVIDIA L4-6Q`, 6,144 MiB (PyTorch sees 5.78 GiB); cloud `NVIDIA L4`, 23,034 MiB; driver 580.159.03 on both. **Resident:** 200/200 P1 requests, median 1,014 ms, peak use 4,781 MiB (78%, under rule 14's 90%), so residency is **resident**. **Swap does not work on the GRID vGPU** ("CUDA driver error: operation not supported": no pinned host memory). |
+| D2 paths | 12 training IDs × 2 repetitions, interleaved, 24/24 on all five configurations. Unshaped medians: edge 1,007 ms, cloud 269 ms, distributed 655/658/656 ms (synchronous/prompt-first/int8). Prompt-first equals synchronous on 24/24; int8 equals lossless on 24/24; int8 bytes are 0.5006×. Edge and cloud outputs are identical on 24/24. Every response carries 19 `server_state_*` fields. |
+| D3 stability (A2a rule 10) | Three runs of 100 edge/full at 19:41, 21:52 and 00:06 UTC. Medians 1,015.4 / 1,014.7 / 1,015.8 ms, so CV ≈ 0.05% (limit 3%); p90/median 1.081 / 1.077 / 1.096 (limit 1.15). **`g6f.2xlarge` is accepted** (fit and stability). |
+| D4 network | Unshaped: 4.96 Gb/s each way, 0.19–0.25 ms RTT. Classified netem results below; the 200 Mb/s check passes (T08). While shaped at 5 Mb/s, a 60 MB S3 sync takes 2.2 s and an SSM round trip 2.1 s, so management traffic is unshaped. The shaping clears back to default on both hosts. **Bug found and fixed:** tc refuses to `replace` an existing flower filter, so changing condition now deletes our own root first (`f150379`). |
+| D5 resource state | The GRID vGPU exposes clocks, memory used/free, GPU and memory utilization and the performance state. It does **not** expose temperature, power or clock-event reasons. Those edge-state inputs are always null on AWS and should leave the B8 input list in phase E. |
+| CPU headroom guard (A2a-2) | 100 `cloud/raw_image` requests with the server, probes and the strongest candidate C100 running: median cloud CPU 50.5% (limit 70%), non-model server time 0.09% (limit 5%). **Cloud stays `g6.xlarge`.** At C100 the cloud server time is 863 ms against 269 ms unloaded (3.2×), so C1 will be a lower duty. |
+| D6 fault drill | Drill grid `configs/profiles/aws_drill_grid.json`, with settings `acceptance_drill: true` (reference checks skipped, never campaign data). Results below. |
+
+D4 classified netem, three grid conditions:
+
+| Condition | Measured each way | Echo RTT | Drops |
+| --- | --- | --- | --- |
+| T01 5 Mb/s +20 ms | 5.0 Mb/s | 20.61 ms | 0 |
+| E04 175 Mb/s +50 ms | 173.7 Mb/s | 50.42 ms | 0 |
+| T08 200 Mb/s +5 ms | 198.5 Mb/s | 5.31 ms | 0 |
+
+D6 fault drill results:
+- **Supervisor `docker kill` mid sub-block (three times):** the children die with the container, and a restart resumes with no gaps or duplicates.
+- **Edge instance stop mid-campaign:** the supervisor took SIGTERM cleanly; after the restart it resumed and completed.
+- **Cloud C1 worker SIGKILL mid sub-block:** gate A2a.7 invalidated the sub-block ("C1 not alive in 24 responses"), and it was rerun and valid.
+- **Afterwards:** no stray workers or benchmarks on either host, and default qdiscs.
+- **Not tested on AWS:** killing the edge load worker (see below). It was tested in the local rehearsal.
+- **Lessons:**
+  - Root in an SSM shell cannot signal processes inside a container (snap/AppArmor confinement), so drills must kill through `docker exec`. The supervisor already reaps that way.
+  - `ps` must use `-ww`, and torch processes are named `pt_main_thread`.
+  - The orchestrator moved to `container/compose.orchestrator.yaml`, because compose interpolated the benchmark service's variables.
+  - The image rebuild must prune old images, since the 30 GiB root holds one image plus one build. The prune must keep the current digest.
+  - Every session needs a keepalive right after start.
+  - `g6.xlarge` start-ups in us-east-1d hit `InsufficientInstanceCapacity` 2–4 times. Starting through a short capacity reservation, cancelled once running, works.
+
+**Open decision: edge GPU load (section 6) does not fit on `g6f.2xlarge`.**
+- In the interleaved benchmark, the resident model uses about 5.5 GiB of the 5.78 GiB the vGPU gives PyTorch.
+- A separate load process needs about 200 MiB of CUDA context plus its working set.
+- With 512 MiB the worker could not allocate; with 256 MiB (473 MiB in total) the model ran out of memory on its next request.
+- Options for phase E2:
+  1. Generate the load inside the benchmark process (no extra context). That is a design change to section 6 and needs an amendment.
+  2. Move the edge to `g4dn.xlarge` (T4, 16 GB). That needs an amendment, because rule 10 passed for `g6f.2xlarge`.
+  3. Drop edge GPU load on AWS and keep cloud load and network as the system factors.
 1. **D1 Nodes:** `nvidia-smi`, a BF16 matrix operation and the model load on both nodes. On the edge, test **resident and swap residency**, and record peak memory and whether each fits.
 2. **D2 Paths:** edge/full, cloud/raw, distributed sync, plus prompt-first and int8 once B lands; outputs and wire bytes checked.
 3. **D3 Edge stability (decides D2).** Run 100 edge/full requests three times at different times of day, edge otherwise idle. Pass if the coefficient of variation of the per-run median is at most 3%, the within-run p90/median is at most 1.15, and the model fits. Otherwise move to the next edge instance and record a new environment revision.

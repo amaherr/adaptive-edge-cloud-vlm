@@ -48,6 +48,9 @@ if [ "$role" = edge ]; then
   created=${4:?created timestamp}
   repository=${5:?ECR repository URL}
   local_tag="adaptive-vlm:$commit"
+  # The 30 GiB root (D11) holds one ~9 GB image plus one build, not two images.
+  docker container prune -f > /dev/null
+  docker image prune -af > /dev/null
   cd "$source"
   docker build --platform linux/amd64 -f container/Dockerfile --tag "$local_tag" \
     --build-arg "GIT_SHA=$commit" --build-arg "BUILD_CREATED=$created" \
