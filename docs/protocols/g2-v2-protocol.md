@@ -1,6 +1,6 @@
 # G2 v2 baseline protocol
 
-**Status: draft.** Section 3 (prompt contract and selection rule) and section 4 (dataset construction) are **frozen and executed**: they were committed before any calibration answer was generated or scored, and were applied exactly as written. All other sections stay a draft until the off-site rehearsal and edge pilot in the [preparation roadmap](../g2-v2-preparation.md) confirm feasibility. At that point the whole document is frozen, and the campaign grid config pins its SHA-256. Changes after freezing are allowed only as dated amendments at the end of this document, written before the affected data is collected.
+**Status: frozen (18 November 2026) for the G2 v2+ campaign on AWS.** Amendments A2a and A2b, below, adapt the draft sections to the AWS pair; where they differ from sections 5–9, the amendments apply. Section 3 (prompt contract and selection rule) and section 4 (dataset construction) were frozen and executed before any calibration answer was generated or scored. The campaign grid ([aws_network_grid_v2plus.json](../../configs/profiles/aws_network_grid_v2plus.json)) pins this document's SHA-256. Changes from here on are allowed only as dated amendments at the end of this document, written before the affected data is collected.
 
 ## 1. Purpose and scope
 
@@ -162,7 +162,7 @@ Within each crop stratum, request IDs are shuffled with seed `3907` and assigned
 - **Model contract:** unchanged from G2 (`e7ef0180…94aa1`).
 - **Overlap:** no question or image is shared with G2 or with the calibration set.
 
-## 5. Network conditions (draft)
+## 5. Network conditions
 
 The rate applies to egress on both hosts. Added RTT is split evenly, with each host's egress delay set to half of it. Every netem qdisc sets `limit 10000` packets and must report zero drops before and after each sub-block (`tc -s qdisc`). A condition passes the same live-measurement checks as G2: iperf3 receiver rate within ±20% of the target in both directions, and echo RTT within max(5 ms, 20%) of the unshaped baseline plus the added RTT.
 
@@ -183,7 +183,7 @@ The rate applies to egress on both hosts. Added RTT is split evenly, with each h
 
 Every validation and evaluation condition lies inside the training rate and RTT ranges, and none was used in G2. If the on-site pilot shows the edge uplink can't sustain 200 Mb/s within tolerance, T08 becomes 150 Mb/s / 5 ms and E04 becomes 140 Mb/s / 50 ms. This substitution is fixed now, so it isn't a post-hoc choice.
 
-## 6. Edge GPU load (draft)
+## 6. Edge GPU load
 
 | Level | Competitor ([levels_v1.json](../../configs/edge_load/levels_v1.json)) | Edge/full median under P1 | Purpose |
 | --- | --- | ---: | --- |
@@ -221,7 +221,7 @@ Each split therefore contains cells where the best placement changes with load.
 
 All three placements are predicted to win in every split. T08-L1-long stays a distributed win in all nine sensitivity scenarios (cloud time ±15%, transport ±20%). These are estimates; the measured winners are what counts.
 
-## 7. Execution design (draft)
+## 7. Execution design
 
 - **Cell:** one condition at one load level, for one task. There are 48 cells:
   - 34 short-answer cells: 22 at L0 and 12 at L1 or L2;
@@ -250,7 +250,7 @@ All three placements are predicted to win in every split. T08-L1-long stays a di
 
 There are also 432 excluded warmups (144 sub-blocks × 3 placements).
 
-## 8. Validity gates (draft)
+## 8. Validity gates
 
 A sub-block is valid only if:
 1. it passes the pre and post network measurements and the zero-drop check;
@@ -261,11 +261,11 @@ A sub-block is valid only if:
 
 An invalid sub-block is rerun as a whole. A dataset with any invalid sub-block left is not G2 v2.
 
-## 9. Analysis plan (draft)
+## 9. Analysis plan
 
 - **Latency.** For each cell and placement: median, p90 and the bootstrap 95% CI of the median end-to-end latency over all of the split's IDs and repetitions (seed `1707`, 2,000 resamples, as in G2).
 - **Measured winner.** For each cell, the placement with the lowest median latency, plus its margin over the runner-up. Cells where the CIs of the top two overlap are reported as ties.
-- **Quality.** Official VQA accuracy for each placement on each split, scored as in section 3.3. This covers the short-answer task only; the long-answer task is timed only. Its placements are checked against the per-GPU same-device references (gate 2). *Proposed, to be decided before freezing:* the primary score lowercases each answer before export. That is standard VQA submission practice, and it avoids the evaluator's case-sensitive comparison when all references agree; the [calibration](../../results/prompt-calibration-20261115/README.md#diagnostic-the-evaluators-case-handling) found that comparison costs about 22 points on capitalized "Yes"/"No" answers. The unchanged score is reported alongside. Placement quality parity: the accuracy difference between any two placements, on the same IDs, must be at most 2 percentage points. If not, the selector must treat quality as placement-dependent.
+- **Quality.** Official VQA accuracy for each placement on each split, scored as in section 3.3. This covers the short-answer task only; the long-answer task is timed only. Its placements are checked against the per-GPU same-device references (gate 2). **Decided at the freeze (18 November 2026):** the primary score lowercases each answer before export. That is standard VQA submission practice, and it avoids the evaluator's case-sensitive comparison when all references agree; the [calibration](../../results/prompt-calibration-20261115/README.md#diagnostic-the-evaluators-case-handling) found that comparison costs about 22 points on capitalized "Yes"/"No" answers. The unchanged score is reported alongside. Placement quality parity: the accuracy difference between any two placements, on the same IDs, must be at most 2 percentage points. If not, the selector must treat quality as placement-dependent.
 - **Isolation.** Training cells only, for anything fitted (Predictor V2 r2, G3). The validation cells are opened once for G3. The evaluation cells stay sealed until the selector is frozen for G4.
 
 ## Amendments
@@ -433,3 +433,10 @@ These are the measured values that A2a deferred to A2b. Phase D and phase E resu
      5. Cloud and distributed rows carry `server_state_*` fields.
      6. Scaled to the campaign's sub-blocks and requests, the pilot's measured time per sub-block keeps the run within three sessions of at most 12 h.
    - **Replaced checks.** Section 6's pilot check (cloud median at 35/20 between 1.6 and 2.6 s) and the requirement that each placement wins a pilot cell do not apply on AWS. A2a-5 replaced rule 11's targets, and the E5 estimate predicts no distributed win.
+10. **Pilot result (18 November 2026): go.** The pilot ran on image `sha256:75d2f734…` (commit `b360d6b`). [Results](../../results/aws-pilot-20261118/README.md).
+    1. **Validity:** all 16 sub-blocks were valid on their first attempt, and 750 of 750 measured attempts succeeded.
+    2. **C2 at L0:** the measured winner changed at both P02 and P03, from `cloud/raw_image` to `edge/full`.
+    3. **L1 at C2:** the winner changed back to `cloud/raw_image` at both conditions.
+    4. **Correctness:** every pilot row equals its reference, with no cross-GPU disagreement. The profile builder's per-sub-block `passed` flag is false for every sub-block, because it counts all 120 manifest IDs and asks for two repetitions within one sub-block. That is a defect in how the flag is scoped, not an output difference. The same-device references, the 3-repetition controls and the preflight smoke establish repeatability, and sub-block validity does not depend on the flag.
+    5. **Cloud state:** every cloud and distributed row carries `server_state_*`.
+    6. **Run length:** overhead was 56–69 s per sub-block (mean 62 s), and request time was 0.99× the E5 estimate. The campaign is therefore about 18.3 h of requests plus 3.4 h of overhead, roughly 22 h, or about 7.2 h per session over three sessions.

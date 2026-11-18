@@ -3,7 +3,7 @@
   "campaign_id": "aws-vqa-v2plus",
   "description": "G2 v2+ campaign grid on the AWS pair (protocol amendments A2a and A2b). Short task: every section 5 condition at L0 and L1, each at C0 and C2 (88 cells). Long task (section 3.5): the section 6 long-answer cells with L2 removed (10 cells, C0). Two repetitions. Added RTT is split evenly between both hosts' egress queues; classified shaping (A2a rule 12).",
   "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
-  "protocol_sha256": null,
+  "protocol_sha256": "a972ecdc595ab664c9914987c5aeaf71aba50daffcc86e02df2598315bf0e1d5",
   "split_path": "../evaluation/physical_vqa_split_v2.json",
   "experiment_config_path": "../experiments/aws_vqa_v2.yaml",
   "edge_load_levels_path": "../edge_load/aws_levels_v1.json",
