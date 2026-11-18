@@ -33,5 +33,11 @@
       "idle_ms": 0
     }
   },
-  "levels": {}
+  "levels": {
+    "C1": {
+      "working_set_mib": 512,
+      "busy_ms": 10,
+      "idle_ms": 10
+    }
+  }
 }

@@ -254,6 +254,12 @@ D6 fault drill results:
    - resume, with no gaps, no duplicates and no stray load.
 
 ### Phase E: recalibration on AWS (about 1.5 days)
+**Status (18 November 2026): E1, E3 and E4 runs are done. E2 and E5 wait on a design decision.** Results are in [results/aws-phase-e-20261118](../results/aws-phase-e-20261118/README.md). Image `sha256:2c1bbf861a4d…` (commit `61c1748`).
+- E1: resident.
+- E3: C1 = C50 (10/10 ms on 512 MiB), giving 1.46× the C0 server time (263 ms). C100 gives 3.27×.
+- E4: int8 matched 199/200 short answers; official scoring is pending.
+- **Open decision:** at 35/20 the cloud takes 359 ms and the unloaded edge 1,019 ms. Rule 11's L1/L2 targets cannot be met. A simple model from these measurements predicts that `cloud/raw_image` wins all 22 short-task conditions at C0 and C1 (L0 or loaded edge). Only a heavy cloud load near C100 lets the edge win (12 conditions, mostly at high RTT). Distributed wins nowhere. The edge-load sweep (256 MiB, 8 MiB kernels) spans 1.21–3.0 s.
+
 1. **E1 Residency**, from D1. Use resident if it fits with margin; otherwise swap.
 2. **E2 Edge load L1/L2**, using the W5 procedure on the chosen edge, with the in-process generator (A2a-3). Targets are re-derived for a strong cloud:
    - L1: edge/full median about equal to the cloud/raw median at 35/20;

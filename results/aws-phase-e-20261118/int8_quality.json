@@ -1,0 +1,37 @@
+{
+  "long": {
+    "gated": false,
+    "identical_token_sequences": 132,
+    "images": 200,
+    "lengths": {
+      "int8": {
+        "mean": 32,
+        "median": 32.0,
+        "min": 32
+      },
+      "lossless": {
+        "mean": 32,
+        "median": 32.0,
+        "min": 32
+      }
+    },
+    "mean_common_prefix_tokens": 26.005,
+    "mean_position_agreement": 0.8325
+  },
+  "protocol": "A2a rule 4",
+  "schema_version": 1,
+  "short": {
+    "differing": [
+      {
+        "int8": "5",
+        "lossless": "6",
+        "request_id": "vqa-v2-val2014-232769003"
+      }
+    ],
+    "identical_share_casefolded": 0.995,
+    "max_accuracy_change_pp": 0.5,
+    "questions": 200,
+    "token_identical": 199
+  },
+  "status": "identical-answer check done; official accuracy not yet scored"
+}
