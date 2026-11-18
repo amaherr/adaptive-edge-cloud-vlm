@@ -254,11 +254,22 @@ D6 fault drill results:
    - resume, with no gaps, no duplicates and no stray load.
 
 ### Phase E: recalibration on AWS (about 1.5 days)
-**Status (18 November 2026): E1, E3 and E4 are done. E2 and E5 follow amendment A2a-5 (heavy cloud load).** Results are in [results/aws-phase-e-20261118](../results/aws-phase-e-20261118/README.md). Image `sha256:2c1bbf861a4d…` (commit `61c1748`).
+**Status (18 November 2026): phase E is done.** E2 and E5 followed amendment A2a-5 (heavy cloud load). Results are in [results/aws-phase-e-20261118](../results/aws-phase-e-20261118/README.md). Image `sha256:2c1bbf861a4d…` (commit `61c1748`).
 - E1: resident.
 - E3: C1 = C50 (10/10 ms on 512 MiB), giving 1.46× the C0 server time (263 ms). C100 gives 3.27×.
 - E4: **int8 is admitted.** 199/200 short answers are identical, and official accuracy is 56.7 / 79.7% against 56.2 / 79.2% lossless (unchanged / lowercased).
-- **Open decision:** at 35/20 the cloud takes 359 ms and the unloaded edge 1,019 ms. Rule 11's L1/L2 targets cannot be met. A simple model from these measurements predicts that `cloud/raw_image` wins all 22 short-task conditions at C0 and C1 (L0 or loaded edge). Only a heavy cloud load near C100 lets the edge win (12 conditions, mostly at high RTT). Distributed wins nowhere. The edge-load sweep (256 MiB, 8 MiB kernels) spans 1.21–3.0 s.
+- At 35/20 the cloud takes 359 ms and the unloaded edge 1,019 ms, so rule 11's L1/L2 targets could not be met. Amendment A2a-5 replaced them.
+- E2 (A2a-5): **L1 = E-I10** (1/10 ms, 256 MiB, 8 MiB kernels): 1.39× L0. Three reproduction runs agree within 0.2%, with no OOM in any configuration. The level is in `configs/edge_load/aws_levels_v1.json`.
+- E5: **C2 = C100**, putting the cloud 3.4% under the edge at 35/20 (C75: −40%).
+- E5 winner estimate (`winners.json`, transport fit residuals ≤ 7.3 ms):
+  - the winner changes only in p1 / L0 / C2: edge 13, cloud 9, with changes in every split;
+  - every other task/load combination goes to `cloud/raw_image`;
+  - distributed never wins.
+- **For A2b (phase F): which load cells to run.** Candidates:
+  - p1 / L0 / C2 on all 22 conditions;
+  - p1 / L1 / C2, which turns those 13 edge wins back to the cloud;
+  - C1 and e1 load cells, which change no winner.
+- The AWS grids still point to the physical `edge_load/levels_v1.json`; A2b switches them.
 
 1. **E1 Residency**, from D1. Use resident if it fits with margin; otherwise swap.
 2. **E2 Edge load L1/L2**, using the W5 procedure on the chosen edge, with the in-process generator (A2a-3). Targets are re-derived for a strong cloud:

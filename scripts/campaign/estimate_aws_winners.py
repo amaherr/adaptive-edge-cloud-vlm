@@ -116,7 +116,7 @@ def main() -> None:
         }
 
     profile: dict[str, dict[str, dict[str, float]]] = {}
-    for run in sorted(args.runs.glob("prof-*")):
+    for run in sorted(p for p in args.runs.glob("prof-*") if p.is_dir()):
         _, task, rest = run.name.split("-", 2)
         edge_level, cloud_level = rest.rsplit("-", 1)
         key = f"{task}/{EDGE_LEVELS[edge_level]}/{CLOUD_LEVELS[cloud_level]}"

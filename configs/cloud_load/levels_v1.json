@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "G2 v2+ cloud GPU load (amendment A2a rule 6). The C1 competitor is the edge-load worker on the cloud GPU. Candidates are swept in phase E3 (C10 and C15 added by amendment A2a-4; 20 cloud/raw_image requests each, unshaped, edge idle); C1 is the smallest candidate whose median cloud server time is 1.4-1.6x the C0 median, copied into levels and committed before the pilot. Until then the grid's C1 cells cannot run.",
+  "description": "G2 v2+ cloud GPU load (amendment A2a rule 6 and A2a-5). The competitor is the edge-load worker on the cloud GPU. C1 is the smallest E3 candidate (C10 and C15 added by A2a-4) whose median cloud server time is 1.4-1.6x the C0 median: C50, 1.46x. C2 (A2a-5) is the smallest of C75/C100 whose cloud/raw_image median at 35/20 is within 10% of the same run's edge/full median: C100, -3.4% (C75 was -40%). Calibrated in phase E on 18 November 2026.",
   "candidates": {
     "C10": {
       "working_set_mib": 512,
@@ -38,6 +38,11 @@
       "working_set_mib": 512,
       "busy_ms": 10,
       "idle_ms": 10
+    },
+    "C2": {
+      "working_set_mib": 512,
+      "busy_ms": 20,
+      "idle_ms": 0
     }
   }
 }

@@ -1,0 +1,4662 @@
+{
+  "cells": [
+    {
+      "cloud_load": "C0",
+      "condition": "T01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 990.7,
+        "distributed/projected/int8": 3362.8,
+        "distributed/projected/prompt_first": 5761.7,
+        "distributed/projected/synchronous": 5741.0,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 2372.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 895.0,
+        "distributed/projected/int8": 1950.0,
+        "distributed/projected/prompt_first": 2747.8,
+        "distributed/projected/synchronous": 2743.3,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 1055.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 875.9,
+        "distributed/projected/int8": 1667.4,
+        "distributed/projected/prompt_first": 2145.0,
+        "distributed/projected/synchronous": 2143.8,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 791.5,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 863.1,
+        "distributed/projected/int8": 1479.0,
+        "distributed/projected/prompt_first": 1743.1,
+        "distributed/projected/synchronous": 1744.1,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 615.9,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 856.1,
+        "distributed/projected/int8": 1376.0,
+        "distributed/projected/prompt_first": 1523.4,
+        "distributed/projected/synchronous": 1525.6,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 519.9,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T06",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 852.0,
+        "distributed/projected/int8": 1314.2,
+        "distributed/projected/prompt_first": 1391.5,
+        "distributed/projected/synchronous": 1394.4,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 462.2,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T07",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 808.2,
+        "distributed/projected/int8": 1280.2,
+        "distributed/projected/prompt_first": 1398.2,
+        "distributed/projected/synchronous": 1400.3,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 472.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T08",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 804.6,
+        "distributed/projected/int8": 1227.2,
+        "distributed/projected/prompt_first": 1285.2,
+        "distributed/projected/synchronous": 1287.9,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 422.6,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T09",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1100.5,
+        "distributed/projected/int8": 1718.9,
+        "distributed/projected/prompt_first": 1833.2,
+        "distributed/projected/synchronous": 1837.7,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 618.4,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T10",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1109.3,
+        "distributed/projected/int8": 1848.5,
+        "distributed/projected/prompt_first": 2109.5,
+        "distributed/projected/synchronous": 2112.5,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 739.2,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T11",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1252.0,
+        "distributed/projected/int8": 1914.5,
+        "distributed/projected/prompt_first": 1986.8,
+        "distributed/projected/synchronous": 1992.9,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 662.5,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T12",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1275.9,
+        "distributed/projected/int8": 2267.7,
+        "distributed/projected/prompt_first": 2740.3,
+        "distributed/projected/synchronous": 2742.3,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 991.8,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1042.0,
+        "distributed/projected/int8": 2895.8,
+        "distributed/projected/prompt_first": 4607.4,
+        "distributed/projected/synchronous": 4594.4,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 1853.8,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 867.7,
+        "distributed/projected/int8": 1546.3,
+        "distributed/projected/prompt_first": 1886.7,
+        "distributed/projected/synchronous": 1886.9,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 678.6,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 951.4,
+        "distributed/projected/int8": 1558.7,
+        "distributed/projected/prompt_first": 1754.9,
+        "distributed/projected/synchronous": 1757.3,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 607.3,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 853.2,
+        "distributed/projected/int8": 1331.8,
+        "distributed/projected/prompt_first": 1429.2,
+        "distributed/projected/synchronous": 1431.9,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 478.6,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1256.2,
+        "distributed/projected/int8": 1976.3,
+        "distributed/projected/prompt_first": 2118.6,
+        "distributed/projected/synchronous": 2124.1,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 720.1,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 975.4,
+        "distributed/projected/int8": 1911.9,
+        "distributed/projected/prompt_first": 2508.4,
+        "distributed/projected/synchronous": 2506.8,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 936.5,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 857.4,
+        "distributed/projected/int8": 1394.9,
+        "distributed/projected/prompt_first": 1563.7,
+        "distributed/projected/synchronous": 1565.7,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 537.5,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1099.3,
+        "distributed/projected/int8": 1701.3,
+        "distributed/projected/prompt_first": 1795.5,
+        "distributed/projected/synchronous": 1800.2,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 602.0,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 943.6,
+        "distributed/projected/int8": 1442.6,
+        "distributed/projected/prompt_first": 1507.4,
+        "distributed/projected/synchronous": 1511.1,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 499.0,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1261.5,
+        "distributed/projected/int8": 2055.8,
+        "distributed/projected/prompt_first": 2288.2,
+        "distributed/projected/synchronous": 2292.7,
+        "edge/full": 3434.1
+      },
+      "margin_ms": 794.3,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1388.2,
+        "distributed/projected/int8": 3676.5,
+        "distributed/projected/prompt_first": 6074.7,
+        "distributed/projected/synchronous": 6054.0,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 2054.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1292.5,
+        "distributed/projected/int8": 2263.7,
+        "distributed/projected/prompt_first": 3060.8,
+        "distributed/projected/synchronous": 3056.3,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 971.2,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1273.4,
+        "distributed/projected/int8": 1981.1,
+        "distributed/projected/prompt_first": 2458.0,
+        "distributed/projected/synchronous": 2456.8,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 707.7,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1260.6,
+        "distributed/projected/int8": 1792.7,
+        "distributed/projected/prompt_first": 2056.2,
+        "distributed/projected/synchronous": 2057.1,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 532.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1253.7,
+        "distributed/projected/int8": 1689.7,
+        "distributed/projected/prompt_first": 1836.4,
+        "distributed/projected/synchronous": 1838.6,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 436.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T06",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1249.5,
+        "distributed/projected/int8": 1627.9,
+        "distributed/projected/prompt_first": 1704.6,
+        "distributed/projected/synchronous": 1707.4,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 378.4,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T07",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1205.7,
+        "distributed/projected/int8": 1594.0,
+        "distributed/projected/prompt_first": 1711.2,
+        "distributed/projected/synchronous": 1713.3,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 388.3,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T08",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1202.1,
+        "distributed/projected/int8": 1541.0,
+        "distributed/projected/prompt_first": 1598.2,
+        "distributed/projected/synchronous": 1600.9,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 338.9,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T09",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1498.0,
+        "distributed/projected/int8": 2032.7,
+        "distributed/projected/prompt_first": 2146.2,
+        "distributed/projected/synchronous": 2150.7,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 534.7,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T10",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1506.8,
+        "distributed/projected/int8": 2162.2,
+        "distributed/projected/prompt_first": 2422.5,
+        "distributed/projected/synchronous": 2425.5,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 655.4,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T11",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1649.5,
+        "distributed/projected/int8": 2228.3,
+        "distributed/projected/prompt_first": 2299.8,
+        "distributed/projected/synchronous": 2305.9,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 578.8,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T12",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1673.4,
+        "distributed/projected/int8": 2581.5,
+        "distributed/projected/prompt_first": 3053.3,
+        "distributed/projected/synchronous": 3055.3,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 908.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1439.5,
+        "distributed/projected/int8": 3209.6,
+        "distributed/projected/prompt_first": 4920.4,
+        "distributed/projected/synchronous": 4907.4,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 1770.1,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1265.2,
+        "distributed/projected/int8": 1860.0,
+        "distributed/projected/prompt_first": 2199.7,
+        "distributed/projected/synchronous": 2199.9,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 594.8,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1349.0,
+        "distributed/projected/int8": 1872.4,
+        "distributed/projected/prompt_first": 2068.0,
+        "distributed/projected/synchronous": 2070.4,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 523.4,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1250.7,
+        "distributed/projected/int8": 1645.6,
+        "distributed/projected/prompt_first": 1742.2,
+        "distributed/projected/synchronous": 1744.9,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 394.9,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1653.7,
+        "distributed/projected/int8": 2290.1,
+        "distributed/projected/prompt_first": 2431.7,
+        "distributed/projected/synchronous": 2437.1,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 636.4,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1372.9,
+        "distributed/projected/int8": 2225.6,
+        "distributed/projected/prompt_first": 2821.4,
+        "distributed/projected/synchronous": 2819.8,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 852.7,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1255.0,
+        "distributed/projected/int8": 1708.7,
+        "distributed/projected/prompt_first": 1876.8,
+        "distributed/projected/synchronous": 1878.7,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 453.7,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1496.8,
+        "distributed/projected/int8": 2015.0,
+        "distributed/projected/prompt_first": 2108.5,
+        "distributed/projected/synchronous": 2113.2,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 518.2,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1341.1,
+        "distributed/projected/int8": 1756.4,
+        "distributed/projected/prompt_first": 1820.4,
+        "distributed/projected/synchronous": 1824.1,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 415.3,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1659.1,
+        "distributed/projected/int8": 2369.5,
+        "distributed/projected/prompt_first": 2601.2,
+        "distributed/projected/synchronous": 2605.7,
+        "edge/full": 3442.3
+      },
+      "margin_ms": 710.4,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2158.2,
+        "distributed/projected/int8": 4216.4,
+        "distributed/projected/prompt_first": 6619.9,
+        "distributed/projected/synchronous": 6593.6,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 1267.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2062.5,
+        "distributed/projected/int8": 2803.6,
+        "distributed/projected/prompt_first": 3606.0,
+        "distributed/projected/synchronous": 3595.9,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 741.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2043.4,
+        "distributed/projected/int8": 2521.0,
+        "distributed/projected/prompt_first": 3003.2,
+        "distributed/projected/synchronous": 2996.4,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 477.6,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2030.6,
+        "distributed/projected/int8": 2332.7,
+        "distributed/projected/prompt_first": 2601.3,
+        "distributed/projected/synchronous": 2596.7,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 302.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2023.6,
+        "distributed/projected/int8": 2229.6,
+        "distributed/projected/prompt_first": 2381.6,
+        "distributed/projected/synchronous": 2378.2,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 206.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T06",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2019.4,
+        "distributed/projected/int8": 2167.8,
+        "distributed/projected/prompt_first": 2249.7,
+        "distributed/projected/synchronous": 2247.0,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 148.4,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T07",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1975.7,
+        "distributed/projected/int8": 2133.9,
+        "distributed/projected/prompt_first": 2256.4,
+        "distributed/projected/synchronous": 2252.9,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 158.2,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T08",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1972.1,
+        "distributed/projected/int8": 2080.9,
+        "distributed/projected/prompt_first": 2143.4,
+        "distributed/projected/synchronous": 2140.5,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 108.8,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T09",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2268.0,
+        "distributed/projected/int8": 2572.6,
+        "distributed/projected/prompt_first": 2691.4,
+        "distributed/projected/synchronous": 2690.3,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 304.6,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T10",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2276.8,
+        "distributed/projected/int8": 2702.1,
+        "distributed/projected/prompt_first": 2967.7,
+        "distributed/projected/synchronous": 2965.1,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 425.3,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T11",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2419.5,
+        "distributed/projected/int8": 2768.2,
+        "distributed/projected/prompt_first": 2845.0,
+        "distributed/projected/synchronous": 2845.5,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 348.7,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T12",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2443.4,
+        "distributed/projected/int8": 3121.4,
+        "distributed/projected/prompt_first": 3598.5,
+        "distributed/projected/synchronous": 3594.9,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 678.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2209.5,
+        "distributed/projected/int8": 3749.5,
+        "distributed/projected/prompt_first": 5465.6,
+        "distributed/projected/synchronous": 5447.0,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 1215.7,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2035.2,
+        "distributed/projected/int8": 2399.9,
+        "distributed/projected/prompt_first": 2744.9,
+        "distributed/projected/synchronous": 2739.5,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 364.7,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2118.9,
+        "distributed/projected/int8": 2412.3,
+        "distributed/projected/prompt_first": 2613.1,
+        "distributed/projected/synchronous": 2610.0,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 293.4,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2020.6,
+        "distributed/projected/int8": 2185.5,
+        "distributed/projected/prompt_first": 2287.4,
+        "distributed/projected/synchronous": 2284.5,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 164.9,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2423.6,
+        "distributed/projected/int8": 2830.0,
+        "distributed/projected/prompt_first": 2976.8,
+        "distributed/projected/synchronous": 2976.7,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 406.4,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2142.9,
+        "distributed/projected/int8": 2765.5,
+        "distributed/projected/prompt_first": 3366.6,
+        "distributed/projected/synchronous": 3359.4,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 622.6,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2024.9,
+        "distributed/projected/int8": 2248.6,
+        "distributed/projected/prompt_first": 2421.9,
+        "distributed/projected/synchronous": 2418.3,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 223.7,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2266.8,
+        "distributed/projected/int8": 2554.9,
+        "distributed/projected/prompt_first": 2653.7,
+        "distributed/projected/synchronous": 2652.8,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 288.1,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2111.1,
+        "distributed/projected/int8": 2296.3,
+        "distributed/projected/prompt_first": 2365.6,
+        "distributed/projected/synchronous": 2363.7,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 185.2,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 2429.0,
+        "distributed/projected/int8": 2909.4,
+        "distributed/projected/prompt_first": 3146.4,
+        "distributed/projected/synchronous": 3145.3,
+        "edge/full": 3425.2
+      },
+      "margin_ms": 480.4,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 985.8,
+        "distributed/projected/int8": 3529.9,
+        "distributed/projected/prompt_first": 5931.6,
+        "distributed/projected/synchronous": 5905.8,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 2544.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 890.1,
+        "distributed/projected/int8": 2117.1,
+        "distributed/projected/prompt_first": 2917.7,
+        "distributed/projected/synchronous": 2908.1,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 1227.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 870.9,
+        "distributed/projected/int8": 1834.5,
+        "distributed/projected/prompt_first": 2314.9,
+        "distributed/projected/synchronous": 2308.6,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 963.6,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 858.2,
+        "distributed/projected/int8": 1646.2,
+        "distributed/projected/prompt_first": 1913.1,
+        "distributed/projected/synchronous": 1908.9,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 788.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 851.2,
+        "distributed/projected/int8": 1543.1,
+        "distributed/projected/prompt_first": 1693.3,
+        "distributed/projected/synchronous": 1690.4,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 691.9,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T06",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 847.0,
+        "distributed/projected/int8": 1481.3,
+        "distributed/projected/prompt_first": 1561.4,
+        "distributed/projected/synchronous": 1559.2,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 634.3,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T07",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 803.2,
+        "distributed/projected/int8": 1447.4,
+        "distributed/projected/prompt_first": 1568.1,
+        "distributed/projected/synchronous": 1565.1,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 644.2,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T08",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 799.7,
+        "distributed/projected/int8": 1394.4,
+        "distributed/projected/prompt_first": 1455.1,
+        "distributed/projected/synchronous": 1452.7,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 594.7,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T09",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1095.6,
+        "distributed/projected/int8": 1886.1,
+        "distributed/projected/prompt_first": 2003.1,
+        "distributed/projected/synchronous": 2002.5,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 790.5,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T10",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1104.3,
+        "distributed/projected/int8": 2015.6,
+        "distributed/projected/prompt_first": 2279.4,
+        "distributed/projected/synchronous": 2277.2,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 911.3,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T11",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1247.0,
+        "distributed/projected/int8": 2081.7,
+        "distributed/projected/prompt_first": 2156.7,
+        "distributed/projected/synchronous": 2157.7,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 834.7,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T12",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1270.9,
+        "distributed/projected/int8": 2434.9,
+        "distributed/projected/prompt_first": 2910.2,
+        "distributed/projected/synchronous": 2907.1,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 1164.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1037.1,
+        "distributed/projected/int8": 3063.0,
+        "distributed/projected/prompt_first": 4777.3,
+        "distributed/projected/synchronous": 4759.2,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 2025.9,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 862.7,
+        "distributed/projected/int8": 1713.4,
+        "distributed/projected/prompt_first": 2056.6,
+        "distributed/projected/synchronous": 2051.7,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 850.7,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 946.5,
+        "distributed/projected/int8": 1725.8,
+        "distributed/projected/prompt_first": 1924.9,
+        "distributed/projected/synchronous": 1922.1,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 779.3,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 848.2,
+        "distributed/projected/int8": 1499.0,
+        "distributed/projected/prompt_first": 1599.1,
+        "distributed/projected/synchronous": 1596.7,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 650.8,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1251.2,
+        "distributed/projected/int8": 2143.5,
+        "distributed/projected/prompt_first": 2288.6,
+        "distributed/projected/synchronous": 2288.9,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 892.3,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 970.4,
+        "distributed/projected/int8": 2079.0,
+        "distributed/projected/prompt_first": 2678.3,
+        "distributed/projected/synchronous": 2671.6,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 1108.6,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 852.5,
+        "distributed/projected/int8": 1562.1,
+        "distributed/projected/prompt_first": 1733.7,
+        "distributed/projected/synchronous": 1730.5,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 709.6,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1094.4,
+        "distributed/projected/int8": 1868.4,
+        "distributed/projected/prompt_first": 1965.4,
+        "distributed/projected/synchronous": 1965.0,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 774.0,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 938.6,
+        "distributed/projected/int8": 1609.8,
+        "distributed/projected/prompt_first": 1677.3,
+        "distributed/projected/synchronous": 1675.9,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 671.2,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1256.6,
+        "distributed/projected/int8": 2222.9,
+        "distributed/projected/prompt_first": 2458.1,
+        "distributed/projected/synchronous": 2457.5,
+        "edge/full": 5056.5
+      },
+      "margin_ms": 966.3,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1383.5,
+        "distributed/projected/int8": 3842.8,
+        "distributed/projected/prompt_first": 6237.6,
+        "distributed/projected/synchronous": 6216.2,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 2459.3,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1287.8,
+        "distributed/projected/int8": 2430.0,
+        "distributed/projected/prompt_first": 3223.6,
+        "distributed/projected/synchronous": 3218.6,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 1142.2,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1268.7,
+        "distributed/projected/int8": 2147.4,
+        "distributed/projected/prompt_first": 2620.9,
+        "distributed/projected/synchronous": 2619.1,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 878.7,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1255.9,
+        "distributed/projected/int8": 1959.0,
+        "distributed/projected/prompt_first": 2219.0,
+        "distributed/projected/synchronous": 2219.4,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 703.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1248.9,
+        "distributed/projected/int8": 1856.0,
+        "distributed/projected/prompt_first": 1999.2,
+        "distributed/projected/synchronous": 2000.8,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 607.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T06",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1244.7,
+        "distributed/projected/int8": 1794.2,
+        "distributed/projected/prompt_first": 1867.4,
+        "distributed/projected/synchronous": 1869.7,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 549.5,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T07",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1201.0,
+        "distributed/projected/int8": 1760.2,
+        "distributed/projected/prompt_first": 1874.1,
+        "distributed/projected/synchronous": 1875.5,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 559.2,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T08",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1197.4,
+        "distributed/projected/int8": 1707.2,
+        "distributed/projected/prompt_first": 1761.0,
+        "distributed/projected/synchronous": 1763.1,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 509.8,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T09",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1493.3,
+        "distributed/projected/int8": 2198.9,
+        "distributed/projected/prompt_first": 2309.1,
+        "distributed/projected/synchronous": 2312.9,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 705.6,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T10",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1502.1,
+        "distributed/projected/int8": 2328.5,
+        "distributed/projected/prompt_first": 2585.3,
+        "distributed/projected/synchronous": 2587.7,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 826.4,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T11",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1644.7,
+        "distributed/projected/int8": 2394.5,
+        "distributed/projected/prompt_first": 2462.7,
+        "distributed/projected/synchronous": 2468.2,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 749.8,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T12",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1668.7,
+        "distributed/projected/int8": 2747.7,
+        "distributed/projected/prompt_first": 3216.1,
+        "distributed/projected/synchronous": 3217.6,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 1079.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1434.8,
+        "distributed/projected/int8": 3375.8,
+        "distributed/projected/prompt_first": 5083.3,
+        "distributed/projected/synchronous": 5069.6,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 1941.0,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1260.5,
+        "distributed/projected/int8": 2026.3,
+        "distributed/projected/prompt_first": 2362.5,
+        "distributed/projected/synchronous": 2362.1,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 765.8,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1344.2,
+        "distributed/projected/int8": 2038.7,
+        "distributed/projected/prompt_first": 2230.8,
+        "distributed/projected/synchronous": 2232.6,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 694.5,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1245.9,
+        "distributed/projected/int8": 1811.8,
+        "distributed/projected/prompt_first": 1905.1,
+        "distributed/projected/synchronous": 1907.1,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 565.9,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1648.9,
+        "distributed/projected/int8": 2456.3,
+        "distributed/projected/prompt_first": 2594.5,
+        "distributed/projected/synchronous": 2599.3,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 807.4,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1368.1,
+        "distributed/projected/int8": 2391.9,
+        "distributed/projected/prompt_first": 2984.3,
+        "distributed/projected/synchronous": 2982.0,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 1023.8,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1250.2,
+        "distributed/projected/int8": 1874.9,
+        "distributed/projected/prompt_first": 2039.6,
+        "distributed/projected/synchronous": 2040.9,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 624.7,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1492.1,
+        "distributed/projected/int8": 2181.3,
+        "distributed/projected/prompt_first": 2271.4,
+        "distributed/projected/synchronous": 2275.4,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 689.2,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1336.4,
+        "distributed/projected/int8": 1922.6,
+        "distributed/projected/prompt_first": 1983.2,
+        "distributed/projected/synchronous": 1986.4,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 586.2,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1654.3,
+        "distributed/projected/int8": 2535.8,
+        "distributed/projected/prompt_first": 2764.0,
+        "distributed/projected/synchronous": 2767.9,
+        "edge/full": 5056.0
+      },
+      "margin_ms": 881.5,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2080.5,
+        "distributed/projected/int8": 4325.1,
+        "distributed/projected/prompt_first": 6723.1,
+        "distributed/projected/synchronous": 6698.2,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 2244.6,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1984.8,
+        "distributed/projected/int8": 2912.3,
+        "distributed/projected/prompt_first": 3709.2,
+        "distributed/projected/synchronous": 3700.6,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 927.5,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1965.7,
+        "distributed/projected/int8": 2629.7,
+        "distributed/projected/prompt_first": 3106.4,
+        "distributed/projected/synchronous": 3101.1,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 664.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1952.9,
+        "distributed/projected/int8": 2441.3,
+        "distributed/projected/prompt_first": 2704.5,
+        "distributed/projected/synchronous": 2701.4,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 488.4,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1945.9,
+        "distributed/projected/int8": 2338.3,
+        "distributed/projected/prompt_first": 2484.8,
+        "distributed/projected/synchronous": 2482.8,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 392.4,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T06",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1941.8,
+        "distributed/projected/int8": 2276.5,
+        "distributed/projected/prompt_first": 2352.9,
+        "distributed/projected/synchronous": 2351.7,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 334.7,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T07",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1898.0,
+        "distributed/projected/int8": 2242.5,
+        "distributed/projected/prompt_first": 2359.6,
+        "distributed/projected/synchronous": 2357.5,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 344.5,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T08",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1894.4,
+        "distributed/projected/int8": 2189.5,
+        "distributed/projected/prompt_first": 2246.6,
+        "distributed/projected/synchronous": 2245.1,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 295.1,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T09",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2190.3,
+        "distributed/projected/int8": 2681.2,
+        "distributed/projected/prompt_first": 2794.6,
+        "distributed/projected/synchronous": 2794.9,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 490.9,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T10",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2199.1,
+        "distributed/projected/int8": 2810.7,
+        "distributed/projected/prompt_first": 3070.9,
+        "distributed/projected/synchronous": 3069.7,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 611.6,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T11",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2341.8,
+        "distributed/projected/int8": 2876.8,
+        "distributed/projected/prompt_first": 2948.2,
+        "distributed/projected/synchronous": 2950.2,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 535.0,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T12",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2365.7,
+        "distributed/projected/int8": 3230.0,
+        "distributed/projected/prompt_first": 3701.7,
+        "distributed/projected/synchronous": 3699.6,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 864.3,
+      "split": "training",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2131.8,
+        "distributed/projected/int8": 3858.1,
+        "distributed/projected/prompt_first": 5568.8,
+        "distributed/projected/synchronous": 5551.6,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 1726.3,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1957.5,
+        "distributed/projected/int8": 2508.6,
+        "distributed/projected/prompt_first": 2848.1,
+        "distributed/projected/synchronous": 2844.1,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 551.1,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2041.2,
+        "distributed/projected/int8": 2521.0,
+        "distributed/projected/prompt_first": 2716.3,
+        "distributed/projected/synchronous": 2714.6,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 479.8,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1943.0,
+        "distributed/projected/int8": 2294.1,
+        "distributed/projected/prompt_first": 2390.6,
+        "distributed/projected/synchronous": 2389.1,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 351.1,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2346.0,
+        "distributed/projected/int8": 2938.6,
+        "distributed/projected/prompt_first": 3080.1,
+        "distributed/projected/synchronous": 3081.3,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 592.6,
+      "split": "validation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2065.2,
+        "distributed/projected/int8": 2874.2,
+        "distributed/projected/prompt_first": 3469.8,
+        "distributed/projected/synchronous": 3464.0,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 809.0,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1947.2,
+        "distributed/projected/int8": 2357.2,
+        "distributed/projected/prompt_first": 2525.1,
+        "distributed/projected/synchronous": 2523.0,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 410.0,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2189.1,
+        "distributed/projected/int8": 2663.6,
+        "distributed/projected/prompt_first": 2756.9,
+        "distributed/projected/synchronous": 2757.5,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 474.5,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2033.4,
+        "distributed/projected/int8": 2404.9,
+        "distributed/projected/prompt_first": 2468.8,
+        "distributed/projected/synchronous": 2468.4,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 371.5,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 2351.3,
+        "distributed/projected/int8": 3018.1,
+        "distributed/projected/prompt_first": 3249.6,
+        "distributed/projected/synchronous": 3249.9,
+        "edge/full": 5046.5
+      },
+      "margin_ms": 666.8,
+      "split": "evaluation",
+      "task": "e1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 483.8,
+        "distributed/projected/int8": 2869.5,
+        "distributed/projected/prompt_first": 5268.3,
+        "distributed/projected/synchronous": 5244.3,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 519.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 388.1,
+        "distributed/projected/int8": 1456.6,
+        "distributed/projected/prompt_first": 2254.4,
+        "distributed/projected/synchronous": 2246.7,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 615.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 368.9,
+        "distributed/projected/int8": 1174.1,
+        "distributed/projected/prompt_first": 1651.6,
+        "distributed/projected/synchronous": 1647.1,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 634.4,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 356.2,
+        "distributed/projected/int8": 985.7,
+        "distributed/projected/prompt_first": 1249.7,
+        "distributed/projected/synchronous": 1247.4,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 629.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 349.2,
+        "distributed/projected/int8": 882.7,
+        "distributed/projected/prompt_first": 1030.0,
+        "distributed/projected/synchronous": 1028.9,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 533.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T06",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 345.0,
+        "distributed/projected/int8": 820.9,
+        "distributed/projected/prompt_first": 898.1,
+        "distributed/projected/synchronous": 897.7,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 475.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T07",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 301.3,
+        "distributed/projected/int8": 786.9,
+        "distributed/projected/prompt_first": 904.8,
+        "distributed/projected/synchronous": 903.6,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 485.6,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T08",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 297.7,
+        "distributed/projected/int8": 733.9,
+        "distributed/projected/prompt_first": 791.7,
+        "distributed/projected/synchronous": 791.2,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 436.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T09",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 593.6,
+        "distributed/projected/int8": 1225.6,
+        "distributed/projected/prompt_first": 1339.8,
+        "distributed/projected/synchronous": 1341.0,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 409.7,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T10",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 602.3,
+        "distributed/projected/int8": 1355.1,
+        "distributed/projected/prompt_first": 1616.0,
+        "distributed/projected/synchronous": 1615.8,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 401.0,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T11",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 745.0,
+        "distributed/projected/int8": 1421.2,
+        "distributed/projected/prompt_first": 1493.4,
+        "distributed/projected/synchronous": 1496.2,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 258.3,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T12",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 768.9,
+        "distributed/projected/int8": 1774.4,
+        "distributed/projected/prompt_first": 2246.8,
+        "distributed/projected/synchronous": 2245.7,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 234.4,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 535.1,
+        "distributed/projected/int8": 2402.5,
+        "distributed/projected/prompt_first": 4114.0,
+        "distributed/projected/synchronous": 4097.7,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 468.2,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 360.7,
+        "distributed/projected/int8": 1053.0,
+        "distributed/projected/prompt_first": 1393.2,
+        "distributed/projected/synchronous": 1390.2,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 642.6,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 444.5,
+        "distributed/projected/int8": 1065.4,
+        "distributed/projected/prompt_first": 1261.5,
+        "distributed/projected/synchronous": 1260.7,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 558.8,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 346.2,
+        "distributed/projected/int8": 838.5,
+        "distributed/projected/prompt_first": 935.8,
+        "distributed/projected/synchronous": 935.2,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 492.3,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 749.2,
+        "distributed/projected/int8": 1483.0,
+        "distributed/projected/prompt_first": 1625.2,
+        "distributed/projected/synchronous": 1627.4,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 254.1,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 468.4,
+        "distributed/projected/int8": 1418.6,
+        "distributed/projected/prompt_first": 2015.0,
+        "distributed/projected/synchronous": 2010.1,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 534.9,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 350.5,
+        "distributed/projected/int8": 901.6,
+        "distributed/projected/prompt_first": 1070.3,
+        "distributed/projected/synchronous": 1069.0,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 551.1,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 592.4,
+        "distributed/projected/int8": 1208.0,
+        "distributed/projected/prompt_first": 1302.1,
+        "distributed/projected/synchronous": 1303.5,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 410.9,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 436.6,
+        "distributed/projected/int8": 949.3,
+        "distributed/projected/prompt_first": 1013.9,
+        "distributed/projected/synchronous": 1014.4,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 512.7,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 754.6,
+        "distributed/projected/int8": 1562.5,
+        "distributed/projected/prompt_first": 1794.8,
+        "distributed/projected/synchronous": 1796.0,
+        "edge/full": 1003.3
+      },
+      "margin_ms": 248.7,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 611.8,
+        "distributed/projected/int8": 2921.0,
+        "distributed/projected/prompt_first": 5326.5,
+        "distributed/projected/synchronous": 5296.9,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 390.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 516.2,
+        "distributed/projected/int8": 1508.2,
+        "distributed/projected/prompt_first": 2312.6,
+        "distributed/projected/synchronous": 2299.3,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 486.1,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 497.0,
+        "distributed/projected/int8": 1225.6,
+        "distributed/projected/prompt_first": 1709.9,
+        "distributed/projected/synchronous": 1699.8,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 505.3,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 484.3,
+        "distributed/projected/int8": 1037.2,
+        "distributed/projected/prompt_first": 1308.0,
+        "distributed/projected/synchronous": 1300.1,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 518.0,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 477.3,
+        "distributed/projected/int8": 934.2,
+        "distributed/projected/prompt_first": 1088.2,
+        "distributed/projected/synchronous": 1081.5,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 456.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T06",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 473.1,
+        "distributed/projected/int8": 872.4,
+        "distributed/projected/prompt_first": 956.4,
+        "distributed/projected/synchronous": 950.4,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 399.3,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T07",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 429.3,
+        "distributed/projected/int8": 838.5,
+        "distributed/projected/prompt_first": 963.0,
+        "distributed/projected/synchronous": 956.3,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 409.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T08",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 425.7,
+        "distributed/projected/int8": 785.5,
+        "distributed/projected/prompt_first": 850.0,
+        "distributed/projected/synchronous": 843.8,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 359.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T09",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 721.6,
+        "distributed/projected/int8": 1277.2,
+        "distributed/projected/prompt_first": 1398.0,
+        "distributed/projected/synchronous": 1393.6,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 280.7,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T10",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 730.4,
+        "distributed/projected/int8": 1406.7,
+        "distributed/projected/prompt_first": 1674.3,
+        "distributed/projected/synchronous": 1668.4,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 271.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T11",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 873.1,
+        "distributed/projected/int8": 1472.7,
+        "distributed/projected/prompt_first": 1551.6,
+        "distributed/projected/synchronous": 1548.9,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 129.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T12",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 897.0,
+        "distributed/projected/int8": 1826.0,
+        "distributed/projected/prompt_first": 2305.1,
+        "distributed/projected/synchronous": 2298.3,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 105.3,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 663.1,
+        "distributed/projected/int8": 2454.1,
+        "distributed/projected/prompt_first": 4172.2,
+        "distributed/projected/synchronous": 4150.4,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 339.2,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 488.8,
+        "distributed/projected/int8": 1104.5,
+        "distributed/projected/prompt_first": 1451.5,
+        "distributed/projected/synchronous": 1442.8,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 513.5,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 572.6,
+        "distributed/projected/int8": 1116.9,
+        "distributed/projected/prompt_first": 1319.8,
+        "distributed/projected/synchronous": 1313.3,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 429.7,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 474.3,
+        "distributed/projected/int8": 890.1,
+        "distributed/projected/prompt_first": 994.0,
+        "distributed/projected/synchronous": 987.8,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 415.8,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 877.3,
+        "distributed/projected/int8": 1534.6,
+        "distributed/projected/prompt_first": 1683.5,
+        "distributed/projected/synchronous": 1680.0,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 125.0,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 596.5,
+        "distributed/projected/int8": 1470.1,
+        "distributed/projected/prompt_first": 2073.3,
+        "distributed/projected/synchronous": 2062.7,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 405.8,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 478.6,
+        "distributed/projected/int8": 953.1,
+        "distributed/projected/prompt_first": 1128.6,
+        "distributed/projected/synchronous": 1121.7,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 474.5,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 720.4,
+        "distributed/projected/int8": 1259.5,
+        "distributed/projected/prompt_first": 1360.4,
+        "distributed/projected/synchronous": 1356.2,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 281.9,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 564.7,
+        "distributed/projected/int8": 1000.9,
+        "distributed/projected/prompt_first": 1072.2,
+        "distributed/projected/synchronous": 1067.1,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 436.2,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 882.7,
+        "distributed/projected/int8": 1614.0,
+        "distributed/projected/prompt_first": 1853.0,
+        "distributed/projected/synchronous": 1848.7,
+        "edge/full": 1002.3
+      },
+      "margin_ms": 119.6,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1105.6,
+        "distributed/projected/int8": 3172.4,
+        "distributed/projected/prompt_first": 5570.9,
+        "distributed/projected/synchronous": 5545.9,
+        "edge/full": 998.8
+      },
+      "margin_ms": 106.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1009.9,
+        "distributed/projected/int8": 1759.5,
+        "distributed/projected/prompt_first": 2557.0,
+        "distributed/projected/synchronous": 2548.3,
+        "edge/full": 998.8
+      },
+      "margin_ms": 11.1,
+      "split": "training",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 990.8,
+        "distributed/projected/int8": 1476.9,
+        "distributed/projected/prompt_first": 1954.2,
+        "distributed/projected/synchronous": 1948.8,
+        "edge/full": 998.8
+      },
+      "margin_ms": 8.0,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 978.0,
+        "distributed/projected/int8": 1288.6,
+        "distributed/projected/prompt_first": 1552.4,
+        "distributed/projected/synchronous": 1549.1,
+        "edge/full": 998.8
+      },
+      "margin_ms": 20.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 971.1,
+        "distributed/projected/int8": 1185.6,
+        "distributed/projected/prompt_first": 1332.6,
+        "distributed/projected/synchronous": 1330.5,
+        "edge/full": 998.8
+      },
+      "margin_ms": 27.7,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T06",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 966.9,
+        "distributed/projected/int8": 1123.7,
+        "distributed/projected/prompt_first": 1200.7,
+        "distributed/projected/synchronous": 1199.3,
+        "edge/full": 998.8
+      },
+      "margin_ms": 31.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T07",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 923.1,
+        "distributed/projected/int8": 1089.8,
+        "distributed/projected/prompt_first": 1207.4,
+        "distributed/projected/synchronous": 1205.2,
+        "edge/full": 998.8
+      },
+      "margin_ms": 75.7,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T08",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 919.5,
+        "distributed/projected/int8": 1036.8,
+        "distributed/projected/prompt_first": 1094.4,
+        "distributed/projected/synchronous": 1092.8,
+        "edge/full": 998.8
+      },
+      "margin_ms": 79.3,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T09",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1215.4,
+        "distributed/projected/int8": 1528.5,
+        "distributed/projected/prompt_first": 1642.4,
+        "distributed/projected/synchronous": 1642.6,
+        "edge/full": 998.8
+      },
+      "margin_ms": 216.6,
+      "split": "training",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T10",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1224.2,
+        "distributed/projected/int8": 1658.0,
+        "distributed/projected/prompt_first": 1918.7,
+        "distributed/projected/synchronous": 1917.4,
+        "edge/full": 998.8
+      },
+      "margin_ms": 225.4,
+      "split": "training",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T11",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1366.9,
+        "distributed/projected/int8": 1724.1,
+        "distributed/projected/prompt_first": 1796.0,
+        "distributed/projected/synchronous": 1797.9,
+        "edge/full": 998.8
+      },
+      "margin_ms": 368.1,
+      "split": "training",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T12",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1390.8,
+        "distributed/projected/int8": 2077.3,
+        "distributed/projected/prompt_first": 2549.5,
+        "distributed/projected/synchronous": 2547.3,
+        "edge/full": 998.8
+      },
+      "margin_ms": 392.0,
+      "split": "training",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1156.9,
+        "distributed/projected/int8": 2705.4,
+        "distributed/projected/prompt_first": 4416.6,
+        "distributed/projected/synchronous": 4399.3,
+        "edge/full": 998.8
+      },
+      "margin_ms": 158.1,
+      "split": "validation",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 982.6,
+        "distributed/projected/int8": 1355.8,
+        "distributed/projected/prompt_first": 1695.9,
+        "distributed/projected/synchronous": 1691.8,
+        "edge/full": 998.8
+      },
+      "margin_ms": 16.2,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1066.4,
+        "distributed/projected/int8": 1368.2,
+        "distributed/projected/prompt_first": 1564.1,
+        "distributed/projected/synchronous": 1562.3,
+        "edge/full": 998.8
+      },
+      "margin_ms": 67.6,
+      "split": "validation",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 968.1,
+        "distributed/projected/int8": 1141.4,
+        "distributed/projected/prompt_first": 1238.4,
+        "distributed/projected/synchronous": 1236.8,
+        "edge/full": 998.8
+      },
+      "margin_ms": 30.7,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1371.1,
+        "distributed/projected/int8": 1785.9,
+        "distributed/projected/prompt_first": 1927.9,
+        "distributed/projected/synchronous": 1929.0,
+        "edge/full": 998.8
+      },
+      "margin_ms": 372.3,
+      "split": "validation",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E01",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1090.3,
+        "distributed/projected/int8": 1721.5,
+        "distributed/projected/prompt_first": 2317.6,
+        "distributed/projected/synchronous": 2311.7,
+        "edge/full": 998.8
+      },
+      "margin_ms": 91.5,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E02",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 972.3,
+        "distributed/projected/int8": 1204.5,
+        "distributed/projected/prompt_first": 1373.0,
+        "distributed/projected/synchronous": 1370.6,
+        "edge/full": 998.8
+      },
+      "margin_ms": 26.5,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E03",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1214.2,
+        "distributed/projected/int8": 1510.8,
+        "distributed/projected/prompt_first": 1604.7,
+        "distributed/projected/synchronous": 1605.1,
+        "edge/full": 998.8
+      },
+      "margin_ms": 215.4,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E04",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1058.5,
+        "distributed/projected/int8": 1252.2,
+        "distributed/projected/prompt_first": 1316.6,
+        "distributed/projected/synchronous": 1316.1,
+        "edge/full": 998.8
+      },
+      "margin_ms": 59.7,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E05",
+      "edge_load": "L0",
+      "estimates_ms": {
+        "cloud/raw_image": 1376.5,
+        "distributed/projected/int8": 1865.4,
+        "distributed/projected/prompt_first": 2097.4,
+        "distributed/projected/synchronous": 2097.6,
+        "edge/full": 998.8
+      },
+      "margin_ms": 377.7,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 484.0,
+        "distributed/projected/int8": 3032.5,
+        "distributed/projected/prompt_first": 5437.1,
+        "distributed/projected/synchronous": 5412.2,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 926.1,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 388.3,
+        "distributed/projected/int8": 1619.6,
+        "distributed/projected/prompt_first": 2423.2,
+        "distributed/projected/synchronous": 2414.5,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 1021.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 369.2,
+        "distributed/projected/int8": 1337.1,
+        "distributed/projected/prompt_first": 1820.4,
+        "distributed/projected/synchronous": 1815.0,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 967.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 356.4,
+        "distributed/projected/int8": 1148.7,
+        "distributed/projected/prompt_first": 1418.5,
+        "distributed/projected/synchronous": 1415.3,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 792.3,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 349.5,
+        "distributed/projected/int8": 1045.7,
+        "distributed/projected/prompt_first": 1198.8,
+        "distributed/projected/synchronous": 1196.8,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 696.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T06",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 345.3,
+        "distributed/projected/int8": 983.8,
+        "distributed/projected/prompt_first": 1066.9,
+        "distributed/projected/synchronous": 1065.6,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 638.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T07",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 301.5,
+        "distributed/projected/int8": 949.9,
+        "distributed/projected/prompt_first": 1073.6,
+        "distributed/projected/synchronous": 1071.5,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 648.4,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T08",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 297.9,
+        "distributed/projected/int8": 896.9,
+        "distributed/projected/prompt_first": 960.6,
+        "distributed/projected/synchronous": 959.1,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 599.0,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T09",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 593.8,
+        "distributed/projected/int8": 1388.6,
+        "distributed/projected/prompt_first": 1508.6,
+        "distributed/projected/synchronous": 1508.9,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 794.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T10",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 602.6,
+        "distributed/projected/int8": 1518.1,
+        "distributed/projected/prompt_first": 1784.9,
+        "distributed/projected/synchronous": 1783.7,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 807.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T11",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 745.3,
+        "distributed/projected/int8": 1584.2,
+        "distributed/projected/prompt_first": 1662.2,
+        "distributed/projected/synchronous": 1664.1,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 664.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "T12",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 769.2,
+        "distributed/projected/int8": 1937.4,
+        "distributed/projected/prompt_first": 2415.7,
+        "distributed/projected/synchronous": 2413.5,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 640.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 535.3,
+        "distributed/projected/int8": 2565.5,
+        "distributed/projected/prompt_first": 4282.8,
+        "distributed/projected/synchronous": 4265.6,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 874.8,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 361.0,
+        "distributed/projected/int8": 1216.0,
+        "distributed/projected/prompt_first": 1562.1,
+        "distributed/projected/synchronous": 1558.1,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 855.0,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 444.8,
+        "distributed/projected/int8": 1228.3,
+        "distributed/projected/prompt_first": 1430.3,
+        "distributed/projected/synchronous": 1428.6,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 783.5,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 346.5,
+        "distributed/projected/int8": 1001.5,
+        "distributed/projected/prompt_first": 1104.6,
+        "distributed/projected/synchronous": 1103.1,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 655.0,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "V05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 749.5,
+        "distributed/projected/int8": 1646.0,
+        "distributed/projected/prompt_first": 1794.0,
+        "distributed/projected/synchronous": 1795.3,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 660.6,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 468.7,
+        "distributed/projected/int8": 1581.6,
+        "distributed/projected/prompt_first": 2183.8,
+        "distributed/projected/synchronous": 2178.0,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 941.4,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 350.7,
+        "distributed/projected/int8": 1064.6,
+        "distributed/projected/prompt_first": 1239.1,
+        "distributed/projected/synchronous": 1236.9,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 713.9,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 592.6,
+        "distributed/projected/int8": 1370.9,
+        "distributed/projected/prompt_first": 1470.9,
+        "distributed/projected/synchronous": 1471.4,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 778.3,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 436.9,
+        "distributed/projected/int8": 1112.3,
+        "distributed/projected/prompt_first": 1182.8,
+        "distributed/projected/synchronous": 1182.3,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 675.4,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C0",
+      "condition": "E05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 754.8,
+        "distributed/projected/int8": 1725.5,
+        "distributed/projected/prompt_first": 1963.6,
+        "distributed/projected/synchronous": 1963.9,
+        "edge/full": 1410.1
+      },
+      "margin_ms": 655.3,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 621.6,
+        "distributed/projected/int8": 3092.3,
+        "distributed/projected/prompt_first": 5492.3,
+        "distributed/projected/synchronous": 5470.5,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 796.1,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 525.9,
+        "distributed/projected/int8": 1679.4,
+        "distributed/projected/prompt_first": 2478.4,
+        "distributed/projected/synchronous": 2472.9,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 891.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 506.7,
+        "distributed/projected/int8": 1396.9,
+        "distributed/projected/prompt_first": 1875.6,
+        "distributed/projected/synchronous": 1873.4,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 890.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 494.0,
+        "distributed/projected/int8": 1208.5,
+        "distributed/projected/prompt_first": 1473.8,
+        "distributed/projected/synchronous": 1473.7,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 714.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 487.0,
+        "distributed/projected/int8": 1105.5,
+        "distributed/projected/prompt_first": 1254.0,
+        "distributed/projected/synchronous": 1255.1,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 618.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T06",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 482.8,
+        "distributed/projected/int8": 1043.7,
+        "distributed/projected/prompt_first": 1122.1,
+        "distributed/projected/synchronous": 1124.0,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 560.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T07",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 439.1,
+        "distributed/projected/int8": 1009.7,
+        "distributed/projected/prompt_first": 1128.8,
+        "distributed/projected/synchronous": 1129.8,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 570.6,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T08",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 435.5,
+        "distributed/projected/int8": 956.7,
+        "distributed/projected/prompt_first": 1015.8,
+        "distributed/projected/synchronous": 1017.4,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 521.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T09",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 731.4,
+        "distributed/projected/int8": 1448.4,
+        "distributed/projected/prompt_first": 1563.8,
+        "distributed/projected/synchronous": 1567.2,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 686.3,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T10",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 740.1,
+        "distributed/projected/int8": 1577.9,
+        "distributed/projected/prompt_first": 1840.1,
+        "distributed/projected/synchronous": 1842.0,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 677.6,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T11",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 882.8,
+        "distributed/projected/int8": 1644.0,
+        "distributed/projected/prompt_first": 1717.4,
+        "distributed/projected/synchronous": 1722.5,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 534.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "T12",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 906.8,
+        "distributed/projected/int8": 1997.2,
+        "distributed/projected/prompt_first": 2470.9,
+        "distributed/projected/synchronous": 2471.9,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 510.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 672.9,
+        "distributed/projected/int8": 2625.3,
+        "distributed/projected/prompt_first": 4338.0,
+        "distributed/projected/synchronous": 4323.9,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 744.8,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 498.5,
+        "distributed/projected/int8": 1275.8,
+        "distributed/projected/prompt_first": 1617.3,
+        "distributed/projected/synchronous": 1616.4,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 777.3,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 582.3,
+        "distributed/projected/int8": 1288.2,
+        "distributed/projected/prompt_first": 1485.5,
+        "distributed/projected/synchronous": 1486.9,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 705.9,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 484.0,
+        "distributed/projected/int8": 1061.3,
+        "distributed/projected/prompt_first": 1159.8,
+        "distributed/projected/synchronous": 1161.4,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 577.3,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "V05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 887.0,
+        "distributed/projected/int8": 1705.8,
+        "distributed/projected/prompt_first": 1849.3,
+        "distributed/projected/synchronous": 1853.6,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 530.7,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 606.2,
+        "distributed/projected/int8": 1641.4,
+        "distributed/projected/prompt_first": 2239.0,
+        "distributed/projected/synchronous": 2236.3,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 811.5,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 488.3,
+        "distributed/projected/int8": 1124.4,
+        "distributed/projected/prompt_first": 1294.4,
+        "distributed/projected/synchronous": 1295.2,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 636.1,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 730.2,
+        "distributed/projected/int8": 1430.8,
+        "distributed/projected/prompt_first": 1526.1,
+        "distributed/projected/synchronous": 1529.7,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 687.5,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 574.4,
+        "distributed/projected/int8": 1172.1,
+        "distributed/projected/prompt_first": 1238.0,
+        "distributed/projected/synchronous": 1240.7,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 597.7,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C1",
+      "condition": "E05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 892.4,
+        "distributed/projected/int8": 1785.3,
+        "distributed/projected/prompt_first": 2018.8,
+        "distributed/projected/synchronous": 2022.2,
+        "edge/full": 1417.7
+      },
+      "margin_ms": 525.3,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1110.2,
+        "distributed/projected/int8": 3339.2,
+        "distributed/projected/prompt_first": 5743.2,
+        "distributed/projected/synchronous": 5714.2,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 293.0,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1014.5,
+        "distributed/projected/int8": 1926.3,
+        "distributed/projected/prompt_first": 2729.3,
+        "distributed/projected/synchronous": 2716.6,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 388.7,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 995.3,
+        "distributed/projected/int8": 1643.8,
+        "distributed/projected/prompt_first": 2126.6,
+        "distributed/projected/synchronous": 2117.1,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 407.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 982.6,
+        "distributed/projected/int8": 1455.4,
+        "distributed/projected/prompt_first": 1724.7,
+        "distributed/projected/synchronous": 1717.4,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 420.6,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 975.6,
+        "distributed/projected/int8": 1352.4,
+        "distributed/projected/prompt_first": 1504.9,
+        "distributed/projected/synchronous": 1498.8,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 376.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T06",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 971.4,
+        "distributed/projected/int8": 1290.6,
+        "distributed/projected/prompt_first": 1373.1,
+        "distributed/projected/synchronous": 1367.7,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 319.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T07",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 927.7,
+        "distributed/projected/int8": 1256.6,
+        "distributed/projected/prompt_first": 1379.7,
+        "distributed/projected/synchronous": 1373.6,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 328.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T08",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 924.1,
+        "distributed/projected/int8": 1203.6,
+        "distributed/projected/prompt_first": 1266.7,
+        "distributed/projected/synchronous": 1261.2,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 279.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T09",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1220.0,
+        "distributed/projected/int8": 1695.3,
+        "distributed/projected/prompt_first": 1814.7,
+        "distributed/projected/synchronous": 1810.9,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 183.2,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T10",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1228.7,
+        "distributed/projected/int8": 1824.8,
+        "distributed/projected/prompt_first": 2091.0,
+        "distributed/projected/synchronous": 2085.7,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 174.5,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T11",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1371.4,
+        "distributed/projected/int8": 1890.9,
+        "distributed/projected/prompt_first": 1968.3,
+        "distributed/projected/synchronous": 1966.2,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 31.8,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "T12",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1395.3,
+        "distributed/projected/int8": 2244.1,
+        "distributed/projected/prompt_first": 2721.8,
+        "distributed/projected/synchronous": 2715.6,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 7.9,
+      "split": "training",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1161.5,
+        "distributed/projected/int8": 2872.2,
+        "distributed/projected/prompt_first": 4588.9,
+        "distributed/projected/synchronous": 4567.7,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 241.7,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 987.1,
+        "distributed/projected/int8": 1522.7,
+        "distributed/projected/prompt_first": 1868.2,
+        "distributed/projected/synchronous": 1860.2,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 416.1,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1070.9,
+        "distributed/projected/int8": 1535.1,
+        "distributed/projected/prompt_first": 1736.5,
+        "distributed/projected/synchronous": 1730.6,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 332.3,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 972.6,
+        "distributed/projected/int8": 1308.2,
+        "distributed/projected/prompt_first": 1410.8,
+        "distributed/projected/synchronous": 1405.2,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 335.6,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "V05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1375.6,
+        "distributed/projected/int8": 1952.7,
+        "distributed/projected/prompt_first": 2100.2,
+        "distributed/projected/synchronous": 2097.4,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 27.6,
+      "split": "validation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E01",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1094.8,
+        "distributed/projected/int8": 1888.3,
+        "distributed/projected/prompt_first": 2490.0,
+        "distributed/projected/synchronous": 2480.0,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 308.4,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E02",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 976.9,
+        "distributed/projected/int8": 1371.3,
+        "distributed/projected/prompt_first": 1545.3,
+        "distributed/projected/synchronous": 1539.0,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 394.4,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E03",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1218.8,
+        "distributed/projected/int8": 1677.7,
+        "distributed/projected/prompt_first": 1777.1,
+        "distributed/projected/synchronous": 1773.5,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 184.4,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E04",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1063.0,
+        "distributed/projected/int8": 1419.0,
+        "distributed/projected/prompt_first": 1488.9,
+        "distributed/projected/synchronous": 1484.4,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 340.2,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "cloud_load": "C2",
+      "condition": "E05",
+      "edge_load": "L1",
+      "estimates_ms": {
+        "cloud/raw_image": 1381.0,
+        "distributed/projected/int8": 2032.2,
+        "distributed/projected/prompt_first": 2269.7,
+        "distributed/projected/synchronous": 2266.0,
+        "edge/full": 1403.2
+      },
+      "margin_ms": 22.2,
+      "split": "evaluation",
+      "task": "p1",
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    }
+  ],
+  "method": "Inputs are phase E runs on the AWS pair (``artifacts/phase-e``):",
+  "network_fit": {
+    "cloud": {
+      "beta": 0.599,
+      "gamma": 3.077,
+      "residuals_ms": [
+        -0.2,
+        -0.4,
+        3.3
+      ]
+    },
+    "distributed": {
+      "beta": 0.941,
+      "gamma": 4.604,
+      "residuals_ms": [
+        0.4,
+        0.9,
+        -7.3
+      ]
+    },
+    "distributed_int8": {
+      "beta": 0.886,
+      "gamma": 4.618,
+      "residuals_ms": [
+        0.3,
+        0.6,
+        -5.1
+      ]
+    },
+    "distributed_prompt_first": {
+      "beta": 0.946,
+      "gamma": 4.579,
+      "residuals_ms": [
+        0.0,
+        0.0,
+        -0.4
+      ]
+    },
+    "edge": {
+      "beta": 0.0,
+      "gamma": 0.0,
+      "residuals_ms": []
+    }
+  },
+  "profile_medians_ms": {
+    "e1/L0/C0": {
+      "cloud/raw_image": 785.6,
+      "distributed/projected/int8": 1151.2,
+      "distributed/projected/prompt_first": 1149.2,
+      "distributed/projected/synchronous": 1152.4,
+      "edge/full": 3434.1
+    },
+    "e1/L0/C1": {
+      "cloud/raw_image": 1183.2,
+      "distributed/projected/int8": 1464.9,
+      "distributed/projected/prompt_first": 1462.3,
+      "distributed/projected/synchronous": 1465.5,
+      "edge/full": 3442.3
+    },
+    "e1/L0/C2": {
+      "cloud/raw_image": 1953.1,
+      "distributed/projected/int8": 2004.8,
+      "distributed/projected/prompt_first": 2007.4,
+      "distributed/projected/synchronous": 2005.1,
+      "edge/full": 3425.2
+    },
+    "e1/L1/C0": {
+      "cloud/raw_image": 780.7,
+      "distributed/projected/int8": 1318.3,
+      "distributed/projected/prompt_first": 1319.2,
+      "distributed/projected/synchronous": 1317.2,
+      "edge/full": 5056.5
+    },
+    "e1/L1/C1": {
+      "cloud/raw_image": 1178.4,
+      "distributed/projected/int8": 1631.2,
+      "distributed/projected/prompt_first": 1625.1,
+      "distributed/projected/synchronous": 1627.7,
+      "edge/full": 5056.0
+    },
+    "e1/L1/C2": {
+      "cloud/raw_image": 1875.4,
+      "distributed/projected/int8": 2113.5,
+      "distributed/projected/prompt_first": 2110.7,
+      "distributed/projected/synchronous": 2109.7,
+      "edge/full": 5046.5
+    },
+    "p1/L0/C0": {
+      "cloud/raw_image": 278.7,
+      "distributed/projected/int8": 657.9,
+      "distributed/projected/prompt_first": 655.8,
+      "distributed/projected/synchronous": 655.8,
+      "edge/full": 1003.3
+    },
+    "p1/L0/C1": {
+      "cloud/raw_image": 406.8,
+      "distributed/projected/int8": 709.4,
+      "distributed/projected/prompt_first": 714.1,
+      "distributed/projected/synchronous": 708.4,
+      "edge/full": 1002.3
+    },
+    "p1/L0/C2": {
+      "cloud/raw_image": 900.6,
+      "distributed/projected/int8": 960.7,
+      "distributed/projected/prompt_first": 958.5,
+      "distributed/projected/synchronous": 957.4,
+      "edge/full": 998.8
+    },
+    "p1/L1/C0": {
+      "cloud/raw_image": 278.9,
+      "distributed/projected/int8": 820.8,
+      "distributed/projected/prompt_first": 824.6,
+      "distributed/projected/synchronous": 823.7,
+      "edge/full": 1410.1
+    },
+    "p1/L1/C1": {
+      "cloud/raw_image": 416.5,
+      "distributed/projected/int8": 880.7,
+      "distributed/projected/prompt_first": 879.9,
+      "distributed/projected/synchronous": 882.0,
+      "edge/full": 1417.7
+    },
+    "p1/L1/C2": {
+      "cloud/raw_image": 905.1,
+      "distributed/projected/int8": 1127.6,
+      "distributed/projected/prompt_first": 1130.8,
+      "distributed/projected/synchronous": 1125.7,
+      "edge/full": 1403.2
+    }
+  },
+  "schema_version": 1,
+  "winner_counts": {
+    "e1/L0/C0": {
+      "cloud/raw_image": 22
+    },
+    "e1/L0/C1": {
+      "cloud/raw_image": 22
+    },
+    "e1/L0/C2": {
+      "cloud/raw_image": 22
+    },
+    "e1/L1/C0": {
+      "cloud/raw_image": 22
+    },
+    "e1/L1/C1": {
+      "cloud/raw_image": 22
+    },
+    "e1/L1/C2": {
+      "cloud/raw_image": 22
+    },
+    "p1/L0/C0": {
+      "cloud/raw_image": 22
+    },
+    "p1/L0/C1": {
+      "cloud/raw_image": 22
+    },
+    "p1/L0/C2": {
+      "cloud/raw_image": 9,
+      "edge/full": 13
+    },
+    "p1/L1/C0": {
+      "cloud/raw_image": 22
+    },
+    "p1/L1/C1": {
+      "cloud/raw_image": 22
+    },
+    "p1/L1/C2": {
+      "cloud/raw_image": 22
+    }
+  }
+}

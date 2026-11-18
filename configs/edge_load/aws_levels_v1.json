@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "description": "G2 v2+ edge GPU load on the AWS g6f.2xlarge edge (amendment A2a-3, A2a-5). In-process generator on its own CUDA stream; L0 means no load. L1 is the E2 setting closest to 1.4x the L0 edge/full median: 1 ms busy / 10 ms idle over a 256 MiB working set in 8 MiB kernels, 1.39x in the sweep and 1,410 ms in each of three reproduction runs (0.2% spread). L2 is dropped (A2a-5).",
+  "generator": "in_process",
+  "levels": {
+    "L1": {
+      "working_set_mib": 256,
+      "busy_ms": 1,
+      "idle_ms": 10,
+      "kernel_mib": 8
+    }
+  }
+}
