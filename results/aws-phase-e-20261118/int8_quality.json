@@ -33,5 +33,5 @@
     "questions": 200,
     "token_identical": 199
   },
-  "status": "identical-answer check done; official accuracy not yet scored"
+  "status": "admitted; official scores in results/int8-quality-20261118/decision.json"
 }

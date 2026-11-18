@@ -193,7 +193,7 @@ def test_grid_cloud_cells_ids_and_calibration(tmp_path: Path) -> None:
     grid = load_grid(GRID)
     ids = {b.subblock_id for b in grid.subblocks()}
     assert "T01-L1-C1-r0" in ids and "T01-L1-r0" in ids and len(ids) == 7
-    assert grid.cloud_load() == C1
+    assert grid.cloud_loads() == {"C1": C1}
     payload = json.loads(GRID.read_text())
     for key in ("protocol_path", "split_path", "experiment_config_path"):
         payload[key] = str((GRID.parent / payload[key]).resolve())
@@ -206,7 +206,7 @@ def test_grid_cloud_cells_ids_and_calibration(tmp_path: Path) -> None:
     path = tmp_path / "grid.json"
     path.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match="not calibrated"):
-        load_grid(path).cloud_load()
+        load_grid(path).cloud_loads()
     payload["cloud_load"]["cells"] = [["V01", "L1", "short"]]
     path.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match="same C0 cell"):
@@ -396,3 +396,34 @@ def test_dead_worker_or_stray_worker_invalidates_and_crash_still_stops(
             }
         )
     assert cloud.events == ["reap", "start C1", "stop"]
+
+
+def test_grid_with_two_cloud_levels(tmp_path: Path) -> None:
+    """Amendment A2a-5: C1 and C2 cells in one grid, each with its own level."""
+
+    payload = json.loads(GRID.read_text())
+    for key in ("protocol_path", "split_path", "experiment_config_path"):
+        payload[key] = str((GRID.parent / payload[key]).resolve())
+    for task in payload["extra_tasks"].values():
+        for key in ("split_path", "experiment_config_path"):
+            task[key] = str((GRID.parent / task[key]).resolve())
+    levels = tmp_path / "levels.json"
+    heavy = {**C1.to_dict(), "busy_ms": 20, "idle_ms": 0}
+    calibrated = {"C1": C1.to_dict(), "C2": heavy}
+    levels.write_text(json.dumps({"schema_version": 1, "levels": calibrated}))
+    payload["cloud_load"] = {
+        "levels_path": str(levels),
+        "levels": {"C1": [["T01", "L1", "short"]], "C2": [["T01", "L0", "short"]]},
+    }
+    path = tmp_path / "grid.json"
+    path.write_text(json.dumps(payload))
+    grid = load_grid(path)
+    assert grid.cloud_load_levels == ("C1", "C2")
+    ids = {b.subblock_id for b in grid.subblocks()}
+    assert {"T01-L1-C1-r0", "T01-L0-C2-r0", "T01-L0-r0"} <= ids
+    loads = grid.cloud_loads()
+    assert loads["C1"] == C1 and loads["C2"].busy_ms == 20
+    calibrated.pop("C2")
+    levels.write_text(json.dumps({"schema_version": 1, "levels": calibrated}))
+    with pytest.raises(ValueError, match="C2 is not calibrated"):
+        grid.cloud_loads()

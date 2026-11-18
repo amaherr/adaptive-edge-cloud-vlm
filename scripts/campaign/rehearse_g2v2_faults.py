@@ -140,7 +140,7 @@ def main() -> None:
         shutil.rmtree(output, ignore_errors=True)
         shutil.rmtree(derived, ignore_errors=True)
     output.mkdir(parents=True)
-    cloud_cells = load_grid(Path(settings["grid"])).cloud_load_level is not None
+    cloud_cells = bool(load_grid(Path(settings["grid"])).cloud_load_levels)
     cloud_heartbeat = Path(
         settings.get("cloud_load_heartbeat") or cloud_load.DEFAULT_HEARTBEAT
     )

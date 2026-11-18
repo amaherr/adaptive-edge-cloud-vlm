@@ -104,7 +104,7 @@ def benchmark_arguments(
     ]
     if grid.placements != PLACEMENTS:
         arguments += ["--placements", *grid.placements]
-    if grid.cloud_load_level is not None:
+    if grid.cloud_load_levels:
         arguments += ["--cloud-load-level", block.cloud_load]
     return [*arguments, "--resume"] if resume else arguments
 
@@ -368,7 +368,7 @@ def run_subblock(
         for label, state in (("first", snapshots[0]), ("last", snapshots[-1])):
             if state.get("edge_load_alive") is not True:
                 reasons.append(f"load generator not alive at the {label} request")
-    if grid.cloud_load_level is not None:
+    if grid.cloud_load_levels:
         reasons += cloud_load_reasons(
             [
                 row

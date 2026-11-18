@@ -89,8 +89,10 @@ class Grid:
     repetitions: tuple[int, ...]
     tasks: Mapping[str, Task]
     placements: tuple[str, ...] = PLACEMENTS
-    cloud_load_level: str | None = None
-    cloud_load_cells: tuple[tuple[str, str, str], ...] = ()
+    # Cloud-load levels (C1, and C2 by amendment A2a-5) in grid order, and
+    # their cells as (condition ID, edge load level, task, cloud level).
+    cloud_load_levels: tuple[str, ...] = ()
+    cloud_load_cells: tuple[tuple[str, str, str, str], ...] = ()
 
     @property
     def configurations(self) -> tuple[str, ...]:
@@ -120,22 +122,23 @@ class Grid:
             cells += [(self.conditions[c], level, task.name) for c, level in task.cells]
         return cells
 
-    def cloud_load(self) -> LoadLevel | None:
-        """The calibrated cloud-load level, or None if the grid has no C1 cells.
+    def cloud_loads(self) -> dict[str, LoadLevel]:
+        """The calibrated cloud-load levels the grid uses (empty without any).
 
         Raises if the grid names a level the levels file does not define yet
-        (C1 is filled in only after calibration, A2a rule 6).
+        (levels are filled in only after calibration, A2a rules 6 and A2a-5).
         """
 
-        if self.cloud_load_level is None:
-            return None
+        if not self.cloud_load_levels:
+            return {}
         path = (self.path.parent / self.payload["cloud_load"]["levels_path"]).resolve()
         levels = load_levels(path, no_load=NO_CLOUD_LOAD)
-        if self.cloud_load_level not in levels:
+        missing = [name for name in self.cloud_load_levels if name not in levels]
+        if missing:
             raise ValueError(
-                f"cloud-load level {self.cloud_load_level} is not calibrated in {path}"
+                f"cloud-load level {', '.join(missing)} is not calibrated in {path}"
             )
-        return levels[self.cloud_load_level]
+        return {name: levels[name] for name in self.cloud_load_levels}
 
     def cells_by_id(self) -> list[tuple[str, str, str]]:
         """C0 cells as ``(condition ID, edge load level, task)``."""
@@ -151,18 +154,11 @@ class Grid:
             for condition, level, task in self.cells()
             for repetition in self.repetitions
         ]
-        if self.cloud_load_level is not None:
-            blocks += [
-                SubBlock(
-                    self.conditions[condition],
-                    level,
-                    repetition,
-                    task,
-                    self.cloud_load_level,
-                )
-                for condition, level, task in self.cloud_load_cells
-                for repetition in self.repetitions
-            ]
+        blocks += [
+            SubBlock(self.conditions[condition], level, repetition, task, cloud)
+            for condition, level, task, cloud in self.cloud_load_cells
+            for repetition in self.repetitions
+        ]
         return blocks
 
     def execution_order(self) -> list[SubBlock]:
@@ -301,15 +297,22 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
             "distributed/projected/synchronous"
         )
     cloud = payload.get("cloud_load")
-    cloud_level: str | None = None
-    cloud_cells: tuple[tuple[str, str, str], ...] = ()
+    cloud_levels: tuple[str, ...] = ()
+    cloud_cells: tuple[tuple[str, str, str, str], ...] = ()
     if cloud is not None:
-        cloud_level = str(cloud["level"])
-        if cloud_level == NO_CLOUD_LOAD:
-            raise ValueError("C0 is implicit; name the cloud-load level")
-        cloud_cells = tuple((str(c), str(e), str(t)) for c, e, t in cloud["cells"])
-        if not cloud_cells or len(set(cloud_cells)) != len(cloud_cells):
-            raise ValueError("cloud-load cells must be unique and non-empty")
+        # {"level": "C1", "cells": [...]} (G2 v2+) or {"levels": {"C1": [...],
+        # "C2": [...]}} (amendment A2a-5).
+        by_level = (
+            cloud["levels"] if "levels" in cloud else {cloud["level"]: cloud["cells"]}
+        )
+        cloud_levels = tuple(str(name) for name in by_level)
+        if not cloud_levels or NO_CLOUD_LOAD in cloud_levels:
+            raise ValueError("C0 is implicit; name the cloud-load levels")
+        for name in cloud_levels:
+            level_cells = [(str(c), str(e), str(t)) for c, e, t in by_level[name]]
+            if not level_cells or len(set(level_cells)) != len(level_cells):
+                raise ValueError("cloud-load cells must be unique and non-empty")
+            cloud_cells += tuple((c, e, t, name) for c, e, t in level_cells)
         base_cells = {
             (condition, level, task)
             for condition, level, task in Grid(
@@ -323,7 +326,7 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
                 tasks=tasks,
             ).cells_by_id()
         }
-        uncovered = set(cloud_cells) - base_cells
+        uncovered = {cell[:3] for cell in cloud_cells} - base_cells
         if uncovered:
             raise ValueError(
                 f"cloud-load cells need the same C0 cell: {sorted(uncovered)}"
@@ -341,7 +344,7 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
         placements=tuple(
             p for p in SPEC_BY_PLACEMENT if p in {spec.placement for spec in specs}
         ),
-        cloud_load_level=cloud_level,
+        cloud_load_levels=cloud_levels,
         cloud_load_cells=cloud_cells,
     )
     grid.execution_order()  # Fail early if the adjacency constraint is impossible.

@@ -90,7 +90,11 @@ def load_levels(path: Path, *, no_load: str = NO_LOAD) -> dict[str, LoadLevel]:
             busy_ms=float(values["busy_ms"]),
             idle_ms=float(values["idle_ms"]),
             generator=generator,
-            kernel_mib=(int(values["kernel_mib"]) if "kernel_mib" in values else None),
+            kernel_mib=(
+                int(values["kernel_mib"])
+                if values.get("kernel_mib") is not None
+                else None
+            ),
         )
         if level.working_set_mib < 1 or level.busy_ms < 0 or level.idle_ms < 0:
             raise ValueError(f"invalid edge-load level {name}")

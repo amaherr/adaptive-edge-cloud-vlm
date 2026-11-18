@@ -307,9 +307,9 @@ class CampaignSupervisor:
         )
         self.warnings: list[str] = []
         # Cloud GPU load (C1): the same runner as shaping; locally in loopback.
-        self.cloud_level: LoadLevel | None = None
+        self.cloud_levels: dict[str, LoadLevel] = {}
         self.cloud_load: CloudLoad | None = None
-        if self.grid.cloud_load_level is not None:
+        if self.grid.cloud_load_levels:
             self.cloud_load = CloudLoad(
                 remote if remote is not None else LocalRunner(timeout=180),
                 shlex.split(settings["cloud_python"])
@@ -466,8 +466,8 @@ class CampaignSupervisor:
         self.output.mkdir(parents=True, exist_ok=True)
         self.check_host_memory(startup=True)
         self.status("preflight")
-        # Fails until C1 is calibrated (A2a rule 6) if the grid has C1 cells.
-        self.cloud_level = self.grid.cloud_load()
+        # Fails until every cloud-load level the grid uses is calibrated.
+        self.cloud_levels = self.grid.cloud_loads()
         if self.cloud_load is not None:
             reaped = self.cloud_load.reap()
             if reaped:
@@ -846,7 +846,7 @@ class CampaignSupervisor:
                         max_restarts=int(s["max_restarts_per_subblock"]),
                         log=log,
                         cloud_load=self.cloud_load,
-                        cloud_level=self.cloud_level,
+                        cloud_level=self.cloud_levels.get(block.cloud_load),
                     )
                     if report["valid"]:
                         if self.checkpoint is not None:

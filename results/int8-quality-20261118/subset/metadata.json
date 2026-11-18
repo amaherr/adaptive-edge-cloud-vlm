@@ -1,0 +1,9 @@
+{
+  "annotations_source_sha256": "0564650e712b34c246e4ad142894692bf2e45dee8e9cc6ebb2cedbe85731c4bf",
+  "annotations_subset_sha256": "1acac3dde0d23796fdc62eb55afb0da0fd7df0b5ce07647b608f765e5f2dc657",
+  "manifest_sha256": "d1a5c80ab24a836d81be382e521c695684a3baaafc5e39248588058d9d83c0c5",
+  "question_count": 200,
+  "questions_source_sha256": "f34d9c9909dea76700d361baddd63dd47b4494945097459b542d9fe840244811",
+  "questions_subset_sha256": "3212249ccc3c296e474227b7262883881bf8b09a47e48920e2f09b6b924fb657",
+  "schema_version": 1
+}

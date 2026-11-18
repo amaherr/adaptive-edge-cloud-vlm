@@ -1,0 +1,19 @@
+schema_version: 1
+name: aws-calibration-e1
+mode: cloud
+model_config: ../model/moondream2.yaml
+edge_hardware_config: ../hardware/aws_edge_g6f_2xlarge.yaml
+cloud_hardware_config: ../hardware/aws_cloud_g6_xlarge.yaml
+dataset:
+  manifest_path: ../../data/manifests/prompt_calibration/e1.jsonl
+  revision: vqa-v2-val2014-prompt-calibration-e1
+runtime:
+  seed: 42
+  warmup_requests: 1
+  measured_repetitions: 1
+transport:
+  host: 10.42.1.20
+  port: 5050
+  timeout_seconds: 120.0
+  protocol_version: 1
+artifacts_dir: ../../artifacts

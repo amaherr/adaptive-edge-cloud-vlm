@@ -1,0 +1,63 @@
+{
+  "accuracy_percent": {
+    "lowercased": {
+      "int8": 79.7,
+      "lossless": 79.2
+    },
+    "unchanged": {
+      "int8": 56.7,
+      "lossless": 56.2
+    }
+  },
+  "files_sha256": {
+    "int8.lowercased.official.json": "77227920bd176b4e96402b87a7132470ac7552f4703202b507ed01eeeb6c7845",
+    "int8.predictions.json": "2010c69e1894f6e3bd86dba06efce56d2c6805c2df525ce43603ecc9bbc7ce2f",
+    "int8.unchanged.official.json": "6371c6f0fc084f4d25d4e3e1855df8a193915219a2a6116e5c3eeb61069b0782",
+    "lossless.lowercased.official.json": "dc24858bbf1ee6fc9b33e5b4536d1754c23532395e28f2cf1b83fbaf5ccdd380",
+    "lossless.predictions.json": "30d9ca662680567b5d5f45054ef9072497215d00ef7de1bb987b4bdaa6bb4d56",
+    "lossless.unchanged.official.json": "d3fdbf414836f7927dbafd300a55d4f083b52e49e697e35ffd3afb035b3e7c1a"
+  },
+  "long": {
+    "gated": false,
+    "identical_token_sequences": 132,
+    "images": 200,
+    "lengths": {
+      "int8": {
+        "mean": 32,
+        "median": 32.0,
+        "min": 32
+      },
+      "lossless": {
+        "mean": 32,
+        "median": 32.0,
+        "min": 32
+      }
+    },
+    "mean_common_prefix_tokens": 26.005,
+    "mean_position_agreement": 0.8325
+  },
+  "protocol": "docs/protocols/g2-v2-protocol.md amendment A2a rule 4",
+  "schema_version": 1,
+  "short": {
+    "accuracy_drop_pp": {
+      "lowercased": -0.5,
+      "unchanged": -0.5
+    },
+    "admitted": true,
+    "checks": {
+      "accuracy_lowercased_within_1.0pp": true,
+      "accuracy_unchanged_within_1.0pp": true,
+      "identical_at_least_95%": true
+    },
+    "identical_share": 0.995,
+    "rule": {
+      "max_accuracy_drop_pp": 1.0,
+      "min_identical_share": 0.95,
+      "scorings": [
+        "unchanged",
+        "lowercased"
+      ]
+    }
+  },
+  "short_manifest_sha256": "d1a5c80ab24a836d81be382e521c695684a3baaafc5e39248588058d9d83c0c5"
+}

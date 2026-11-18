@@ -1,0 +1,1019 @@
+{
+  "data_subtype": "val2014",
+  "data_type": "mscoco",
+  "info": {
+    "contributor": "VQA Team",
+    "date_created": "2017-04-26 17:00:44",
+    "description": "This is v2.0 of the VQA dataset.",
+    "url": "http://visualqa.org",
+    "version": "2.0",
+    "year": 2017
+  },
+  "license": {
+    "name": "Creative Commons Attribution 4.0 International License",
+    "url": "http://creativecommons.org/licenses/by/4.0/"
+  },
+  "questions": [
+    {
+      "image_id": 131280,
+      "question": "What color is the lettering on shirts?",
+      "question_id": 131280000
+    },
+    {
+      "image_id": 393811,
+      "question": "Where is the duck swimming?",
+      "question_id": 393811002
+    },
+    {
+      "image_id": 1146,
+      "question": "What color is the tie?",
+      "question_id": 1146005
+    },
+    {
+      "image_id": 394773,
+      "question": "What kind of kickstand appears?",
+      "question_id": 394773003
+    },
+    {
+      "image_id": 395378,
+      "question": "Does the bird eat at the water's edge?",
+      "question_id": 395378002
+    },
+    {
+      "image_id": 133476,
+      "question": "How many drinks are there?",
+      "question_id": 133476010
+    },
+    {
+      "image_id": 133690,
+      "question": "Is the dog sitting on a bed?",
+      "question_id": 133690004
+    },
+    {
+      "image_id": 459440,
+      "question": "Does the paper mention 72 artists?",
+      "question_id": 459440001
+    },
+    {
+      "image_id": 528488,
+      "question": "What has the dog caught?",
+      "question_id": 528488001
+    },
+    {
+      "image_id": 4764,
+      "question": "Is this indoor?",
+      "question_id": 4764004
+    },
+    {
+      "image_id": 136833,
+      "question": "How many motorcycles are in the picture?",
+      "question_id": 136833000
+    },
+    {
+      "image_id": 530317,
+      "question": "What color is the bottom of the boat?",
+      "question_id": 530317005
+    },
+    {
+      "image_id": 530975,
+      "question": "Is there a bag of chips?",
+      "question_id": 530975000
+    },
+    {
+      "image_id": 279561,
+      "question": "Is the owner of this desk fond of the Windows operating system?",
+      "question_id": 279561004
+    },
+    {
+      "image_id": 531324,
+      "question": "What is featured leaning against the building?",
+      "question_id": 531324003
+    },
+    {
+      "image_id": 269932,
+      "question": "What is sitting on the chair?",
+      "question_id": 269932000
+    },
+    {
+      "image_id": 139141,
+      "question": "Are the players both wearing eyeglasses?",
+      "question_id": 139141000
+    },
+    {
+      "image_id": 532994,
+      "question": "What is the carriage for?",
+      "question_id": 532994002
+    },
+    {
+      "image_id": 8953,
+      "question": "How many food items are ready to eat in this photo?",
+      "question_id": 8953002
+    },
+    {
+      "image_id": 272185,
+      "question": "How many days of the week is the store open?",
+      "question_id": 272185008
+    },
+    {
+      "image_id": 11390,
+      "question": "What does the shirt say?",
+      "question_id": 11390011
+    },
+    {
+      "image_id": 274612,
+      "question": "How many umbrellas are in the picture?",
+      "question_id": 274612009
+    },
+    {
+      "image_id": 176863,
+      "question": "What is behind the zebras?",
+      "question_id": 176863002
+    },
+    {
+      "image_id": 537150,
+      "question": "Does this look cold?",
+      "question_id": 537150000
+    },
+    {
+      "image_id": 144250,
+      "question": "What are the animals walking on?",
+      "question_id": 144250001
+    },
+    {
+      "image_id": 144300,
+      "question": "What is the road made of?",
+      "question_id": 144300012
+    },
+    {
+      "image_id": 276323,
+      "question": "What color is the motorbike?",
+      "question_id": 276323002
+    },
+    {
+      "image_id": 538513,
+      "question": "What is the plate sitting on?",
+      "question_id": 538513002
+    },
+    {
+      "image_id": 145956,
+      "question": "What is on the top of the clock tower?",
+      "question_id": 145956002
+    },
+    {
+      "image_id": 539413,
+      "question": "What is on the man's shirt?",
+      "question_id": 539413007
+    },
+    {
+      "image_id": 146767,
+      "question": "What is cat's name?",
+      "question_id": 146767004
+    },
+    {
+      "image_id": 15994,
+      "question": "What is she doing with her middle finger?",
+      "question_id": 15994000
+    },
+    {
+      "image_id": 278161,
+      "question": "Why is the man taking pictures of the buses?",
+      "question_id": 278161004
+    },
+    {
+      "image_id": 147154,
+      "question": "Is this a cooking show?",
+      "question_id": 147154001
+    },
+    {
+      "image_id": 409763,
+      "question": "What is on the man's head?",
+      "question_id": 409763001
+    },
+    {
+      "image_id": 147904,
+      "question": "Is this nice weather?",
+      "question_id": 147904005
+    },
+    {
+      "image_id": 148243,
+      "question": "Are these people standing in a circle?",
+      "question_id": 148243004
+    },
+    {
+      "image_id": 542451,
+      "question": "Is it cloudy?",
+      "question_id": 542451007
+    },
+    {
+      "image_id": 281221,
+      "question": "Is it sunny or cloudy?",
+      "question_id": 281221004
+    },
+    {
+      "image_id": 440226,
+      "question": "What is flying in the air?",
+      "question_id": 440226003
+    },
+    {
+      "image_id": 19974,
+      "question": "What type of animals are these?",
+      "question_id": 19974004
+    },
+    {
+      "image_id": 152330,
+      "question": "What are there black marks on the pizza?",
+      "question_id": 152330002
+    },
+    {
+      "image_id": 283642,
+      "question": "Is this a high-speed train?",
+      "question_id": 283642007
+    },
+    {
+      "image_id": 153083,
+      "question": "Why is this bike parked in a forest?",
+      "question_id": 153083001
+    },
+    {
+      "image_id": 153205,
+      "question": "How deep is the snow?",
+      "question_id": 153205003
+    },
+    {
+      "image_id": 22208,
+      "question": "Is there a V.C.R?",
+      "question_id": 22208003
+    },
+    {
+      "image_id": 284548,
+      "question": "What three numbers are present on the train?",
+      "question_id": 284548002
+    },
+    {
+      "image_id": 547102,
+      "question": "What type are the yellow flowers?",
+      "question_id": 547102005
+    },
+    {
+      "image_id": 285291,
+      "question": "Is this girl going to sprain her ankle?",
+      "question_id": 285291001
+    },
+    {
+      "image_id": 416434,
+      "question": "Does this phone have a camera?",
+      "question_id": 416434002
+    },
+    {
+      "image_id": 23981,
+      "question": "Are there zebras underneath the tree?",
+      "question_id": 23981002
+    },
+    {
+      "image_id": 419074,
+      "question": "Is the plane taking off?",
+      "question_id": 419074020
+    },
+    {
+      "image_id": 548485,
+      "question": "Does this room have tile or carpet on the floor?",
+      "question_id": 548485003
+    },
+    {
+      "image_id": 548713,
+      "question": "Is this a city scene?",
+      "question_id": 548713001
+    },
+    {
+      "image_id": 156104,
+      "question": "What kind of church?",
+      "question_id": 156104002
+    },
+    {
+      "image_id": 156532,
+      "question": "What color is the boat?",
+      "question_id": 156532003
+    },
+    {
+      "image_id": 156651,
+      "question": "What pattern tie is the man wearing?",
+      "question_id": 156651003
+    },
+    {
+      "image_id": 26654,
+      "question": "Is this car a convertible or coupe?",
+      "question_id": 26654000
+    },
+    {
+      "image_id": 420113,
+      "question": "What are the people in the water doing?",
+      "question_id": 420113005
+    },
+    {
+      "image_id": 114049,
+      "question": "Is someone having a snack?",
+      "question_id": 114049001
+    },
+    {
+      "image_id": 422424,
+      "question": "Is this cat hungry for food?",
+      "question_id": 422424016
+    },
+    {
+      "image_id": 48738,
+      "question": "Does this animal have spherical pupils?",
+      "question_id": 48738002
+    },
+    {
+      "image_id": 557127,
+      "question": "What is the street name?",
+      "question_id": 557127006
+    },
+    {
+      "image_id": 33759,
+      "question": "Is the ball in the picture?",
+      "question_id": 33759005
+    },
+    {
+      "image_id": 428148,
+      "question": "Is the screen on?",
+      "question_id": 428148002
+    },
+    {
+      "image_id": 35328,
+      "question": "Are these stairs in an apartment building?",
+      "question_id": 35328001
+    },
+    {
+      "image_id": 35489,
+      "question": "What color is the collar?",
+      "question_id": 35489000
+    },
+    {
+      "image_id": 35974,
+      "question": "What game is this?",
+      "question_id": 35974000
+    },
+    {
+      "image_id": 115266,
+      "question": "Is the train heading towards the camera?",
+      "question_id": 115266003
+    },
+    {
+      "image_id": 299448,
+      "question": "What words are written on the train engine?",
+      "question_id": 299448001
+    },
+    {
+      "image_id": 37655,
+      "question": "Is this a shaded area?",
+      "question_id": 37655001
+    },
+    {
+      "image_id": 168847,
+      "question": "What is the cat standing on?",
+      "question_id": 168847004
+    },
+    {
+      "image_id": 37875,
+      "question": "What is the kid standing on?",
+      "question_id": 37875008
+    },
+    {
+      "image_id": 42178,
+      "question": "Are the train cars on the left or right used to transport liquids?",
+      "question_id": 42178003
+    },
+    {
+      "image_id": 435957,
+      "question": "What is photographed in the window?",
+      "question_id": 435957002
+    },
+    {
+      "image_id": 567340,
+      "question": "Is this a man or woman?",
+      "question_id": 567340019
+    },
+    {
+      "image_id": 305253,
+      "question": "What number of clocks are on this tower?",
+      "question_id": 305253003
+    },
+    {
+      "image_id": 174284,
+      "question": "What airline does the plane belong to?",
+      "question_id": 174284002
+    },
+    {
+      "image_id": 437290,
+      "question": "Would a child like to come here?",
+      "question_id": 437290010
+    },
+    {
+      "image_id": 175356,
+      "question": "What type of court are they paying on?",
+      "question_id": 175356000
+    },
+    {
+      "image_id": 569452,
+      "question": "What is the sport being played?",
+      "question_id": 569452005
+    },
+    {
+      "image_id": 510152,
+      "question": "Is it warm or cold where this photo was taken?",
+      "question_id": 510152002
+    },
+    {
+      "image_id": 84477,
+      "question": "How many umbrellas are shown?",
+      "question_id": 84477002
+    },
+    {
+      "image_id": 439834,
+      "question": "Why is one zebra smaller than the other?",
+      "question_id": 439834001
+    },
+    {
+      "image_id": 571584,
+      "question": "Can the residents of the apartment building generally hear the bus drive by?",
+      "question_id": 571584024
+    },
+    {
+      "image_id": 571764,
+      "question": "How many glasses?",
+      "question_id": 571764002
+    },
+    {
+      "image_id": 572296,
+      "question": "Is that a large TV?",
+      "question_id": 572296005
+    },
+    {
+      "image_id": 441245,
+      "question": "What is holding the motorcycles up?",
+      "question_id": 441245002
+    },
+    {
+      "image_id": 310262,
+      "question": "What color is the disk?",
+      "question_id": 310262005
+    },
+    {
+      "image_id": 179727,
+      "question": "Which person is wearing a tie?",
+      "question_id": 179727000
+    },
+    {
+      "image_id": 8583,
+      "question": "Is there a mouse pad?",
+      "question_id": 8583004
+    },
+    {
+      "image_id": 183004,
+      "question": "Is this animal on a farm?",
+      "question_id": 183004004
+    },
+    {
+      "image_id": 183914,
+      "question": "Is he smoking?",
+      "question_id": 183914001
+    },
+    {
+      "image_id": 54562,
+      "question": "Is that a train station?",
+      "question_id": 54562002
+    },
+    {
+      "image_id": 186413,
+      "question": "Are the cows waiting to be picked up?",
+      "question_id": 186413001
+    },
+    {
+      "image_id": 186472,
+      "question": "What color is this transit?",
+      "question_id": 186472003
+    },
+    {
+      "image_id": 448854,
+      "question": "How many oranges are in this photo?",
+      "question_id": 448854004
+    },
+    {
+      "image_id": 187924,
+      "question": "Is there a beer advertisement on one of the buildings?",
+      "question_id": 187924007
+    },
+    {
+      "image_id": 57172,
+      "question": "Has the man fallen?",
+      "question_id": 57172003
+    },
+    {
+      "image_id": 188346,
+      "question": "Which Fire Dept. is present?",
+      "question_id": 188346005
+    },
+    {
+      "image_id": 406848,
+      "question": "Do these vegetables have a sweet and sour sauce?",
+      "question_id": 406848003
+    },
+    {
+      "image_id": 451468,
+      "question": "What pattern is the floor?",
+      "question_id": 451468001
+    },
+    {
+      "image_id": 190095,
+      "question": "Are the waves dangerous?",
+      "question_id": 190095007
+    },
+    {
+      "image_id": 452866,
+      "question": "How many hands are cutting the cake?",
+      "question_id": 452866001
+    },
+    {
+      "image_id": 61034,
+      "question": "Do you see a monitor?",
+      "question_id": 61034002
+    },
+    {
+      "image_id": 325211,
+      "question": "What part of the human anatomy is used with this object?",
+      "question_id": 325211000
+    },
+    {
+      "image_id": 64059,
+      "question": "Who are on the field?",
+      "question_id": 64059018
+    },
+    {
+      "image_id": 64610,
+      "question": "What color is the train?",
+      "question_id": 64610004
+    },
+    {
+      "image_id": 195897,
+      "question": "Where is the window in relation to the toilet?",
+      "question_id": 195897018
+    },
+    {
+      "image_id": 458048,
+      "question": "Are the pizzas hot?",
+      "question_id": 458048003
+    },
+    {
+      "image_id": 461839,
+      "question": "What material is the flooring?",
+      "question_id": 461839000
+    },
+    {
+      "image_id": 200089,
+      "question": "What is in the water?",
+      "question_id": 200089001
+    },
+    {
+      "image_id": 332318,
+      "question": "Is this a cloudy day?",
+      "question_id": 332318001
+    },
+    {
+      "image_id": 332916,
+      "question": "Is the scene pictured an urban commercial area or an urban residential area?",
+      "question_id": 332916017
+    },
+    {
+      "image_id": 77351,
+      "question": "What are exiting the bus?",
+      "question_id": 77351013
+    },
+    {
+      "image_id": 202001,
+      "question": "What color is the girl's hair?",
+      "question_id": 202001003
+    },
+    {
+      "image_id": 186705,
+      "question": "What is the man drinking?",
+      "question_id": 186705001
+    },
+    {
+      "image_id": 73239,
+      "question": "Where are the laptops?",
+      "question_id": 73239007
+    },
+    {
+      "image_id": 205183,
+      "question": "Is the dog in defensive position?",
+      "question_id": 205183006
+    },
+    {
+      "image_id": 205531,
+      "question": "How many panes of glass are in the window?",
+      "question_id": 205531007
+    },
+    {
+      "image_id": 468354,
+      "question": "What is the blue thing floating in the water?",
+      "question_id": 468354002
+    },
+    {
+      "image_id": 223093,
+      "question": "What time does the clock say?",
+      "question_id": 223093002
+    },
+    {
+      "image_id": 469165,
+      "question": "What kind of bat is the baseball player holding?",
+      "question_id": 469165001
+    },
+    {
+      "image_id": 76916,
+      "question": "What is behind the giraffe in the center?",
+      "question_id": 76916001
+    },
+    {
+      "image_id": 208793,
+      "question": "What color is the car?",
+      "question_id": 208793001
+    },
+    {
+      "image_id": 342566,
+      "question": "Are there cars on the street?",
+      "question_id": 342566000
+    },
+    {
+      "image_id": 80429,
+      "question": "Is that blood on the bat?",
+      "question_id": 80429005
+    },
+    {
+      "image_id": 211665,
+      "question": "Is this an egg roll?",
+      "question_id": 211665000
+    },
+    {
+      "image_id": 211825,
+      "question": "Is the guy cutting something?",
+      "question_id": 211825006
+    },
+    {
+      "image_id": 581560,
+      "question": "How tall is this stuffed teddy?",
+      "question_id": 581560004
+    },
+    {
+      "image_id": 213457,
+      "question": "How many ski poles does the man have?",
+      "question_id": 213457003
+    },
+    {
+      "image_id": 82696,
+      "question": "Do people eat at the table?",
+      "question_id": 82696002
+    },
+    {
+      "image_id": 214200,
+      "question": "Why is this car stopping?",
+      "question_id": 214200002
+    },
+    {
+      "image_id": 476460,
+      "question": "What is under his arm?",
+      "question_id": 476460000
+    },
+    {
+      "image_id": 477534,
+      "question": "Which skier has the most experience?",
+      "question_id": 477534000
+    },
+    {
+      "image_id": 215579,
+      "question": "What channel is the cat watching?",
+      "question_id": 215579001
+    },
+    {
+      "image_id": 216333,
+      "question": "How many red suitcases are there?",
+      "question_id": 216333001
+    },
+    {
+      "image_id": 167155,
+      "question": "Is there snow on the ground?",
+      "question_id": 167155000
+    },
+    {
+      "image_id": 232769,
+      "question": "How many players are there?",
+      "question_id": 232769003
+    },
+    {
+      "image_id": 385786,
+      "question": "What color is the table in the background?",
+      "question_id": 385786008
+    },
+    {
+      "image_id": 480757,
+      "question": "Do you see a mirror?",
+      "question_id": 480757001
+    },
+    {
+      "image_id": 298628,
+      "question": "How many brown cows are there?",
+      "question_id": 298628003
+    },
+    {
+      "image_id": 124004,
+      "question": "What is the counter made out of?",
+      "question_id": 124004001
+    },
+    {
+      "image_id": 89154,
+      "question": "Are there a lot of birds visiting the playground?",
+      "question_id": 89154001
+    },
+    {
+      "image_id": 220722,
+      "question": "What color is the umbrella?",
+      "question_id": 220722002
+    },
+    {
+      "image_id": 221753,
+      "question": "Is this a home kitchen?",
+      "question_id": 221753012
+    },
+    {
+      "image_id": 222195,
+      "question": "What color is the cat's eyes?",
+      "question_id": 222195009
+    },
+    {
+      "image_id": 353435,
+      "question": "What are they eating?",
+      "question_id": 353435003
+    },
+    {
+      "image_id": 353948,
+      "question": "Are these zebras looking for food?",
+      "question_id": 353948005
+    },
+    {
+      "image_id": 321385,
+      "question": "What does the dalmatian have on its neck?",
+      "question_id": 321385000
+    },
+    {
+      "image_id": 224554,
+      "question": "How many train cars are visible?",
+      "question_id": 224554002
+    },
+    {
+      "image_id": 93611,
+      "question": "What color is the person's umbrella?",
+      "question_id": 93611000
+    },
+    {
+      "image_id": 93703,
+      "question": "What is the object doing?",
+      "question_id": 93703002
+    },
+    {
+      "image_id": 356790,
+      "question": "What color is the mouse?",
+      "question_id": 356790000
+    },
+    {
+      "image_id": 225738,
+      "question": "Do these animals live in a zoo?",
+      "question_id": 225738002
+    },
+    {
+      "image_id": 489613,
+      "question": "Is the bathroom dirty?",
+      "question_id": 489613002
+    },
+    {
+      "image_id": 96998,
+      "question": "Is this room a bathroom?",
+      "question_id": 96998001
+    },
+    {
+      "image_id": 359715,
+      "question": "What color is the motorcycle?",
+      "question_id": 359715013
+    },
+    {
+      "image_id": 98248,
+      "question": "How many giraffes are there?",
+      "question_id": 98248005
+    },
+    {
+      "image_id": 361027,
+      "question": "What color is the man's shirt?",
+      "question_id": 361027002
+    },
+    {
+      "image_id": 101660,
+      "question": "What room is this?",
+      "question_id": 101660002
+    },
+    {
+      "image_id": 233771,
+      "question": "Does the umbrella match the woman's outfit?",
+      "question_id": 233771008
+    },
+    {
+      "image_id": 103307,
+      "question": "What kind of tree is the giraffe standing by?",
+      "question_id": 103307000
+    },
+    {
+      "image_id": 236016,
+      "question": "How many doors are open?",
+      "question_id": 236016006
+    },
+    {
+      "image_id": 104982,
+      "question": "Is that a new phone?",
+      "question_id": 104982020
+    },
+    {
+      "image_id": 106235,
+      "question": "Are the lights on in this room?",
+      "question_id": 106235000
+    },
+    {
+      "image_id": 239351,
+      "question": "What is written on the signs?",
+      "question_id": 239351000
+    },
+    {
+      "image_id": 501824,
+      "question": "How many suitcases do you see?",
+      "question_id": 501824003
+    },
+    {
+      "image_id": 240185,
+      "question": "Is the man wearing a mask?",
+      "question_id": 240185002
+    },
+    {
+      "image_id": 109403,
+      "question": "What colors are the barrel on the right?",
+      "question_id": 109403003
+    },
+    {
+      "image_id": 83844,
+      "question": "What does the graffiti say?",
+      "question_id": 83844002
+    },
+    {
+      "image_id": 503518,
+      "question": "What this army man watching?",
+      "question_id": 503518014
+    },
+    {
+      "image_id": 504297,
+      "question": "Are there fries in this picture?",
+      "question_id": 504297001
+    },
+    {
+      "image_id": 111180,
+      "question": "Does the grass need to be cut?",
+      "question_id": 111180001
+    },
+    {
+      "image_id": 373591,
+      "question": "In what direction is the beak of this bird pointing?",
+      "question_id": 373591003
+    },
+    {
+      "image_id": 374333,
+      "question": "How many laptops are there?",
+      "question_id": 374333011
+    },
+    {
+      "image_id": 375409,
+      "question": "What kind of train in the picture?",
+      "question_id": 375409003
+    },
+    {
+      "image_id": 171819,
+      "question": "Could this be the woman's first time at the beach?",
+      "question_id": 171819001
+    },
+    {
+      "image_id": 114173,
+      "question": "What type of tiles are on the wall?",
+      "question_id": 114173000
+    },
+    {
+      "image_id": 507935,
+      "question": "Who is up in the air?",
+      "question_id": 507935006
+    },
+    {
+      "image_id": 115875,
+      "question": "What is the child holding?",
+      "question_id": 115875010
+    },
+    {
+      "image_id": 116252,
+      "question": "What is the brand of the camera?",
+      "question_id": 116252000
+    },
+    {
+      "image_id": 116461,
+      "question": "What items are on pizza?",
+      "question_id": 116461003
+    },
+    {
+      "image_id": 380343,
+      "question": "Is pink a healthy color for the spines of this tree?",
+      "question_id": 380343003
+    },
+    {
+      "image_id": 118256,
+      "question": "What store are the kids in?",
+      "question_id": 118256002
+    },
+    {
+      "image_id": 325623,
+      "question": "Is the woman slim?",
+      "question_id": 325623001
+    },
+    {
+      "image_id": 515025,
+      "question": "What is the cat eating?",
+      "question_id": 515025002
+    },
+    {
+      "image_id": 515821,
+      "question": "Does anyone have a photo ID tag?",
+      "question_id": 515821001
+    },
+    {
+      "image_id": 124262,
+      "question": "How many lights are there?",
+      "question_id": 124262003
+    },
+    {
+      "image_id": 386424,
+      "question": "Are they in a castle?",
+      "question_id": 386424001
+    },
+    {
+      "image_id": 124911,
+      "question": "Is this a desktop, or laptop computer?",
+      "question_id": 124911032
+    },
+    {
+      "image_id": 128059,
+      "question": "Is there broccoli on this pizza?",
+      "question_id": 128059002
+    },
+    {
+      "image_id": 390471,
+      "question": "How many slices are on the plate?",
+      "question_id": 390471001
+    },
+    {
+      "image_id": 259761,
+      "question": "How many of the children are smiling?",
+      "question_id": 259761013
+    },
+    {
+      "image_id": 218060,
+      "question": "What geometric shapes are the long skinny black tiles?",
+      "question_id": 218060011
+    },
+    {
+      "image_id": 522418,
+      "question": "What is this person cutting?",
+      "question_id": 522418001
+    },
+    {
+      "image_id": 391794,
+      "question": "Is the keyboard white or black?",
+      "question_id": 391794000
+    },
+    {
+      "image_id": 523097,
+      "question": "Is the girl wearing glasses?",
+      "question_id": 523097001
+    },
+    {
+      "image_id": 392443,
+      "question": "Is this man wet?",
+      "question_id": 392443001
+    },
+    {
+      "image_id": 523565,
+      "question": "Are these flowers real?",
+      "question_id": 523565013
+    }
+  ],
+  "task_type": "Open-Ended"
+}

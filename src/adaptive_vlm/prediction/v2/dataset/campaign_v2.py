@@ -530,7 +530,7 @@ def prepare_campaign_partitions(
         "contract_sha256": digest(contract_path),
         "configurations": list(grid.configurations),
         "int8_admitted": admitted,
-        "cloud_load_level": grid.cloud_load_level,
+        "cloud_load_levels": list(grid.cloud_load_levels),
         "classification": dict(classified),
         "training_attempts": len(training),
         "validation_attempts": len(validation_inputs),

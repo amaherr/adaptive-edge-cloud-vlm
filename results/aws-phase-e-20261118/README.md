@@ -51,7 +51,6 @@ Each setting ran 20 edge/full requests on questions 120–139, with 2 warmups. T
 ## E4: int8 quality (rule 4)
 
 [int8_quality.json](int8_quality.json) records the full results.
-- **Short task (P1, 200 questions):** 199 of 200 answers are token-identical; the exception is "6" against "5". The identical-answer share is 99.5%, above the 95% minimum. With only one answer changed, official accuracy can move by at most 0.5 points under either scoring, so the 1-point rule holds by construction. The official evaluator scores are still to be recorded.
+- **Short task (P1, 200 questions):** 199 of 200 answers are token-identical; the exception is "6" against "5". The identical-answer share is 99.5%. Official VQA accuracy, lossless against int8, is 56.2% vs 56.7% unchanged and 79.2% vs 79.7% lowercased. **int8 is admitted** ([decision.json](../int8-quality-20261118/decision.json), scored with the pinned evaluator under PyPy 2.7.18 / 7.3.15).
 - **Long task (E1, 200 images):** 132 of 200 token sequences are identical. Mean position agreement is 0.83, and the mean common prefix is 26 of 32 tokens. Every output reaches the 32-token cap. This is reported, not gated.
 
-int8 is admitted (rule 4) once the official scores are recorded.
