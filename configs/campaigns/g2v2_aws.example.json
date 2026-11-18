@@ -25,7 +25,7 @@
   "artifact_manifest": "configs/model/moondream2_artifact.yaml",
   "cache_dir": "/models",
   "edge_device": "cuda:0",
-  "edge_residency": "REPLACE-from-phase-D-resident-or-swap",
+  "edge_residency": "resident",
   "rate_fallback": false,
   "run_test_suite": false,
   "min_free_gb": 5,
@@ -33,7 +33,7 @@
   "max_restarts_per_subblock": 3,
   "max_subblock_attempts": 2,
   "max_failure_rate": 0.01,
-  "edge_dedicated_limit_mib": "REPLACE-usable-edge-MiB-from-phase-D",
+  "edge_dedicated_limit_mib": 6144,
   "spill_margin_mib": 128,
   "checkpoint": {
     "s3_uri": "s3://REPLACE-artifact-bucket/research/adaptive-vlm/g2v2plus",

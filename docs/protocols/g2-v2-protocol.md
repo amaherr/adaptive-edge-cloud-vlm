@@ -371,3 +371,52 @@ The physical G2 v2 edge keeps the separate worker (`"generator": "process"`, the
 4. **E5 network model.** Besides the unshaped profile, E5 measures all configurations at C0 / L0 on two more shaped conditions, T12 (25 Mb/s / 150 ms) and T06 (150 Mb/s / 20 ms). Together with 35/20, these fit the transport terms of the AWS winner estimate.
 5. **Scheduler inputs** (rule 9) carry the cloud-load level as C0, C1 or C2.
 
+
+### A2b: AWS values, cells and run size (18 November 2026, after phase E, before any reference, pilot or campaign run)
+
+These are the measured values that A2a deferred to A2b. Phase D and phase E results are in the [AWS roadmap](../g2-v2-plus-aws-roadmap.md) and [results/aws-phase-e-20261118](../../results/aws-phase-e-20261118/README.md).
+
+1. **Hardware contract.**
+   - **Edge:** `g6f.2xlarge`, `NVIDIA L4-6Q` GRID vGPU (6,144 MiB, 5.78 GiB visible to PyTorch). It passed rule 10: 200/200 without OOM; three-run median CV 0.05%; p90/median at most 1.096.
+   - **Cloud:** `g6.xlarge`, `NVIDIA L4` (23,034 MiB).
+   - **Common:** driver 580.159.03 on both, us-east-1, one AZ, on demand.
+   - **CPU headroom guard:** median cloud CPU 50.5% (limit 70%) and non-model server time 0.09% (limit 5%), so the cloud stays `g6.xlarge`.
+   - **Image:** both hosts run one image digest, recorded at the freeze.
+2. **Residency (rule 14): resident.** Peak use is 4,781 MiB, 78% of the vGPU. Swap residency does not run on the GRID vGPU, which has no pinned host memory.
+3. **Edge-state inputs.** The vGPU does not report temperature, power or clock-event reasons, and AWS has no Windows counters. These inputs are dropped from the AWS plan (`EDGE_STATE_KEYS_BY_PLATFORM["aws-linux"]`).
+4. **Levels.** The rule 11 working set is 256 MiB, the largest that fits (A2a-3).
+
+   | Level | Setting | Calibration |
+   | --- | --- | --- |
+   | L1 | 1 ms busy / 10 ms idle, 8 MiB kernels, in process ([aws_levels_v1.json](../../configs/edge_load/aws_levels_v1.json)) | 1.38–1.39× L0; three runs within 0.2% |
+   | C1 | 10 ms busy / 10 ms idle, 512 MiB worker ([levels_v1.json](../../configs/cloud_load/levels_v1.json)) | 1.46× C0 server time |
+   | C2 | 20 ms busy / 0 ms idle, 512 MiB worker | `cloud/raw_image` 3.4% under `edge/full` at 35/20 |
+
+   L2 is dropped (A2a-5). int8 is admitted (rule 4).
+5. **Cells** (A2a-5 rule 3), in [aws_network_grid_v2plus.json](../../configs/profiles/aws_network_grid_v2plus.json):
+   - **Short task: 88 cells.** Every section 5 condition runs at L0 and L1, each at C0 and C2.
+     - The E5 estimate changes the winner only at L0 / C2: edge 13, cloud 9, with changes in every split.
+     - L1 is crossed with every condition and with both cloud levels. Edge load is then not confined to slow links, and the effects of edge load, cloud load and their interaction can be reported over the whole grid.
+     - Every C2 cell has its C0 twin at the same condition and edge level, as rule 6 paired C1 cells.
+   - **Long task: 10 cells, all at C0.** These are the section 6 long-answer cells with L2 removed:
+     - T06, T09, V04 and E04 at L0 and L1;
+     - T04 and T08 at L1.
+
+     The estimate puts `cloud/raw_image` first on every long-task cell, by at least 109 ms even at C2, so no long-task cloud-load cells are run.
+   - **C1 has no cells.** It is calibrated, but the estimate predicts the same winner as C0 on every C1 cell, and the run time goes to C2. Rule 6's C1 cells were the L2 cells, which no longer exist.
+   - **Conditions.** T08 and E04 keep their nominal rates: D4 measured 198.5 Mb/s at T08. Section 5's rate fallback is not applied.
+6. **Order and repetitions.** Two repetitions (rule 13). The sub-blocks are shuffled with seed `7219`, under section 7's no-adjacent-cell constraint.
+7. **Counts.**
+
+   | Part | (Condition, ID) pairs | × reps × configurations | Measured attempts |
+   | --- | ---: | ---: | ---: |
+   | Short, per load combination (4) | 12×60 + 5×30 + 5×30 = 1,020 | × 2 × 5 | 10,200 each |
+   | Short, total | 4,080 | × 2 × 5 | 40,800 |
+   | Long | 6×30 + 2×15 + 2×15 = 240 | × 2 × 5 | 2,400 |
+   | **Total** | | | **43,200** |
+
+   There are 196 sub-blocks and 980 excluded warmups.
+8. **Run estimate and sessions.**
+   - **Requests:** the E5 estimate gives 18.6 h of request time (short 17.1 h, long 1.4 h).
+   - **Overhead:** the phase D drill measured 1–2.5 min per sub-block for probes, shaping, model load and validation, adding 3.3–8.2 h.
+   - **Total:** 22–27 h. The run is split into **three sessions of at most 12 h each**, amending A2a-5 rule 3's two sessions. The instances stop between sessions, and the seeded order runs across the session boundaries.

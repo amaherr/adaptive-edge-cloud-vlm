@@ -69,7 +69,7 @@ A, B-code and C can run in parallel. D needs C, plus enough of A to run the imag
 - **A6:** `orchestrator` service; `adaptive-vlm-inference` container name; `iproute2` and `awscli` in the image; [runtime contract v2](cloud/container_runtime_contract_v2.md); `configs/campaigns/g2v2_aws.example.json`.
 - **A7:** tests.
 - **Also:** the correctness smoke now runs a few **training IDs of the campaign manifest** through the campaign config instead of the fixture config. The old version would have failed preflight: its fixture IDs aren't in the v2 reference, and it pointed at the physical cloud's IP.
-- **Still open:** the AWS grid (`configs/profiles/aws_network_grid_v2plus.json`) is created in B6.
+- **AWS grid:** `configs/profiles/aws_network_grid_v2plus.json`, created with amendment A2b (18 November 2026).
 
 1. **A1 Port the branch.**
    - Bring `infra/`, `container/`, `.github/workflows/cloud-infrastructure.yml` and the cloud scripts (into `scripts/cloud/`) onto `main`.
@@ -265,11 +265,12 @@ D6 fault drill results:
   - the winner changes only in p1 / L0 / C2: edge 13, cloud 9, with changes in every split;
   - every other task/load combination goes to `cloud/raw_image`;
   - distributed never wins.
-- **For A2b (phase F): which load cells to run.** Candidates:
-  - p1 / L0 / C2 on all 22 conditions;
-  - p1 / L1 / C2, which turns those 13 edge wins back to the cloud;
-  - C1 and e1 load cells, which change no winner.
-- The AWS grids still point to the physical `edge_load/levels_v1.json`; A2b switches them.
+- **Decided (18 November 2026), amendment A2b:**
+  - the short task runs every condition at L0 and L1, each at C0 and C2 (88 cells), so edge load is crossed with the whole network grid;
+  - the long task keeps the section 6 cells without L2 (10 cells, C0);
+  - C1 has no cells;
+  - 196 sub-blocks and 43,200 measured attempts, estimated at 22–27 h over **three sessions** of at most 12 h.
+- The campaign grid uses `edge_load/aws_levels_v1.json`. The drill grid keeps its placeholders.
 
 1. **E1 Residency**, from D1. Use resident if it fits with margin; otherwise swap.
 2. **E2 Edge load L1/L2**, using the W5 procedure on the chosen edge, with the in-process generator (A2a-3). Targets are re-derived for a strong cloud:
@@ -281,12 +282,12 @@ D6 fault drill results:
 5. **E5 Stage profile and winner estimate.** Run a short profile (20 requests per configuration, at L0/L1/L2 and C0/C1, unshaped). Feed it into `estimate_g2v2_winners.py` with AWS inputs, then confirm or revise the long-task and C1 cells so each split keeps winner changes. Revising draft sections is allowed; sections 3–4 stay frozen.
 
 ### Phase F: freeze, references, pilot, run
-1. **B6** grids and pilot; **B0b** amendment A2 with the AWS contract, calibrated values, cells, counts and run estimate.
+1. **B6** grids and pilot; **B0b** amendment A2b with the AWS contract, calibrated values, cells, counts and run estimate. **A2b and the campaign grid are done (18 November 2026); the AWS pilot grid is still to do.**
 2. **B9** tests and the fault rehearsal (loopback, plus the D6 drill rerun on AWS).
 3. **Freeze:** commit, build and push the image, and deploy the digest on both hosts.
 4. **References:** per task, the same-device run on both VMs, the synchronous and int8 controls, then the bundles.
 5. **Pilot:** go/no-go per the plan's section 6, then freeze the protocol and pin its hash.
-6. **Run:** two sessions, about 11–12 h each. Stop the instances between sessions (EBS keeps the state). Validated sub-blocks go to S3 as they finish.
+6. **Run:** three sessions of at most 12 h each (A2b: 22–27 h in total). Stop the instances between sessions (EBS keeps the state). Validated sub-blocks go to S3 as they finish.
 7. **Teardown:** stop compute. Keep the data volumes, the artifact bucket and ECR until the analysis is archived, then destroy the disposable stack.
 
 ### Phase G: after the run
@@ -298,7 +299,7 @@ Derive the tables, then archive under `results/aws-g2v2plus-<date>/` with `SHA25
 | --- | --- |
 | 1 | A1–A7 and B0a, B1, B2, B4, B5 (code), in parallel; C1–C5 (infrastructure) as applies allow |
 | 2 | C6, D1–D6, E1–E5; B7, B8; B6 and B0b |
-| 3 | B9, freeze, references, pilot, run (two sessions), teardown |
+| 3 | B9, freeze, references, pilot, run (three sessions), teardown |
 
 That is about 12–14 working days, with the critical path through A → D → E → F. The run itself is 2–3 calendar days of wall time.
 
@@ -319,22 +320,22 @@ On-demand prices from the 5 November review, to be confirmed in C1: `g6f.2xlarge
 | E5 stage profile | ✓ | ✓ | 1.5 |
 | References: same-device per host, then the controls | ✓ / ✓ | ✓ | 2 + 1 + 1.5 |
 | Pilot | ✓ | ✓ | 2 |
-| Campaign, two sessions | ✓ | ✓ | 24 |
+| Campaign, three sessions (A2b) | ✓ | ✓ | 27 |
 | Debugging and reruns allowance | ✓ | ✓ | 12 |
 
 **Estimate (on demand, all of G2 v2+):**
 
 | Item | Cost |
 | --- | ---: |
-| Pair-hours (~50 h × $1.28) | ~$64 |
+| Pair-hours (~53 h × $1.28) | ~$68 |
 | Edge-only hours (~10 h × $0.475) | ~$5 |
 | Cloud-only hours (~2.5 h × $0.81) | ~$2 |
 | Public IPv4 (~110 instance-hours × $0.005) | ~$0.6 |
 | EBS, 100 GiB gp3 for ~5 weeks | ~$10 |
 | S3, ECR and CloudWatch | ~$4 |
-| **G2 v2+ total** | **~$86** |
+| **G2 v2+ total** | **~$90** |
 | Reserved for G5, the dynamic evaluation (~24 h pair plus setup) | ~$50 |
-| Contingency | ~$44 |
+| Contingency | ~$40 |
 | **Ceiling** | **$180** |
 
 
