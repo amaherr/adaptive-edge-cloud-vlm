@@ -358,3 +358,5 @@ The rationale and work plan are in [g2-v2-plus-plan.md](../g2-v2-plus-plan.md) a
 5. **Fault drill.** No separate worker exists to kill. The phase F drill rerun instead kills the benchmark process during an L1 sub-block, which stops the load with it, and checks that resume restarts both. A failing load thread is covered by unit tests.
 
 The physical G2 v2 edge keeps the separate worker (`"generator": "process"`, the default). Reports name the generator in use.
+
+**A2a-4 (18 November 2026, before any phase E measurement).** Phase D measured 863 ms of cloud server time at 100% duty, about 3.2× the unloaded time. So 25% duty may already exceed rule 6's 1.6× band. The E3 sweep therefore adds two lower candidates: C10 (2 ms busy / 18 ms idle) and C15 (3 / 17). The selection rule is unchanged: C1 is the smallest candidate duty whose median cloud server time is 1.4–1.6× the C0 median.

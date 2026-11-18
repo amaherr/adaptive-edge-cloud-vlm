@@ -89,6 +89,21 @@ EDGE_STATE_KEYS = (
     "edge_load_duty",
     "edge_load_heartbeat_age_s",
 )
+# The AWS GRID vGPU reports no temperature, power or clock-event reasons, and
+# an AWS edge has no Windows counters (phase D5): those inputs would always be
+# null there, so they are not inputs on that platform.
+_NOT_ON_AWS = {
+    "edge_gpu_temperature_c",
+    "edge_gpu_power_w",
+    "edge_gpu_clock_event_reasons",
+    "edge_windows_gpu_dedicated_mib",
+    "edge_windows_gpu_shared_mib",
+    "edge_windows_gpu_sample_age_s",
+}
+EDGE_STATE_KEYS_BY_PLATFORM = {
+    "physical-wsl": EDGE_STATE_KEYS,
+    "aws-linux": tuple(k for k in EDGE_STATE_KEYS if k not in _NOT_ON_AWS),
+}
 _INPUT_KEYS = ROUTING_KEYS | {
     "edge_load_level",
     "pre_request_state",
@@ -254,10 +269,19 @@ def _cloud_state(state: Any) -> dict[str, Any] | None:
     }
 
 
-def _edge_state(state: Any) -> dict[str, Any]:
+def edge_state_keys(plan: dict[str, Any]) -> tuple[str, ...]:
+    """The edge-state inputs for the campaign's platform."""
+
+    platform = plan["settings"].get("platform", "physical-wsl")
+    if platform not in EDGE_STATE_KEYS_BY_PLATFORM:
+        raise ValueError(f"no edge-state inputs defined for platform {platform}")
+    return EDGE_STATE_KEYS_BY_PLATFORM[platform]
+
+
+def _edge_state(state: Any, keys: tuple[str, ...]) -> dict[str, Any]:
     source = state if isinstance(state, dict) else {}
     values: dict[str, float | bool | None] = {}
-    for key in EDGE_STATE_KEYS:
+    for key in keys:
         value = source.get(key)
         if isinstance(value, bool) or value is None:
             values[key] = value
@@ -309,6 +333,7 @@ def prepare_campaign_partitions(
         raise FileExistsError("refusing to overwrite a partition bundle")
     contract = strict_json(contract_path.read_bytes())
     plan, grid = _campaign_grid(campaign)
+    state_keys = edge_state_keys(plan)
     # A2a rules 4-5: the scheduler may see int8 only if its quality was admitted.
     admitted = contract.get("int8_admitted")
     if INT8 in grid.configurations and admitted is not True:
@@ -442,7 +467,7 @@ def prepare_campaign_partitions(
                     float(contract["max_probe_age_seconds"]),
                 ),
                 "edge_load_level": meta["edge_load_level"],
-                "edge_state": _edge_state(meta.get("pre_request_state")),
+                "edge_state": _edge_state(meta.get("pre_request_state"), state_keys),
                 "cloud_load_level": meta.get("cloud_load_level", "C0"),
                 "previous_cloud_state": _cloud_state(meta.get("previous_cloud_state")),
             }

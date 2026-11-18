@@ -855,3 +855,19 @@ def test_linux_spill_gate_uses_nvml_memory(
     )
     assert not report["valid"]
     assert "edge_gpu_memory_used_mib reached 3950" in report["reasons"][0]
+
+
+def test_edge_state_inputs_follow_the_platform() -> None:
+    from adaptive_vlm.prediction.v2.dataset.campaign_v2 import (
+        EDGE_STATE_KEYS,
+        edge_state_keys,
+    )
+
+    physical = edge_state_keys({"settings": {}})
+    assert physical == EDGE_STATE_KEYS
+    aws = edge_state_keys({"settings": {"platform": "aws-linux"}})
+    assert "edge_gpu_memory_used_mib" in aws and "edge_load_duty" in aws
+    assert not {k for k in aws if "temperature" in k or "power" in k}
+    assert not {k for k in aws if "windows" in k or "event_reasons" in k}
+    with pytest.raises(ValueError, match="platform"):
+        edge_state_keys({"settings": {"platform": "mars"}})
