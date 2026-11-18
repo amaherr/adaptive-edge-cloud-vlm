@@ -200,9 +200,9 @@ def test_grid_cloud_cells_ids_and_calibration(tmp_path: Path) -> None:
     for task in payload["extra_tasks"].values():
         for key in ("split_path", "experiment_config_path"):
             task[key] = str((GRID.parent / task[key]).resolve())
-    payload["cloud_load"]["levels_path"] = str(
-        ROOT / "configs/cloud_load/levels_v1.json"
-    )
+    uncalibrated = tmp_path / "levels.json"
+    uncalibrated.write_text(json.dumps({"schema_version": 1, "levels": {}}))
+    payload["cloud_load"]["levels_path"] = str(uncalibrated)
     path = tmp_path / "grid.json"
     path.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match="not calibrated"):
