@@ -2,7 +2,58 @@
 
 The rules come from the [r2 specification](../../../docs/predictor-v2/r2-specification.md), frozen in `1d01508` before any fit. The implementation is `6469129`. Every number below comes from the **training partition** (T01–T12) or from validation **inputs**. No validation outcome has been read.
 
-**Status:** the candidate is frozen and its validation predictions are sealed. The single validation pass has **not** been run.
+## Decision: G3 passed, `r2_component` selected and frozen
+
+The single validation pass ran on 20 November 2026 from commit `265e9ea` (clean tree): targets unsealed at 10:36:05 UTC, decision at 10:36:07 UTC.
+- **Decision:** [decision.json](validation/decision.json): candidate `r2_component`, selected `r2_component`, G3 `passed`.
+- **Freeze marker:** [model_freeze_marker.json](validation/model_freeze_marker.json):
+  - calibration SHA-256 `16c20438…f05a`;
+  - decision SHA-256 `d3b55134…784d`.
+- **Full report:** [validation_report.json](validation/validation_report.json), SHA-256 `c405f30d…5f09`.
+
+Validation covers V01–V05: 630 request-cells per configuration (600 short, 30 long), every attempt successful, no unit missing an observed value.
+
+| `r2_component` | Median APE | P90 APE | MAE | Bias | Interval coverage |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `edge/full` | 3.48% | 6.04% | 38.9 ms | +24.2 ms | 99.8% |
+| `cloud/raw_image` | 2.25% | 3.97% | 20.2 ms | +6.4 ms | 96.5% |
+| bf16 split | 0.42% | 1.35% | 10.8 ms | +0.6 ms | 99.7% |
+| `prompt_first` split | 0.44% | 1.61% | 15.7 ms | −4.4 ms | 96.2% |
+| int8 split | 0.43% | 1.50% | 9.3 ms | +1.0 ms | 99.7% |
+| **Gate** | **≤ 15%** | **≤ 30%** | | | (reported) |
+
+| Model | Gate | Worst median / P90 APE | Top-1 agreement | Mean regret (95% CI) | Max regret |
+| --- | --- | --- | ---: | --- | ---: |
+| **`r2_component`** | **pass** | 3.48% / 6.04% | **619/630 (98.3%)** | **0.80 ms (0.35–1.29)** | 82 ms |
+| `r2_additive` | pass (not needed) | 4.46% / 11.84% | 614/630 (97.5%) | 1.46 ms (0.85–2.09) | 92 ms |
+| `constant_median` | fail | 32.3% / 115.1% | 503/630 (79.8%) | 42.3 ms (33.8–51.6) | 767 ms |
+
+- **Every gate condition holds for the component model:**
+  - each configuration is far inside the error limits;
+  - coverage is 100%;
+  - it agrees on 116 more request-cells than the constant baseline (cluster-bootstrap 95% CI 87–147);
+  - there are 0 unsafe feasibility choices.
+- **Training and validation errors match.** The grouped-CV P90 APE was at most 8.0%; validation's is at most 6.0%. There is no sign of overfitting to the training conditions.
+- **Ranking:**
+  - The observed fastest configuration was cloud in 503 request-cells and the edge in 127.
+  - The component model chose cloud for 508 and the edge for 122, and agreed in 619.
+  - The 11 misses are near-ties: 5 in V05-L1-C2, 3 in V03-L0-C2, and one each in V05-L0, V02-L0-C2 and V01-L1-C2. They cost 4–82 ms.
+  - Agreement over the four lossless configurations is the same: 98.3%.
+- **Breakdowns** (all in the report):
+  - Every load state and condition stays within 6.7% P90 for every configuration, except V05 (80 Mb/s, 150 ms RTT). There the cloud's P90 is 13.1% and `prompt_first`'s 7.7%, both still under the gate.
+  - The long task is the most predictable: at most 1.4% P90.
+  - The 120 extrapolated predictions (V05-L1 remote, RTT 0.06 ms above training) have a median APE of 0.8% and a maximum of 20.4%.
+- **One systematic error:** the edge is over-predicted by about 24 ms (+3%) on average. It's small, and the same in every load state.
+
+r1 failed G3 on the physical pair because of cloud error tails (P90 30–33%) and edge memory coverage. r2 resolves both on AWS:
+- **Cloud tails:** the cloud's P90 APE is 4.0%, now that cloud load is modelled explicitly and the network term models slow start;
+- **Memory coverage:** the L4-6Q edge holds the model resident, so every configuration has full coverage.
+
+---
+
+The sections below were written before validation and are unchanged.
+
+**Status at freeze:** the candidate was frozen and its validation predictions sealed; the validation pass had not yet run.
 
 ## Fit (training only)
 
@@ -57,7 +108,7 @@ From [training_review.json](candidate/training_review.json). The figures are med
 
 The partition audit is copied to [candidate/partition_audit.json](candidate/partition_audit.json).
 
-## Next: the single validation pass
+## The validation pass (run once)
 
 ```bash
 .venv/bin/python scripts/prediction/run_predictor_r2.py validate \
@@ -70,4 +121,4 @@ The partition audit is copied to [candidate/partition_audit.json](candidate/part
 What this command does:
 1. It unseals the targets, checks their hash and the hashes of the predictions and calibrations, and scores all three models.
 2. It applies the section 8 gate and choice rule, and writes `decision.json`. It writes `model_freeze_marker.json` only if a model passes.
-3. It refuses to run a second time.
+3. It refuses to run a second time. A decision now exists, so it can't run again.

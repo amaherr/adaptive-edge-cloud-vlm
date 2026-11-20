@@ -13,7 +13,8 @@ Start with the [project README](../README.md) for setup and usage. This folder h
 | Edge full-model memory | Fixed by swap residency, not yet used by the campaign scripts | [GPU placement and memory](physical-testbed/gpu-placement-and-memory.md#edge-full-model-swap-residency-15-november-2026) |
 | G2 v2 baseline (swap-residency edge, short-answer prompt, interleaved placements, edge-load factor) | Off-site work done (W0–W9); next: on-site pilot, protocol freeze and the unattended run | [G2 v2 preparation](g2-v2-preparation.md), [runbook](runbooks/physical-campaign.md#g2-v2-campaign), [on-site checklist](runbooks/g2v2-onsite-checklist.md) |
 | G2 v2+ on AWS (five configurations, edge and cloud load): 43,200 requests in 196 sub-blocks | **Passed** (19 November 2026): every sub-block valid and correct; quality identical across configurations. On the training cells, cloud wins 48 of 54 and the edge 6, the two loads act independently, and split inference never wins. It supersedes the on-site physical G2 v2 run. | [Baseline report](../results/aws-campaign-20261119/baseline/README.md), [campaign record](../results/aws-campaign-20261119/README.md), [derived checks](../results/aws-campaign-20261119/derived/README.md), [amendment A3](protocols/g2-v2-amendment-a3.md) |
-| Predictor V2 r2 (G3), selector vs measured oracle (G4), dynamic evaluation (G5), thesis | Not started | [Thesis completion roadmap](thesis-completion-roadmap.md) |
+| Predictor V2 r2 (G3) | **Passed** (20 November 2026): `r2_component` frozen. On the validation cells, median APE is 0.4–3.5% and P90 APE 1.4–6.0% per configuration, with 98.3% top-1 agreement and 0.8 ms mean regret. | [r2 record](../results/aws-campaign-20261119/predictor_r2/README.md), [r2 specification](predictor-v2/r2-specification.md) |
+| Selector vs measured oracle (G4), dynamic evaluation (G5), thesis | Not started | [Thesis completion roadmap](thesis-completion-roadmap.md) |
 
 ## Plan and runbook
 

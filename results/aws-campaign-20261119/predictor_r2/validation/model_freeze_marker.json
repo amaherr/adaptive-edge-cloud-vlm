@@ -1,0 +1,7 @@
+{
+ "calibration_sha256": "16c20438649c28cf020a98e430fe23e04420455aa7594122790e2a0971cdf05a",
+ "commit": "265e9ea0102d51ce51be9c22c75a26de921236c5",
+ "decision_sha256": "d3b55134de7a5d22fee0143cc4759ba88a83b67fe33c642eba01b9732b1a784d",
+ "frozen_at_utc": "2026-11-20T10:36:09+00:00",
+ "model": "r2_component"
+}

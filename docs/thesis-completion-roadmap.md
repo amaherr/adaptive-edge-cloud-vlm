@@ -123,6 +123,16 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 
 ## Phase 3: Predictor V2 r2 and G3
 
+**Status (20 November 2026): G3 passed.** `r2_component` is selected and frozen. See the [r2 record](../results/aws-campaign-20261119/predictor_r2/README.md).
+- **3.1:** the [r2 specification](predictor-v2/r2-specification.md) was committed (`1d01508`) before any fit.
+- **3.2:** partitions came from `0948aa8`, with the validation targets sealed. The models were fitted on T01–T12 only. Training review: grouped-CV P90 APE at most 8.0%, 98.0% top-1 agreement.
+- **3.3:** the single validation pass on V01–V05 (630 request-cells × 5 configurations):
+  - median APE 0.4–3.5% and P90 APE 1.4–6.0% per configuration;
+  - top-1 agreement 98.3% against 79.8% for the constant baseline;
+  - mean regret 0.8 ms;
+  - 0 unsafe choices.
+- **Source hash:** the r2 code changes the reference verifier's source hash. G4's evaluation profiles must therefore be derived from a worktree of `0948aa8`.
+
 3.1 **Predeclare r2 before fitting** (spec revision plus amendment):
 - **Inputs:** the schema-3 edge state, `cloud_load_level`, `previous_cloud_state` (B8), the measured network (pre-sub-block probe), task (short or long, crop count, prompt tokens), and configuration (five).
 - **Models:**

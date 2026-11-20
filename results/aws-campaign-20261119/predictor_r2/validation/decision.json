@@ -1,0 +1,18 @@
+{
+ "candidate": "r2_component",
+ "considered": [
+  "r2_component",
+  "r2_additive"
+ ],
+ "decided_at_utc": "2026-11-20T10:36:07+00:00",
+ "g3": "passed",
+ "prediction_manifest_sha256": "f50c34d332fb3b90d538c7b7ee1775d4826ec847ec8b26b7b57aa0d727da024a",
+ "rule": "select the candidate if it passes; otherwise r2_additive if it passes; otherwise G3 fails (constant_median is never selected)",
+ "selected": "r2_component",
+ "source": {
+  "commit": "265e9ea0102d51ce51be9c22c75a26de921236c5",
+  "dirty_paths": []
+ },
+ "unsealed_at_utc": "2026-11-20T10:36:05+00:00",
+ "validation_report_sha256": "c405f30d1a9cced4c3a197bb550fa210d6f918a8c18b4908741fc29941ad5f09"
+}
