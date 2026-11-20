@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1030 470" width="1030" height="470" role="img" aria-labelledby="title desc">
+<title id="title">Median latency against link rate</title>
+<desc id="desc">Training conditions T01 to T06 (added RTT 20 ms) at no edge load, without and with heavy cloud load: median end-to-end latency of four configurations against link rate.</desc>
+
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; } .ink2 { fill: #52514e; } .muted { fill: #898781; }
+  .on-fill { fill: #ffffff; }
+  .grid { stroke: #e1e0d9; stroke-width: 1; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .ring { stroke: #fcfcfb; }
+  .f-cloud { fill: #2a78d6; } .k-cloud { stroke: #2a78d6; }
+  .f-edge { fill: #eb6834; } .k-edge { stroke: #eb6834; }
+  .f-synchronous { fill: #1baf7a; } .k-synchronous { stroke: #1baf7a; }
+  .f-int8 { fill: #eda100; } .k-int8 { stroke: #eda100; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #f0efec; } .ink2 { fill: #c3c2b7; }
+    .grid { stroke: #2c2c2a; } .axis { stroke: #383835; }
+    .ring { stroke: #1a1a19; }
+    .f-cloud { fill: #3987e5; } .k-cloud { stroke: #3987e5; }
+    .f-edge { fill: #d95926; } .k-edge { stroke: #d95926; }
+    .f-synchronous { fill: #199e70; } .k-synchronous { stroke: #199e70; }
+    .f-int8 { fill: #c98500; } .k-int8 { stroke: #c98500; }
+  }
+</style>
+
+<rect class="surface" width="1030" height="470"/>
+<text x="24.0" y="32.0" class="ink" font-size="16" font-weight="600">Median end-to-end latency against link rate (added RTT 20 ms, no edge load)</text>
+<text x="24.0" y="52.0" class="ink2" font-size="12">Both split configurations stay above cloud/raw_image at every rate. prompt_first is omitted: it is within 0.4% of the bf16 split.</text>
+<text x="80.0" y="82.0" class="ink" font-size="13" font-weight="600">No cloud load (L0 / C0)</text>
+<line class="axis" x1="80" x2="380" y1="396.0" y2="396.0"/>
+<text x="72.0" y="400.0" class="muted" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="80" x2="380" y1="346.0" y2="346.0"/>
+<text x="72.0" y="350.0" class="muted" font-size="11" text-anchor="end">1</text>
+<line class="grid" x1="80" x2="380" y1="296.0" y2="296.0"/>
+<text x="72.0" y="300.0" class="muted" font-size="11" text-anchor="end">2</text>
+<line class="grid" x1="80" x2="380" y1="246.0" y2="246.0"/>
+<text x="72.0" y="250.0" class="muted" font-size="11" text-anchor="end">3</text>
+<line class="grid" x1="80" x2="380" y1="196.0" y2="196.0"/>
+<text x="72.0" y="200.0" class="muted" font-size="11" text-anchor="end">4</text>
+<line class="grid" x1="80" x2="380" y1="146.0" y2="146.0"/>
+<text x="72.0" y="150.0" class="muted" font-size="11" text-anchor="end">5</text>
+<line class="grid" x1="80" x2="380" y1="96.0" y2="96.0"/>
+<text x="72.0" y="100.0" class="muted" font-size="11" text-anchor="end">6</text>
+<text x="88.9" y="414.0" class="muted" font-size="11" text-anchor="middle">5</text>
+<text x="181.1" y="414.0" class="muted" font-size="11" text-anchor="middle">15</text>
+<text x="224.1" y="414.0" class="muted" font-size="11" text-anchor="middle">25</text>
+<text x="273.4" y="414.0" class="muted" font-size="11" text-anchor="middle">45</text>
+<text x="321.8" y="414.0" class="muted" font-size="11" text-anchor="middle">80</text>
+<text x="374.6" y="414.0" class="muted" font-size="11" text-anchor="middle">150</text>
+<text x="230.0" y="432.0" class="muted" font-size="11" text-anchor="middle">Link rate (Mb/s, log scale)</text>
+<text x="38.0" y="246.0" class="muted" font-size="11" text-anchor="middle" transform="rotate(-90 38 246.0)">Median latency (s)</text>
+<polyline class="k-synchronous" fill="none" stroke-width="2" stroke-linejoin="round" points="88.9,121.0 181.1,281.6 224.1,313.5 273.4,334.2 321.8,345.2 374.6,351.6"/>
+<g><title>split, bf16, 5 Mb/s: 5500 ms</title><circle cx="88.9" cy="121.0" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="88.9" cy="121.0" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 15 Mb/s: 2288 ms</title><circle cx="181.1" cy="281.6" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="181.1" cy="281.6" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 25 Mb/s: 1650 ms</title><circle cx="224.1" cy="313.5" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="224.1" cy="313.5" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 45 Mb/s: 1236 ms</title><circle cx="273.4" cy="334.2" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="273.4" cy="334.2" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 80 Mb/s: 1015 ms</title><circle cx="321.8" cy="345.2" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="321.8" cy="345.2" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 150 Mb/s: 887 ms</title><circle cx="374.6" cy="351.6" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="374.6" cy="351.6" r="11" fill="transparent"/></g>
+<polyline class="k-int8" fill="none" stroke-width="2" stroke-linejoin="round" points="88.9,241.1 181.1,321.4 224.1,337.3 273.4,347.3 321.8,352.6 374.6,355.4"/>
+<g><title>split, int8, 5 Mb/s: 3099 ms</title><circle cx="88.9" cy="241.1" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="88.9" cy="241.1" r="11" fill="transparent"/></g>
+<g><title>split, int8, 15 Mb/s: 1492 ms</title><circle cx="181.1" cy="321.4" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="181.1" cy="321.4" r="11" fill="transparent"/></g>
+<g><title>split, int8, 25 Mb/s: 1175 ms</title><circle cx="224.1" cy="337.3" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="224.1" cy="337.3" r="11" fill="transparent"/></g>
+<g><title>split, int8, 45 Mb/s: 973 ms</title><circle cx="273.4" cy="347.3" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="273.4" cy="347.3" r="11" fill="transparent"/></g>
+<g><title>split, int8, 80 Mb/s: 868 ms</title><circle cx="321.8" cy="352.6" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="321.8" cy="352.6" r="11" fill="transparent"/></g>
+<g><title>split, int8, 150 Mb/s: 812 ms</title><circle cx="374.6" cy="355.4" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="374.6" cy="355.4" r="11" fill="transparent"/></g>
+<polyline class="k-edge" fill="none" stroke-width="2" stroke-linejoin="round" points="88.9,346.3 181.1,346.3 224.1,345.6 273.4,346.1 321.8,346.1 374.6,345.6"/>
+<g><title>edge/full, 5 Mb/s: 994 ms</title><circle cx="88.9" cy="346.3" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="88.9" cy="346.3" r="11" fill="transparent"/></g>
+<g><title>edge/full, 15 Mb/s: 995 ms</title><circle cx="181.1" cy="346.3" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="181.1" cy="346.3" r="11" fill="transparent"/></g>
+<g><title>edge/full, 25 Mb/s: 1007 ms</title><circle cx="224.1" cy="345.6" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="224.1" cy="345.6" r="11" fill="transparent"/></g>
+<g><title>edge/full, 45 Mb/s: 999 ms</title><circle cx="273.4" cy="346.1" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="273.4" cy="346.1" r="11" fill="transparent"/></g>
+<g><title>edge/full, 80 Mb/s: 999 ms</title><circle cx="321.8" cy="346.1" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="321.8" cy="346.1" r="11" fill="transparent"/></g>
+<g><title>edge/full, 150 Mb/s: 1008 ms</title><circle cx="374.6" cy="345.6" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="374.6" cy="345.6" r="11" fill="transparent"/></g>
+<polyline class="k-cloud" fill="none" stroke-width="2" stroke-linejoin="round" points="88.9,368.6 181.1,376.4 224.1,377.5 273.4,378.3 321.8,378.5 374.6,378.9"/>
+<g><title>cloud/raw_image, 5 Mb/s: 547 ms</title><circle cx="88.9" cy="368.6" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="88.9" cy="368.6" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 15 Mb/s: 392 ms</title><circle cx="181.1" cy="376.4" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="181.1" cy="376.4" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 25 Mb/s: 369 ms</title><circle cx="224.1" cy="377.5" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="224.1" cy="377.5" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 45 Mb/s: 354 ms</title><circle cx="273.4" cy="378.3" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="273.4" cy="378.3" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 80 Mb/s: 350 ms</title><circle cx="321.8" cy="378.5" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="321.8" cy="378.5" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 150 Mb/s: 343 ms</title><circle cx="374.6" cy="378.9" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="374.6" cy="378.9" r="11" fill="transparent"/></g>
+<text x="390.0" y="349.6" class="ink2" font-size="11">edge/full 1.01 s</text>
+<text x="390.0" y="363.6" class="ink2" font-size="11">split, bf16 0.89 s</text>
+<text x="390.0" y="377.6" class="ink2" font-size="11">split, int8 0.81 s</text>
+<text x="390.0" y="391.6" class="ink2" font-size="11">cloud/raw_image 0.34 s</text>
+<text x="585.0" y="82.0" class="ink" font-size="13" font-weight="600">Heavy cloud load (L0 / C2)</text>
+<line class="axis" x1="585" x2="885" y1="396.0" y2="396.0"/>
+<text x="577.0" y="400.0" class="muted" font-size="11" text-anchor="end">0</text>
+<line class="grid" x1="585" x2="885" y1="346.0" y2="346.0"/>
+<text x="577.0" y="350.0" class="muted" font-size="11" text-anchor="end">1</text>
+<line class="grid" x1="585" x2="885" y1="296.0" y2="296.0"/>
+<text x="577.0" y="300.0" class="muted" font-size="11" text-anchor="end">2</text>
+<line class="grid" x1="585" x2="885" y1="246.0" y2="246.0"/>
+<text x="577.0" y="250.0" class="muted" font-size="11" text-anchor="end">3</text>
+<line class="grid" x1="585" x2="885" y1="196.0" y2="196.0"/>
+<text x="577.0" y="200.0" class="muted" font-size="11" text-anchor="end">4</text>
+<line class="grid" x1="585" x2="885" y1="146.0" y2="146.0"/>
+<text x="577.0" y="150.0" class="muted" font-size="11" text-anchor="end">5</text>
+<line class="grid" x1="585" x2="885" y1="96.0" y2="96.0"/>
+<text x="577.0" y="100.0" class="muted" font-size="11" text-anchor="end">6</text>
+<text x="593.9" y="414.0" class="muted" font-size="11" text-anchor="middle">5</text>
+<text x="686.1" y="414.0" class="muted" font-size="11" text-anchor="middle">15</text>
+<text x="729.1" y="414.0" class="muted" font-size="11" text-anchor="middle">25</text>
+<text x="778.4" y="414.0" class="muted" font-size="11" text-anchor="middle">45</text>
+<text x="826.8" y="414.0" class="muted" font-size="11" text-anchor="middle">80</text>
+<text x="879.6" y="414.0" class="muted" font-size="11" text-anchor="middle">150</text>
+<text x="735.0" y="432.0" class="muted" font-size="11" text-anchor="middle">Link rate (Mb/s, log scale)</text>
+<text x="543.0" y="246.0" class="muted" font-size="11" text-anchor="middle" transform="rotate(-90 543 246.0)">Median latency (s)</text>
+<polyline class="k-synchronous" fill="none" stroke-width="2" stroke-linejoin="round" points="593.9,105.7 686.1,266.4 729.1,298.2 778.4,319.1 826.8,330.0 879.6,336.4"/>
+<g><title>split, bf16, 5 Mb/s: 5807 ms</title><circle cx="593.9" cy="105.7" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="593.9" cy="105.7" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 15 Mb/s: 2592 ms</title><circle cx="686.1" cy="266.4" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="686.1" cy="266.4" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 25 Mb/s: 1956 ms</title><circle cx="729.1" cy="298.2" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="729.1" cy="298.2" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 45 Mb/s: 1538 ms</title><circle cx="778.4" cy="319.1" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="778.4" cy="319.1" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 80 Mb/s: 1320 ms</title><circle cx="826.8" cy="330.0" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="826.8" cy="330.0" r="11" fill="transparent"/></g>
+<g><title>split, bf16, 150 Mb/s: 1191 ms</title><circle cx="879.6" cy="336.4" r="4.5" class="f-synchronous ring" stroke-width="2"/><circle cx="879.6" cy="336.4" r="11" fill="transparent"/></g>
+<polyline class="k-int8" fill="none" stroke-width="2" stroke-linejoin="round" points="593.9,225.7 686.1,306.3 729.1,322.0 778.4,332.3 826.8,337.4 879.6,340.3"/>
+<g><title>split, int8, 5 Mb/s: 3407 ms</title><circle cx="593.9" cy="225.7" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="593.9" cy="225.7" r="11" fill="transparent"/></g>
+<g><title>split, int8, 15 Mb/s: 1794 ms</title><circle cx="686.1" cy="306.3" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="686.1" cy="306.3" r="11" fill="transparent"/></g>
+<g><title>split, int8, 25 Mb/s: 1480 ms</title><circle cx="729.1" cy="322.0" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="729.1" cy="322.0" r="11" fill="transparent"/></g>
+<g><title>split, int8, 45 Mb/s: 1274 ms</title><circle cx="778.4" cy="332.3" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="778.4" cy="332.3" r="11" fill="transparent"/></g>
+<g><title>split, int8, 80 Mb/s: 1172 ms</title><circle cx="826.8" cy="337.4" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="826.8" cy="337.4" r="11" fill="transparent"/></g>
+<g><title>split, int8, 150 Mb/s: 1114 ms</title><circle cx="879.6" cy="340.3" r="4.5" class="f-int8 ring" stroke-width="2"/><circle cx="879.6" cy="340.3" r="11" fill="transparent"/></g>
+<polyline class="k-edge" fill="none" stroke-width="2" stroke-linejoin="round" points="593.9,346.3 686.1,346.3 729.1,346.0 778.4,346.2 826.8,346.1 879.6,346.0"/>
+<g><title>edge/full, 5 Mb/s: 994 ms</title><circle cx="593.9" cy="346.3" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="593.9" cy="346.3" r="11" fill="transparent"/></g>
+<g><title>edge/full, 15 Mb/s: 994 ms</title><circle cx="686.1" cy="346.3" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="686.1" cy="346.3" r="11" fill="transparent"/></g>
+<g><title>edge/full, 25 Mb/s: 1000 ms</title><circle cx="729.1" cy="346.0" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="729.1" cy="346.0" r="11" fill="transparent"/></g>
+<g><title>edge/full, 45 Mb/s: 996 ms</title><circle cx="778.4" cy="346.2" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="778.4" cy="346.2" r="11" fill="transparent"/></g>
+<g><title>edge/full, 80 Mb/s: 999 ms</title><circle cx="826.8" cy="346.1" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="826.8" cy="346.1" r="11" fill="transparent"/></g>
+<g><title>edge/full, 150 Mb/s: 1000 ms</title><circle cx="879.6" cy="346.0" r="4.5" class="f-edge ring" stroke-width="2"/><circle cx="879.6" cy="346.0" r="11" fill="transparent"/></g>
+<polyline class="k-cloud" fill="none" stroke-width="2" stroke-linejoin="round" points="593.9,338.1 686.1,345.8 729.1,347.0 778.4,348.1 826.8,348.1 879.6,348.2"/>
+<g><title>cloud/raw_image, 5 Mb/s: 1159 ms</title><circle cx="593.9" cy="338.1" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="593.9" cy="338.1" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 15 Mb/s: 1004 ms</title><circle cx="686.1" cy="345.8" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="686.1" cy="345.8" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 25 Mb/s: 979 ms</title><circle cx="729.1" cy="347.0" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="729.1" cy="347.0" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 45 Mb/s: 959 ms</title><circle cx="778.4" cy="348.1" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="778.4" cy="348.1" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 80 Mb/s: 959 ms</title><circle cx="826.8" cy="348.1" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="826.8" cy="348.1" r="11" fill="transparent"/></g>
+<g><title>cloud/raw_image, 150 Mb/s: 955 ms</title><circle cx="879.6" cy="348.2" r="4.5" class="f-cloud ring" stroke-width="2"/><circle cx="879.6" cy="348.2" r="11" fill="transparent"/></g>
+<text x="895.0" y="340.4" class="ink2" font-size="11">split, bf16 1.19 s</text>
+<text x="895.0" y="354.4" class="ink2" font-size="11">split, int8 1.11 s</text>
+<text x="895.0" y="368.4" class="ink2" font-size="11">edge/full 1.00 s</text>
+<text x="895.0" y="382.4" class="ink2" font-size="11">cloud/raw_image 0.95 s</text>
+<line class="k-cloud" x1="80" x2="102" y1="448" y2="448" stroke-width="2"/>
+<circle cx="91" cy="448" r="4" class="f-cloud"/>
+<text x="110.0" y="452.0" class="ink2" font-size="12">cloud/raw_image</text>
+<line class="k-edge" x1="245" x2="267" y1="448" y2="448" stroke-width="2"/>
+<circle cx="256" cy="448" r="4" class="f-edge"/>
+<text x="275.0" y="452.0" class="ink2" font-size="12">edge/full</text>
+<line class="k-synchronous" x1="368" x2="390" y1="448" y2="448" stroke-width="2"/>
+<circle cx="379" cy="448" r="4" class="f-synchronous"/>
+<text x="398.0" y="452.0" class="ink2" font-size="12">split, bf16</text>
+<line class="k-int8" x1="505" x2="527" y1="448" y2="448" stroke-width="2"/>
+<circle cx="516" cy="448" r="4" class="f-int8"/>
+<text x="535.0" y="452.0" class="ink2" font-size="12">split, int8</text>
+</svg>

@@ -1,0 +1,108 @@
+{
+ "limits": {
+  "baseline_echo_rtt_ms": 0.153,
+  "cloud_heartbeat_max_age_s": 5.0,
+  "l0_edge_memory_limit_mib": 6016.0,
+  "max_failure_rate": 0.01,
+  "rate_tolerance": "receiver rate within 20% of the target, both directions",
+  "rtt_tolerance": "echo RTT within max(5 ms, 20% of added) of baseline + added"
+ },
+ "splits": {
+  "evaluation": {
+   "c0_responses": 2640,
+   "c0_responses_with_cloud_load_alive": 0,
+   "c2_responses": 2400,
+   "c2_responses_alive": 2400,
+   "failed": 0,
+   "l0_min_headroom_mib": 113.5,
+   "l0_oom": 0,
+   "l0_peak_edge_memory_mib": 5902.5,
+   "l0_subblocks": 22,
+   "l1_alive_first_and_last": 22,
+   "l1_snapshots": 3150,
+   "l1_snapshots_alive": 3150,
+   "l1_subblocks": 22,
+   "max_cloud_heartbeat_age_s": 1.02,
+   "measured": 6300,
+   "netem_drops": 0,
+   "probe_failures": 0,
+   "rate_ratio": {
+    "max": 0.993,
+    "median": 0.993,
+    "min": 0.992
+   },
+   "restarts": 0,
+   "rtt_error_ms": {
+    "max": 0.54,
+    "median": 0.3,
+    "min": 0.12
+   },
+   "subblocks": 44,
+   "valid": 44
+  },
+  "training": {
+   "c0_responses": 12960,
+   "c0_responses_with_cloud_load_alive": 0,
+   "c2_responses": 11520,
+   "c2_responses_alive": 11520,
+   "failed": 0,
+   "l0_min_headroom_mib": 115.5,
+   "l0_oom": 0,
+   "l0_peak_edge_memory_mib": 5900.5,
+   "l0_subblocks": 52,
+   "l1_alive_first_and_last": 56,
+   "l1_snapshots": 15600,
+   "l1_snapshots_alive": 15600,
+   "l1_subblocks": 56,
+   "max_cloud_heartbeat_age_s": 1.02,
+   "measured": 30600,
+   "netem_drops": 0,
+   "probe_failures": 0,
+   "rate_ratio": {
+    "max": 0.995,
+    "median": 0.993,
+    "min": 0.94
+   },
+   "restarts": 0,
+   "rtt_error_ms": {
+    "max": 0.7,
+    "median": 0.33,
+    "min": 0.1
+   },
+   "subblocks": 108,
+   "valid": 108
+  },
+  "validation": {
+   "c0_responses": 2640,
+   "c0_responses_with_cloud_load_alive": 0,
+   "c2_responses": 2400,
+   "c2_responses_alive": 2400,
+   "failed": 0,
+   "l0_min_headroom_mib": 117.5,
+   "l0_oom": 0,
+   "l0_peak_edge_memory_mib": 5898.5,
+   "l0_subblocks": 22,
+   "l1_alive_first_and_last": 22,
+   "l1_snapshots": 3150,
+   "l1_snapshots_alive": 3150,
+   "l1_subblocks": 22,
+   "max_cloud_heartbeat_age_s": 1.02,
+   "measured": 6300,
+   "netem_drops": 0,
+   "probe_failures": 0,
+   "rate_ratio": {
+    "max": 0.994,
+    "median": 0.993,
+    "min": 0.991
+   },
+   "restarts": 0,
+   "rtt_error_ms": {
+    "max": 0.69,
+    "median": 0.34,
+    "min": 0.11
+   },
+   "subblocks": 44,
+   "valid": 44
+  }
+ }
+}

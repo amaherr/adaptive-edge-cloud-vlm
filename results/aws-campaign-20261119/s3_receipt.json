@@ -1,0 +1,62 @@
+{
+ "bucket": "terraform output 'bucket' (artifact bucket, us-east-1)",
+ "listed_at_utc": "2026-11-20T09:45:44+00:00",
+ "objects_csv_sha256": "f1681d704eb0320d98f9f1b1c60152b1c17bd59a7e33493454d7c38eadcc7a20",
+ "prefixes": {
+  "cloud-v1/cloud/g2v2/reference-long/": {
+   "bytes": 162985,
+   "md5_mismatch": 0,
+   "md5_verified": 4,
+   "missing_locally": 0,
+   "multipart_size_only": 0,
+   "objects": 4,
+   "size_mismatch": 0
+  },
+  "cloud-v1/cloud/g2v2/reference/": {
+   "bytes": 236962,
+   "md5_mismatch": 0,
+   "md5_verified": 4,
+   "missing_locally": 0,
+   "multipart_size_only": 0,
+   "objects": 4,
+   "size_mismatch": 0
+  },
+  "cloud-v1/edge/ebs-final/g2v2plus/": {
+   "bytes": 240003490,
+   "md5_mismatch": 0,
+   "md5_verified": 6492,
+   "missing_locally": 0,
+   "multipart_size_only": 0,
+   "objects": 6492,
+   "size_mismatch": 0
+  },
+  "cloud-v1/edge/g2v2/reference-long/": {
+   "bytes": 3749147,
+   "md5_mismatch": 0,
+   "md5_verified": 32,
+   "missing_locally": 0,
+   "multipart_size_only": 0,
+   "objects": 32,
+   "size_mismatch": 0
+  },
+  "cloud-v1/edge/g2v2/reference/": {
+   "bytes": 6547484,
+   "md5_mismatch": 0,
+   "md5_verified": 32,
+   "missing_locally": 0,
+   "multipart_size_only": 0,
+   "objects": 32,
+   "size_mismatch": 0
+  },
+  "cloud-v1/edge/g2v2plus/": {
+   "bytes": 227150242,
+   "md5_mismatch": 0,
+   "md5_verified": 5878,
+   "missing_locally": 0,
+   "multipart_size_only": 0,
+   "objects": 5878,
+   "size_mismatch": 0
+  }
+ },
+ "schema_version": 1
+}

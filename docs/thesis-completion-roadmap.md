@@ -6,7 +6,7 @@ The thesis claim we are working towards:
 
 > Under changing network, edge-load and cloud-load conditions, the system observes the current state, predicts the latency of each feasible configuration of one VLM, and selects a configuration per request. It comes close to the measured oracle and beats the fixed-placement baselines where adapting pays off, with no loss in answer quality.
 
-What the G2 v2+ data already shows (medians only; formal analysis pending):
+What the G2 v2+ data shows (training cells; [baseline report](../results/aws-campaign-20261119/baseline/README.md)):
 - Cloud wins most cells. The edge wins only under heavy cloud load on slower or higher-latency links. Split inference wins none.
 - The two loads add independent, roughly fixed costs, so a simple predictor is plausible.
 - The gain from adapting is concentrated in specific conditions rather than spread on average.
@@ -96,6 +96,15 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 **Gate:** row-level correctness is clean, the training oracle table is derived, and parity holds. If parity fails, the selector must treat quality as configuration-dependent (section 9).
 
 ## Phase 2: G2 v2+ baseline report
+
+**Status (20 November 2026): done.** See the [baseline report](../results/aws-campaign-20261119/baseline/README.md).
+- **2.1:** the record stays in `results/aws-campaign-20261119/`, now with an S3 receipt (12,442 objects verified by MD5).
+- **2.2:** crossover map, load effects with CIs, the long task, split anatomy, int8 gain, the `prompt_first` null result and static policies.
+  - The loads are independent: cloud load adds +606 ms to the cloud, edge load multiplies the edge by ×1.415, and the interaction is at most 18 ms.
+  - The split is dominated by the cloud in every load state.
+  - Always-cloud regret is 2.5%.
+- **2.3:** the hardware ratio and what carries over from physical G2. Whether splitting pays depends on the edge-vision to cloud-vision speed ratio.
+- **2.4:** G2 v2+ passed, with the section 8 gate evidence for all 196 sub-blocks.
 
 2.1 **Results record** `results/aws-g2v2plus-<date>/` with `SHA256SUMS` and S3 receipts (roadmap phase G).
 

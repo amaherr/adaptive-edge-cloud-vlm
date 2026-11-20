@@ -1,6 +1,6 @@
 # G2 v2+ campaign on AWS (18–19 November 2026)
 
-The full A2b campaign, run under the frozen G2 v2 protocol (`protocol_sha256` `a972ecdc…e1d5`). This folder records the run and checks its integrity. The [derived checks](derived/README.md) add row-level correctness, official VQA accuracy and the training-cell section 9 oracle. G3 and G4 are still to come.
+The full A2b campaign, run under the frozen G2 v2 protocol (`protocol_sha256` `a972ecdc…e1d5`). This folder records the run and checks its integrity. The [derived checks](derived/README.md) add row-level correctness, official VQA accuracy and the training-cell section 9 oracle. The **[baseline report](baseline/README.md)** (phase 2) states the G2 v2+ pass decision with the gate evidence and analyses the training cells. G3 and G4 are still to come.
 
 - **Hosts:** edge `g6f.2xlarge` (L4-6Q vGPU), cloud `g6.xlarge` (L4), us-east-1d.
 - **Image:** `sha256:4049c069dc79…` (commit `d5e116c`), the same digest on both hosts in every session.
@@ -36,6 +36,7 @@ Each restart repeated the preflight against the campaign contract and reran the 
 
 - **[runs.csv](runs.csv):** the SHA-256 of every `requests.jsonl` journal, 196 sub-blocks × 5 configurations = 980 rows. Every hash matches both the sub-block's validation report and the S3 checkpoint copy.
 - **[subblock_medians.csv](subblock_medians.csv):** **training cells only** (54 cells, 108 sub-blocks). For each sub-block and configuration: the cell, condition, levels, task, repetition, measured and `ok` counts, and the median latency taken from the validation report.
+- **[s3_receipt.json](s3_receipt.json):** the campaign and reference prefixes in the artifact bucket, listed on 20 November 2026. All 12,442 objects match the local mirror by size and MD5.
 - **[SHA256SUMS](SHA256SUMS):** every file in the campaign folder (5,921 files, excluding `supervisor.pid`), with paths relative to the campaign folder.
 - **[descriptive_winners.json](descriptive_winners.json):** **training cells only.** For each cell, the configuration with the lowest mean of its two repetition medians, with the edge, cloud and fastest-distributed means in ms.
 

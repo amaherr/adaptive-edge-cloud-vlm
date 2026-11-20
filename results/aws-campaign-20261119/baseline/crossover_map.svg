@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 828 606" width="828" height="606" role="img" aria-labelledby="title desc">
+<title id="title">Measured winner per training cell</title>
+<desc id="desc">Tile grid of the twelve training conditions (rows, by added RTT then rate) against the four load states (columns). Each tile names the configuration with the lowest median latency and its margin over the runner-up; outlined tiles are ties.</desc>
+
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; } .ink2 { fill: #52514e; } .muted { fill: #898781; }
+  .on-fill { fill: #ffffff; }
+  .grid { stroke: #e1e0d9; stroke-width: 1; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .ring { stroke: #fcfcfb; }
+  .f-cloud { fill: #2a78d6; } .k-cloud { stroke: #2a78d6; }
+  .f-edge { fill: #eb6834; } .k-edge { stroke: #eb6834; }
+  .f-synchronous { fill: #1baf7a; } .k-synchronous { stroke: #1baf7a; }
+  .f-int8 { fill: #eda100; } .k-int8 { stroke: #eda100; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #f0efec; } .ink2 { fill: #c3c2b7; }
+    .grid { stroke: #2c2c2a; } .axis { stroke: #383835; }
+    .ring { stroke: #1a1a19; }
+    .f-cloud { fill: #3987e5; } .k-cloud { stroke: #3987e5; }
+    .f-edge { fill: #d95926; } .k-edge { stroke: #d95926; }
+    .f-synchronous { fill: #199e70; } .k-synchronous { stroke: #199e70; }
+    .f-int8 { fill: #c98500; } .k-int8 { stroke: #c98500; }
+  }
+</style>
+
+<rect class="surface" width="828" height="606"/>
+<text x="24.0" y="32.0" class="ink" font-size="16" font-weight="600">Measured winner per training cell (short task)</text>
+<text x="24.0" y="52.0" class="ink2" font-size="12">Fastest configuration by median latency, and its margin over the runner-up. No split configuration wins a cell.</text>
+<text x="265.0" y="86.0" class="ink" font-size="13" font-weight="600" text-anchor="middle">L0 / C0</text>
+<text x="265.0" y="102.0" class="muted" font-size="11" text-anchor="middle">no load</text>
+<text x="417.0" y="86.0" class="ink" font-size="13" font-weight="600" text-anchor="middle">L0 / C2</text>
+<text x="417.0" y="102.0" class="muted" font-size="11" text-anchor="middle">heavy cloud load</text>
+<text x="569.0" y="86.0" class="ink" font-size="13" font-weight="600" text-anchor="middle">L1 / C0</text>
+<text x="569.0" y="102.0" class="muted" font-size="11" text-anchor="middle">edge load</text>
+<text x="721.0" y="86.0" class="ink" font-size="13" font-weight="600" text-anchor="middle">L1 / C2</text>
+<text x="721.0" y="102.0" class="muted" font-size="11" text-anchor="middle">both loads</text>
+<text x="24.0" y="102.0" class="muted" font-size="11">Condition, rate, added RTT</text>
+<text x="24.0" y="132.0" class="ink" font-size="12" font-weight="600">T07</text>
+<text x="64.0" y="132.0" class="ink2" font-size="12">100 Mb/s · 5 ms</text>
+<g><title>T07-L0: cloud fastest by 494 ms over int8</title><rect x="190" y="112" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="132.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 494 ms</text></g>
+<g><title>T07-L0-C2: cloud fastest by 88 ms over edge</title><rect x="342" y="112" width="150" height="30" rx="4" class="f-cloud"/><text x="417.0" y="132.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 88 ms</text></g>
+<g><title>T07-L1: cloud fastest by 651 ms over int8</title><rect x="494" y="112" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="132.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 651 ms</text></g>
+<g><title>T07-L1-C2: cloud fastest by 349 ms over int8</title><rect x="646" y="112" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="132.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 349 ms</text></g>
+<text x="24.0" y="164.0" class="ink" font-size="12" font-weight="600">T08</text>
+<text x="64.0" y="164.0" class="ink2" font-size="12">200 Mb/s · 5 ms</text>
+<g><title>T08-L0: cloud fastest by 428 ms over int8</title><rect x="190" y="144" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="164.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 428 ms</text></g>
+<g><title>T08-L0-C2: cloud fastest by 94 ms over edge</title><rect x="342" y="144" width="150" height="30" rx="4" class="f-cloud"/><text x="417.0" y="164.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 94 ms</text></g>
+<g><title>T08-L1: cloud fastest by 603 ms over int8</title><rect x="494" y="144" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="164.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 603 ms</text></g>
+<g><title>T08-L1-C2: cloud fastest by 297 ms over int8</title><rect x="646" y="144" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="164.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 297 ms</text></g>
+<text x="24.0" y="204.0" class="ink" font-size="12" font-weight="600">T01</text>
+<text x="64.0" y="204.0" class="ink2" font-size="12">5 Mb/s · 20 ms</text>
+<g><title>T01-L0: cloud fastest by 447 ms over edge</title><rect x="190" y="184" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="204.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 447 ms</text></g>
+<g><title>T01-L0-C2: edge fastest by 164 ms over cloud</title><rect x="342" y="184" width="150" height="30" rx="4" class="f-edge"/><text x="417.0" y="204.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">edge · 164 ms</text></g>
+<g><title>T01-L1: cloud fastest by 866 ms over edge</title><rect x="494" y="184" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="204.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 866 ms</text></g>
+<g><title>T01-L1-C2: cloud fastest by 247 ms over edge</title><rect x="646" y="184" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="204.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 247 ms</text></g>
+<text x="24.0" y="236.0" class="ink" font-size="12" font-weight="600">T02</text>
+<text x="64.0" y="236.0" class="ink2" font-size="12">15 Mb/s · 20 ms</text>
+<g><title>T02-L0: cloud fastest by 603 ms over edge</title><rect x="190" y="216" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="236.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 603 ms</text></g>
+<g><title>T02-L0-C2: edge fastest by 10 ms over cloud (CIs overlap: tie)</title><rect x="343" y="217" width="148" height="28" rx="4" class="surface k-edge" stroke-width="2"/><text x="417.0" y="236.0" class="ink" font-size="12" text-anchor="middle">tie · edge by 10 ms</text></g>
+<g><title>T02-L1: cloud fastest by 1016 ms over edge</title><rect x="494" y="216" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="236.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 1016 ms</text></g>
+<g><title>T02-L1-C2: cloud fastest by 398 ms over edge</title><rect x="646" y="216" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="236.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 398 ms</text></g>
+<text x="24.0" y="268.0" class="ink" font-size="12" font-weight="600">T03</text>
+<text x="64.0" y="268.0" class="ink2" font-size="12">25 Mb/s · 20 ms</text>
+<g><title>T03-L0: cloud fastest by 638 ms over edge</title><rect x="190" y="248" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="268.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 638 ms</text></g>
+<g><title>T03-L0-C2: cloud fastest by 20 ms over edge</title><rect x="342" y="248" width="150" height="30" rx="4" class="f-cloud"/><text x="417.0" y="268.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 20 ms</text></g>
+<g><title>T03-L1: cloud fastest by 979 ms over int8</title><rect x="494" y="248" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="268.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 979 ms</text></g>
+<g><title>T03-L1-C2: cloud fastest by 430 ms over edge</title><rect x="646" y="248" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="268.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 430 ms</text></g>
+<text x="24.0" y="300.0" class="ink" font-size="12" font-weight="600">T04</text>
+<text x="64.0" y="300.0" class="ink2" font-size="12">45 Mb/s · 20 ms</text>
+<g><title>T04-L0: cloud fastest by 619 ms over int8</title><rect x="190" y="280" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="300.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 619 ms</text></g>
+<g><title>T04-L0-C2: cloud fastest by 38 ms over edge</title><rect x="342" y="280" width="150" height="30" rx="4" class="f-cloud"/><text x="417.0" y="300.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 38 ms</text></g>
+<g><title>T04-L1: cloud fastest by 789 ms over int8</title><rect x="494" y="280" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="300.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 789 ms</text></g>
+<g><title>T04-L1-C2: cloud fastest by 447 ms over edge</title><rect x="646" y="280" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="300.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 447 ms</text></g>
+<text x="24.0" y="332.0" class="ink" font-size="12" font-weight="600">T05</text>
+<text x="64.0" y="332.0" class="ink2" font-size="12">80 Mb/s · 20 ms</text>
+<g><title>T05-L0: cloud fastest by 518 ms over int8</title><rect x="190" y="312" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="332.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 518 ms</text></g>
+<g><title>T05-L0-C2: cloud fastest by 40 ms over edge</title><rect x="342" y="312" width="150" height="30" rx="4" class="f-cloud"/><text x="417.0" y="332.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 40 ms</text></g>
+<g><title>T05-L1: cloud fastest by 688 ms over int8</title><rect x="494" y="312" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="332.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 688 ms</text></g>
+<g><title>T05-L1-C2: cloud fastest by 388 ms over int8</title><rect x="646" y="312" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="332.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 388 ms</text></g>
+<text x="24.0" y="364.0" class="ink" font-size="12" font-weight="600">T06</text>
+<text x="64.0" y="364.0" class="ink2" font-size="12">150 Mb/s · 20 ms</text>
+<g><title>T06-L0: cloud fastest by 469 ms over int8</title><rect x="190" y="344" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="364.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 469 ms</text></g>
+<g><title>T06-L0-C2: cloud fastest by 45 ms over edge</title><rect x="342" y="344" width="150" height="30" rx="4" class="f-cloud"/><text x="417.0" y="364.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 45 ms</text></g>
+<g><title>T06-L1: cloud fastest by 629 ms over int8</title><rect x="494" y="344" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="364.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 629 ms</text></g>
+<g><title>T06-L1-C2: cloud fastest by 332 ms over int8</title><rect x="646" y="344" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="364.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 332 ms</text></g>
+<text x="24.0" y="404.0" class="ink" font-size="12" font-weight="600">T10</text>
+<text x="64.0" y="404.0" class="ink2" font-size="12">45 Mb/s · 100 ms</text>
+<g><title>T10-L0: cloud fastest by 429 ms over edge</title><rect x="190" y="384" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="404.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 429 ms</text></g>
+<g><title>T10-L0-C2: edge fastest by 219 ms over cloud</title><rect x="342" y="384" width="150" height="30" rx="4" class="f-edge"/><text x="417.0" y="404.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">edge · 219 ms</text></g>
+<g><title>T10-L1: cloud fastest by 817 ms over edge</title><rect x="494" y="384" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="404.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 817 ms</text></g>
+<g><title>T10-L1-C2: cloud fastest by 186 ms over edge</title><rect x="646" y="384" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="404.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 186 ms</text></g>
+<text x="24.0" y="436.0" class="ink" font-size="12" font-weight="600">T09</text>
+<text x="64.0" y="436.0" class="ink2" font-size="12">100 Mb/s · 100 ms</text>
+<g><title>T09-L0: cloud fastest by 409 ms over edge</title><rect x="190" y="416" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="436.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 409 ms</text></g>
+<g><title>T09-L0-C2: edge fastest by 205 ms over cloud</title><rect x="342" y="416" width="150" height="30" rx="4" class="f-edge"/><text x="417.0" y="436.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">edge · 205 ms</text></g>
+<g><title>T09-L1: cloud fastest by 821 ms over edge</title><rect x="494" y="416" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="436.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 821 ms</text></g>
+<g><title>T09-L1-C2: cloud fastest by 209 ms over edge</title><rect x="646" y="416" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="436.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 209 ms</text></g>
+<text x="24.0" y="476.0" class="ink" font-size="12" font-weight="600">T12</text>
+<text x="64.0" y="476.0" class="ink2" font-size="12">25 Mb/s · 150 ms</text>
+<g><title>T12-L0: cloud fastest by 252 ms over edge</title><rect x="190" y="456" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="476.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 252 ms</text></g>
+<g><title>T12-L0-C2: edge fastest by 380 ms over cloud</title><rect x="342" y="456" width="150" height="30" rx="4" class="f-edge"/><text x="417.0" y="476.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">edge · 380 ms</text></g>
+<g><title>T12-L1: cloud fastest by 672 ms over edge</title><rect x="494" y="456" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="476.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 672 ms</text></g>
+<g><title>T12-L1-C2: cloud fastest by 18 ms over edge (CIs overlap: tie)</title><rect x="647" y="457" width="148" height="28" rx="4" class="surface k-cloud" stroke-width="2"/><text x="721.0" y="476.0" class="ink" font-size="12" text-anchor="middle">tie · cloud by 18 ms</text></g>
+<text x="24.0" y="508.0" class="ink" font-size="12" font-weight="600">T11</text>
+<text x="64.0" y="508.0" class="ink2" font-size="12">150 Mb/s · 150 ms</text>
+<g><title>T11-L0: cloud fastest by 257 ms over edge</title><rect x="190" y="488" width="150" height="30" rx="4" class="f-cloud"/><text x="265.0" y="508.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 257 ms</text></g>
+<g><title>T11-L0-C2: edge fastest by 362 ms over cloud</title><rect x="342" y="488" width="150" height="30" rx="4" class="f-edge"/><text x="417.0" y="508.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">edge · 362 ms</text></g>
+<g><title>T11-L1: cloud fastest by 686 ms over edge</title><rect x="494" y="488" width="150" height="30" rx="4" class="f-cloud"/><text x="569.0" y="508.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 686 ms</text></g>
+<g><title>T11-L1-C2: cloud fastest by 83 ms over edge</title><rect x="646" y="488" width="150" height="30" rx="4" class="f-cloud"/><text x="721.0" y="508.0" class="on-fill" font-size="12" font-weight="600" text-anchor="middle">cloud · 83 ms</text></g>
+<rect x="24" y="542" width="22" height="14" rx="3" class="f-cloud"/>
+<text x="54.0" y="554.0" class="ink2" font-size="12">cloud/raw_image fastest</text>
+<rect x="245" y="542" width="22" height="14" rx="3" class="f-edge"/>
+<text x="275.0" y="554.0" class="ink2" font-size="12">edge/full fastest</text>
+<rect x="424" y="542" width="22" height="14" rx="3" class="surface k-edge" stroke-width="2"/>
+<text x="454.0" y="554.0" class="ink2" font-size="12">tie: top two 95% CIs overlap</text>
+<text x="24.0" y="578.0" class="muted" font-size="11">Margin = runner-up median minus winner median. Bootstrap CIs: seed 1707, 2,000 resamples.</text>
+</svg>

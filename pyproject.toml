@@ -60,3 +60,15 @@ python_version = "3.11"
 strict = true
 packages = ["adaptive_vlm"]
 
+# The model-only imports (tokenizers, Pillow) are absent from the CPU development
+# environment and present in model environments. The source files carry
+# `type: ignore` comments for the first case and are frozen by the reference
+# source hash, so the config absorbs the difference instead.
+[[tool.mypy.overrides]]
+module = ["tokenizers", "tokenizers.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["adaptive_vlm.models.moondream.artifact", "adaptive_vlm.commands.adaptive"]
+warn_unused_ignores = false
+
