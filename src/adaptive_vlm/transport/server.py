@@ -9,7 +9,7 @@ import threading
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
 from adaptive_vlm.contracts import InferenceRequest, InferenceResult, MetricValue
 from adaptive_vlm.timing import monotonic, perf_counter_ns
@@ -145,14 +145,18 @@ class CloudRequestProcessor:
     def handle(self, received: ReceivedFrame) -> Frame:
         frame = received.frame
         if frame.message_type is MessageType.HEALTH_REQUEST:
+            metadata: dict[str, Any] = {
+                "ready": True,
+                "model_fingerprint": self.model_fingerprint,
+            }
+            if self._state_provider is not None:
+                # The cached background sample (G5 cloud-load sensing).
+                metadata["server_state"] = dict(self._state_provider())
             return Frame(
                 version=self.protocol_version,
                 message_type=MessageType.HEALTH_RESPONSE,
                 request_id=frame.request_id,
-                metadata={
-                    "ready": True,
-                    "model_fingerprint": self.model_fingerprint,
-                },
+                metadata=metadata,
             )
         if frame.message_type is MessageType.CAPABILITY_REQUEST:
             return Frame(

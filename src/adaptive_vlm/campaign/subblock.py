@@ -106,6 +106,19 @@ def benchmark_arguments(
         arguments += ["--placements", *grid.placements]
     if grid.cloud_load_levels:
         arguments += ["--cloud-load-level", block.cloud_load]
+    if grid.adaptive:
+        # G5 (amendment A4): the adaptive placement and its frozen inputs. Its
+        # network input is this segment's periodic probe, taken before the run.
+        arguments += [
+            "--adaptive-calibration",
+            str(grid.resolve_adaptive("calibration_path")),
+            "--adaptive-sensing",
+            str(grid.resolve_adaptive("sensing_path")),
+            "--adaptive-features",
+            str(grid.resolve_adaptive("features_path")),
+            "--adaptive-network-probe",
+            str(run_dir.parent / "network_pre.json"),
+        ]
     return [*arguments, "--resume"] if resume else arguments
 
 
@@ -117,7 +130,11 @@ def cloud_load_reasons(
     remote = [
         row.get("metrics") or {}
         for row in rows
-        if row.get("status") == "ok" and row.get("mode") != "edge"
+        if row.get("status") == "ok"
+        and row.get("mode") != "edge"
+        # An adaptive request that ran on the edge carries no server state.
+        and (row.get("metrics") or {}).get("adaptive_selected_configuration_id")
+        != "edge/full"
     ]
     if block.cloud_load == NO_CLOUD_LOAD:
         alive = sum(m.get("server_state_load_alive") is True for m in remote)
@@ -304,8 +321,11 @@ def run_subblock(
             if dropped is None or start is None or dropped - start != 0:
                 reasons.append(f"{host} netem dropped packets ({start} -> {dropped})")
 
+    run_placements = (
+        (*grid.placements, "adaptive") if grid.adaptive else grid.placements
+    )
     placements = {}
-    for placement in grid.placements:
+    for placement in run_placements:
         directory = run_dir / placement
         planned = json.loads((directory / "plan.json").read_text())["schedule"]
         rows = _rows(directory / "requests.jsonl")
@@ -334,7 +354,7 @@ def run_subblock(
         for row in sorted(
             (
                 row
-                for placement in grid.placements
+                for placement in run_placements
                 for row in _rows(run_dir / placement / "requests.jsonl")
                 if not row["warmup"]
             ),
@@ -359,7 +379,7 @@ def run_subblock(
             )
         oom = sum(
             row.get("status") == "oom"
-            for placement in grid.placements
+            for placement in run_placements
             for row in _rows(run_dir / placement / "requests.jsonl")
         )
         if oom:
@@ -372,7 +392,7 @@ def run_subblock(
         reasons += cloud_load_reasons(
             [
                 row
-                for placement in grid.placements
+                for placement in run_placements
                 for row in _rows(run_dir / placement / "requests.jsonl")
                 if not row["warmup"]
             ],

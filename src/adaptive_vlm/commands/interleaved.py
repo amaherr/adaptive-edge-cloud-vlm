@@ -213,6 +213,13 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
     if generator is not None:
         sources.append(generator.snapshot)
     state_probe = combine(*sources, prefix="edge_") if sources else None
+    adaptive = _adaptive_runner(args, policies, prepare)
+    if adaptive is not None:
+        run_manifests["adaptive"] = create_run_manifest(
+            config,
+            {**environment, "execution_placement": {"placement": "adaptive"}},
+            dataset_manifest_sha256=manifest.sha256,
+        )
     try:
         if generator is not None:
             with progress.phase(
@@ -242,6 +249,7 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
             ),
             resume=args.resume,
             max_consecutive_failures=args.max_consecutive_failures,
+            adaptive=adaptive,
         )
     except DeviceContextFailure as exc:
         print(f"error: {exc}", flush=True)
@@ -257,6 +265,73 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
             windows.stop()
     print(json.dumps(summary["placements"], indent=2, sort_keys=True))
     return 0
+
+
+def _adaptive_runner(
+    args: argparse.Namespace,
+    policies: dict[str, ExecutionPolicy],
+    prepare: Any,
+) -> Any:
+    """The G5 adaptive placement (amendment A4), or None without the flags."""
+
+    if args.adaptive_calibration is None:
+        return None
+    import hashlib
+
+    from adaptive_vlm.prediction.r2.live import AdaptiveRecord, AdaptiveRunner
+    from adaptive_vlm.scheduler.sensing import (
+        SensingConfig,
+        Sensor,
+        network_from_probe,
+        torch_edge_probe,
+    )
+
+    for flag in ("adaptive_sensing", "adaptive_features", "adaptive_network_probe"):
+        if getattr(args, flag) is None:
+            raise ConfigError(f"--{flag.replace('_', '-')} is required with G5")
+    by_id = {SPEC_BY_PLACEMENT[p].id.value: policy for p, policy in policies.items()}
+    remote = next(
+        (
+            policy
+            for policy in policies.values()
+            if isinstance(policy, CloudExecutionPolicy)
+        ),
+        None,
+    )
+    if remote is None:
+        raise ConfigError("the adaptive placement needs the cloud placement")
+    calibration_bytes = args.adaptive_calibration.read_bytes()
+    sensing, sensing_sha = SensingConfig.load(args.adaptive_sensing)
+    if args.adaptive_edge_probe == "torch":
+        edge_probe = torch_edge_probe(
+            args.edge_device, sensing.edge_probe_matrix, sensing.edge_probe_repetitions
+        )
+    else:  # loopback rehearsal with the fake model: a fixed reading
+        value = float(args.adaptive_edge_probe.removeprefix("fixed:"))
+        edge_probe = lambda: value  # noqa: E731
+    features = json.loads(args.adaptive_features.read_text(encoding="utf-8"))
+    sensor = Sensor(
+        sensing,
+        edge_probe=edge_probe,
+        cloud_state=lambda: remote.health().server_state,
+        network=network_from_probe(args.adaptive_network_probe),
+    )
+    record = AdaptiveRecord(
+        calibration_sha256=hashlib.sha256(calibration_bytes).hexdigest(),
+        sensing_sha256=sensing_sha,
+        network_probe_sha256=hashlib.sha256(
+            args.adaptive_network_probe.read_bytes()
+        ).hexdigest(),
+        task=features["task"],
+    )
+    return AdaptiveRunner(
+        calibration=json.loads(calibration_bytes),
+        record=record,
+        sensor=sensor,
+        policies=by_id,
+        features=features["tasks"],
+        prepare_stage=prepare if callable(prepare) else None,
+    )
 
 
 def add_interleaved_parser(
@@ -315,6 +390,24 @@ def add_interleaved_parser(
             "Cloud-load level the campaign runs this sub-block under (C0, C1); "
             "recorded in the plan only, the supervisor drives the cloud worker"
         ),
+    )
+    adaptive = parser.add_argument_group("G5 adaptive placement (amendment A4)")
+    adaptive.add_argument(
+        "--adaptive-calibration", type=Path, help="Frozen r2_component calibration"
+    )
+    adaptive.add_argument("--adaptive-sensing", type=Path, help="G5 sensing JSON")
+    adaptive.add_argument(
+        "--adaptive-features", type=Path, help="Pre-execution task features JSON"
+    )
+    adaptive.add_argument(
+        "--adaptive-network-probe",
+        type=Path,
+        help="Latest periodic network probe (the sub-block's network_pre.json)",
+    )
+    adaptive.add_argument(
+        "--adaptive-edge-probe",
+        default="torch",
+        help="'torch' (edge GPU timing probe) or 'fixed:<ms>' for loopback",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
     return parser

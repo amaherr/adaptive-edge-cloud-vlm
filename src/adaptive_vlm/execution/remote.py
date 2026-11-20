@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -24,6 +25,8 @@ class RemoteInferenceError(RuntimeError):
 class HealthStatus:
     ready: bool
     model_fingerprint: str
+    # The server's cached resource sample, when it reports one (G5 sensing).
+    server_state: Mapping[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -82,9 +85,11 @@ def check_remote_health(
     fingerprint = cast(str, response.metadata["model_fingerprint"])
     if fingerprint != model.fingerprint:
         raise ProtocolError("server health reported a different model fingerprint")
+    state = response.metadata.get("server_state")
     return HealthStatus(
         ready=cast(bool, response.metadata["ready"]),
         model_fingerprint=fingerprint,
+        server_state=dict(state) if isinstance(state, dict) else None,
     )
 
 

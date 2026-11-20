@@ -24,7 +24,7 @@ import subprocess
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from adaptive_vlm.artifacts import append_jsonl, write_json_atomic
 from adaptive_vlm.benchmark.runner import (
@@ -50,12 +50,20 @@ from adaptive_vlm.scheduler.configuration import ALL_CONFIGURATIONS, SPEC_BY_PLA
 from adaptive_vlm.timing import perf_counter_ns
 from adaptive_vlm.transport.protocol import ProtocolError
 
+if TYPE_CHECKING:
+    from adaptive_vlm.prediction.r2.live import AdaptiveRunner
+
 # G2 v2's three placements (the default); G2 v2+ adds the prompt-first and
 # int8 variants of the distributed split. A placement names a run directory.
 PLACEMENTS = ("edge", "cloud", "distributed")
 ALL_PLACEMENTS = tuple(spec.placement for spec in ALL_CONFIGURATIONS)
+# G5 (amendment A4): the live adaptive policy runs as one more interleaved
+# placement; it chooses one of the fixed configurations per request.
+ADAPTIVE_PLACEMENT = "adaptive"
+INTERLEAVED_PLACEMENTS = (*ALL_PLACEMENTS, ADAPTIVE_PLACEMENT)
 PREPARED_STAGE: Mapping[str, str | None] = {
-    spec.placement: spec.prepared_stage for spec in ALL_CONFIGURATIONS
+    **{spec.placement: spec.prepared_stage for spec in ALL_CONFIGURATIONS},
+    ADAPTIVE_PLACEMENT: None,
 }
 DEVICE_RESTART_EXIT_CODE = 75
 ENVIRONMENT_RESTART_EXIT_CODE = 76
@@ -110,7 +118,7 @@ def make_interleaved_order(
         raise ValueError("repetition indices must be non-negative")
     if not placements or len(set(placements)) != len(placements):
         raise ValueError("placements must be non-empty and unique")
-    unknown = set(placements) - set(ALL_PLACEMENTS)
+    unknown = set(placements) - set(INTERLEAVED_PLACEMENTS)
     if unknown:
         raise ValueError(f"unknown placements: {sorted(unknown)}")
     rng = random.Random(seed)
@@ -233,9 +241,11 @@ def _run_interleaved_benchmark(
     conditions: Mapping[str, Any] | None = None,
     resume: bool = False,
     max_consecutive_failures: int = 0,
+    adaptive: AdaptiveRunner | None = None,
 ) -> dict[str, Any]:
     """Run every placement for each request in a seeded interleaved order.
 
+    ``adaptive`` adds the G5 adaptive placement, run like the fixed ones.
     ``conditions`` (for example the edge-load level) is recorded in every
     placement plan, so a resume under different conditions is refused.
     ``precondition`` runs before each attempt; if it raises, nothing is
@@ -248,10 +258,11 @@ def _run_interleaved_benchmark(
         raise ValueError("request manifest revision differs from experiment config")
     if max_consecutive_failures < 0:
         raise ValueError("max_consecutive_failures must be non-negative")
-    placements = [p for p in ALL_PLACEMENTS if p in policies]
-    if set(policies) != set(placements) or set(run_manifests) != set(placements):
+    fixed = [p for p in ALL_PLACEMENTS if p in policies]
+    placements = fixed + ([ADAPTIVE_PLACEMENT] if adaptive is not None else [])
+    if set(policies) != set(fixed) or set(run_manifests) != set(placements):
         raise ValueError("policies and run manifests must name the same placements")
-    specs = {p: SPEC_BY_PLACEMENT[p] for p in placements}
+    specs = {p: SPEC_BY_PLACEMENT[p] for p in fixed}
     for placement, policy in policies.items():
         spec = specs[placement]
         if policy.mode is not spec.mode:
@@ -285,21 +296,28 @@ def _run_interleaved_benchmark(
     schedule = [trial.to_dict() for p, trial in order if p == placements[0]]
     plans: dict[str, dict[str, Any]] = {}
     for placement in placements:
+        placement_spec = specs.get(placement)
         plan: dict[str, Any] = {
             "schema_version": 1,
             "config": config.to_dict(),
             "config_sha256": semantic_config_sha256(config.to_dict()),
             "model_contract_sha256": model_contract_fingerprint(config.model),
             "dataset_manifest_sha256": manifest.sha256,
-            "mode": specs[placement].mode.value,
-            "pipeline": specs[placement].pipeline or "synchronous",
-            "payload": specs[placement].payload,
+            "mode": placement_spec.mode.value if placement_spec else ADAPTIVE_PLACEMENT,
+            "pipeline": (placement_spec.pipeline or "synchronous")
+            if placement_spec
+            else None,
+            "payload": placement_spec.payload if placement_spec else None,
             "placement": placement,
-            "configuration_id": specs[placement].id.value,
+            "configuration_id": placement_spec.id.value
+            if placement_spec
+            else ADAPTIVE_PLACEMENT,
             "schedule": schedule,
             "interleave": parameters,
             "conditions": dict(conditions or {}),
         }
+        if placement_spec is None and adaptive is not None:
+            plan["adaptive"] = adaptive.record.to_dict()
         plan["plan_sha256"] = _digest(plan)
         plans[placement] = plan
     index = {
@@ -424,7 +442,12 @@ def _run_interleaved_benchmark(
             if state_probe is not None:
                 row["resource_state"] = dict(state_probe())
             started = perf_counter_ns()
-            result = policies[placement].infer(item.to_request())
+            infer = (
+                adaptive.infer
+                if placement == ADAPTIVE_PLACEMENT and adaptive is not None
+                else policies[placement].infer
+            )
+            result = infer(item.to_request())
             if result.request_id != item.request_id:
                 raise ValueError("policy returned a different request_id")
             row.update(
@@ -467,10 +490,11 @@ def _run_interleaved_benchmark(
 
     summaries: dict[str, Any] = {}
     for placement in placements:
+        mode = plans[placement]["mode"]
         summary = summarize(
             rows[placement],
             manifest,
-            ExecutionMode(plans[placement]["mode"]),
+            mode if mode == ADAPTIVE_PLACEMENT else ExecutionMode(mode),
             plans[placement]["plan_sha256"],
         )
         write_json_atomic(run_dir / placement / "summary.json", summary)

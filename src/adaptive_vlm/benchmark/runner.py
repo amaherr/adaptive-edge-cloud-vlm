@@ -310,7 +310,7 @@ def run_benchmark(
 def summarize(
     rows: Sequence[Mapping[str, Any]],
     manifest: FrozenManifest,
-    mode: ExecutionMode,
+    mode: ExecutionMode | str,
     plan_hash: str,
 ) -> dict[str, Any]:
     """Summarize measured attempts only, retaining failures in the denominator."""
@@ -335,7 +335,7 @@ def summarize(
     status_counts = dict(Counter(str(row["status"]) for row in measured))
     return {
         "schema_version": 1,
-        "mode": mode.value,
+        "mode": mode.value if isinstance(mode, ExecutionMode) else mode,
         "source": manifest.source,
         "revision": manifest.revision,
         "dataset_manifest_sha256": manifest.sha256,

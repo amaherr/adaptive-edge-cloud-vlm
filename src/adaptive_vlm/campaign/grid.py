@@ -7,6 +7,11 @@ runs once per repetition as its own sub-block. These cells use the primary
 experiment config, split and cells as ``[condition, load level]`` pairs.
 Sub-blocks are shuffled with a fixed seed, re-drawn until no two sub-blocks of
 the same cell are adjacent.
+
+A G5 grid (amendment A4) lists ``traces`` instead: ordered segments, each a
+(condition, edge load, cloud load) state that runs as one sub-block, so the
+state changes from segment to segment while the adaptive placement runs. The
+trace order is shuffled per repetition; segments keep their order.
 """
 
 from __future__ import annotations
@@ -64,6 +69,7 @@ class SubBlock:
     repetition: int
     task: str = PRIMARY_TASK
     cloud_load: str = NO_CLOUD_LOAD
+    segment: str | None = None  # G5 trace segment, e.g. "net-s2"
 
     @property
     def cell_id(self) -> str:
@@ -75,7 +81,8 @@ class SubBlock:
 
     @property
     def subblock_id(self) -> str:
-        return f"{self.cell_id}-r{self.repetition}"
+        base = f"{self.cell_id}-r{self.repetition}"
+        return base if self.segment is None else f"{self.segment}-{base}"
 
 
 @dataclass(frozen=True)
@@ -93,6 +100,9 @@ class Grid:
     # their cells as (condition ID, edge load level, task, cloud level).
     cloud_load_levels: tuple[str, ...] = ()
     cloud_load_cells: tuple[tuple[str, str, str, str], ...] = ()
+    # G5 traces: (trace ID, ((condition, edge load, cloud load), ...)).
+    traces: tuple[tuple[str, tuple[tuple[str, str, str], ...]], ...] = ()
+    adaptive: Mapping[str, Any] | None = None
 
     @property
     def configurations(self) -> tuple[str, ...]:
@@ -105,6 +115,13 @@ class Grid:
     @property
     def warmups(self) -> int:
         return int(self.payload["warmups_per_subblock"])
+
+    def resolve_adaptive(self, name: str) -> Path:
+        """A path from the grid's ``adaptive`` section, relative to the grid."""
+
+        if not self.adaptive:
+            raise ValueError("this grid has no adaptive placement")
+        return (self.path.parent / str(self.adaptive[name])).resolve()
 
     def resolve(self, name: str) -> Path:
         """A path stored in the grid, relative to the grid file."""
@@ -149,6 +166,20 @@ class Grid:
         return {level for _, level, _ in self.cells()} - {NO_LOAD}
 
     def subblocks(self) -> list[SubBlock]:
+        if self.traces:
+            return [
+                SubBlock(
+                    self.conditions[condition],
+                    edge,
+                    repetition,
+                    PRIMARY_TASK,
+                    cloud,
+                    segment=f"{trace}-s{index}",
+                )
+                for repetition in self.repetitions
+                for trace, segments in self.traces
+                for index, (condition, edge, cloud) in enumerate(segments)
+            ]
         blocks = [
             SubBlock(condition, level, repetition, task)
             for condition, level, task in self.cells()
@@ -162,8 +193,26 @@ class Grid:
         return blocks
 
     def execution_order(self) -> list[SubBlock]:
-        """Seeded shuffle with no two sub-blocks of one cell back to back."""
+        """Seeded shuffle with no two sub-blocks of one cell back to back.
 
+        G5 traces: per repetition, the traces in a seeded order, each with its
+        segments in their declared order.
+        """
+
+        if self.traces:
+            rng = random.Random(self.order_seed)
+            order: list[SubBlock] = []
+            for repetition in self.repetitions:
+                traces = [trace for trace, _ in self.traces]
+                rng.shuffle(traces)
+                for trace in traces:
+                    order += [
+                        block
+                        for block in self.subblocks()
+                        if block.repetition == repetition
+                        and str(block.segment).rsplit("-s", 1)[0] == trace
+                    ]
+            return order
         blocks = self.subblocks()
         rng = random.Random(self.order_seed)
         for _ in range(_MAX_ORDER_DRAWS):
@@ -197,8 +246,9 @@ class Grid:
         measured = warmups = 0
         for block in self.subblocks():
             ids = len(loaded[block.task][f"{block.condition.split}_request_ids"])
-            measured += ids * len(self.placements)
-            warmups += self.warmups * len(self.placements)
+            placements = len(self.placements) + (1 if self.adaptive else 0)
+            measured += ids * placements
+            warmups += self.warmups * placements
         return {"measured": measured, "warmups": warmups}
 
 
@@ -331,6 +381,26 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
             raise ValueError(
                 f"cloud-load cells need the same C0 cell: {sorted(uncovered)}"
             )
+    traces = tuple(
+        (
+            str(trace),
+            tuple((str(c), str(e), str(cl)) for c, e, cl in segments),
+        )
+        for trace, segments in payload.get("traces", {}).items()
+    )
+    for trace, segments in traces:
+        if not segments or "-" in trace:
+            raise ValueError(f"trace {trace} needs segments and an ID without '-'")
+        for seg_condition, seg_edge, seg_cloud in segments:
+            if seg_condition not in conditions:
+                raise ValueError(f"trace {trace}: unknown condition {seg_condition}")
+            if seg_edge != NO_LOAD and seg_edge not in levels:
+                raise ValueError(f"trace {trace}: unknown edge load {seg_edge}")
+            if seg_cloud != NO_CLOUD_LOAD and seg_cloud not in cloud_levels:
+                raise ValueError(f"trace {trace}: unknown cloud load {seg_cloud}")
+    adaptive = payload.get("adaptive")
+    if adaptive is not None and not traces:
+        raise ValueError("the adaptive placement runs only in a G5 trace grid")
     grid = Grid(
         path=resolved,
         sha256=_sha256(resolved),
@@ -346,6 +416,8 @@ def load_grid(path: Path, *, rate_fallback: bool = False) -> Grid:
         ),
         cloud_load_levels=cloud_levels,
         cloud_load_cells=cloud_cells,
+        traces=traces,
+        adaptive=adaptive,
     )
     grid.execution_order()  # Fail early if the adjacency constraint is impossible.
     return grid
@@ -358,7 +430,9 @@ def check_split(grid: Grid, split: Mapping[str, Any], task: str = PRIMARY_TASK) 
     same split with ``-<task>`` appended (the same questions and images).
     """
 
-    if task == PRIMARY_TASK:
+    if grid.traces:
+        used = {c for _, segments in grid.traces for c, _, _ in segments}
+    elif task == PRIMARY_TASK:
         used = set(grid.conditions)
     else:
         used = {c for c, _ in grid.tasks[task].cells}
@@ -369,6 +443,11 @@ def check_split(grid: Grid, split: Mapping[str, Any], task: str = PRIMARY_TASK) 
         in_grid = {
             c for c, v in grid.conditions.items() if v.split == name and c in used
         }
+        if grid.traces:
+            # G5 traces use some of a split's conditions, never others.
+            if listed and not in_grid <= listed:
+                raise ValueError(f"{task} trace conditions are not {name} conditions")
+            continue
         if listed and listed != in_grid:
             raise ValueError(f"{task} split and grid disagree on {name} conditions")
     if task != PRIMARY_TASK:

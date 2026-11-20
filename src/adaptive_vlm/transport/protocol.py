@@ -224,7 +224,16 @@ def _validate_message(frame: Frame) -> None:
         _require_keys(metadata, set())
         _require_empty_payload(frame)
     elif frame.message_type is MessageType.HEALTH_RESPONSE:
-        _require_keys(metadata, {"ready", "model_fingerprint"})
+        optional = {"server_state"} & set(metadata)
+        _require_keys(metadata, {"ready", "model_fingerprint"} | optional)
+        if optional:
+            state = metadata["server_state"]
+            if not isinstance(state, dict) or any(
+                not isinstance(k, str)
+                or not (v is None or isinstance(v, (bool, int, float, str)))
+                for k, v in state.items()
+            ):
+                raise ProtocolError("health server_state must map names to scalars")
         _require_type(metadata, "ready", bool)
         _require_fingerprint(metadata)
         _require_empty_payload(frame)
