@@ -71,7 +71,7 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 - **1.3 done.** The derivation ran in WSL with temporary `/app` and `/artifacts` links.
   - 108 training profiles pass.
   - Oracle: cloud wins 48 of 54 cells, the edge 6; 2 are ties.
-  - Still open for phase 3: the task-feature bundle, which needs `tokenizers==0.21.4` in the WSL environment.
+  - The task-feature bundles (120 short and 60 long requests), which feed phase 3, are derived too.
 
 **Gate passed:** correctness is clean, the training oracle is derived, and parity holds.
 

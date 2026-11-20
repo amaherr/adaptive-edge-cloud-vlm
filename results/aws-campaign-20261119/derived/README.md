@@ -96,6 +96,13 @@ Every configuration's output equals its reference:
 | `oracle-training/oracle_cells.json` | `d5065fde3f98d2ce75a4ac51bf2fb510b34b21becf2cd6326cf623e9ff60f727` |
 | `profiles/profiles_index.json` | `f4e0d023048a7e684e431d92b7d9046fb4e37c5dd5b1d2db98a7331e5348d39a` |
 
-**Task features: not derived yet.**
-- The `features` step failed because the WSL environment lacks `tokenizers` (pinned `0.21.4` in `requirements/model-cu128.lock`).
-- The features feed the G3 predictor (phase 3), not the oracle.
+## Task features (G3 predictor inputs)
+
+[task_features/](task_features/) comes from the `features` step, run the same way. That step needed `tokenizers==0.21.4` and `pillow==11.2.1` from `requirements/model-cu128.lock`, which were installed into the WSL environment without dependencies.
+
+These are static per-request inputs: image bytes and size, prompt tokens under the pinned tokenizer and query template, and the token budget. They hold no latency, so they cover all IDs without opening any split.
+
+| Bundle | Requests | Image bytes (median) | Prompt tokens (range) | SHA-256 |
+| --- | ---: | ---: | --- | --- |
+| `task_features-short.json` | 120 | 146,764 | 15–24 | `e7a18defef7b2c1476abc282a5a86a64e3e86b6934f1aa8c1bdf0e304457c81d` |
+| `task_features-long.json` | 60 | 148,884 | 10 | `5db09082300f93024be2030ebb22d6c02eda9e5c415a3ecf629e164ba7ef1b73` |
