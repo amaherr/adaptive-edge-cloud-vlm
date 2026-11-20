@@ -497,3 +497,12 @@ def test_aws_g5_grids_load_with_the_frozen_inputs() -> None:
         "pilot-s0-E01-L0-r0",
         "pilot-s1-E01-L1-C2-r0",
     ]
+
+
+def test_sensing_config_carries_the_probe_shape(tmp_path: Path) -> None:
+    template = json.loads((ROOT / "configs/g5/sensing_template.json").read_text())
+    path = tmp_path / "sensing.json"
+    path.write_text(json.dumps(template | {"edge_probe_threshold_ms": 20.0}))
+    config, _ = SensingConfig.load(path)
+    assert (config.edge_probe_matrix, config.edge_probe_repetitions) == (128, 80)
+    assert config.edge_probe_synchronize_each is True

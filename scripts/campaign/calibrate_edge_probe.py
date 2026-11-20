@@ -48,6 +48,7 @@ def main() -> None:
         args.device,
         int(template.get("edge_probe_matrix", 2048)),
         int(template.get("edge_probe_repetitions", 5)),
+        bool(template.get("edge_probe_synchronize_each", False)),
     )
 
     def sample() -> list[float]:

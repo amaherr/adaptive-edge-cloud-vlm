@@ -32,13 +32,16 @@ class SensingConfig:
     edge_probe_threshold_ms: float
     edge_probe_matrix: int = 2048
     edge_probe_repetitions: int = 5
+    # Amendment A4a: synchronise after every multiply, so each repetition can
+    # wait behind a competing kernel the way the model's many short kernels do.
+    edge_probe_synchronize_each: bool = False
 
     def __post_init__(self) -> None:
         for name in ("cloud_power_threshold_w", "edge_probe_threshold_ms"):
             value = getattr(self, name)
             if not math.isfinite(value) or value <= 0:
                 raise ValueError(f"{name} must be finite and positive")
-        if self.edge_probe_matrix < 64 or self.edge_probe_repetitions < 1:
+        if self.edge_probe_matrix < 16 or self.edge_probe_repetitions < 1:
             raise ValueError("edge probe size and repetitions must be positive")
 
     @classmethod
@@ -142,10 +145,13 @@ class Sensor:
         )
 
 
-def torch_edge_probe(device: str, matrix: int, repetitions: int) -> Callable[[], float]:
+def torch_edge_probe(
+    device: str, matrix: int, repetitions: int, synchronize_each: bool = False
+) -> Callable[[], float]:
     """A fixed bf16 matrix-multiply burst on the edge GPU, timed with syncs.
 
-    It shares the GPU with any edge load, so contention lengthens it.
+    It shares the GPU with any edge load, so contention lengthens it. With
+    ``synchronize_each`` every multiply is followed by a device synchronise.
     """
 
     torch: Any = importlib.import_module("torch")
@@ -158,6 +164,8 @@ def torch_edge_probe(device: str, matrix: int, repetitions: int) -> Callable[[],
         started = perf_counter_ns()
         for _ in range(repetitions):
             torch.matmul(a, b)
+            if synchronize_each:
+                torch.cuda.synchronize(device)
         torch.cuda.synchronize(device)
         return (perf_counter_ns() - started) / 1_000_000
 

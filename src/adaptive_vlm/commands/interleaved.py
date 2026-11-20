@@ -304,7 +304,10 @@ def _adaptive_runner(
     sensing, sensing_sha = SensingConfig.load(args.adaptive_sensing)
     if args.adaptive_edge_probe == "torch":
         edge_probe = torch_edge_probe(
-            args.edge_device, sensing.edge_probe_matrix, sensing.edge_probe_repetitions
+            args.edge_device,
+            sensing.edge_probe_matrix,
+            sensing.edge_probe_repetitions,
+            sensing.edge_probe_synchronize_each,
         )
     else:  # loopback rehearsal with the fake model: a fixed reading
         value = float(args.adaptive_edge_probe.removeprefix("fixed:"))
