@@ -419,9 +419,10 @@
   "adaptive": {
     "calibration_path": "../g5/calibration_r2_component.json",
     "calibration_sha256": "16c20438649c28cf020a98e430fe23e04420455aa7594122790e2a0971cdf05a",
-    "sensing_path": "../g5/sensing.json",
+    "sensing_path": "/artifacts/g5/sensing.json",
     "features_path": "../g5/task_features-short.json",
     "features_sha256": "e7a18defef7b2c1476abc282a5a86a64e3e86b6934f1aa8c1bdf0e304457c81d",
-    "edge_probe": "torch"
+    "edge_probe": "torch",
+    "sensing_note": "written on the edge data volume by scripts/campaign/calibrate_edge_probe.py in the pilot (A4 section 5); its SHA-256 is recorded in every segment plan and pinned at the freeze"
   }
 }
