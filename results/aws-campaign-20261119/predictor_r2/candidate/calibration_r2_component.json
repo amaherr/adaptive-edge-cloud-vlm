@@ -1,0 +1,176 @@
+{
+ "clamped": [],
+ "edge": {
+  "distributed/projected/int8|*|L0": [
+   16.512009971895395,
+   58.747765020488345
+  ],
+  "distributed/projected/int8|*|L1": [
+   56.543917504667775,
+   72.56304586323289
+  ],
+  "distributed/projected/prompt_first|*|L0": [
+   16.318345870998826,
+   58.79859657633471
+  ],
+  "distributed/projected/prompt_first|*|L1": [
+   56.39124922594283,
+   72.59099218580987
+  ],
+  "distributed/projected/synchronous|*|L0": [
+   16.605268260589696,
+   58.73687644601943
+  ],
+  "distributed/projected/synchronous|*|L1": [
+   56.48935813365324,
+   72.58723479852064
+  ],
+  "edge/full|long|L0": [
+   2897.8200189122003,
+   59.26001926248477
+  ],
+  "edge/full|long|L1": [
+   4407.565888198945,
+   74.09789754613274
+  ],
+  "edge/full|short|L0": [
+   495.23296452865156,
+   59.40775571451465
+  ],
+  "edge/full|short|L1": [
+   784.4507986462166,
+   74.29036629696085
+  ]
+ },
+ "initial_window_bytes": 65536,
+ "initial_window_search": {
+  "128": 276.6093692873558,
+  "16": 569.3936019479219,
+  "192": 516.9052813448706,
+  "256": 939.6544924409418,
+  "32": 180.3850525368149,
+  "48": 34.80541518564862,
+  "64": 16.856190382301385,
+  "96": 120.07710400957869
+ },
+ "model": "r2_component",
+ "network": {
+  "cloud/raw_image": [
+   2.9608710925072614,
+   1.0412957516713477
+  ],
+  "distributed/projected/int8": [
+   10.565773354627822,
+   1.0036056204099437
+  ],
+  "distributed/projected/prompt_first": [
+   13.539067723967719,
+   1.0019900804056132
+  ],
+  "distributed/projected/synchronous": [
+   13.555090121469448,
+   1.0020059227500866
+  ]
+ },
+ "provenance": {
+  "fitted_at_utc": "2026-11-20T10:30:02+00:00",
+  "partition_audit_sha256": "d1e03116ee82ab8f2665beade60bc78eb427269baee26f13a557767bda39945e",
+  "source": {
+   "commit": "64691294b1275aa00c199a5f9b99e169d2a44783",
+   "dirty_paths": []
+  },
+  "training_jsonl_sha256": "59fec5b16c544b1e6c97b0aeba48f5b2118663ab4a72dffeffa599135f861aa0",
+  "training_units_sha256": "adb9816cbe02f71dfedf529d9f67e3e50dcec618727fee0275106eb408fa1fe3"
+ },
+ "request_bytes": {
+  "cloud/raw_image": {
+   "framing": 391.0
+  },
+  "distributed/projected/int8": {
+   "bytes": 1494968.0
+  },
+  "distributed/projected/prompt_first": {
+   "bytes": 2986477.0
+  },
+  "distributed/projected/synchronous": {
+   "bytes": 2986476.0
+  }
+ },
+ "residual": {
+  "cloud/raw_image|L0": 0.14625775000003927,
+  "cloud/raw_image|L1": 0.13282749999996923,
+  "distributed/projected/int8|L0": 5.713367750000003,
+  "distributed/projected/int8|L1": 8.956117250000148,
+  "distributed/projected/prompt_first|L0": 2.03002374999992,
+  "distributed/projected/prompt_first|L1": 5.378756500000023,
+  "distributed/projected/synchronous|L0": 1.5417939999999675,
+  "distributed/projected/synchronous|L1": 4.714530999999994,
+  "edge/full|L0": 0.7978752500000326,
+  "edge/full|L1": 3.6995452499999715
+ },
+ "schema": "predictor-v2-r2",
+ "server": {
+  "cloud/raw_image|long|C0": [
+   598.7101803914941,
+   18.851104971883885
+  ],
+  "cloud/raw_image|short|C0": [
+   107.14598319739008,
+   18.700738134443682
+  ],
+  "cloud/raw_image|short|C2": [
+   615.8697717485863,
+   30.400785991443453
+  ],
+  "distributed/projected/int8|long|C0": [
+   588.74717375,
+   0.0
+  ],
+  "distributed/projected/int8|short|C0": [
+   92.11863149999999,
+   0.0
+  ],
+  "distributed/projected/int8|short|C2": [
+   397.899455,
+   0.0
+  ],
+  "distributed/projected/prompt_first|long|C0": [
+   587.67586275,
+   0.0
+  ],
+  "distributed/projected/prompt_first|short|C0": [
+   90.96117325,
+   0.0
+  ],
+  "distributed/projected/prompt_first|short|C2": [
+   397.14807974999997,
+   0.0
+  ],
+  "distributed/projected/synchronous|long|C0": [
+   587.559045,
+   0.0
+  ],
+  "distributed/projected/synchronous|short|C0": [
+   91.07125825,
+   0.0
+  ],
+  "distributed/projected/synchronous|short|C2": [
+   397.09177224999996,
+   0.0
+  ]
+ },
+ "support": {
+  "crops": [
+   2,
+   10
+  ],
+  "rtt_ms": [
+   5.3543345,
+   150.6083265
+  ],
+  "uplink_bps": [
+   4971252.332517773,
+   198541604.17235994
+  ]
+ }
+}

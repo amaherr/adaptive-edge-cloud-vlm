@@ -1,0 +1,18 @@
+{
+ "calibrations": {
+  "constant_median": "554b1c35326d775d3920c3bb18e2f450006248af13afa2cf1e3a61892bddecf2",
+  "r2_additive": "209ade7f076be66685a9050b7180fbd2ed15fe3121188347d0681c520ded2cd9",
+  "r2_component": "16c20438649c28cf020a98e430fe23e04420455aa7594122790e2a0971cdf05a"
+ },
+ "provenance": {
+  "fitted_at_utc": "2026-11-20T10:30:02+00:00",
+  "partition_audit_sha256": "d1e03116ee82ab8f2665beade60bc78eb427269baee26f13a557767bda39945e",
+  "source": {
+   "commit": "64691294b1275aa00c199a5f9b99e169d2a44783",
+   "dirty_paths": []
+  },
+  "training_jsonl_sha256": "59fec5b16c544b1e6c97b0aeba48f5b2118663ab4a72dffeffa599135f861aa0",
+  "training_units_sha256": "adb9816cbe02f71dfedf529d9f67e3e50dcec618727fee0275106eb408fa1fe3"
+ },
+ "units": 15300
+}

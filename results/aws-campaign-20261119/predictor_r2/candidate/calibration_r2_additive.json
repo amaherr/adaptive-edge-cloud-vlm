@@ -1,0 +1,271 @@
+{
+ "groups": {
+  "cloud/raw_image|long": {
+   "cloud_levels": [
+    "C0"
+   ],
+   "coefficients": [
+    569.4023973049824,
+    -4.3996455623129975,
+    21.7013526257734,
+    3.440621727132689,
+    1.5322086162039565
+   ],
+   "columns": [
+    "L1",
+    "crops",
+    "rtt_ms",
+    "payload_ms"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "cloud/raw_image|short": {
+   "cloud_levels": [
+    "C0",
+    "C2"
+   ],
+   "coefficients": [
+    22.94432966954446,
+    1.3562868993921597,
+    598.1278580925315,
+    28.344861707822815,
+    3.39000733119427,
+    0.9727768458002541
+   ],
+   "columns": [
+    "L1",
+    "C2",
+    "crops",
+    "rtt_ms",
+    "payload_ms"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "distributed/projected/int8|long": {
+   "cloud_levels": [
+    "C0"
+   ],
+   "coefficients": [
+    537.5298462400923,
+    150.42794013442872,
+    67.3702947794016,
+    5.630918837174709,
+    0.81167979463488
+   ],
+   "columns": [
+    "L1",
+    "crops",
+    "rtt_ms",
+    "payload_ms"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "distributed/projected/int8|short": {
+   "cloud_levels": [
+    "C0",
+    "C2"
+   ],
+   "coefficients": [
+    48.23023698070483,
+    150.24203888577927,
+    309.34958012514926,
+    65.63381046669724,
+    5.161370114637716,
+    0.9734969370857823
+   ],
+   "columns": [
+    "L1",
+    "C2",
+    "crops",
+    "rtt_ms",
+    "payload_ms"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "distributed/projected/prompt_first|long": {
+   "cloud_levels": [
+    "C0"
+   ],
+   "coefficients": [
+    543.4679138677102,
+    147.7845147389953,
+    65.95663588591151,
+    5.947679260521209,
+    0.8994280216371173
+   ],
+   "columns": [
+    "L1",
+    "crops",
+    "rtt_ms",
+    "payload_ms"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "distributed/projected/prompt_first|short": {
+   "cloud_levels": [
+    "C0",
+    "C2"
+   ],
+   "coefficients": [
+    69.48670449255951,
+    145.03668874021378,
+    309.53401493235515,
+    61.82898464413847,
+    5.612335730748811,
+    0.9856246418116309
+   ],
+   "columns": [
+    "L1",
+    "C2",
+    "crops",
+    "rtt_ms",
+    "payload_ms"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "distributed/projected/synchronous|long": {
+   "cloud_levels": [
+    "C0"
+   ],
+   "coefficients": [
+    527.3983515912389,
+    153.69246304713397,
+    67.57066290370811,
+    5.862347418404413,
+    0.9051376972073799
+   ],
+   "columns": [
+    "L1",
+    "crops",
+    "rtt_ms",
+    "payload_ms"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "distributed/projected/synchronous|short": {
+   "cloud_levels": [
+    "C0",
+    "C2"
+   ],
+   "coefficients": [
+    40.76297012906434,
+    149.88970009758668,
+    309.4979932510123,
+    65.6422705696616,
+    5.442114874686016,
+    0.9857856507133581
+   ],
+   "columns": [
+    "L1",
+    "C2",
+    "crops",
+    "rtt_ms",
+    "payload_ms"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "edge/full|long": {
+   "cloud_levels": [
+    "C0"
+   ],
+   "coefficients": [
+    2822.6739809803025,
+    1627.3305881333324,
+    69.13173647009071
+   ],
+   "columns": [
+    "L1",
+    "crops"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  },
+  "edge/full|short": {
+   "cloud_levels": [
+    "C0",
+    "C2"
+   ],
+   "coefficients": [
+    441.60472759451443,
+    406.7316077864583,
+    -5.052568731597347,
+    66.84061306074723
+   ],
+   "columns": [
+    "L1",
+    "C2",
+    "crops"
+   ],
+   "edge_levels": [
+    "L0",
+    "L1"
+   ]
+  }
+ },
+ "model": "r2_additive",
+ "provenance": {
+  "fitted_at_utc": "2026-11-20T10:30:02+00:00",
+  "partition_audit_sha256": "d1e03116ee82ab8f2665beade60bc78eb427269baee26f13a557767bda39945e",
+  "source": {
+   "commit": "64691294b1275aa00c199a5f9b99e169d2a44783",
+   "dirty_paths": []
+  },
+  "training_jsonl_sha256": "59fec5b16c544b1e6c97b0aeba48f5b2118663ab4a72dffeffa599135f861aa0",
+  "training_units_sha256": "adb9816cbe02f71dfedf529d9f67e3e50dcec618727fee0275106eb408fa1fe3"
+ },
+ "request_bytes": {
+  "cloud/raw_image": {
+   "framing": 391.0
+  },
+  "distributed/projected/int8": {
+   "bytes": 1494968.0
+  },
+  "distributed/projected/prompt_first": {
+   "bytes": 2986477.0
+  },
+  "distributed/projected/synchronous": {
+   "bytes": 2986476.0
+  }
+ },
+ "schema": "predictor-v2-r2",
+ "support": {
+  "crops": [
+   2,
+   10
+  ],
+  "rtt_ms": [
+   5.3543345,
+   150.6083265
+  ],
+  "uplink_bps": [
+   4971252.332517773,
+   198541604.17235994
+  ]
+ }
+}
