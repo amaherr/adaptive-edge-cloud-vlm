@@ -294,6 +294,101 @@ def test_quality_repeatability_and_reference_changes_block(
     ]
 
 
+def _one_repetition_subset(rows: dict[str, list[dict]]) -> dict[str, list[dict]]:
+    """Rows shaped like one campaign sub-block: two IDs, one repetition."""
+    measured = [r for r in rows["edge"] if not r["warmup"]]
+    keep_ids = sorted({r["request_id"] for r in measured})[:2]
+    repetition = measured[0]["repetition"]
+    return {
+        mode: [
+            r
+            for r in mode_rows
+            if r["warmup"]
+            or (r["request_id"] in keep_ids and r["repetition"] == repetition)
+        ]
+        for mode, mode_rows in rows.items()
+    }
+
+
+def test_measured_scope_passes_a_single_repetition_subblock(evidence: tuple) -> None:
+    frozen, dirs, _, _ = evidence
+    proof = checked_proof(evidence)
+    rows = _one_repetition_subset(raw_rows(dirs))
+    measured = evaluate_rows(
+        rows, frozen, expected_outputs=proof["_expected_outputs"], scope="measured"
+    )
+    assert measured["passed"]
+    assert measured["scope"] == "measured" and measured["scoped_request_count"] == 2
+    assert measured["required_repetitions"] == 1
+    assert measured["quality_disagreement_request_ids"] == []
+    manifest = evaluate_rows(rows, frozen, expected_outputs=proof["_expected_outputs"])
+    assert not manifest["passed"]
+    assert not manifest["full_repeated_successful_request_coverage"]
+    # Unmeasured IDs no longer create empty groups that read as non-repeatable.
+    assert manifest["within_placement_repeatable"]
+
+
+def test_measured_scope_still_blocks_a_reference_mismatch(evidence: tuple) -> None:
+    frozen, dirs, _, _ = evidence
+    proof = checked_proof(evidence)
+    rows = _one_repetition_subset(raw_rows(dirs))
+    first = next(r for r in rows["cloud"] if not r["warmup"])
+    first["output_token_ids"] = [999]
+    result = evaluate_rows(
+        rows, frozen, expected_outputs=proof["_expected_outputs"], scope="measured"
+    )
+    assert not result["passed"]
+    assert result["reference_output_mismatches"]["cloud"] == [first["request_id"]]
+
+
+def test_measured_scope_blocks_a_missing_placement_row(evidence: tuple) -> None:
+    frozen, dirs, _, _ = evidence
+    proof = checked_proof(evidence)
+    rows = _one_repetition_subset(raw_rows(dirs))
+    measured = [r for r in rows["edge"] if not r["warmup"]]
+    rows["edge"] = [r for r in rows["edge"] if r is not measured[0]]
+    result = evaluate_rows(
+        rows, frozen, expected_outputs=proof["_expected_outputs"], scope="measured"
+    )
+    assert not result["passed"]
+    assert result["insufficient_repeatability"]["edge"] == [measured[0]["request_id"]]
+
+
+def test_timed_only_requests_skip_quality_but_not_references(evidence: tuple) -> None:
+    frozen, dirs, _, _ = evidence
+    proof = checked_proof(evidence)
+    unscored = replace(
+        frozen,
+        items=tuple(
+            replace(item, scoring="none", references=()) for item in frozen.items
+        ),
+    )
+    rows = _one_repetition_subset(raw_rows(dirs))
+    for mode_rows in rows.values():
+        for row in mode_rows:
+            row["quality_score"] = None
+    result = evaluate_rows(
+        rows, unscored, expected_outputs=proof["_expected_outputs"], scope="measured"
+    )
+    assert result["passed"] and result["quality_disagreement_request_ids"] == []
+    first = next(r for r in rows["edge"] if not r["warmup"])
+    first["quality_score"] = 1.0
+    assert not evaluate_rows(
+        rows, unscored, expected_outputs=proof["_expected_outputs"], scope="measured"
+    )["task_quality_equal"]
+    first["quality_score"] = None
+    first["output_token_ids"] = [999]
+    assert not evaluate_rows(
+        rows, unscored, expected_outputs=proof["_expected_outputs"], scope="measured"
+    )["passed"]
+
+
+def test_unknown_scope_rejected(evidence: tuple) -> None:
+    frozen, dirs, _, _ = evidence
+    with pytest.raises(ValueError, match="unknown correctness scope"):
+        evaluate_rows(raw_rows(dirs), frozen, scope="subset")
+
+
 def test_unknown_placement_and_request_rejected(evidence: tuple) -> None:
     frozen, dirs, _, _ = evidence
     rows = raw_rows(dirs)

@@ -165,6 +165,9 @@ def build_profile(
     correctness_protocol = spec.get("correctness_protocol", "strict-v1")
     if correctness_protocol not in {"strict-v1", PROTOCOL}:
         raise ValueError("unsupported correctness protocol")
+    correctness_scope = spec.get("correctness_scope")
+    if correctness_scope not in {None, "manifest", "measured"}:
+        raise ValueError("correctness_scope must be manifest or measured")
     network = spec["network_state"]
     if not isinstance(network.get("controlled"), bool):
         raise ValueError("network_state.controlled must be boolean")
@@ -652,10 +655,21 @@ def build_profile(
             reference["model_contract_sha256"],
             expected_devices=expected_devices,
         )
+        if correctness_scope is None:
+            # Scope to what the runs scheduled: a G2 v2 campaign sub-block
+            # measures a subset of the manifest once (repetitions are separate
+            # sub-blocks), so the full-manifest, two-repetition check cannot
+            # apply. Decided from the plan's trials, never from outcomes.
+            planned = [r for _, _, rows in runs for r in rows if not r["warmup"]]
+            full = {r["request_id"] for r in planned} == {
+                item.request_id for item in frozen.items
+            } and len({r["repetition"] for r in planned}) >= 2
+            correctness_scope = "manifest" if full else "measured"
         correctness = evaluate_rows(
             {_placement(plan): rows for plan, _, rows in runs},
             frozen,
             expected_outputs=proof.pop("_expected_outputs"),
+            scope=correctness_scope,
         )
         correctness["same_device_reference"] = proof
         local_passed = common_passed and correctness["passed"]

@@ -28,6 +28,8 @@ REFERENCE_FOR = {
     "distributed_int8": "distributed_int8",
 }
 LOSSY_PLACEMENTS = frozenset({"distributed_int8"})
+# Correctness scope -> successful repetitions required per in-scope request ID.
+SCOPES = {"manifest": 2, "measured": 1}
 
 
 def semantic_manifest_sha256(manifest: FrozenManifest) -> str:
@@ -308,9 +310,30 @@ def evaluate_rows(
     *,
     expected_outputs: Mapping[str, Mapping[str, tuple[tuple[int, ...], str]]]
     | None = None,
+    scope: str = "manifest",
 ) -> dict[str, Any]:
-    """Keep failures; require repeated exact local outputs and exact score control."""
-    ids = {item.request_id for item in manifest.items}
+    """Keep failures; require repeated exact local outputs and exact score control.
+
+    ``scope="manifest"`` (correctness runs, preflight smoke) requires every
+    manifest ID with two repetitions per placement. ``scope="measured"`` (one
+    campaign sub-block, which measures a subset of IDs once) checks only the
+    measured IDs and requires one successful row per placement; repeatability
+    is then checked wherever an ID has more than one row.
+    """
+    if scope not in SCOPES:
+        raise ValueError(f"unknown correctness scope: {scope}")
+    manifest_ids = {item.request_id for item in manifest.items}
+    measured_ids = {
+        str(row["request_id"])
+        for rows in runs.values()
+        for row in rows
+        if not row["warmup"]
+    }
+    if not measured_ids <= manifest_ids:
+        raise ValueError("heterogeneous result has unknown request")
+    ids = manifest_ids if scope == "manifest" else measured_ids
+    required_repetitions = SCOPES[scope]
+    unscored = {item.request_id for item in manifest.items if item.scoring == "none"}
     if not {"edge", "cloud", "distributed"} <= set(runs) <= set(REFERENCE_FOR):
         raise ValueError(
             "heterogeneous correctness requires edge, cloud and distributed "
@@ -331,13 +354,16 @@ def evaluate_rows(
         measured = [row for row in rows if not row["warmup"]]
         statuses[mode] = dict(Counter(str(row["status"]) for row in measured))
         for row in measured:
-            if row["request_id"] not in ids:
-                raise ValueError("heterogeneous result has unknown request")
             if row["status"] != "ok":
                 continue
             grouped[row["request_id"]].append(row)
             score = row.get("quality_score")
-            if (
+            if row["request_id"] in unscored:
+                # Timed-only task (manifest scoring "none"): outputs are still
+                # checked against the references, but a score must be absent.
+                if score is not None:
+                    valid_quality = False
+            elif (
                 not isinstance(score, (int, float))
                 or isinstance(score, bool)
                 or not math.isfinite(score)
@@ -359,18 +385,24 @@ def evaluate_rows(
         insufficient[mode] = [
             request_id
             for request_id in sorted(ids)
-            if len({row["repetition"] for row in grouped[request_id]}) < 2
+            if len({row["repetition"] for row in grouped.get(request_id, [])})
+            < required_repetitions
         ]
         for group in grouped.values():
             if len({tuple(row["output_token_ids"]) for row in group}) != 1 or (
                 len({row["output_text"] for row in group}) != 1
             ):
                 repeatable = False
-    quality_disagreements = [key for key in sorted(ids) if len(quality[key]) != 1]
+    quality_disagreements = [
+        key for key in sorted(ids - unscored) if len(quality.get(key, ())) != 1
+    ]
     coverage = all(not missing for missing in insufficient.values())
     quality_equal = valid_quality and not quality_disagreements
     return {
         "protocol": PROTOCOL,
+        "scope": scope,
+        "scoped_request_count": len(ids),
+        "required_repetitions": required_repetitions,
         "full_repeated_successful_request_coverage": coverage,
         "within_placement_repeatable": repeatable,
         "task_quality_equal": quality_equal,

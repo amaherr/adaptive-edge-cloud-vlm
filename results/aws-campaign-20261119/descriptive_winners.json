@@ -1,0 +1,380 @@
+{
+ "T01-L0": [
+  "cloud",
+  996,
+  547,
+  "distributed_int8",
+  3099
+ ],
+ "T01-L0-C2": [
+  "edge",
+  995,
+  1161,
+  "distributed_int8",
+  3407
+ ],
+ "T01-L1": [
+  "cloud",
+  1409,
+  540,
+  "distributed_int8",
+  3271
+ ],
+ "T01-L1-C2": [
+  "cloud",
+  1410,
+  1165,
+  "distributed_int8",
+  3583
+ ],
+ "T02-L0": [
+  "cloud",
+  994,
+  392,
+  "distributed_int8",
+  1491
+ ],
+ "T02-L0-C2": [
+  "edge",
+  994,
+  1004,
+  "distributed_int8",
+  1794
+ ],
+ "T02-L1": [
+  "cloud",
+  1410,
+  394,
+  "distributed_int8",
+  1664
+ ],
+ "T02-L1-C2": [
+  "cloud",
+  1410,
+  1012,
+  "distributed_int8",
+  1970
+ ],
+ "T03-L0": [
+  "cloud",
+  1006,
+  370,
+  "distributed_int8",
+  1174
+ ],
+ "T03-L0-C2": [
+  "cloud",
+  999,
+  984,
+  "distributed_int8",
+  1479
+ ],
+ "T03-L1": [
+  "cloud",
+  1408,
+  370,
+  "distributed_int8",
+  1349
+ ],
+ "T03-L1-C2": [
+  "cloud",
+  1414,
+  984,
+  "distributed_int8",
+  1653
+ ],
+ "T04-L0": [
+  "cloud",
+  998,
+  354,
+  "distributed_int8",
+  974
+ ],
+ "T04-L0-C2": [
+  "cloud",
+  998,
+  958,
+  "distributed_int8",
+  1274
+ ],
+ "T04-L1": [
+  "cloud",
+  1416,
+  357,
+  "distributed_int8",
+  1147
+ ],
+ "T04-L1-C2": [
+  "cloud",
+  1406,
+  960,
+  "distributed_int8",
+  1450
+ ],
+ "T04-L1-long": [
+  "cloud",
+  5083,
+  845,
+  "distributed_int8",
+  1636
+ ],
+ "T05-L0": [
+  "cloud",
+  999,
+  349,
+  "distributed_int8",
+  868
+ ],
+ "T05-L0-C2": [
+  "cloud",
+  1000,
+  963,
+  "distributed_int8",
+  1171
+ ],
+ "T05-L1": [
+  "cloud",
+  1420,
+  352,
+  "distributed_int8",
+  1038
+ ],
+ "T05-L1-C2": [
+  "cloud",
+  1412,
+  953,
+  "distributed_int8",
+  1341
+ ],
+ "T06-L0": [
+  "cloud",
+  1006,
+  344,
+  "distributed_int8",
+  812
+ ],
+ "T06-L0-C2": [
+  "cloud",
+  997,
+  955,
+  "distributed_int8",
+  1113
+ ],
+ "T06-L0-long": [
+  "cloud",
+  3430,
+  843,
+  "distributed_int8",
+  1306
+ ],
+ "T06-L1": [
+  "cloud",
+  1405,
+  352,
+  "distributed_int8",
+  982
+ ],
+ "T06-L1-C2": [
+  "cloud",
+  1402,
+  949,
+  "distributed_int8",
+  1283
+ ],
+ "T06-L1-long": [
+  "cloud",
+  5082,
+  834,
+  "distributed_int8",
+  1470
+ ],
+ "T07-L0": [
+  "cloud",
+  1020,
+  300,
+  "distributed_int8",
+  790
+ ],
+ "T07-L0-C2": [
+  "cloud",
+  994,
+  905,
+  "distributed_int8",
+  1082
+ ],
+ "T07-L1": [
+  "cloud",
+  1416,
+  303,
+  "distributed_int8",
+  952
+ ],
+ "T07-L1-C2": [
+  "cloud",
+  1415,
+  908,
+  "distributed_int8",
+  1257
+ ],
+ "T08-L0": [
+  "cloud",
+  1002,
+  304,
+  "distributed_int8",
+  731
+ ],
+ "T08-L0-C2": [
+  "cloud",
+  998,
+  906,
+  "distributed_int8",
+  1031
+ ],
+ "T08-L1": [
+  "cloud",
+  1424,
+  299,
+  "distributed_int8",
+  901
+ ],
+ "T08-L1-C2": [
+  "cloud",
+  1424,
+  905,
+  "distributed_int8",
+  1204
+ ],
+ "T08-L1-long": [
+  "cloud",
+  5048,
+  803,
+  "distributed_int8",
+  1395
+ ],
+ "T09-L0": [
+  "cloud",
+  997,
+  588,
+  "distributed_int8",
+  1298
+ ],
+ "T09-L0-C2": [
+  "edge",
+  996,
+  1203,
+  "distributed_int8",
+  1603
+ ],
+ "T09-L0-long": [
+  "cloud",
+  3429,
+  1087,
+  "distributed_int8",
+  1800
+ ],
+ "T09-L1": [
+  "cloud",
+  1413,
+  591,
+  "distributed_int8",
+  1475
+ ],
+ "T09-L1-C2": [
+  "cloud",
+  1411,
+  1201,
+  "distributed_int8",
+  1779
+ ],
+ "T09-L1-long": [
+  "cloud",
+  5065,
+  1086,
+  "distributed_int8",
+  1964
+ ],
+ "T10-L0": [
+  "cloud",
+  1018,
+  595,
+  "distributed_int8",
+  1377
+ ],
+ "T10-L0-C2": [
+  "edge",
+  995,
+  1214,
+  "distributed_int8",
+  1669
+ ],
+ "T10-L1": [
+  "cloud",
+  1411,
+  594,
+  "distributed_int8",
+  1534
+ ],
+ "T10-L1-C2": [
+  "cloud",
+  1405,
+  1217,
+  "distributed_int8",
+  1843
+ ],
+ "T11-L0": [
+  "cloud",
+  999,
+  742,
+  "distributed_int8",
+  1588
+ ],
+ "T11-L0-C2": [
+  "edge",
+  996,
+  1363,
+  "distributed_int8",
+  1888
+ ],
+ "T11-L1": [
+  "cloud",
+  1428,
+  741,
+  "distributed_int8",
+  1759
+ ],
+ "T11-L1-C2": [
+  "cloud",
+  1435,
+  1357,
+  "distributed_int8",
+  2069
+ ],
+ "T12-L0": [
+  "cloud",
+  1015,
+  760,
+  "distributed_int8",
+  1767
+ ],
+ "T12-L0-C2": [
+  "edge",
+  996,
+  1376,
+  "distributed_int8",
+  2068
+ ],
+ "T12-L1": [
+  "cloud",
+  1428,
+  761,
+  "distributed_int8",
+  1938
+ ],
+ "T12-L1-C2": [
+  "cloud",
+  1410,
+  1393,
+  "distributed_int8",
+  2244
+ ]
+}

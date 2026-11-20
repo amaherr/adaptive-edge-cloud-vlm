@@ -1,0 +1,913 @@
+{
+ "annotations_sha256": "0564650e712b34c246e4ad142894692bf2e45dee8e9cc6ebb2cedbe85731c4bf",
+ "evaluator": "GT-Vision-Lab/VQA a013f0043c1e2cdc995922dfe257f7149aa9af06",
+ "manifest_sha256": "4f8bfe63f245db948274d7e0717bde3bab388e5ffe65505a3f841a35e3f9b89d",
+ "questions_sha256": "f34d9c9909dea76700d361baddd63dd47b4494945097459b542d9fe840244811",
+ "schema_version": 1,
+ "splits": {
+  "training": {
+   "configurations": {
+    "cloud/raw_image": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 75.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 48.0,
+        "yes/no": 93.93
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 100.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "is this a": 100.0,
+        "is this an": 100.0,
+        "none of the above": 76.67,
+        "was": 100.0,
+        "what": 72.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 98.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "37ae490a4b89fd0cadc71dc519b212da51fc1891ccf6aca686cafedc82cdc5f6",
+      "predictions_sha256": "d97582fbff81b1bc4e229285cb67ec6390534028049290f472265b684f032b69"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 55.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 40.0,
+        "yes/no": 58.21
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 0.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 25.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 50.0,
+        "is there a": 0.0,
+        "is this": 66.67,
+        "is this a": 100.0,
+        "is this an": 0.0,
+        "none of the above": 43.33,
+        "was": 100.0,
+        "what": 47.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 78.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "7fedd9d6bc6d6cb077b87525014a5c9f50c5b45ecae0e1487d2f918397f67694",
+      "predictions_sha256": "aae0f31d07df11652bcd52eb1ae51cb73497eea1b2aed411e7b62dbea65b2514"
+     }
+    },
+    "distributed/projected/int8": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 75.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 48.0,
+        "yes/no": 93.93
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 100.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "is this a": 100.0,
+        "is this an": 100.0,
+        "none of the above": 76.67,
+        "was": 100.0,
+        "what": 72.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 98.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "64f289bea5cab8b390f0129804cc8028cf2fdc17ec7c145b08aea138882c1a61",
+      "predictions_sha256": "81bfc9178e35fa8d2971eeacdf9fbc47ad77e913bdc7e42bea6c24fbce562d44"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 55.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 40.0,
+        "yes/no": 58.21
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 0.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 25.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 50.0,
+        "is there a": 0.0,
+        "is this": 66.67,
+        "is this a": 100.0,
+        "is this an": 0.0,
+        "none of the above": 43.33,
+        "was": 100.0,
+        "what": 47.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 78.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "6710f47a40458f103c25f6366c110343e5702857650e21ea8665e77044af6ad0",
+      "predictions_sha256": "4fa0b6ceac6bab42c11e74cec8c55ae254e7e8a422d482fc454c306ce03019db"
+     }
+    },
+    "distributed/projected/prompt_first": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 75.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 48.0,
+        "yes/no": 93.93
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 100.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "is this a": 100.0,
+        "is this an": 100.0,
+        "none of the above": 76.67,
+        "was": 100.0,
+        "what": 72.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 98.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "37ae490a4b89fd0cadc71dc519b212da51fc1891ccf6aca686cafedc82cdc5f6",
+      "predictions_sha256": "d97582fbff81b1bc4e229285cb67ec6390534028049290f472265b684f032b69"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 55.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 40.0,
+        "yes/no": 58.21
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 0.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 25.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 50.0,
+        "is there a": 0.0,
+        "is this": 66.67,
+        "is this a": 100.0,
+        "is this an": 0.0,
+        "none of the above": 43.33,
+        "was": 100.0,
+        "what": 47.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 78.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "7fedd9d6bc6d6cb077b87525014a5c9f50c5b45ecae0e1487d2f918397f67694",
+      "predictions_sha256": "aae0f31d07df11652bcd52eb1ae51cb73497eea1b2aed411e7b62dbea65b2514"
+     }
+    },
+    "distributed/projected/synchronous": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 75.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 48.0,
+        "yes/no": 93.93
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 100.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "is this a": 100.0,
+        "is this an": 100.0,
+        "none of the above": 76.67,
+        "was": 100.0,
+        "what": 72.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 98.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "37ae490a4b89fd0cadc71dc519b212da51fc1891ccf6aca686cafedc82cdc5f6",
+      "predictions_sha256": "d97582fbff81b1bc4e229285cb67ec6390534028049290f472265b684f032b69"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 55.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 40.0,
+        "yes/no": 58.21
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 0.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 25.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 50.0,
+        "is there a": 0.0,
+        "is this": 66.67,
+        "is this a": 100.0,
+        "is this an": 0.0,
+        "none of the above": 43.33,
+        "was": 100.0,
+        "what": 47.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 78.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "7fedd9d6bc6d6cb077b87525014a5c9f50c5b45ecae0e1487d2f918397f67694",
+      "predictions_sha256": "aae0f31d07df11652bcd52eb1ae51cb73497eea1b2aed411e7b62dbea65b2514"
+     }
+    },
+    "edge/full": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 75.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 48.0,
+        "yes/no": 93.93
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 100.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "is this a": 100.0,
+        "is this an": 100.0,
+        "none of the above": 76.67,
+        "was": 100.0,
+        "what": 72.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 98.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "37ae490a4b89fd0cadc71dc519b212da51fc1891ccf6aca686cafedc82cdc5f6",
+      "predictions_sha256": "d97582fbff81b1bc4e229285cb67ec6390534028049290f472265b684f032b69"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 55.33,
+       "perAnswerType": {
+        "number": 98.57,
+        "other": 40.0,
+        "yes/no": 58.21
+       },
+       "perQuestionType": {
+        "are": 100.0,
+        "are the": 100.0,
+        "are there": 100.0,
+        "are there any": 30.0,
+        "are these": 86.67,
+        "are they": 100.0,
+        "could": 0.0,
+        "how": 0.0,
+        "how many": 100.0,
+        "is": 0.0,
+        "is he": 100.0,
+        "is it": 25.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the person": 0.0,
+        "is there": 50.0,
+        "is there a": 0.0,
+        "is this": 66.67,
+        "is this a": 100.0,
+        "is this an": 0.0,
+        "none of the above": 43.33,
+        "was": 100.0,
+        "what": 47.5,
+        "what are the": 60.0,
+        "what color is": 30.0,
+        "what color is the": 78.0,
+        "what is the": 0.0,
+        "what is the person": 100.0,
+        "what is the woman": 100.0,
+        "what kind of": 25.0,
+        "what number is": 100.0,
+        "what room is": 0.0,
+        "what type of": 30.0,
+        "who is": 0.0
+       }
+      },
+      "official_sha256": "7fedd9d6bc6d6cb077b87525014a5c9f50c5b45ecae0e1487d2f918397f67694",
+      "predictions_sha256": "aae0f31d07df11652bcd52eb1ae51cb73497eea1b2aed411e7b62dbea65b2514"
+     }
+    }
+   },
+   "parity": {
+    "cloud/raw_image vs distributed/projected/int8": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs distributed/projected/prompt_first": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs distributed/projected/prompt_first": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/prompt_first vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/prompt_first vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/synchronous vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    }
+   },
+   "request_ids": 60
+  },
+  "validation": {
+   "configurations": {
+    "cloud/raw_image": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 79.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 68.46,
+        "yes/no": 80.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 100.0,
+        "is the": 50.0,
+        "is there": 100.0,
+        "is this": 66.67,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 50.0,
+        "what is the": 50.0,
+        "where are the": 100.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fdd408871c055b5dd4e4d2ef67d686bc7806d997a6abaac5de8e25457dff5ba4",
+      "predictions_sha256": "5842ae821175a7d2f95829a357173aa0a2e2aecffe80f19cc5d4d9ab63b4018a"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 59.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 53.08,
+        "yes/no": 40.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 0.0,
+        "is the": 0.0,
+        "is there": 0.0,
+        "is this": 33.33,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 0.0,
+        "what is the": 50.0,
+        "where are the": 0.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fe14fa28afb570d20d8fae64b7e8b18dff1c805e4f885e2a48f2a85f94d7c856",
+      "predictions_sha256": "138cac4d99813c1788f592a6309628c8a6ced56119a4c6cb3b6950324c1de8d2"
+     }
+    },
+    "distributed/projected/int8": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 79.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 68.46,
+        "yes/no": 80.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 100.0,
+        "is the": 50.0,
+        "is there": 100.0,
+        "is this": 66.67,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 50.0,
+        "what is the": 50.0,
+        "where are the": 100.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fdd408871c055b5dd4e4d2ef67d686bc7806d997a6abaac5de8e25457dff5ba4",
+      "predictions_sha256": "5842ae821175a7d2f95829a357173aa0a2e2aecffe80f19cc5d4d9ab63b4018a"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 59.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 53.08,
+        "yes/no": 40.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 0.0,
+        "is the": 0.0,
+        "is there": 0.0,
+        "is this": 33.33,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 0.0,
+        "what is the": 50.0,
+        "where are the": 0.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fe14fa28afb570d20d8fae64b7e8b18dff1c805e4f885e2a48f2a85f94d7c856",
+      "predictions_sha256": "138cac4d99813c1788f592a6309628c8a6ced56119a4c6cb3b6950324c1de8d2"
+     }
+    },
+    "distributed/projected/prompt_first": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 79.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 68.46,
+        "yes/no": 80.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 100.0,
+        "is the": 50.0,
+        "is there": 100.0,
+        "is this": 66.67,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 50.0,
+        "what is the": 50.0,
+        "where are the": 100.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fdd408871c055b5dd4e4d2ef67d686bc7806d997a6abaac5de8e25457dff5ba4",
+      "predictions_sha256": "5842ae821175a7d2f95829a357173aa0a2e2aecffe80f19cc5d4d9ab63b4018a"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 59.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 53.08,
+        "yes/no": 40.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 0.0,
+        "is the": 0.0,
+        "is there": 0.0,
+        "is this": 33.33,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 0.0,
+        "what is the": 50.0,
+        "where are the": 0.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fe14fa28afb570d20d8fae64b7e8b18dff1c805e4f885e2a48f2a85f94d7c856",
+      "predictions_sha256": "138cac4d99813c1788f592a6309628c8a6ced56119a4c6cb3b6950324c1de8d2"
+     }
+    },
+    "distributed/projected/synchronous": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 79.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 68.46,
+        "yes/no": 80.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 100.0,
+        "is the": 50.0,
+        "is there": 100.0,
+        "is this": 66.67,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 50.0,
+        "what is the": 50.0,
+        "where are the": 100.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fdd408871c055b5dd4e4d2ef67d686bc7806d997a6abaac5de8e25457dff5ba4",
+      "predictions_sha256": "5842ae821175a7d2f95829a357173aa0a2e2aecffe80f19cc5d4d9ab63b4018a"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 59.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 53.08,
+        "yes/no": 40.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 0.0,
+        "is the": 0.0,
+        "is there": 0.0,
+        "is this": 33.33,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 0.0,
+        "what is the": 50.0,
+        "where are the": 0.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fe14fa28afb570d20d8fae64b7e8b18dff1c805e4f885e2a48f2a85f94d7c856",
+      "predictions_sha256": "138cac4d99813c1788f592a6309628c8a6ced56119a4c6cb3b6950324c1de8d2"
+     }
+    },
+    "edge/full": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 79.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 68.46,
+        "yes/no": 80.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 100.0,
+        "is the": 50.0,
+        "is there": 100.0,
+        "is this": 66.67,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 50.0,
+        "what is the": 50.0,
+        "where are the": 100.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fdd408871c055b5dd4e4d2ef67d686bc7806d997a6abaac5de8e25457dff5ba4",
+      "predictions_sha256": "5842ae821175a7d2f95829a357173aa0a2e2aecffe80f19cc5d4d9ab63b4018a"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 59.67,
+       "perAnswerType": {
+        "number": 100.0,
+        "other": 53.08,
+        "yes/no": 40.0
+       },
+       "perQuestionType": {
+        "are there": 100.0,
+        "does the": 100.0,
+        "how many": 100.0,
+        "is it": 0.0,
+        "is the": 0.0,
+        "is there": 0.0,
+        "is this": 33.33,
+        "none of the above": 100.0,
+        "was": 100.0,
+        "what": 50.0,
+        "what are the": 100.0,
+        "what color is the": 0.0,
+        "what is the": 50.0,
+        "where are the": 0.0,
+        "which": 90.0
+       }
+      },
+      "official_sha256": "fe14fa28afb570d20d8fae64b7e8b18dff1c805e4f885e2a48f2a85f94d7c856",
+      "predictions_sha256": "138cac4d99813c1788f592a6309628c8a6ced56119a4c6cb3b6950324c1de8d2"
+     }
+    }
+   },
+   "parity": {
+    "cloud/raw_image vs distributed/projected/int8": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs distributed/projected/prompt_first": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs distributed/projected/prompt_first": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/prompt_first vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/prompt_first vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/synchronous vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    }
+   },
+   "request_ids": 30
+  }
+ }
+}

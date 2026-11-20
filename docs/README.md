@@ -12,10 +12,12 @@ Start with the [project README](../README.md) for setup and usage. This folder h
 | Predictor V2 r1 (G3) | **Failed**: cloud error tails and edge memory coverage | [Validation report](predictor-v2/validation-report.md) |
 | Edge full-model memory | Fixed by swap residency, not yet used by the campaign scripts | [GPU placement and memory](physical-testbed/gpu-placement-and-memory.md#edge-full-model-swap-residency-15-november-2026) |
 | G2 v2 baseline (swap-residency edge, short-answer prompt, interleaved placements, edge-load factor) | Off-site work done (W0–W9); next: on-site pilot, protocol freeze and the unattended run | [G2 v2 preparation](g2-v2-preparation.md), [runbook](runbooks/physical-campaign.md#g2-v2-campaign), [on-site checklist](runbooks/g2v2-onsite-checklist.md) |
-| Selector vs measured oracle (G4) and later phases | Not started; builds on G2 v2 | [Roadmap](roadmap.md) |
+| G2 v2+ on AWS (five configurations, edge and cloud load): 43,200 requests in 196 sub-blocks | **Done** (19 November 2026): every sub-block valid and correct; quality identical across configurations; the section 9 oracle is being derived. It supersedes the on-site physical G2 v2 run. | [Campaign record](../results/aws-campaign-20261119/README.md), [derived checks](../results/aws-campaign-20261119/derived/README.md), [amendment A3](protocols/g2-v2-amendment-a3.md) |
+| Predictor V2 r2 (G3), selector vs measured oracle (G4), dynamic evaluation (G5), thesis | Not started | [Thesis completion roadmap](thesis-completion-roadmap.md) |
 
 ## Plan and runbook
 
+- [Thesis completion roadmap](thesis-completion-roadmap.md): every remaining phase after the G2 v2+ AWS campaign, from close-out through G3, G4, the G5 dynamic evaluation, archive and writing.
 - [Roadmap](roadmap.md): the physical validation plan from repository cleanup to the final thesis matrix, with every gate.
 - [G2 v2 preparation](g2-v2-preparation.md): everything to finish off site and on site before the new unattended baseline run.
 - [G2 v2+ AWS roadmap](g2-v2-plus-aws-roadmap.md): migration to two AWS VMs (Terraform, container, SSM, classified shaping) combined with the G2 v2+ work, phases A–G.
