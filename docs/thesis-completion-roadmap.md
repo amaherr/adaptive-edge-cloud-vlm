@@ -37,8 +37,8 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 ## Phase 0: close out the run
 
 **Status (20 November 2026):**
-- **Done:** 0.1 ([amendment A3](protocols/g2-v2-amendment-a3.md), kept in a separate file so the pinned protocol hash stays valid; the pre-run phase E estimate had predicted all 98 winners), 0.2, 0.3 (local commit) and 0.5.
-- **Open:** 0.4 is waiting on your decision; the pair stays stopped until then.
+- **Done:** 0.1 ([amendment A3](protocols/g2-v2-amendment-a3.md), kept in a separate file so the pinned protocol hash stays valid; the pre-run phase E estimate had predicted all 98 winners), 0.2, 0.3 (pushed) and 0.5.
+- **0.4 decided:** keep the stopped pair until G5 (~$0.35 a day). The compute-down plan was not applied, and the ECR images are kept.
 
 0.1 **Record the split exposure (amendment A3).** On 19–20 November, per-cell medians and descriptive winners for **all** 98 cells were computed and viewed. That includes the validation (V01–V05) and evaluation (E01–E05) cells, which the protocol keeps unopened until G3 and sealed until G4 (section 9, "Isolation").
 - Write down exactly what was seen: cell medians and winners, not per-request rows.
