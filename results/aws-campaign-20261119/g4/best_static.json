@@ -1,0 +1,20 @@
+{
+ "configuration": "cloud/raw_image",
+ "median_ms": {
+  "cloud/raw_image": 829.6252499999999,
+  "distributed/projected/int8": 1354.01374975,
+  "distributed/projected/prompt_first": 1586.5871392499998,
+  "distributed/projected/synchronous": 1587.1797072499999,
+  "edge/full": 1052.3471455000001
+ },
+ "rule": "lowest median request-cell latency over the validation cells; configuration order breaks ties",
+ "split": "validation",
+ "units": {
+  "cloud/raw_image": 630,
+  "distributed/projected/int8": 630,
+  "distributed/projected/prompt_first": 630,
+  "distributed/projected/synchronous": 630,
+  "edge/full": 630
+ },
+ "validation_targets_sha256": "d8baf5598be353cafdfd0aa58b1b950f90403362c85578dbf1a19fde7d519759"
+}

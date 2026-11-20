@@ -11,6 +11,7 @@ from adaptive_vlm.scheduler.configuration import (
     CONFIGURATIONS,
     CapabilityStatus,
     ConfigurationId,
+    ConfigurationSpec,
 )
 
 
@@ -139,15 +140,19 @@ def _exclusion(
 def select(
     snapshots: tuple[CandidateSnapshot, ...],
     constraints: SelectionConstraints | None = None,
+    *,
+    configurations: tuple[ConfigurationSpec, ...] = CONFIGURATIONS,
 ) -> SelectionDecision:
     """Filter unsafe/unknown candidates, then choose minimum predicted latency.
 
-    The stable configuration order breaks exact ties. SLA is a preference among
-    feasible candidates; when none meets it, the fastest safe candidate is logged
-    with ``sla_unmet``. No inference or measured outcomes enter this function.
+    ``configurations`` is the candidate set in its stable order: the three
+    Phase 5-7 configurations by default, or ``ALL_CONFIGURATIONS`` (G2 v2+).
+    The stable order breaks exact ties. SLA is a preference among feasible
+    candidates; when none meets it, the fastest safe candidate is logged with
+    ``sla_unmet``. No inference or measured outcomes enter this function.
     """
     constraints = constraints or SelectionConstraints()
-    expected = {spec.id for spec in CONFIGURATIONS}
+    expected = {spec.id for spec in configurations}
     if (
         len(snapshots) != len(expected)
         or {item.configuration_id for item in snapshots} != expected
@@ -155,7 +160,7 @@ def select(
         raise ValueError("selection requires exactly one snapshot per configuration")
     by_id = {item.configuration_id: item for item in snapshots}
     decisions: list[CandidateDecision] = []
-    for spec in CONFIGURATIONS:
+    for spec in configurations:
         item = by_id[spec.id]
         reason = _exclusion(item, constraints)
         total = item.prediction.total_ms if item.prediction is not None else None
@@ -203,7 +208,7 @@ def predicted_oracle(decision: SelectionDecision) -> str | None:
     eligible = [candidate for candidate in decision.candidates if candidate.eligible]
     if not eligible:
         return None
-    order = {spec.id.value: index for index, spec in enumerate(CONFIGURATIONS)}
+    order = {c.configuration_id: index for index, c in enumerate(decision.candidates)}
     eligible.sort(
         key=lambda item: (
             item.prediction.total_ms if item.prediction else math.inf,
