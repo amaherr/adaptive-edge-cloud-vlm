@@ -1,6 +1,6 @@
 # G2 v2+ campaign on AWS (18–19 November 2026)
 
-The full A2b campaign, run under the frozen G2 v2 protocol (`protocol_sha256` `a972ecdc…e1d5`). This folder records the run and checks its integrity. The analysis (section 9 oracle, G3, G4) is still to come.
+The full A2b campaign, run under the frozen G2 v2 protocol (`protocol_sha256` `a972ecdc…e1d5`). This folder records the run and checks its integrity. The [derived checks](derived/README.md) add row-level correctness, official VQA accuracy and the training-cell section 9 oracle. G3 and G4 are still to come.
 
 - **Hosts:** edge `g6f.2xlarge` (L4-6Q vGPU), cloud `g6.xlarge` (L4), us-east-1d.
 - **Image:** `sha256:4049c069dc79…` (commit `d5e116c`), the same digest on both hosts in every session.
@@ -52,7 +52,7 @@ The validation and evaluation rows were briefly included and then moved to the i
 
 ## First look: training cells (descriptive, not the oracle)
 
-These numbers compare medians only. The section 9 oracle, with bootstrap CIs and ties, still has to be derived. The [derived checks](derived/README.md) cover row-level correctness (196/196 sub-blocks pass) and official VQA accuracy, which is identical for all five configurations. The training cells are T01–T12: 48 short cells and 6 long cells.
+These numbers compare medians only. The section 9 oracle in the [derived checks](derived/README.md#section-9-oracle-training-cells) adds bootstrap CIs and ties, and it agrees on all 54 winners. The [derived checks](derived/README.md) cover row-level correctness (196/196 sub-blocks pass) and official VQA accuracy, which is identical for all five configurations. The training cells are T01–T12: 48 short cells and 6 long cells.
 
 - **Repeatability:** the two repetitions' medians differ by 0.26% at the median (95th percentile 1.8%, maximum 3.5%).
 - **Winners:** cloud is fastest in 48 of 54 cells, the edge in 6, and a distributed configuration in none.

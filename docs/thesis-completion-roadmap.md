@@ -68,7 +68,12 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 - **1.1 done.** Scope fixed, plus two related defects: empty groups and timed-only rows.
 - **1.2 done.** 196/196 sub-blocks pass, with 0 reference mismatches and 0 cross-GPU disagreements.
 - **1.4 done.** All five configurations score identically (training 75.33%, validation 79.67%, lowercased), so parity holds.
-- **1.3 blocked.** The derivation needs the container paths `/app` and `/artifacts`: either a root-created link in WSL or a run inside the frozen image on AWS.
+- **1.3 done.** The derivation ran in WSL with temporary `/app` and `/artifacts` links.
+  - 108 training profiles pass.
+  - Oracle: cloud wins 48 of 54 cells, the edge 6; 2 are ties.
+  - Still open for phase 3: the task-feature bundle, which needs `tokenizers==0.21.4` in the WSL environment.
+
+**Gate passed:** correctness is clean, the training oracle is derived, and parity holds.
 
 1.1 **Fix `evaluate_rows` scope** (`benchmark/heterogeneous_correctness.py`).
 - Scope coverage, quality equality and repeatability to the IDs and repetitions a sub-block actually measured.

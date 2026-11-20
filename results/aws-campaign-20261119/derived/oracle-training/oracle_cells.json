@@ -1,0 +1,4073 @@
+{
+  "attempts": 6120,
+  "bootstrap_resamples": 2000,
+  "cells": [
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T01-L0",
+      "condition_id": "T01",
+      "load_level": "L0",
+      "margin_ms": 447.13983999999994,
+      "margin_ms_lossless": 447.13983999999994,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            518.839943,
+            593.186118
+          ],
+          "median_ms": 547.12616,
+          "ok": 120,
+          "p90_ms": 719.7145851
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            3098.152828,
+            3100.267095
+          ],
+          "median_ms": 3098.8843385,
+          "ok": 120,
+          "p90_ms": 3141.4723522
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5499.458731,
+            5504.173879
+          ],
+          "median_ms": 5500.1548755,
+          "ok": 120,
+          "p90_ms": 5534.483709200001
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5499.375225,
+            5505.58251
+          ],
+          "median_ms": 5500.385961,
+          "ok": 120,
+          "p90_ms": 5535.1347312
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            993.1165639999999,
+            1000.027625
+          ],
+          "median_ms": 994.266,
+          "ok": 120,
+          "p90_ms": 1083.488114
+        }
+      },
+      "rate_mbps": 5.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T01-L0-C2",
+      "condition_id": "T01",
+      "load_level": "L0",
+      "margin_ms": 164.35943699999984,
+      "margin_ms_lossless": 164.35943699999984,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1130.2967155000001,
+            1200.068536
+          ],
+          "median_ms": 1158.6386619999998,
+          "ok": 120,
+          "p90_ms": 1345.9019474
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            3402.6892295,
+            3408.916133
+          ],
+          "median_ms": 3406.612831,
+          "ok": 120,
+          "p90_ms": 3452.2296924
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5804.057159,
+            5808.635576
+          ],
+          "median_ms": 5807.299308,
+          "ok": 120,
+          "p90_ms": 5852.1482399
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5803.1353285000005,
+            5809.324957
+          ],
+          "median_ms": 5806.6856575,
+          "ok": 120,
+          "p90_ms": 5852.5527541
+        },
+        "edge/full": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            992.751657,
+            998.821574
+          ],
+          "median_ms": 994.279225,
+          "ok": 120,
+          "p90_ms": 1070.491448
+        }
+      },
+      "rate_mbps": 5.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T01-L1",
+      "condition_id": "T01",
+      "load_level": "L1",
+      "margin_ms": 866.4861669999998,
+      "margin_ms_lossless": 866.4861669999998,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            516.0994055000001,
+            589.672964
+          ],
+          "median_ms": 540.2021050000001,
+          "ok": 120,
+          "p90_ms": 712.1309739000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            3268.3879045,
+            3274.959425
+          ],
+          "median_ms": 3270.826594,
+          "ok": 120,
+          "p90_ms": 3303.4998129
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5670.8947035,
+            5675.967307
+          ],
+          "median_ms": 5673.3015595,
+          "ok": 120,
+          "p90_ms": 5700.2279801
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5671.099069,
+            5675.597695
+          ],
+          "median_ms": 5673.131609,
+          "ok": 120,
+          "p90_ms": 5703.770602
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1404.2279205,
+            1414.187178
+          ],
+          "median_ms": 1406.6882719999999,
+          "ok": 120,
+          "p90_ms": 1534.6732711000002
+        }
+      },
+      "rate_mbps": 5.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T01-L1-C2",
+      "condition_id": "T01",
+      "load_level": "L1",
+      "margin_ms": 246.82234299999982,
+      "margin_ms_lossless": 246.82234299999982,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 107,
+          "failed": 0,
+          "median_ci_ms": [
+            1143.6392555,
+            1207.197271
+          ],
+          "median_ms": 1162.463396,
+          "ok": 120,
+          "p90_ms": 1366.3061011
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            3580.928556,
+            3587.950008
+          ],
+          "median_ms": 3583.330254,
+          "ok": 120,
+          "p90_ms": 3622.5854
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5980.7220625,
+            5988.872349
+          ],
+          "median_ms": 5986.045237,
+          "ok": 120,
+          "p90_ms": 6019.897317999999
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5980.413952,
+            5987.419698
+          ],
+          "median_ms": 5983.258180000001,
+          "ok": 120,
+          "p90_ms": 6026.245446999999
+        },
+        "edge/full": {
+          "attempt_wins": 13,
+          "failed": 0,
+          "median_ci_ms": [
+            1405.6644515,
+            1413.982508
+          ],
+          "median_ms": 1409.285739,
+          "ok": 120,
+          "p90_ms": 1531.2690681000001
+        }
+      },
+      "rate_mbps": 5.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T02-L0",
+      "condition_id": "T02",
+      "load_level": "L0",
+      "margin_ms": 602.7321595,
+      "margin_ms_lossless": 602.7321595,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            382.342708,
+            405.817337
+          ],
+          "median_ms": 391.89243550000003,
+          "ok": 120,
+          "p90_ms": 455.592576
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1489.6261035,
+            1494.950473
+          ],
+          "median_ms": 1491.524416,
+          "ok": 120,
+          "p90_ms": 1525.3167047000002
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2285.6819195,
+            2289.755832
+          ],
+          "median_ms": 2288.1642174999997,
+          "ok": 120,
+          "p90_ms": 2321.4870597999998
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2286.5367345,
+            2289.638042
+          ],
+          "median_ms": 2288.1208735,
+          "ok": 120,
+          "p90_ms": 2331.0428649
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            992.13048,
+            996.269515
+          ],
+          "median_ms": 994.624595,
+          "ok": 120,
+          "p90_ms": 1071.5437384000002
+        }
+      },
+      "rate_mbps": 15.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T02-L0-C2",
+      "condition_id": "T02",
+      "load_level": "L0",
+      "margin_ms": 10.032940000000053,
+      "margin_ms_lossless": 10.032940000000053,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 54,
+          "failed": 0,
+          "median_ci_ms": [
+            993.5364950000001,
+            1015.575235
+          ],
+          "median_ms": 1004.0694550000001,
+          "ok": 120,
+          "p90_ms": 1077.5952803
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1791.4851485,
+            1795.818745
+          ],
+          "median_ms": 1793.7209105,
+          "ok": 120,
+          "p90_ms": 1843.390453
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2590.1455265,
+            2596.293059
+          ],
+          "median_ms": 2592.9764324999996,
+          "ok": 120,
+          "p90_ms": 2639.9955818999997
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2589.3671615000003,
+            2595.653519
+          ],
+          "median_ms": 2592.0593555,
+          "ok": 120,
+          "p90_ms": 2639.6175249000003
+        },
+        "edge/full": {
+          "attempt_wins": 66,
+          "failed": 0,
+          "median_ci_ms": [
+            992.10076,
+            999.746515
+          ],
+          "median_ms": 994.036515,
+          "ok": 120,
+          "p90_ms": 1082.0899915
+        }
+      },
+      "rate_mbps": 15.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "training",
+      "task": "short",
+      "tie": true,
+      "tie_lossless": true,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T02-L1",
+      "condition_id": "T02",
+      "load_level": "L1",
+      "margin_ms": 1016.1217969999999,
+      "margin_ms_lossless": 1016.1217969999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            383.9141045,
+            406.714237
+          ],
+          "median_ms": 394.15088249999997,
+          "ok": 120,
+          "p90_ms": 459.358818
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1663.010898,
+            1666.380721
+          ],
+          "median_ms": 1664.2741345,
+          "ok": 120,
+          "p90_ms": 1695.1367304
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2459.552604,
+            2464.007473
+          ],
+          "median_ms": 2462.2794814999997,
+          "ok": 120,
+          "p90_ms": 2489.1801983
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2459.349889,
+            2463.247252
+          ],
+          "median_ms": 2461.4286199999997,
+          "ok": 120,
+          "p90_ms": 2492.0179540999998
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1407.0519225,
+            1416.59982
+          ],
+          "median_ms": 1410.2726794999999,
+          "ok": 120,
+          "p90_ms": 1535.7950183
+        }
+      },
+      "rate_mbps": 15.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T02-L1-C2",
+      "condition_id": "T02",
+      "load_level": "L1",
+      "margin_ms": 397.90754949999996,
+      "margin_ms_lossless": 397.90754949999996,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            996.3521315,
+            1027.637517
+          ],
+          "median_ms": 1012.17956,
+          "ok": 120,
+          "p90_ms": 1082.3105322
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1965.6761865,
+            1972.955458
+          ],
+          "median_ms": 1970.9235305000002,
+          "ok": 120,
+          "p90_ms": 2008.3903381999999
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2764.686364,
+            2773.722232
+          ],
+          "median_ms": 2770.0048285000003,
+          "ok": 120,
+          "p90_ms": 2809.829752
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2764.80446,
+            2771.95695
+          ],
+          "median_ms": 2768.3057975,
+          "ok": 120,
+          "p90_ms": 2804.5894823000003
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1405.425806,
+            1413.965658
+          ],
+          "median_ms": 1410.0871095,
+          "ok": 120,
+          "p90_ms": 1552.6126254
+        }
+      },
+      "rate_mbps": 15.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T03-L0",
+      "condition_id": "T03",
+      "load_level": "L0",
+      "margin_ms": 637.9980875000001,
+      "margin_ms_lossless": 637.9980875000001,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            362.505332,
+            375.556302
+          ],
+          "median_ms": 369.1938925,
+          "ok": 120,
+          "p90_ms": 411.13920790000003
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1172.3148085,
+            1179.805609
+          ],
+          "median_ms": 1174.7125099999998,
+          "ok": 120,
+          "p90_ms": 1220.3080011
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1649.7433475,
+            1652.95147
+          ],
+          "median_ms": 1651.231029,
+          "ok": 120,
+          "p90_ms": 1685.4834850000002
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1649.066572,
+            1653.872831
+          ],
+          "median_ms": 1650.375928,
+          "ok": 120,
+          "p90_ms": 1685.2949088
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            998.135183,
+            1016.067657
+          ],
+          "median_ms": 1007.1919800000001,
+          "ok": 120,
+          "p90_ms": 1101.2107694000001
+        }
+      },
+      "rate_mbps": 25.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T03-L0-C2",
+      "condition_id": "T03",
+      "load_level": "L0",
+      "margin_ms": 20.180424000000016,
+      "margin_ms_lossless": 20.180424000000016,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 85,
+          "failed": 0,
+          "median_ci_ms": [
+            972.652938,
+            989.489957
+          ],
+          "median_ms": 979.332536,
+          "ok": 120,
+          "p90_ms": 1036.5814231
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1475.301752,
+            1484.426942
+          ],
+          "median_ms": 1480.447956,
+          "ok": 120,
+          "p90_ms": 1527.9631611
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1954.4843329999999,
+            1965.838492
+          ],
+          "median_ms": 1959.361042,
+          "ok": 120,
+          "p90_ms": 2005.8614661000001
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1953.0059485,
+            1964.021759
+          ],
+          "median_ms": 1956.182279,
+          "ok": 120,
+          "p90_ms": 2006.7408094
+        },
+        "edge/full": {
+          "attempt_wins": 35,
+          "failed": 0,
+          "median_ci_ms": [
+            997.6993235,
+            1003.264805
+          ],
+          "median_ms": 999.51296,
+          "ok": 120,
+          "p90_ms": 1074.6460649
+        }
+      },
+      "rate_mbps": 25.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T03-L1",
+      "condition_id": "T03",
+      "load_level": "L1",
+      "margin_ms": 979.3893930000002,
+      "margin_ms_lossless": 1042.4594934999998,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            362.7793875,
+            375.132872
+          ],
+          "median_ms": 369.7919675,
+          "ok": 120,
+          "p90_ms": 413.7755951
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1346.020598,
+            1351.675768
+          ],
+          "median_ms": 1349.1813605000002,
+          "ok": 120,
+          "p90_ms": 1376.593099
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1822.392536,
+            1828.460281
+          ],
+          "median_ms": 1823.892457,
+          "ok": 120,
+          "p90_ms": 1854.6724581
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1822.190391,
+            1828.250391
+          ],
+          "median_ms": 1824.0018275,
+          "ok": 120,
+          "p90_ms": 1855.1285781
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1404.6834454999998,
+            1422.090605
+          ],
+          "median_ms": 1412.2514609999998,
+          "ok": 120,
+          "p90_ms": 1538.2961712
+        }
+      },
+      "rate_mbps": 25.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T03-L1-C2",
+      "condition_id": "T03",
+      "load_level": "L1",
+      "margin_ms": 429.6062205000002,
+      "margin_ms_lossless": 429.6062205000002,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            978.0036474999999,
+            991.388408
+          ],
+          "median_ms": 984.2090525,
+          "ok": 120,
+          "p90_ms": 1039.5336578000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1651.7325190000001,
+            1657.584113
+          ],
+          "median_ms": 1653.4367750000001,
+          "ok": 120,
+          "p90_ms": 1693.547282
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2127.856687,
+            2136.377799
+          ],
+          "median_ms": 2131.7147649999997,
+          "ok": 120,
+          "p90_ms": 2172.4406531
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2128.0287230000004,
+            2135.184808
+          ],
+          "median_ms": 2131.9943555,
+          "ok": 120,
+          "p90_ms": 2172.778144
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1408.406903,
+            1417.374761
+          ],
+          "median_ms": 1413.8152730000002,
+          "ok": 120,
+          "p90_ms": 1536.5948681
+        }
+      },
+      "rate_mbps": 25.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T04-L0",
+      "condition_id": "T04",
+      "load_level": "L0",
+      "margin_ms": 619.1971495,
+      "margin_ms_lossless": 644.63795,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            348.47392,
+            359.945945
+          ],
+          "median_ms": 354.078,
+          "ok": 120,
+          "p90_ms": 387.37453
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            970.3696095,
+            979.149145
+          ],
+          "median_ms": 973.2751495,
+          "ok": 120,
+          "p90_ms": 1017.571827
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1233.9112129999999,
+            1238.399028
+          ],
+          "median_ms": 1236.4449435000001,
+          "ok": 120,
+          "p90_ms": 1266.1610011000002
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1234.0470285000001,
+            1237.547138
+          ],
+          "median_ms": 1235.616013,
+          "ok": 120,
+          "p90_ms": 1277.637093
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            996.622575,
+            1000.490275
+          ],
+          "median_ms": 998.71595,
+          "ok": 120,
+          "p90_ms": 1076.4452439000002
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T04-L0-C2",
+      "condition_id": "T04",
+      "load_level": "L0",
+      "margin_ms": 37.47117900000001,
+      "margin_ms_lossless": 37.47117900000001,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 96,
+          "failed": 0,
+          "median_ci_ms": [
+            951.7081095000001,
+            967.011428
+          ],
+          "median_ms": 959.020051,
+          "ok": 120,
+          "p90_ms": 1007.202415
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1270.6512175,
+            1276.890719
+          ],
+          "median_ms": 1273.483162,
+          "ok": 120,
+          "p90_ms": 1322.6159735
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1535.849435,
+            1540.28059
+          ],
+          "median_ms": 1537.631202,
+          "ok": 120,
+          "p90_ms": 1585.4741391999999
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1535.668244,
+            1540.55424
+          ],
+          "median_ms": 1537.989608,
+          "ok": 120,
+          "p90_ms": 1587.6614109999998
+        },
+        "edge/full": {
+          "attempt_wins": 24,
+          "failed": 0,
+          "median_ci_ms": [
+            994.1125724999999,
+            1001.534065
+          ],
+          "median_ms": 996.49123,
+          "ok": 120,
+          "p90_ms": 1076.7784029000002
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T04-L1",
+      "condition_id": "T04",
+      "load_level": "L1",
+      "margin_ms": 789.4437655,
+      "margin_ms_lossless": 1052.1838925000002,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            351.919813,
+            365.103434
+          ],
+          "median_ms": 357.72104249999995,
+          "ok": 120,
+          "p90_ms": 388.8560721
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1142.8589395,
+            1149.921366
+          ],
+          "median_ms": 1147.164808,
+          "ok": 120,
+          "p90_ms": 1173.3846842
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1409.1213585,
+            1413.062057
+          ],
+          "median_ms": 1411.4643005,
+          "ok": 120,
+          "p90_ms": 1437.267591
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1406.338812,
+            1412.678007
+          ],
+          "median_ms": 1409.904935,
+          "ok": 120,
+          "p90_ms": 1440.4098554
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1410.3226,
+            1428.626099
+          ],
+          "median_ms": 1415.9305789999999,
+          "ok": 120,
+          "p90_ms": 1537.2772045
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T04-L1-C2",
+      "condition_id": "T04",
+      "load_level": "L1",
+      "margin_ms": 446.95358550000003,
+      "margin_ms_lossless": 446.95358550000003,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            953.55463,
+            970.365315
+          ],
+          "median_ms": 959.196785,
+          "ok": 120,
+          "p90_ms": 1001.457437
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1448.887572,
+            1453.416772
+          ],
+          "median_ms": 1450.0382765,
+          "ok": 120,
+          "p90_ms": 1488.631012
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1711.5614110000001,
+            1715.469596
+          ],
+          "median_ms": 1713.4872605,
+          "ok": 120,
+          "p90_ms": 1749.8005131
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1709.3547800000001,
+            1714.232596
+          ],
+          "median_ms": 1711.662175,
+          "ok": 120,
+          "p90_ms": 1751.039908
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1403.6377659999998,
+            1409.34073
+          ],
+          "median_ms": 1406.1503705,
+          "ok": 120,
+          "p90_ms": 1524.05978
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 60,
+      "cell_id": "T04-L1-long",
+      "condition_id": "T04",
+      "load_level": "L1",
+      "margin_ms": 789.9081624999999,
+      "margin_ms_lossless": 1054.1973360000002,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            841.0545796125,
+            856.729593
+          ],
+          "median_ms": 846.4261975,
+          "ok": 60,
+          "p90_ms": 869.553183
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1630.9645898875,
+            1640.9324775125
+          ],
+          "median_ms": 1636.3343599999998,
+          "ok": 60,
+          "p90_ms": 1656.000405
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1897.5049565125,
+            1903.024508
+          ],
+          "median_ms": 1900.6235335000001,
+          "ok": 60,
+          "p90_ms": 1914.5332101000001
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1896.9114385,
+            1906.408249
+          ],
+          "median_ms": 1901.3396539999999,
+          "ok": 60,
+          "p90_ms": 1920.2350410000001
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5074.144381,
+            5087.379876
+          ],
+          "median_ms": 5082.3652005,
+          "ok": 60,
+          "p90_ms": 5104.433844
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "long",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T05-L0",
+      "condition_id": "T05",
+      "load_level": "L0",
+      "margin_ms": 517.8790469999999,
+      "margin_ms_lossless": 649.103271,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            342.6271605,
+            356.465625
+          ],
+          "median_ms": 349.7932235,
+          "ok": 120,
+          "p90_ms": 378.355413
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            866.4456175,
+            869.548162
+          ],
+          "median_ms": 867.6722705,
+          "ok": 120,
+          "p90_ms": 901.5340741000001
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1013.6175305,
+            1019.875635
+          ],
+          "median_ms": 1016.3618175,
+          "ok": 120,
+          "p90_ms": 1046.4299736
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1012.611275,
+            1018.80884
+          ],
+          "median_ms": 1015.046791,
+          "ok": 120,
+          "p90_ms": 1057.2180992
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            997.6157085,
+            1000.204015
+          ],
+          "median_ms": 998.8964945,
+          "ok": 120,
+          "p90_ms": 1075.6818041
+        }
+      },
+      "rate_mbps": 80.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T05-L0-C2",
+      "condition_id": "T05",
+      "load_level": "L0",
+      "margin_ms": 40.06529750000004,
+      "margin_ms_lossless": 40.06529750000004,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 97,
+          "failed": 0,
+          "median_ci_ms": [
+            952.935512,
+            974.656174
+          ],
+          "median_ms": 958.9274865,
+          "ok": 120,
+          "p90_ms": 1005.2789525000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1169.541271,
+            1173.939224
+          ],
+          "median_ms": 1171.8520825,
+          "ok": 120,
+          "p90_ms": 1224.8069021000001
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1317.8927955,
+            1322.807474
+          ],
+          "median_ms": 1319.8745370000001,
+          "ok": 120,
+          "p90_ms": 1364.8965890000002
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1319.201631,
+            1323.948515
+          ],
+          "median_ms": 1320.451868,
+          "ok": 120,
+          "p90_ms": 1362.0702284000001
+        },
+        "edge/full": {
+          "attempt_wins": 23,
+          "failed": 0,
+          "median_ci_ms": [
+            996.769782,
+            1002.617717
+          ],
+          "median_ms": 998.992784,
+          "ok": 120,
+          "p90_ms": 1080.8738415
+        }
+      },
+      "rate_mbps": 80.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T05-L1",
+      "condition_id": "T05",
+      "load_level": "L1",
+      "margin_ms": 687.996337,
+      "margin_ms_lossless": 833.6905019999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            345.375423,
+            358.206506
+          ],
+          "median_ms": 350.7076785,
+          "ok": 120,
+          "p90_ms": 381.9354402
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1035.041946,
+            1040.309937
+          ],
+          "median_ms": 1038.7040155,
+          "ok": 120,
+          "p90_ms": 1067.3950318
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1184.655048,
+            1188.508458
+          ],
+          "median_ms": 1186.686221,
+          "ok": 120,
+          "p90_ms": 1217.0679222
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1180.632218,
+            1187.698727
+          ],
+          "median_ms": 1184.3981804999999,
+          "ok": 120,
+          "p90_ms": 1212.7244869
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1404.70784,
+            1426.084041
+          ],
+          "median_ms": 1415.858816,
+          "ok": 120,
+          "p90_ms": 1557.2182438000002
+        }
+      },
+      "rate_mbps": 80.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T05-L1-C2",
+      "condition_id": "T05",
+      "load_level": "L1",
+      "margin_ms": 387.6252609999999,
+      "margin_ms_lossless": 455.887467,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            941.418829,
+            959.582904
+          ],
+          "median_ms": 952.713884,
+          "ok": 120,
+          "p90_ms": 995.009183
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1338.41117,
+            1343.054089
+          ],
+          "median_ms": 1340.339145,
+          "ok": 120,
+          "p90_ms": 1382.164982
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1483.5716670000002,
+            1489.186313
+          ],
+          "median_ms": 1485.8776214999998,
+          "ok": 120,
+          "p90_ms": 1527.205302
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1482.841887,
+            1489.334152
+          ],
+          "median_ms": 1487.344263,
+          "ok": 120,
+          "p90_ms": 1531.347995
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1404.866121,
+            1415.765571
+          ],
+          "median_ms": 1408.601351,
+          "ok": 120,
+          "p90_ms": 1535.560943
+        }
+      },
+      "rate_mbps": 80.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T06-L0",
+      "condition_id": "T06",
+      "load_level": "L0",
+      "margin_ms": 469.221902,
+      "margin_ms_lossless": 544.5691035,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            334.559845,
+            351.333555
+          ],
+          "median_ms": 342.858335,
+          "ok": 120,
+          "p90_ms": 372.58919190000006
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            810.955012,
+            814.794813
+          ],
+          "median_ms": 812.080237,
+          "ok": 120,
+          "p90_ms": 849.052736
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            889.553013,
+            893.580214
+          ],
+          "median_ms": 890.4259179999999,
+          "ok": 120,
+          "p90_ms": 930.052761
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            885.188523,
+            890.047063
+          ],
+          "median_ms": 887.4274385,
+          "ok": 120,
+          "p90_ms": 927.25241
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1001.0452250000001,
+            1012.980446
+          ],
+          "median_ms": 1008.01124,
+          "ok": 120,
+          "p90_ms": 1093.9084901
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T06-L0-C2",
+      "condition_id": "T06",
+      "load_level": "L0",
+      "margin_ms": 45.23985700000003,
+      "margin_ms_lossless": 45.23985700000003,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 96,
+          "failed": 0,
+          "median_ci_ms": [
+            946.005771,
+            960.175872
+          ],
+          "median_ms": 954.9780430000001,
+          "ok": 120,
+          "p90_ms": 996.3226512
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 2,
+          "failed": 0,
+          "median_ci_ms": [
+            1110.234969,
+            1117.484499
+          ],
+          "median_ms": 1113.4754404999999,
+          "ok": 120,
+          "p90_ms": 1163.6848931
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1188.6191065,
+            1194.923772
+          ],
+          "median_ms": 1190.865753,
+          "ok": 120,
+          "p90_ms": 1238.4350771
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1188.157556,
+            1195.187521
+          ],
+          "median_ms": 1191.044203,
+          "ok": 120,
+          "p90_ms": 1238.0752482
+        },
+        "edge/full": {
+          "attempt_wins": 22,
+          "failed": 0,
+          "median_ci_ms": [
+            997.933558,
+            1003.798818
+          ],
+          "median_ms": 1000.2179000000001,
+          "ok": 120,
+          "p90_ms": 1078.5545140000002
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 60,
+      "cell_id": "T06-L0-long",
+      "condition_id": "T06",
+      "load_level": "L0",
+      "margin_ms": 461.68283099999985,
+      "margin_ms_lossless": 537.4192785,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            836.3799625,
+            852.996752
+          ],
+          "median_ms": 843.1168130000001,
+          "ok": 60,
+          "p90_ms": 864.1155073
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1302.849268,
+            1312.13193
+          ],
+          "median_ms": 1304.799644,
+          "ok": 60,
+          "p90_ms": 1331.355084
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1377.899705,
+            1383.969244
+          ],
+          "median_ms": 1381.559551,
+          "ok": 60,
+          "p90_ms": 1405.2425943
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1378.2405105,
+            1383.305791
+          ],
+          "median_ms": 1380.5360915,
+          "ok": 60,
+          "p90_ms": 1404.7230443
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            3420.6103125,
+            3438.658647
+          ],
+          "median_ms": 3433.1347514999998,
+          "ok": 60,
+          "p90_ms": 3462.0572625
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "training",
+      "task": "long",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T06-L1",
+      "condition_id": "T06",
+      "load_level": "L1",
+      "margin_ms": 629.439627,
+      "margin_ms_lossless": 703.234206,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            340.8432245,
+            357.369018
+          ],
+          "median_ms": 351.3655175,
+          "ok": 120,
+          "p90_ms": 375.0730191
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            976.4331855,
+            985.445883
+          ],
+          "median_ms": 980.8051445,
+          "ok": 120,
+          "p90_ms": 1017.575233
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1052.7533925,
+            1060.972214
+          ],
+          "median_ms": 1055.9455795,
+          "ok": 120,
+          "p90_ms": 1085.9727802
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1051.3226555,
+            1060.784673
+          ],
+          "median_ms": 1054.5997235,
+          "ok": 120,
+          "p90_ms": 1089.0839571000001
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1397.8472595,
+            1413.531967
+          ],
+          "median_ms": 1403.9287199999999,
+          "ok": 120,
+          "p90_ms": 1539.3039786000002
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 120,
+      "cell_id": "T06-L1-C2",
+      "condition_id": "T06",
+      "load_level": "L1",
+      "margin_ms": 332.3589455,
+      "margin_ms_lossless": 405.18248600000004,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            941.1230419999999,
+            956.747685
+          ],
+          "median_ms": 950.588165,
+          "ok": 120,
+          "p90_ms": 987.5944871
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1278.759599,
+            1285.179739
+          ],
+          "median_ms": 1282.9471105,
+          "ok": 120,
+          "p90_ms": 1318.861434
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1352.272689,
+            1361.547156
+          ],
+          "median_ms": 1355.770651,
+          "ok": 120,
+          "p90_ms": 1396.1295588
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1353.8804795,
+            1362.20934
+          ],
+          "median_ms": 1359.2294299999999,
+          "ok": 120,
+          "p90_ms": 1394.3188809
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1396.3354955,
+            1409.148991
+          ],
+          "median_ms": 1404.1098155,
+          "ok": 120,
+          "p90_ms": 1531.933419
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 60,
+      "cell_id": "T06-L1-long",
+      "condition_id": "T06",
+      "load_level": "L1",
+      "margin_ms": 635.9990849999999,
+      "margin_ms_lossless": 713.4856735000001,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            831.89962515,
+            848.147983
+          ],
+          "median_ms": 834.1616065000001,
+          "ok": 60,
+          "p90_ms": 858.4275182
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1467.943052,
+            1473.269885
+          ],
+          "median_ms": 1470.1606915,
+          "ok": 60,
+          "p90_ms": 1490.2838881
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1545.1972135,
+            1553.878543025
+          ],
+          "median_ms": 1547.6472800000001,
+          "ok": 60,
+          "p90_ms": 1572.2155025000002
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1547.1307601250003,
+            1554.0512606125
+          ],
+          "median_ms": 1549.4043415,
+          "ok": 60,
+          "p90_ms": 1568.8605061
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5070.880665,
+            5087.809344
+          ],
+          "median_ms": 5078.468225500001,
+          "ok": 60,
+          "p90_ms": 5113.0902108
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "long",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 120,
+      "cell_id": "T07-L0",
+      "condition_id": "T07",
+      "load_level": "L0",
+      "margin_ms": 493.640579,
+      "margin_ms_lossless": 610.6361055,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            296.450644,
+            304.678775
+          ],
+          "median_ms": 300.212313,
+          "ok": 120,
+          "p90_ms": 320.6475133
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            785.6838765,
+            795.993532
+          ],
+          "median_ms": 793.852892,
+          "ok": 120,
+          "p90_ms": 829.0081491
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            906.6470039999999,
+            913.117643
+          ],
+          "median_ms": 910.8484185,
+          "ok": 120,
+          "p90_ms": 941.4357927000001
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            906.8943715,
+            914.075674
+          ],
+          "median_ms": 911.197518,
+          "ok": 120,
+          "p90_ms": 943.2245193
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1007.4097655,
+            1035.612256
+          ],
+          "median_ms": 1030.775811,
+          "ok": 120,
+          "p90_ms": 1113.3001229000001
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 120,
+      "cell_id": "T07-L0-C2",
+      "condition_id": "T07",
+      "load_level": "L0",
+      "margin_ms": 88.46618650000005,
+      "margin_ms_lossless": 88.46618650000005,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 96,
+          "failed": 0,
+          "median_ci_ms": [
+            900.3986695000001,
+            910.406833
+          ],
+          "median_ms": 905.527066,
+          "ok": 120,
+          "p90_ms": 945.7017305
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 2,
+          "failed": 0,
+          "median_ci_ms": [
+            1079.863336,
+            1087.518385
+          ],
+          "median_ms": 1083.0724965,
+          "ok": 120,
+          "p90_ms": 1127.0587719999999
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1199.1513325,
+            1206.836301
+          ],
+          "median_ms": 1201.751382,
+          "ok": 120,
+          "p90_ms": 1249.327264
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1197.403906,
+            1203.936868
+          ],
+          "median_ms": 1199.4250550000002,
+          "ok": 120,
+          "p90_ms": 1248.5349653
+        },
+        "edge/full": {
+          "attempt_wins": 22,
+          "failed": 0,
+          "median_ci_ms": [
+            992.2174265,
+            994.882601
+          ],
+          "median_ms": 993.9932525,
+          "ok": 120,
+          "p90_ms": 1078.7278622
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 120,
+      "cell_id": "T07-L1",
+      "condition_id": "T07",
+      "load_level": "L1",
+      "margin_ms": 650.5666444999999,
+      "margin_ms_lossless": 768.0170589999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            296.676864,
+            305.242624
+          ],
+          "median_ms": 303.09337500000004,
+          "ok": 120,
+          "p90_ms": 320.93865569999997
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            950.2075944999999,
+            955.180735
+          ],
+          "median_ms": 953.6600195,
+          "ok": 120,
+          "p90_ms": 981.0585761
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1070.7405990000002,
+            1074.275036
+          ],
+          "median_ms": 1072.0533460000001,
+          "ok": 120,
+          "p90_ms": 1097.0355813
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1066.504931,
+            1073.804124
+          ],
+          "median_ms": 1071.110434,
+          "ok": 120,
+          "p90_ms": 1096.5182605
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1412.0596285,
+            1420.454083
+          ],
+          "median_ms": 1414.797891,
+          "ok": 120,
+          "p90_ms": 1537.3322524
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 120,
+      "cell_id": "T07-L1-C2",
+      "condition_id": "T07",
+      "load_level": "L1",
+      "margin_ms": 348.5985159999998,
+      "margin_ms_lossless": 465.11523999999986,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            903.8145665,
+            910.987073
+          ],
+          "median_ms": 908.1211605000001,
+          "ok": 120,
+          "p90_ms": 954.1707601
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1254.609235,
+            1260.462794
+          ],
+          "median_ms": 1256.7196764999999,
+          "ok": 120,
+          "p90_ms": 1303.8484241
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1370.1911125,
+            1377.225538
+          ],
+          "median_ms": 1373.2364005,
+          "ok": 120,
+          "p90_ms": 1417.9516512
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1369.131267,
+            1377.704299
+          ],
+          "median_ms": 1374.2688859999998,
+          "ok": 120,
+          "p90_ms": 1413.2421941
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1411.3095254999998,
+            1418.874592
+          ],
+          "median_ms": 1414.5999379999998,
+          "ok": 120,
+          "p90_ms": 1535.078628
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 120,
+      "cell_id": "T08-L0",
+      "condition_id": "T08",
+      "load_level": "L0",
+      "margin_ms": 428.177115,
+      "margin_ms_lossless": 484.4799299999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            297.108789,
+            305.245565
+          ],
+          "median_ms": 302.531628,
+          "ok": 120,
+          "p90_ms": 322.761568
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            727.488425,
+            735.671762
+          ],
+          "median_ms": 730.708743,
+          "ok": 120,
+          "p90_ms": 764.6634312
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            785.3973364999999,
+            788.730445
+          ],
+          "median_ms": 787.0115579999999,
+          "ok": 120,
+          "p90_ms": 822.8160882000001
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            785.6036925000001,
+            790.414986
+          ],
+          "median_ms": 788.268814,
+          "ok": 120,
+          "p90_ms": 816.2553877
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1000.6794805,
+            1007.653941
+          ],
+          "median_ms": 1004.444393,
+          "ok": 120,
+          "p90_ms": 1080.792106
+        }
+      },
+      "rate_mbps": 200.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 120,
+      "cell_id": "T08-L0-C2",
+      "condition_id": "T08",
+      "load_level": "L0",
+      "margin_ms": 93.5137850000001,
+      "margin_ms_lossless": 93.5137850000001,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 96,
+          "failed": 0,
+          "median_ci_ms": [
+            902.1239155000001,
+            910.945053
+          ],
+          "median_ms": 906.3710189999999,
+          "ok": 120,
+          "p90_ms": 942.9206571
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 6,
+          "failed": 0,
+          "median_ci_ms": [
+            1029.784133,
+            1035.297773
+          ],
+          "median_ms": 1031.7094455000001,
+          "ok": 120,
+          "p90_ms": 1074.2194159
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1086.058538,
+            1093.84286
+          ],
+          "median_ms": 1088.153651,
+          "ok": 120,
+          "p90_ms": 1132.0917141
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1084.2255175,
+            1091.413128
+          ],
+          "median_ms": 1087.6829705,
+          "ok": 120,
+          "p90_ms": 1131.3527669
+        },
+        "edge/full": {
+          "attempt_wins": 18,
+          "failed": 0,
+          "median_ci_ms": [
+            996.0091515,
+            1003.763958
+          ],
+          "median_ms": 999.884804,
+          "ok": 120,
+          "p90_ms": 1076.6035041
+        }
+      },
+      "rate_mbps": 200.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 120,
+      "cell_id": "T08-L1",
+      "condition_id": "T08",
+      "load_level": "L1",
+      "margin_ms": 603.2813255,
+      "margin_ms_lossless": 660.8591265,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            293.7998265,
+            301.700164
+          ],
+          "median_ms": 297.50854949999996,
+          "ok": 120,
+          "p90_ms": 318.7677332
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            897.0686685000001,
+            904.325043
+          ],
+          "median_ms": 900.7898749999999,
+          "ok": 120,
+          "p90_ms": 933.6287447999999
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            956.2365925,
+            960.725743
+          ],
+          "median_ms": 958.367676,
+          "ok": 120,
+          "p90_ms": 990.1750483000001
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            956.112329,
+            960.948644
+          ],
+          "median_ms": 958.4003425,
+          "ok": 120,
+          "p90_ms": 984.632837
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1418.255596,
+            1427.673932
+          ],
+          "median_ms": 1422.074517,
+          "ok": 120,
+          "p90_ms": 1545.1390110999998
+        }
+      },
+      "rate_mbps": 200.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 120,
+      "cell_id": "T08-L1-C2",
+      "condition_id": "T08",
+      "load_level": "L1",
+      "margin_ms": 297.039534,
+      "margin_ms_lossless": 353.6012045000002,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 109,
+          "failed": 0,
+          "median_ci_ms": [
+            900.580425,
+            912.058343
+          ],
+          "median_ms": 906.4280094999999,
+          "ok": 120,
+          "p90_ms": 940.4815120000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 11,
+          "failed": 0,
+          "median_ci_ms": [
+            1198.8499195,
+            1207.821252
+          ],
+          "median_ms": 1203.4675435,
+          "ok": 120,
+          "p90_ms": 1241.5051421
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1256.5381315,
+            1264.304367
+          ],
+          "median_ms": 1260.2071385,
+          "ok": 120,
+          "p90_ms": 1296.8235740999999
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1256.121266,
+            1263.876937
+          ],
+          "median_ms": 1260.0292140000001,
+          "ok": 120,
+          "p90_ms": 1299.2846402
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1412.902117,
+            1431.594042
+          ],
+          "median_ms": 1418.1393155,
+          "ok": 120,
+          "p90_ms": 1541.7897361
+        }
+      },
+      "rate_mbps": 200.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 5.0,
+      "attempts": 60,
+      "cell_id": "T08-L1-long",
+      "condition_id": "T08",
+      "load_level": "L1",
+      "margin_ms": 590.6063304999999,
+      "margin_ms_lossless": 645.1479189999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            797.283632,
+            810.416052
+          ],
+          "median_ms": 804.6336075,
+          "ok": 60,
+          "p90_ms": 818.8622951000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1389.5920531375,
+            1399.535366
+          ],
+          "median_ms": 1395.239938,
+          "ok": 60,
+          "p90_ms": 1421.0250243
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1447.4503897625,
+            1455.928312
+          ],
+          "median_ms": 1449.7815265,
+          "ok": 60,
+          "p90_ms": 1477.4604383
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1445.5106491125,
+            1455.278841
+          ],
+          "median_ms": 1450.902388,
+          "ok": 60,
+          "p90_ms": 1480.5113210999998
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5037.1360685,
+            5065.965087
+          ],
+          "median_ms": 5048.1528015,
+          "ok": 60,
+          "p90_ms": 5189.7721114000005
+        }
+      },
+      "rate_mbps": 200.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "long",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 120,
+      "cell_id": "T09-L0",
+      "condition_id": "T09",
+      "load_level": "L0",
+      "margin_ms": 408.7102565,
+      "margin_ms_lossless": 408.7102565,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            580.4195884999999,
+            615.219449
+          ],
+          "median_ms": 588.7223285,
+          "ok": 120,
+          "p90_ms": 696.963543
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1295.407894,
+            1301.225899
+          ],
+          "median_ms": 1297.8099240000001,
+          "ok": 120,
+          "p90_ms": 1340.3463829999998
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1432.814891,
+            1437.277451
+          ],
+          "median_ms": 1434.462456,
+          "ok": 120,
+          "p90_ms": 1472.069159
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1432.401281,
+            1436.358091
+          ],
+          "median_ms": 1434.590847,
+          "ok": 120,
+          "p90_ms": 1478.394653
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            995.1610045,
+            1000.473125
+          ],
+          "median_ms": 997.432585,
+          "ok": 120,
+          "p90_ms": 1079.5882689999999
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 120,
+      "cell_id": "T09-L0-C2",
+      "condition_id": "T09",
+      "load_level": "L0",
+      "margin_ms": 205.19816349999996,
+      "margin_ms_lossless": 205.19816349999996,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1187.2976005,
+            1241.319829
+          ],
+          "median_ms": 1201.120588,
+          "ok": 120,
+          "p90_ms": 1310.8054511
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1599.7144295,
+            1606.898254
+          ],
+          "median_ms": 1603.180432,
+          "ok": 120,
+          "p90_ms": 1650.0936313
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1737.4063325,
+            1743.337792
+          ],
+          "median_ms": 1739.4547545,
+          "ok": 120,
+          "p90_ms": 1788.2157778
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1736.7580215,
+            1742.221791
+          ],
+          "median_ms": 1738.6042025000002,
+          "ok": 120,
+          "p90_ms": 1787.8766857
+        },
+        "edge/full": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            992.31635,
+            1000.298754
+          ],
+          "median_ms": 995.9224245,
+          "ok": 120,
+          "p90_ms": 1072.693922
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 60,
+      "cell_id": "T09-L0-long",
+      "condition_id": "T09",
+      "load_level": "L0",
+      "margin_ms": 706.3561090000001,
+      "margin_ms_lossless": 844.2409,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            1077.9119575,
+            1171.570333
+          ],
+          "median_ms": 1089.5617365,
+          "ok": 60,
+          "p90_ms": 1204.7773502
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1792.291587,
+            1803.731821
+          ],
+          "median_ms": 1795.9178455,
+          "ok": 60,
+          "p90_ms": 1831.6012368
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1932.387895,
+            1939.83259
+          ],
+          "median_ms": 1935.3290075,
+          "ok": 60,
+          "p90_ms": 1965.3847866
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1930.375664,
+            1937.494739
+          ],
+          "median_ms": 1933.8026365,
+          "ok": 60,
+          "p90_ms": 1962.2192139
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            3424.6336,
+            3433.092093
+          ],
+          "median_ms": 3428.0640734999997,
+          "ok": 60,
+          "p90_ms": 3473.9335802
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "training",
+      "task": "long",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 120,
+      "cell_id": "T09-L1",
+      "condition_id": "T09",
+      "load_level": "L1",
+      "margin_ms": 821.3310105,
+      "margin_ms_lossless": 821.3310105,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            582.355514,
+            613.986674
+          ],
+          "median_ms": 590.9383905,
+          "ok": 120,
+          "p90_ms": 699.1052751000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1472.4623649999999,
+            1477.573569
+          ],
+          "median_ms": 1475.4024725,
+          "ok": 120,
+          "p90_ms": 1508.202914
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1608.97464,
+            1616.014591
+          ],
+          "median_ms": 1612.340673,
+          "ok": 120,
+          "p90_ms": 1638.8768161
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1608.425544,
+            1614.82581
+          ],
+          "median_ms": 1609.8162255,
+          "ok": 120,
+          "p90_ms": 1635.1446315
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1409.327244,
+            1416.064939
+          ],
+          "median_ms": 1412.269401,
+          "ok": 120,
+          "p90_ms": 1536.224918
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 120,
+      "cell_id": "T09-L1-C2",
+      "condition_id": "T09",
+      "load_level": "L1",
+      "margin_ms": 209.42648250000002,
+      "margin_ms_lossless": 209.42648250000002,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 106,
+          "failed": 0,
+          "median_ci_ms": [
+            1185.343768,
+            1235.318849
+          ],
+          "median_ms": 1201.827933,
+          "ok": 120,
+          "p90_ms": 1315.5438519
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1775.616672,
+            1782.456797
+          ],
+          "median_ms": 1779.148011,
+          "ok": 120,
+          "p90_ms": 1811.848547
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1910.2969484999999,
+            1917.116379
+          ],
+          "median_ms": 1912.6058185,
+          "ok": 120,
+          "p90_ms": 1951.128874
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1911.9798584999999,
+            1918.181429
+          ],
+          "median_ms": 1916.319759,
+          "ok": 120,
+          "p90_ms": 1951.817164
+        },
+        "edge/full": {
+          "attempt_wins": 14,
+          "failed": 0,
+          "median_ci_ms": [
+            1407.234966,
+            1415.475391
+          ],
+          "median_ms": 1411.2544155,
+          "ok": 120,
+          "p90_ms": 1535.191203
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 60,
+      "cell_id": "T09-L1-long",
+      "condition_id": "T09",
+      "load_level": "L1",
+      "margin_ms": 870.6272410000001,
+      "margin_ms_lossless": 1010.4498684999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            1074.88249,
+            1171.376283
+          ],
+          "median_ms": 1090.8674075,
+          "ok": 60,
+          "p90_ms": 1192.4122682
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1959.2156909999999,
+            1966.609023
+          ],
+          "median_ms": 1961.4946485,
+          "ok": 60,
+          "p90_ms": 1997.5348751
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2097.140208,
+            2106.517135
+          ],
+          "median_ms": 2101.3172759999998,
+          "ok": 60,
+          "p90_ms": 2131.5008722
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2098.946279875,
+            2105.471694
+          ],
+          "median_ms": 2101.3456165,
+          "ok": 60,
+          "p90_ms": 2124.7310486
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5055.1196225,
+            5079.4680307875
+          ],
+          "median_ms": 5074.742869,
+          "ok": 60,
+          "p90_ms": 5118.4516159
+        }
+      },
+      "rate_mbps": 100.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "training",
+      "task": "long",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 120,
+      "cell_id": "T10-L0",
+      "condition_id": "T10",
+      "load_level": "L0",
+      "margin_ms": 428.84337100000005,
+      "margin_ms_lossless": 428.84337100000005,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            590.1624015,
+            621.39267
+          ],
+          "median_ms": 594.147699,
+          "ok": 120,
+          "p90_ms": 716.3853695
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1371.2564435,
+            1378.54389
+          ],
+          "median_ms": 1374.8721105,
+          "ok": 120,
+          "p90_ms": 1407.5502388
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1637.591794,
+            1642.775445
+          ],
+          "median_ms": 1640.4557949999999,
+          "ok": 120,
+          "p90_ms": 1671.617153
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1635.2158955,
+            1642.033261
+          ],
+          "median_ms": 1638.5121045,
+          "ok": 120,
+          "p90_ms": 1675.2064442
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1002.2345164999999,
+            1033.030696
+          ],
+          "median_ms": 1022.99107,
+          "ok": 120,
+          "p90_ms": 1116.1272781
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 120,
+      "cell_id": "T10-L0-C2",
+      "condition_id": "T10",
+      "load_level": "L0",
+      "margin_ms": 219.19493450000016,
+      "margin_ms_lossless": 219.19493450000016,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1196.3787695,
+            1254.728799
+          ],
+          "median_ms": 1213.9542820000001,
+          "ok": 120,
+          "p90_ms": 1347.9080811000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1666.2081779999999,
+            1671.778265
+          ],
+          "median_ms": 1668.483264,
+          "ok": 120,
+          "p90_ms": 1719.6156583
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1929.6347805,
+            1938.119909
+          ],
+          "median_ms": 1931.6341415000002,
+          "ok": 120,
+          "p90_ms": 1981.2463396
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1929.563306,
+            1936.060478
+          ],
+          "median_ms": 1932.421582,
+          "ok": 120,
+          "p90_ms": 1980.425242
+        },
+        "edge/full": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            993.6691424999999,
+            996.676372
+          ],
+          "median_ms": 994.7593475,
+          "ok": 120,
+          "p90_ms": 1072.3193758999998
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 120,
+      "cell_id": "T10-L1",
+      "condition_id": "T10",
+      "load_level": "L1",
+      "margin_ms": 817.2114815,
+      "margin_ms_lossless": 817.2114815,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            589.6705019999999,
+            622.49427
+          ],
+          "median_ms": 594.842204,
+          "ok": 120,
+          "p90_ms": 709.5496492000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1533.2407680000001,
+            1538.818678
+          ],
+          "median_ms": 1534.943219,
+          "ok": 120,
+          "p90_ms": 1563.6383360000002
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1797.059206,
+            1802.956007
+          ],
+          "median_ms": 1798.5251015,
+          "ok": 120,
+          "p90_ms": 1828.6991057
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1796.912656,
+            1801.85726
+          ],
+          "median_ms": 1799.0902019999999,
+          "ok": 120,
+          "p90_ms": 1827.3030795000002
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1407.6448169999999,
+            1414.560161
+          ],
+          "median_ms": 1412.0536855,
+          "ok": 120,
+          "p90_ms": 1529.3003851
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 120,
+      "cell_id": "T10-L1-C2",
+      "condition_id": "T10",
+      "load_level": "L1",
+      "margin_ms": 186.32473000000005,
+      "margin_ms_lossless": 186.32473000000005,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 103,
+          "failed": 0,
+          "median_ci_ms": [
+            1209.4740084999999,
+            1262.286316
+          ],
+          "median_ms": 1219.324161,
+          "ok": 120,
+          "p90_ms": 1333.5085281
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1840.263281,
+            1847.382937
+          ],
+          "median_ms": 1843.067998,
+          "ok": 120,
+          "p90_ms": 1883.103495
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2106.558835,
+            2112.468939
+          ],
+          "median_ms": 2108.8565765,
+          "ok": 120,
+          "p90_ms": 2146.417419
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2103.552898,
+            2110.503428
+          ],
+          "median_ms": 2107.7747315,
+          "ok": 120,
+          "p90_ms": 2147.6417272
+        },
+        "edge/full": {
+          "attempt_wins": 17,
+          "failed": 0,
+          "median_ci_ms": [
+            1401.365843,
+            1412.577816
+          ],
+          "median_ms": 1405.648891,
+          "ok": 120,
+          "p90_ms": 1523.0631177
+        }
+      },
+      "rate_mbps": 45.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 120,
+      "cell_id": "T11-L0",
+      "condition_id": "T11",
+      "load_level": "L0",
+      "margin_ms": 256.867877,
+      "margin_ms_lossless": 256.867877,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 107,
+          "failed": 0,
+          "median_ci_ms": [
+            729.7183070000001,
+            760.908982
+          ],
+          "median_ms": 742.589202,
+          "ok": 120,
+          "p90_ms": 895.9809521000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1584.0452395,
+            1590.34206
+          ],
+          "median_ms": 1588.522823,
+          "ok": 120,
+          "p90_ms": 1617.1332358000002
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1757.702249,
+            1764.829009
+          ],
+          "median_ms": 1760.2783915,
+          "ok": 120,
+          "p90_ms": 1797.4637241
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1757.6081195,
+            1764.204169
+          ],
+          "median_ms": 1761.118382,
+          "ok": 120,
+          "p90_ms": 1793.0043423
+        },
+        "edge/full": {
+          "attempt_wins": 13,
+          "failed": 0,
+          "median_ci_ms": [
+            995.7883360000001,
+            1002.209367
+          ],
+          "median_ms": 999.457079,
+          "ok": 120,
+          "p90_ms": 1077.54592
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 120,
+      "cell_id": "T11-L0-C2",
+      "condition_id": "T11",
+      "load_level": "L0",
+      "margin_ms": 361.848481,
+      "margin_ms_lossless": 361.848481,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1343.5606765,
+            1402.629198
+          ],
+          "median_ms": 1357.580072,
+          "ok": 120,
+          "p90_ms": 1519.1524774000002
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1885.5939720000001,
+            1892.055002
+          ],
+          "median_ms": 1888.8720050000002,
+          "ok": 120,
+          "p90_ms": 1938.1015842000002
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2058.739326,
+            2064.351541
+          ],
+          "median_ms": 2061.5737790000003,
+          "ok": 120,
+          "p90_ms": 2110.5081011
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2058.0783155,
+            2064.860881
+          ],
+          "median_ms": 2062.566035,
+          "ok": 120,
+          "p90_ms": 2117.239545
+        },
+        "edge/full": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            993.5535695,
+            1000.527275
+          ],
+          "median_ms": 995.731591,
+          "ok": 120,
+          "p90_ms": 1083.8442240000002
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 120,
+      "cell_id": "T11-L1",
+      "condition_id": "T11",
+      "load_level": "L1",
+      "margin_ms": 685.8839109999999,
+      "margin_ms_lossless": 685.8839109999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            731.1064885000001,
+            761.962823
+          ],
+          "median_ms": 742.0629690000001,
+          "ok": 120,
+          "p90_ms": 900.4067399
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1756.10652,
+            1763.681889
+          ],
+          "median_ms": 1758.9422055,
+          "ok": 120,
+          "p90_ms": 1786.7410899
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1927.5456995,
+            1936.052068
+          ],
+          "median_ms": 1933.2287824999999,
+          "ok": 120,
+          "p90_ms": 1964.9396121
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1927.630435,
+            1935.520457
+          ],
+          "median_ms": 1930.043354,
+          "ok": 120,
+          "p90_ms": 1967.0798435
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1421.040737,
+            1431.805541
+          ],
+          "median_ms": 1427.94688,
+          "ok": 120,
+          "p90_ms": 1561.136726
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 120,
+      "cell_id": "T11-L1-C2",
+      "condition_id": "T11",
+      "load_level": "L1",
+      "margin_ms": 83.29471550000017,
+      "margin_ms_lossless": 83.29471550000017,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            1347.303287,
+            1394.164981
+          ],
+          "median_ms": 1358.6788155,
+          "ok": 120,
+          "p90_ms": 1515.7716788
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2064.8578465,
+            2073.165601
+          ],
+          "median_ms": 2069.259503,
+          "ok": 120,
+          "p90_ms": 2112.3127200000004
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2241.911269,
+            2250.914081
+          ],
+          "median_ms": 2246.2191005,
+          "ok": 120,
+          "p90_ms": 2284.542348
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2237.903022,
+            2244.961797
+          ],
+          "median_ms": 2242.233728,
+          "ok": 120,
+          "p90_ms": 2282.2702228000003
+        },
+        "edge/full": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            1420.4894385,
+            1450.879192
+          ],
+          "median_ms": 1441.973531,
+          "ok": 120,
+          "p90_ms": 1581.3315511
+        }
+      },
+      "rate_mbps": 150.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 120,
+      "cell_id": "T12-L0",
+      "condition_id": "T12",
+      "load_level": "L0",
+      "margin_ms": 252.44165350000003,
+      "margin_ms_lossless": 252.44165350000003,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 106,
+          "failed": 0,
+          "median_ci_ms": [
+            756.022884,
+            788.916472
+          ],
+          "median_ms": 760.3434015,
+          "ok": 120,
+          "p90_ms": 938.8379181
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1764.0222395,
+            1771.385276
+          ],
+          "median_ms": 1767.060917,
+          "ok": 120,
+          "p90_ms": 1804.4726916000002
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2242.6485545,
+            2249.867754
+          ],
+          "median_ms": 2247.245693,
+          "ok": 120,
+          "p90_ms": 2280.9932754
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2242.1216139999997,
+            2248.201384
+          ],
+          "median_ms": 2244.094519,
+          "ok": 120,
+          "p90_ms": 2281.3667597999997
+        },
+        "edge/full": {
+          "attempt_wins": 14,
+          "failed": 0,
+          "median_ci_ms": [
+            1002.5093065,
+            1026.390925
+          ],
+          "median_ms": 1012.785055,
+          "ok": 120,
+          "p90_ms": 1116.5035239000001
+        }
+      },
+      "rate_mbps": 25.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 120,
+      "cell_id": "T12-L0-C2",
+      "condition_id": "T12",
+      "load_level": "L0",
+      "margin_ms": 380.289043,
+      "margin_ms_lossless": 380.289043,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1365.86208,
+            1445.075672
+          ],
+          "median_ms": 1376.1751555,
+          "ok": 120,
+          "p90_ms": 1552.0583142
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2065.549927,
+            2070.484961
+          ],
+          "median_ms": 2068.3241879999996,
+          "ok": 120,
+          "p90_ms": 2116.2981398
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2542.2546555,
+            2549.114491
+          ],
+          "median_ms": 2544.510367,
+          "ok": 120,
+          "p90_ms": 2589.0261044999997
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2541.7868215,
+            2546.608129
+          ],
+          "median_ms": 2543.8726625,
+          "ok": 120,
+          "p90_ms": 2591.7225723
+        },
+        "edge/full": {
+          "attempt_wins": 120,
+          "failed": 0,
+          "median_ci_ms": [
+            993.6291675,
+            999.575324
+          ],
+          "median_ms": 995.8861125000001,
+          "ok": 120,
+          "p90_ms": 1080.0455412
+        }
+      },
+      "rate_mbps": 25.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 120,
+      "cell_id": "T12-L1",
+      "condition_id": "T12",
+      "load_level": "L1",
+      "margin_ms": 671.5831584999999,
+      "margin_ms_lossless": 671.5831584999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 119,
+          "failed": 0,
+          "median_ci_ms": [
+            755.8721370000001,
+            795.90184
+          ],
+          "median_ms": 760.957678,
+          "ok": 120,
+          "p90_ms": 940.81434
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1934.5693780000001,
+            1941.377002
+          ],
+          "median_ms": 1937.763274,
+          "ok": 120,
+          "p90_ms": 1960.834754
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2413.5484985000003,
+            2418.815236
+          ],
+          "median_ms": 2415.659,
+          "ok": 120,
+          "p90_ms": 2439.9516921
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2412.402781,
+            2418.039856
+          ],
+          "median_ms": 2416.3967409999996,
+          "ok": 120,
+          "p90_ms": 2445.8942004
+        },
+        "edge/full": {
+          "attempt_wins": 1,
+          "failed": 0,
+          "median_ci_ms": [
+            1413.958755,
+            1445.235241
+          ],
+          "median_ms": 1432.5408364999998,
+          "ok": 120,
+          "p90_ms": 1576.7602978999998
+        }
+      },
+      "rate_mbps": 25.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 120,
+      "cell_id": "T12-L1-C2",
+      "condition_id": "T12",
+      "load_level": "L1",
+      "margin_ms": 18.476750000000038,
+      "margin_ms_lossless": 18.476750000000038,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 55,
+          "failed": 0,
+          "median_ci_ms": [
+            1376.0464025,
+            1445.725293
+          ],
+          "median_ms": 1394.585892,
+          "ok": 120,
+          "p90_ms": 1573.6879101
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2239.011277,
+            2248.79566
+          ],
+          "median_ms": 2244.466006,
+          "ok": 120,
+          "p90_ms": 2284.7544101999997
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2719.2860635,
+            2724.512112
+          ],
+          "median_ms": 2722.2910055,
+          "ok": 120,
+          "p90_ms": 2758.4640783000004
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2716.257221,
+            2723.188702
+          ],
+          "median_ms": 2718.7904230000004,
+          "ok": 120,
+          "p90_ms": 2764.1084941
+        },
+        "edge/full": {
+          "attempt_wins": 65,
+          "failed": 0,
+          "median_ci_ms": [
+            1404.4189805,
+            1415.256099
+          ],
+          "median_ms": 1413.062642,
+          "ok": 120,
+          "p90_ms": 1530.1389561
+        }
+      },
+      "rate_mbps": 25.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "training",
+      "task": "short",
+      "tie": true,
+      "tie_lossless": true,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    }
+  ],
+  "configurations": [
+    "edge/full",
+    "cloud/raw_image",
+    "distributed/projected/synchronous",
+    "distributed/projected/prompt_first",
+    "distributed/projected/int8"
+  ],
+  "files": {
+    "oracle_attempts.jsonl": "f520771448fbacdcdfed910be201a378ea2a2a68c5b293efbdd2cf7a4cffddc2",
+    "oracle_cells.csv": "cf31c4dfd003b1ee041326cdd16de4f59dbefe1573abd977c79a314e5f6ae479"
+  },
+  "profiles_index_sha256": "f4e0d023048a7e684e431d92b7d9046fb4e37c5dd5b1d2db98a7331e5348d39a",
+  "schema_version": 1,
+  "seed": 1707,
+  "splits": [
+    "training"
+  ]
+}

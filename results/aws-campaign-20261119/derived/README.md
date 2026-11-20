@@ -45,6 +45,57 @@ Every configuration's output equals its reference:
 
 **These figures are identical for all five configurations**: `edge/full`, `cloud/raw_image`, and the synchronous, `prompt_first` and int8 split configurations. No question's accuracy differs between any pair. Parity, at most 2 pp, holds with 0.0 pp difference, so the selector can treat quality as independent of configuration (section 9). The roughly 20-point gap between unchanged and lowercased is the evaluator's case-sensitive handling of "Yes"/"No" found in the prompt calibration.
 
-## Section 9 oracle (training cells): pending
+## Section 9 oracle: training cells
 
-`scripts/campaign/derive_g2v2_tables.py` could not run locally. The campaign plan and every run plan store container paths (`/app/configs/…`, `/app/data/…`), and the run plans are hash-checked by the validation reports, so they cannot be rewritten. Mapping `/app` (and `/artifacts`) inside WSL needs root, or the derivation has to run inside the frozen image. The [roadmap](../../../docs/thesis-completion-roadmap.md) tracks this as step 1.3.
+[oracle-training/oracle_cells.csv](oracle-training/oracle_cells.csv) and [oracle_cells.json](oracle-training/oracle_cells.json) come from `scripts/campaign/derive_g2v2_tables.py profiles --splits training` followed by `oracle` (training is the default; there is no `--unseal-evaluation`). The run used the tree described above.
+
+**How it was run.**
+- The campaign plan and run plans store container paths (`/app/…`, `/artifacts/…`), and the validation reports hash-check the run plans, so the paths can't be rewritten.
+- The derivation ran in WSL (20 November 2026) with two temporary links:
+  - `/app` → the repository;
+  - `/artifacts` → `artifacts/aws-s3-mirror/cloud-v1/edge/ebs-final`.
+- The reference paths came from `artifacts/g2v2plus-aws-campaign-derived/contract_local.json`.
+- Both links were removed afterwards.
+
+**Profiles.**
+- 108 training sub-blocks were profiled.
+- All 108 pass `heterogeneous_correctness`, with scope `measured`, and the controlled-network gate.
+- The legacy strict CPU gate is false by design: it doesn't apply to heterogeneous GPUs.
+
+**Oracle:** 54 cells, 6,120 attempts. Bootstrap 95% CI of each median: seed 1707, 2,000 resamples.
+
+| | |
+| --- | --- |
+| Cell winners | `cloud/raw_image` 48, `edge/full` 6, distributed 0 |
+| Lossless-only winners | identical (int8 never wins a cell) |
+| Agreement with the descriptive first look | 54/54 cells |
+| Ties (top two CIs overlap) | 2: T02-L0-C2 (edge ahead by 10.0 ms) and T12-L1-C2 (cloud ahead by 18.5 ms) |
+| Clear edge wins | T01, T09, T10, T11 and T12 at L0/C2, by 164–380 ms |
+| Cell margin | median 429 ms (range 10–1,016) |
+
+**Attempt level (6,120 attempts):**
+- **Fastest configuration per attempt:**
+  - cloud in 83.2% of attempts;
+  - edge in 16.5%;
+  - int8 in 0.3%;
+  - synchronous and `prompt_first` never.
+- **Cell winner vs per-request choice:** always using the cell winner loses to the per-attempt fastest in 6.8% of attempts, at a mean cost of 7.2 ms (median 0). Per-request selection within a cell has almost nothing to gain over per-cell selection.
+- **Mean regret of always choosing one configuration:**
+  - cloud 38 ms;
+  - edge 613 ms;
+  - int8 753 ms;
+  - synchronous 1,183 ms;
+  - `prompt_first` 1,188 ms.
+
+**Kept outside git** (`artifacts/g2v2plus-aws-campaign-derived/`):
+
+| File | SHA-256 |
+| --- | --- |
+| `oracle-training/oracle_attempts.jsonl` (4.4 MB) | `f520771448fbacdcdfed910be201a378ea2a2a68c5b293efbdd2cf7a4cffddc2` |
+| `oracle-training/oracle_cells.csv` | `cf31c4dfd003b1ee041326cdd16de4f59dbefe1573abd977c79a314e5f6ae479` |
+| `oracle-training/oracle_cells.json` | `d5065fde3f98d2ce75a4ac51bf2fb510b34b21becf2cd6326cf623e9ff60f727` |
+| `profiles/profiles_index.json` | `f4e0d023048a7e684e431d92b7d9046fb4e37c5dd5b1d2db98a7331e5348d39a` |
+
+**Task features: not derived yet.**
+- The `features` step failed because the WSL environment lacks `tokenizers` (pinned `0.21.4` in `requirements/model-cu128.lock`).
+- The features feed the G3 predictor (phase 3), not the oracle.
