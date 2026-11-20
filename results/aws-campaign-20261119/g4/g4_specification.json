@@ -1,0 +1,72 @@
+{
+ "best_static": {
+  "configuration": "cloud/raw_image",
+  "file_sha256": "89cd4a320f54ca0b9d1cb4b7757d0609e460d65847a1ad7afb92c7a3c1388eae"
+ },
+ "block": "cell (all five configurations on the same request IDs)",
+ "bootstrap": {
+  "cluster": "request ID",
+  "resamples": 2000,
+  "seed": 1707
+ },
+ "calibration_sha256": "16c20438649c28cf020a98e430fe23e04420455aa7594122790e2a0971cdf05a",
+ "code_sha256": {
+  "scripts/prediction/run_g4_r2.py": "a80cc44866f47d96b5329e93b5902d97c62d670958c9a1cb8998c9bd2ddc8a3f",
+  "src/adaptive_vlm/prediction/r2/features.py": "95f838d9ad418128a0ef4f1fb065b1c6626343f7c1a1d82b8b184f81ab6045cd",
+  "src/adaptive_vlm/prediction/r2/g4.py": "eaf390841773bb142816e9327d588a56e62d780b253a482b42e0ced6c0e4dbe4",
+  "src/adaptive_vlm/prediction/r2/models.py": "4e77b9f4cbe833216c77891b363ff929ff4b89237dbd0583fe29170127fc7bdc",
+  "src/adaptive_vlm/prediction/r2/units.py": "a9fcd53c06dee0cf6d16cf2f1d00ff652a4d6830e54d1c752d321677acca539f",
+  "src/adaptive_vlm/scheduler/configuration.py": "6afd62e7394a2084f6a2ad5837e2e82724cddee03f44389221a74feb524e2dc1",
+  "src/adaptive_vlm/scheduler/selector.py": "744ba3ab08152b39cc643242e5ba117d652d2e9ac3b5cb3a5dc16982bb6109f2"
+ },
+ "fitted_conditions": [
+  "T01",
+  "T02",
+  "T03",
+  "T04",
+  "T05",
+  "T06",
+  "T07",
+  "T08",
+  "T09",
+  "T10",
+  "T11",
+  "T12",
+  "V01",
+  "V02",
+  "V03",
+  "V04",
+  "V05"
+ ],
+ "freeze_marker_sha256": "68b10ea0594d54845ceeeb1c77a5ee4dbae5e399629b3821b1e33d70d28dabc1",
+ "frozen_at_utc": "2026-11-20T10:53:21+00:00",
+ "g3_decision_sha256": "d3b55134de7a5d22fee0143cc4759ba88a83b67fe33c642eba01b9732b1a784d",
+ "gate": {
+  "complete_blocks_min": 10,
+  "median_relative_regret_percent_max": 10.0,
+  "network_holdout": true,
+  "no_feasible_decisions": 0,
+  "predicted_oracle_consistent": true,
+  "unsafe_selections": 0
+ },
+ "holdout_conditions": [
+  "E01",
+  "E02",
+  "E03",
+  "E04",
+  "E05"
+ ],
+ "model": "r2_component",
+ "oracle": "configuration with the lowest observed latency in the request-cell; configuration order breaks ties",
+ "schema": "g4-r2-specification",
+ "selector": {
+  "constraints": "none (no SLA, quality parity, resident edge)",
+  "primary": "all five configurations (int8 admitted, A2a rule 4)",
+  "secondary": "four lossless configurations"
+ },
+ "source": {
+  "commit": "7917f65f29f5861cfb40997ccd0c61fc8d426bf8",
+  "dirty_paths": []
+ },
+ "unit": "request-cell; observed latency = median of the successful repetitions; complete only if every configuration succeeded in every repetition"
+}
