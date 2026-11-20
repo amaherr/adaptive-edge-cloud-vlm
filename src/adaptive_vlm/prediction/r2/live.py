@@ -61,6 +61,8 @@ class AdaptiveRunner:
         policies: Mapping[str, ExecutionPolicy],
         features: Mapping[str, Mapping[str, Any]],
         prepare_stage: Callable[[str], float] | None = None,
+        observe: Callable[[Mapping[str, Any]], None] | None = None,
+        close: Callable[[], None] | None = None,
     ) -> None:
         if calibration.get("model") != "r2_component":
             raise ValueError("the adaptive policy uses the frozen r2_component model")
@@ -73,6 +75,14 @@ class AdaptiveRunner:
         self.policies = dict(policies)
         self.features = features
         self.prepare_stage = prepare_stage
+        self.observe = observe
+        self._close = close
+
+    def close(self) -> None:
+        """Stop background sensing (the cloud-state sampler)."""
+
+        if self._close is not None:
+            self._close()
 
     def infer(self, request: InferenceRequest) -> InferenceResult:
         started = perf_counter_ns()
@@ -105,6 +115,8 @@ class AdaptiveRunner:
             prepare_ms = float(self.prepare_stage(spec.prepared_stage))
         decided_ms = (perf_counter_ns() - started) / 1_000_000
         result = self.policies[chosen].infer(request)
+        if self.observe is not None:  # a remote response carries cloud state
+            self.observe(result.metrics)
         metrics: dict[str, Any] = dict(result.metrics)
         metrics.update(sensed.to_metrics())
         metrics.update(

@@ -506,3 +506,35 @@ def test_sensing_config_carries_the_probe_shape(tmp_path: Path) -> None:
     config, _ = SensingConfig.load(path)
     assert (config.edge_probe_matrix, config.edge_probe_repetitions) == (128, 80)
     assert config.edge_probe_synchronize_each is True
+
+
+def test_background_cloud_state_keeps_probes_off_the_decision_path() -> None:
+    from adaptive_vlm.scheduler.sensing import BackgroundCloudState
+
+    now = [100.0]
+    polls: list[int] = []
+
+    def poll() -> dict[str, Any]:
+        polls.append(1)
+        return {"gpu_power_w": 30.0, "sample_age_s": 0.2}
+
+    cloud = BackgroundCloudState(poll, 3600.0, clock=lambda: now[0])
+    cloud.start()
+    try:
+        before = len(polls)
+        now[0] += 1.5
+        latest = cloud.latest()
+        assert latest is not None and latest["gpu_power_w"] == 30.0
+        assert latest["sample_age_s"] == pytest.approx(1.7)
+        assert len(polls) == before  # reading never polls
+        cloud.observe(
+            {"server_state_gpu_power_w": 70.0, "server_state_sample_age_s": 0.1}
+        )
+        assert cloud.latest() == {
+            "gpu_power_w": 70.0,
+            "sample_age_s": pytest.approx(0.1),
+        }
+        cloud.observe({"decode_ms": 3.0})  # no state: keeps the last sample
+        assert cloud.latest()["gpu_power_w"] == 70.0  # type: ignore[index]
+    finally:
+        cloud.stop()

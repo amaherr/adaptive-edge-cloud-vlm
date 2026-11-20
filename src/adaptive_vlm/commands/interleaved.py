@@ -258,6 +258,8 @@ def run_interleaved_benchmark_command(args: argparse.Namespace) -> int:
         print(f"error: {exc}; resume restarts the load generator", flush=True)
         return ENVIRONMENT_RESTART_EXIT_CODE
     finally:
+        if adaptive is not None:
+            adaptive.close()
         if generator is not None:
             final = generator.stop()
             progress.info(f"Edge load stopped: {json.dumps(final, sort_keys=True)}")
@@ -280,6 +282,7 @@ def _adaptive_runner(
 
     from adaptive_vlm.prediction.r2.live import AdaptiveRecord, AdaptiveRunner
     from adaptive_vlm.scheduler.sensing import (
+        BackgroundCloudState,
         SensingConfig,
         Sensor,
         network_from_probe,
@@ -318,10 +321,14 @@ def _adaptive_runner(
         network = (float(bps), float(rtt))
     else:
         network = network_from_probe(args.adaptive_network_probe)
+    cloud = BackgroundCloudState(
+        lambda: remote.health().server_state, sensing.cloud_poll_interval_s
+    )
+    cloud.start()
     sensor = Sensor(
         sensing,
         edge_probe=edge_probe,
-        cloud_state=lambda: remote.health().server_state,
+        cloud_state=cloud.latest,
         network=network,
     )
     record = AdaptiveRecord(
@@ -339,6 +346,8 @@ def _adaptive_runner(
         policies=by_id,
         features=features["tasks"],
         prepare_stage=prepare if callable(prepare) else None,
+        observe=cloud.observe,
+        close=cloud.stop,
     )
 
 

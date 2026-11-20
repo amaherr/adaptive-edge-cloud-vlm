@@ -18,6 +18,8 @@ import hashlib
 import importlib
 import json
 import math
+import threading
+import time
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -35,12 +37,20 @@ class SensingConfig:
     # Amendment A4a: synchronise after every multiply, so each repetition can
     # wait behind a competing kernel the way the model's many short kernels do.
     edge_probe_synchronize_each: bool = False
+    # Amendment A4b: cloud state comes from a background sampler, never from a
+    # probe on the decision path.
+    cloud_poll_interval_s: float = 1.0
 
     def __post_init__(self) -> None:
         for name in ("cloud_power_threshold_w", "edge_probe_threshold_ms"):
             value = getattr(self, name)
             if not math.isfinite(value) or value <= 0:
                 raise ValueError(f"{name} must be finite and positive")
+        if (
+            not math.isfinite(self.cloud_poll_interval_s)
+            or self.cloud_poll_interval_s <= 0
+        ):
+            raise ValueError("cloud poll interval must be finite and positive")
         if self.edge_probe_matrix < 16 or self.edge_probe_repetitions < 1:
             raise ValueError("edge probe size and repetitions must be positive")
 
@@ -143,6 +153,76 @@ class Sensor:
             rtt_ms=self.network[1],
             sensing_ms=(self.clock_ns() - started) / 1_000_000,
         )
+
+
+class BackgroundCloudState:
+    """The newest cloud state, kept off the decision path (amendment A4b).
+
+    A daemon thread polls ``poll`` (the server's health response) every
+    ``interval_s``; ``observe`` also takes the ``server_state_*`` fields that
+    every remote response carries. ``latest`` returns the newer of the two with
+    its age: the server's own sample age plus the time since it arrived.
+    """
+
+    def __init__(
+        self,
+        poll: Callable[[], Mapping[str, Any] | None],
+        interval_s: float,
+        *,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None:
+        self.poll = poll
+        self.interval_s = interval_s
+        self.clock = clock
+        self._lock = threading.Lock()
+        self._state: dict[str, Any] | None = None
+        self._received = 0.0
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+        self.poll_errors = 0
+
+    def _store(self, state: Mapping[str, Any] | None) -> None:
+        if state:
+            with self._lock:
+                self._state, self._received = dict(state), self.clock()
+
+    def _run(self) -> None:
+        while not self._stop.is_set():
+            try:
+                self._store(self.poll())
+            except Exception:  # a failed poll keeps the last sample, ageing
+                self.poll_errors += 1
+            self._stop.wait(self.interval_s)
+
+    def start(self) -> None:
+        self._store(self.poll())  # one synchronous sample before the first request
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def stop(self) -> None:
+        self._stop.set()
+        if self._thread is not None:
+            self._thread.join(timeout=5)
+
+    def observe(self, metrics: Mapping[str, Any]) -> None:
+        state = {
+            key.removeprefix("server_state_"): value
+            for key, value in metrics.items()
+            if key.startswith("server_state_")
+        }
+        self._store(state)
+
+    def latest(self) -> dict[str, Any] | None:
+        with self._lock:
+            if self._state is None:
+                return None
+            state = dict(self._state)
+            waited = self.clock() - self._received
+        base = state.get("sample_age_s")
+        state["sample_age_s"] = (
+            float(base) + waited if isinstance(base, (int, float)) else waited
+        )
+        return state
 
 
 def torch_edge_probe(
