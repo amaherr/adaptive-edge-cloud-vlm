@@ -310,11 +310,16 @@ def _adaptive_runner(
         value = float(args.adaptive_edge_probe.removeprefix("fixed:"))
         edge_probe = lambda: value  # noqa: E731
     features = json.loads(args.adaptive_features.read_text(encoding="utf-8"))
+    if args.adaptive_network:  # loopback rehearsal: no shaped link to probe
+        _, bps, rtt = args.adaptive_network.split(":")
+        network = (float(bps), float(rtt))
+    else:
+        network = network_from_probe(args.adaptive_network_probe)
     sensor = Sensor(
         sensing,
         edge_probe=edge_probe,
         cloud_state=lambda: remote.health().server_state,
-        network=network_from_probe(args.adaptive_network_probe),
+        network=network,
     )
     record = AdaptiveRecord(
         calibration_sha256=hashlib.sha256(calibration_bytes).hexdigest(),
@@ -403,6 +408,10 @@ def add_interleaved_parser(
         "--adaptive-network-probe",
         type=Path,
         help="Latest periodic network probe (the sub-block's network_pre.json)",
+    )
+    adaptive.add_argument(
+        "--adaptive-network",
+        help="'fixed:<uplink bps>:<rtt ms>' for loopback rehearsal (no shaped link)",
     )
     adaptive.add_argument(
         "--adaptive-edge-probe",

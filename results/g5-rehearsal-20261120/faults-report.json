@@ -1,0 +1,90 @@
+{
+  "delay_ms": 400,
+  "steps": [
+    {
+      "step": "fake server ready",
+      "time": 1795190823.6882982
+    },
+    {
+      "step": "hard kill",
+      "time": 1795190852.9591446,
+      "supervisor_pid": 172733,
+      "subblock": "load-s0-E01-L0-r0",
+      "committed_rows": 4
+    },
+    {
+      "step": "children exited with their supervisor",
+      "time": 1795190853.3625634
+    },
+    {
+      "step": "restarted",
+      "time": 1795190855.0756047
+    },
+    {
+      "step": "load worker killed",
+      "time": 1795190933.5425594,
+      "pid": 172945,
+      "subblock": "load-s1-E01-L1-C1-r0",
+      "committed_rows": 4
+    },
+    {
+      "step": "cloud worker killed",
+      "time": 1795190933.5673766,
+      "pid": 172896
+    }
+  ],
+  "status": {
+    "cleanup_errors": [],
+    "error": null,
+    "measured_attempts": 54,
+    "percent": 100.0,
+    "pid": 172771,
+    "stage": "sub-block 3/3 attempt 1",
+    "state": "completed",
+    "status_counts": {
+      "ok": 54
+    },
+    "subblock": "load-s2-E01-L0-r0",
+    "target_attempts": 54,
+    "updated_at_utc": "2026-11-20T16:11:06+00:00",
+    "valid_subblocks": 3,
+    "warmup_attempts": 18,
+    "warnings": []
+  },
+  "subblocks": {
+    "load-s0-E01-L0-r0": {
+      "valid": true,
+      "reasons": [],
+      "attempts": 24,
+      "restart_exit_codes": []
+    },
+    "load-s1-E01-L1-C1-r0": {
+      "valid": true,
+      "reasons": [],
+      "attempts": 24,
+      "restart_exit_codes": []
+    },
+    "load-s2-E01-L0-r0": {
+      "valid": true,
+      "reasons": [],
+      "attempts": 24,
+      "restart_exit_codes": []
+    }
+  },
+  "stray_processes": [],
+  "derive_exit_code": 0,
+  "derive_stderr_tail": "",
+  "partition_counts": null,
+  "checks": {
+    "campaign_completed": true,
+    "all_attempts_recorded": true,
+    "all_subblocks_valid": true,
+    "cloud_worker_kill_invalidated_and_rerun": true,
+    "children_exited_with_supervisor": true,
+    "load_failure_restarted_with_76": true,
+    "no_stray_processes": true,
+    "no_invalid_reruns": true,
+    "derived_tables_built": true
+  },
+  "passed": true
+}

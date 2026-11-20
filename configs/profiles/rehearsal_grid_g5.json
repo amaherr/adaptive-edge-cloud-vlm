@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "campaign_id": "g5-loopback-rehearsal",
+  "description": "Loopback rehearsal of the G5 trace campaign: one load trace on E01 (L0/C0, L1/C1, L0/C0) with the five fixed configurations and the adaptive placement. Not a measurement grid.",
+  "protocol_path": "../../docs/protocols/g2-v2-protocol.md",
+  "protocol_sha256": null,
+  "split_path": "../evaluation/rehearsal_split_v2.json",
+  "experiment_config_path": "../experiments/fake_g2v2_rehearsal.yaml",
+  "edge_load_levels_path": "../edge_load/levels_v1.json",
+  "correctness_protocol": "physical-heterogeneous-v2",
+  "cloud_host": "127.0.0.1",
+  "edge_interface": "eth0",
+  "iperf_port": 5051,
+  "echo_port": 5052,
+  "netem_limit_packets": 10000,
+  "order_seed": 5113,
+  "repetitions": [
+    0
+  ],
+  "warmups_per_subblock": 1,
+  "load_levels": [
+    "L1"
+  ],
+  "loaded_conditions": [
+    "T01"
+  ],
+  "conditions": {
+    "T01": {
+      "split": "training",
+      "rate_mbps": 5,
+      "added_rtt_ms": 20
+    },
+    "V01": {
+      "split": "validation",
+      "rate_mbps": 7,
+      "added_rtt_ms": 50
+    },
+    "E01": {
+      "split": "evaluation",
+      "rate_mbps": 20,
+      "added_rtt_ms": 50
+    }
+  },
+  "rate_fallback": {},
+  "configurations": [
+    "edge/full",
+    "cloud/raw_image",
+    "distributed/projected/synchronous",
+    "distributed/projected/prompt_first",
+    "distributed/projected/int8"
+  ],
+  "cloud_load": {
+    "levels_path": "../cloud_load/rehearsal_levels.json",
+    "level": "C1",
+    "cells": [
+      [
+        "T01",
+        "L1",
+        "short"
+      ]
+    ]
+  },
+  "traces": {
+    "load": [
+      [
+        "E01",
+        "L0",
+        "C0"
+      ],
+      [
+        "E01",
+        "L1",
+        "C1"
+      ],
+      [
+        "E01",
+        "L0",
+        "C0"
+      ]
+    ]
+  },
+  "adaptive": {
+    "calibration_path": "../g5/calibration_r2_component.json",
+    "sensing_path": "../g5/rehearsal_sensing.json",
+    "features_path": "../g5/rehearsal_task_features-short.json",
+    "edge_probe": "fixed:5.0",
+    "network_override": "fixed:20000000:50"
+  }
+}

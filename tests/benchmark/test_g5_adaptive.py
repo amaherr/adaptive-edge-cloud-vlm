@@ -463,3 +463,37 @@ artifacts_dir: {tmp_path.as_posix()}
         .splitlines()
     }
     assert all(edge[row["trial_id"]] == row["output_text"] for row in rows)
+
+
+def test_aws_g5_grids_load_with_the_frozen_inputs() -> None:
+    import hashlib
+
+    grid = load_grid(ROOT / "configs/profiles/aws_g5_traces.json")
+    assert len(grid.execution_order()) == 80
+    assert grid.expected_attempts() == {"measured": 14_400, "warmups": 480}
+    assert grid.adaptive is not None
+    calibration = grid.resolve_adaptive("calibration_path")
+    assert (
+        hashlib.sha256(calibration.read_bytes()).hexdigest()
+        == grid.adaptive["calibration_sha256"]
+    )
+    marker = json.loads(
+        (
+            ROOT
+            / "results/aws-campaign-20261119/predictor_r2/validation"
+            / "model_freeze_marker.json"
+        ).read_text()
+    )
+    assert grid.adaptive["calibration_sha256"] == marker["calibration_sha256"]
+    features = grid.resolve_adaptive("features_path")
+    assert (
+        hashlib.sha256(features.read_bytes()).hexdigest()
+        == grid.adaptive["features_sha256"]
+    )
+    conditions = {c for _, segments in grid.traces for c, _, _ in segments}
+    assert {grid.conditions[c].split for c in conditions} == {"evaluation"}
+    pilot = load_grid(ROOT / "configs/profiles/aws_g5_pilot.json")
+    assert [b.subblock_id for b in pilot.execution_order()] == [
+        "pilot-s0-E01-L0-r0",
+        "pilot-s1-E01-L1-C2-r0",
+    ]

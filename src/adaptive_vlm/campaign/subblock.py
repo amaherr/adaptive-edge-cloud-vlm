@@ -118,7 +118,11 @@ def benchmark_arguments(
             str(grid.resolve_adaptive("features_path")),
             "--adaptive-network-probe",
             str(run_dir.parent / "network_pre.json"),
+            "--adaptive-edge-probe",
+            str(grid.adaptive.get("edge_probe", "torch")),
         ]
+        if grid.adaptive.get("network_override"):  # loopback rehearsal only
+            arguments += ["--adaptive-network", str(grid.adaptive["network_override"])]
     return [*arguments, "--resume"] if resume else arguments
 
 
@@ -240,6 +244,8 @@ def run_subblock(
         "controlled_network": network.controlled,
         "egress_delay_ms": condition.egress_delay_ms,
     }
+    if block.segment is not None:  # G5 trace segment; absent in G2 v2+ plans
+        plan["segment"] = block.segment
     plan_path = output / "plan.json"
     if plan_path.exists() and json.loads(plan_path.read_text()) != plan:
         raise RuntimeError(f"sub-block plan changed: {block.subblock_id}")

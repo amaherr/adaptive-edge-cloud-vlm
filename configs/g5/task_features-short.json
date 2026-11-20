@@ -1,0 +1,971 @@
+{
+  "dataset_manifest_sha256": "4f8bfe63f245db948274d7e0717bde3bab388e5ffe65505a3f841a35e3f9b89d",
+  "feature_source": "pinned_tokenizer",
+  "model_contract_sha256": "e7ef01806bfa51ee6cedb15a3331598bc4713ff8a7538fb041fd3d0aaf294aa1",
+  "schema_version": 3,
+  "task": "short",
+  "task_bucket": "vqa-short-answer-32-token-budget",
+  "tasks": {
+    "vqa-v2-val2014-101053025": {
+      "image_bytes": 202599,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-101223001": {
+      "image_bytes": 203640,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-10192002": {
+      "image_bytes": 136555,
+      "image_height": 497,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-10694023": {
+      "image_bytes": 61514,
+      "image_height": 375,
+      "image_width": 500,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-107751002": {
+      "image_bytes": 143939,
+      "image_height": 376,
+      "image_width": 500,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-111683003": {
+      "image_bytes": 97788,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-111789004": {
+      "image_bytes": 100011,
+      "image_height": 345,
+      "image_width": 500,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-115412003": {
+      "image_bytes": 91399,
+      "image_height": 375,
+      "image_width": 500,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-116517000": {
+      "image_bytes": 114131,
+      "image_height": 428,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-120826005": {
+      "image_bytes": 224870,
+      "image_height": 425,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-121457004": {
+      "image_bytes": 123007,
+      "image_height": 424,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-128034009": {
+      "image_bytes": 173667,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-132136002": {
+      "image_bytes": 75843,
+      "image_height": 466,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-13357005": {
+      "image_bytes": 57793,
+      "image_height": 457,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-138115001": {
+      "image_bytes": 102016,
+      "image_height": 621,
+      "image_width": 448,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-141882000": {
+      "image_bytes": 176175,
+      "image_height": 375,
+      "image_width": 500,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-150320007": {
+      "image_bytes": 121551,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-150872002": {
+      "image_bytes": 70222,
+      "image_height": 640,
+      "image_width": 360,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-154846003": {
+      "image_bytes": 160031,
+      "image_height": 428,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-156445006": {
+      "image_bytes": 147685,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-160437002": {
+      "image_bytes": 333312,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-160498018": {
+      "image_bytes": 100758,
+      "image_height": 376,
+      "image_width": 500,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-162363000": {
+      "image_bytes": 112248,
+      "image_height": 640,
+      "image_width": 480,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-164899001": {
+      "image_bytes": 158932,
+      "image_height": 428,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-166505000": {
+      "image_bytes": 344801,
+      "image_height": 491,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-172733004": {
+      "image_bytes": 133384,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-180718005": {
+      "image_bytes": 108485,
+      "image_height": 640,
+      "image_width": 427,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-183716015": {
+      "image_bytes": 115951,
+      "image_height": 500,
+      "image_width": 353,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-185125003": {
+      "image_bytes": 101700,
+      "image_height": 612,
+      "image_width": 612,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-185276002": {
+      "image_bytes": 140204,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 22,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-188416001": {
+      "image_bytes": 59578,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-202040003": {
+      "image_bytes": 273622,
+      "image_height": 458,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-206257002": {
+      "image_bytes": 122327,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-217060000": {
+      "image_bytes": 88294,
+      "image_height": 440,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-222548006": {
+      "image_bytes": 193206,
+      "image_height": 405,
+      "image_width": 500,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-223746002": {
+      "image_bytes": 100683,
+      "image_height": 500,
+      "image_width": 439,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-232357004": {
+      "image_bytes": 115640,
+      "image_height": 425,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-233915008": {
+      "image_bytes": 161684,
+      "image_height": 640,
+      "image_width": 427,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-237420001": {
+      "image_bytes": 170491,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-238029016": {
+      "image_bytes": 100251,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-240340007": {
+      "image_bytes": 185074,
+      "image_height": 640,
+      "image_width": 480,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-244633003": {
+      "image_bytes": 112505,
+      "image_height": 332,
+      "image_width": 500,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-252133015": {
+      "image_bytes": 129689,
+      "image_height": 640,
+      "image_width": 480,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-256941000": {
+      "image_bytes": 93827,
+      "image_height": 500,
+      "image_width": 332,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-263251002": {
+      "image_bytes": 197250,
+      "image_height": 500,
+      "image_width": 375,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-267664002": {
+      "image_bytes": 104589,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-267694006": {
+      "image_bytes": 216651,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-269489001": {
+      "image_bytes": 68514,
+      "image_height": 640,
+      "image_width": 427,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-271548002": {
+      "image_bytes": 96777,
+      "image_height": 640,
+      "image_width": 319,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-286858005": {
+      "image_bytes": 81843,
+      "image_height": 640,
+      "image_width": 426,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-289855005": {
+      "image_bytes": 146012,
+      "image_height": 640,
+      "image_width": 427,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-297819004": {
+      "image_bytes": 183316,
+      "image_height": 360,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-303253005": {
+      "image_bytes": 147516,
+      "image_height": 360,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-30407000": {
+      "image_bytes": 139457,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-310516000": {
+      "image_bytes": 126815,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-311497007": {
+      "image_bytes": 221598,
+      "image_height": 640,
+      "image_width": 495,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-312191000": {
+      "image_bytes": 179964,
+      "image_height": 295,
+      "image_width": 640,
+      "prompt_tokens": 15,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-315696000": {
+      "image_bytes": 136061,
+      "image_height": 431,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-327590003": {
+      "image_bytes": 229750,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-334521004": {
+      "image_bytes": 204570,
+      "image_height": 375,
+      "image_width": 500,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-334941014": {
+      "image_bytes": 136070,
+      "image_height": 640,
+      "image_width": 359,
+      "prompt_tokens": 15,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-335644001": {
+      "image_bytes": 197046,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-337653004": {
+      "image_bytes": 92910,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-342006000": {
+      "image_bytes": 105141,
+      "image_height": 640,
+      "image_width": 480,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-342448001": {
+      "image_bytes": 203262,
+      "image_height": 424,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-342476001": {
+      "image_bytes": 154481,
+      "image_height": 363,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-344197000": {
+      "image_bytes": 118053,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-349915001": {
+      "image_bytes": 82048,
+      "image_height": 426,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-350000002": {
+      "image_bytes": 179538,
+      "image_height": 428,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-358707002": {
+      "image_bytes": 141550,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-367929000": {
+      "image_bytes": 165882,
+      "image_height": 511,
+      "image_width": 640,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-38034006": {
+      "image_bytes": 94310,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-389256001": {
+      "image_bytes": 180654,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-390072002": {
+      "image_bytes": 101022,
+      "image_height": 640,
+      "image_width": 427,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-392632006": {
+      "image_bytes": 225267,
+      "image_height": 640,
+      "image_width": 464,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-403919004": {
+      "image_bytes": 178937,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-408610000": {
+      "image_bytes": 236243,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 15,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-412440006": {
+      "image_bytes": 221378,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-414709010": {
+      "image_bytes": 139788,
+      "image_height": 640,
+      "image_width": 632,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-416078002": {
+      "image_bytes": 52616,
+      "image_height": 368,
+      "image_width": 500,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-416663000": {
+      "image_bytes": 22952,
+      "image_height": 500,
+      "image_width": 375,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-422833002": {
+      "image_bytes": 147627,
+      "image_height": 424,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-429174003": {
+      "image_bytes": 176934,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-432898001": {
+      "image_bytes": 154364,
+      "image_height": 500,
+      "image_width": 500,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-435475002": {
+      "image_bytes": 240670,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-44950002": {
+      "image_bytes": 150140,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 24,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-458781000": {
+      "image_bytes": 178454,
+      "image_height": 640,
+      "image_width": 425,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-463876009": {
+      "image_bytes": 79110,
+      "image_height": 640,
+      "image_width": 480,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-466565004": {
+      "image_bytes": 251877,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-472160004": {
+      "image_bytes": 211598,
+      "image_height": 513,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-473015007": {
+      "image_bytes": 229274,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-476008002": {
+      "image_bytes": 248612,
+      "image_height": 486,
+      "image_width": 640,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-478220003": {
+      "image_bytes": 200560,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-492472003": {
+      "image_bytes": 145275,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-493218000": {
+      "image_bytes": 169867,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-494863000": {
+      "image_bytes": 202197,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-500765000": {
+      "image_bytes": 386189,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-502347002": {
+      "image_bytes": 86540,
+      "image_height": 375,
+      "image_width": 500,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-509750000": {
+      "image_bytes": 246489,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-513342001": {
+      "image_bytes": 37987,
+      "image_height": 480,
+      "image_width": 365,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-520047005": {
+      "image_bytes": 242922,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-520531000": {
+      "image_bytes": 131810,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-521282013": {
+      "image_bytes": 116509,
+      "image_height": 640,
+      "image_width": 424,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-521550004": {
+      "image_bytes": 266248,
+      "image_height": 471,
+      "image_width": 640,
+      "prompt_tokens": 20,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-52232000": {
+      "image_bytes": 87557,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-527163002": {
+      "image_bytes": 326147,
+      "image_height": 640,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-527961002": {
+      "image_bytes": 187504,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-539565000": {
+      "image_bytes": 171393,
+      "image_height": 640,
+      "image_width": 640,
+      "prompt_tokens": 19,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-562229003": {
+      "image_bytes": 327662,
+      "image_height": 640,
+      "image_width": 640,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-563653002": {
+      "image_bytes": 262006,
+      "image_height": 431,
+      "image_width": 640,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-566049004": {
+      "image_bytes": 137212,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-5690016": {
+      "image_bytes": 155821,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-570171000": {
+      "image_bytes": 122516,
+      "image_height": 375,
+      "image_width": 500,
+      "prompt_tokens": 21,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-573853003": {
+      "image_bytes": 320145,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-61492002": {
+      "image_bytes": 79387,
+      "image_height": 500,
+      "image_width": 336,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-67833003": {
+      "image_bytes": 208670,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-72632003": {
+      "image_bytes": 130982,
+      "image_height": 640,
+      "image_width": 427,
+      "prompt_tokens": 18,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-75786014": {
+      "image_bytes": 238652,
+      "image_height": 427,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-85584002": {
+      "image_bytes": 215958,
+      "image_height": 426,
+      "image_width": 640,
+      "prompt_tokens": 16,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    },
+    "vqa-v2-val2014-93353002": {
+      "image_bytes": 81747,
+      "image_height": 480,
+      "image_width": 640,
+      "prompt_tokens": 17,
+      "requested_max_new_tokens": 32,
+      "task_bucket": "vqa-short-answer-32-token-budget"
+    }
+  },
+  "tokenizer_sha256": "0512fdcac4a5f9e7746cbefce4a468dc93bf0f93f11e701b84f8b31bff199e9c"
+}

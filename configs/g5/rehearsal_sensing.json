@@ -1,0 +1,10 @@
+{
+  "schema": "g5-sensing",
+  "cloud_power_threshold_w": 58.0,
+  "edge_probe_threshold_ms": 10.0,
+  "edge_probe_matrix": 2048,
+  "edge_probe_repetitions": 5,
+  "provenance": {
+    "note": "loopback rehearsal only, not a measurement configuration"
+  }
+}

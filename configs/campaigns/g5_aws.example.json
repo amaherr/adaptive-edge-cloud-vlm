@@ -1,0 +1,46 @@
+{
+  "platform": "aws-linux",
+  "mode": "physical",
+  "grid": "configs/profiles/aws_g5_traces.json",
+  "cloud_access": {
+    "kind": "ssm",
+    "instance_id": "REPLACE-cloud-instance-id",
+    "region": "us-east-1"
+  },
+  "cloud_container": "adaptive-vlm-inference",
+  "cloud_python": "docker exec adaptive-vlm-inference python",
+  "cloud_repo": "/artifacts",
+  "cloud_interface": "enp39s0",
+  "shaping": "classified",
+  "edge_address": "10.42.1.10",
+  "tc_privilege": [],
+  "same_device_reference_evidence": {
+    "short": "/artifacts/g5/reference/bundle/index.json"
+  },
+  "output_root": "/artifacts/g5/campaign",
+  "python": "/usr/local/bin/python",
+  "test_python": "/usr/local/bin/python",
+  "adaptive_vlm": "/usr/local/bin/adaptive-vlm",
+  "artifact_manifest": "configs/model/moondream2_artifact.yaml",
+  "cache_dir": "/models",
+  "edge_device": "cuda:0",
+  "edge_residency": "resident",
+  "rate_fallback": false,
+  "run_test_suite": false,
+  "min_free_gb": 5,
+  "stall_seconds": 900,
+  "max_restarts_per_subblock": 3,
+  "max_subblock_attempts": 2,
+  "max_failure_rate": 0.01,
+  "edge_dedicated_limit_mib": 6144,
+  "spill_margin_mib": 128,
+  "checkpoint": {
+    "s3_uri": "s3://REPLACE-artifact-bucket/cloud-v1/edge/g5",
+    "region": "us-east-1"
+  },
+  "heartbeat": {
+    "edge_path": "/artifacts/job.heartbeat",
+    "cloud_path": "/srv/adaptive-vlm/artifacts/job.heartbeat",
+    "cloud_every_s": 300
+  }
+}

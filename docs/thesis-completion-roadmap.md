@@ -189,6 +189,25 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 
 ## Phase 5: adaptive runtime and dynamic protocol
 
+**Status (20 November 2026): done locally.** Image build and reference rebuild are carried into phase 6.1, because they need AWS.
+- **5.1 Runtime:**
+  - The live adaptive policy (`prediction/r2/live.py`) senses its inputs, predicts with the frozen `r2_component`, selects with the five-configuration selector and runs the chosen configuration.
+  - It runs as a sixth interleaved placement, so the fixed configurations give a per-request oracle on the same requests.
+  - **Sensing** is chosen by you and lives in `scheduler/sensing.py`:
+    - cloud load from the server's GPU power, which the health response now carries, with a threshold of 58 W from training;
+    - edge load from a timing probe on the edge GPU, with its threshold set by a pilot rule;
+    - the network from the segment's periodic probe.
+  - **Traces:** campaign grids gain ordered trace segments, which switch netem, edge load and cloud load between segments.
+  - **Analysis:** `scripts/campaign/analyze_g5.py`. The older `thesis_analysis.py` is left for phase 7.
+- **5.2 Switching cost:** none measurable. The paired latency after the same versus a different configuration differs by −0.12% to +0.9%, and stage preparation takes 0 ms. So there is no hysteresis and no dwell; decisions are per request.
+- **5.3:** [amendment A4](protocols/g2-v2-amendment-a4.md) fixes the sensing rules, the four traces × five segments × four repetitions (80 segments, 14,400 measured attempts, about 9 h), the metrics, the pilot go/no-go and the G5 gate.
+- **5.4:** the [loopback rehearsal with fault injection](../results/g5-rehearsal-20261120/README.md) passed all checks. The full suite passes (471 passed, 1 skipped), as do Ruff and mypy.
+- **5.5:** committed. Left for 6.1:
+  - build and push the image;
+  - rebuild the reference bundles, since `src` changed;
+  - run the edge-probe calibration and the pilot;
+  - pin the hashes.
+
 5.1 **Bring the Phase 5–7 runtime up to the v2+ configuration space:**
 - `adaptive-benchmark`, the dispatcher and the live monitor support five configurations;
 - the monitor gains cloud-load and edge-load sensing (server state, edge GPU utilization);

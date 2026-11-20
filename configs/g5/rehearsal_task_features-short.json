@@ -1,0 +1,67 @@
+{
+ "feature_source": "rehearsal fixture images (not campaign data)",
+ "schema_version": 1,
+ "task": "short",
+ "tasks": {
+  "correctness-001": {
+   "image_bytes": 167,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-002": {
+   "image_bytes": 167,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-003": {
+   "image_bytes": 167,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-004": {
+   "image_bytes": 167,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-005": {
+   "image_bytes": 179,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-006": {
+   "image_bytes": 179,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-007": {
+   "image_bytes": 179,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-008": {
+   "image_bytes": 179,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-009": {
+   "image_bytes": 208,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-010": {
+   "image_bytes": 208,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-011": {
+   "image_bytes": 208,
+   "image_height": 4,
+   "image_width": 4
+  },
+  "correctness-012": {
+   "image_bytes": 208,
+   "image_height": 4,
+   "image_width": 4
+  }
+ }
+}

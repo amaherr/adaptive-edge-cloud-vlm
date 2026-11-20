@@ -140,7 +140,8 @@ def main() -> None:
         shutil.rmtree(output, ignore_errors=True)
         shutil.rmtree(derived, ignore_errors=True)
     output.mkdir(parents=True)
-    cloud_cells = bool(load_grid(Path(settings["grid"])).cloud_load_levels)
+    grid = load_grid(Path(settings["grid"]))
+    cloud_cells = bool(grid.cloud_load_levels)
     cloud_heartbeat = Path(
         settings.get("cloud_load_heartbeat") or cloud_load.DEFAULT_HEARTBEAT
     )
@@ -264,8 +265,22 @@ def main() -> None:
         if (output / "invalid").exists()
         else []
     )
+    g5 = [
+        sys.executable,
+        str(ROOT / "scripts/campaign/analyze_g5.py"),
+        "--campaign",
+        str(output),
+        "--calibration",
+        str(grid.resolve_adaptive("calibration_path")) if grid.adaptive else "",
+        "--features",
+        str(grid.resolve_adaptive("features_path")) if grid.adaptive else "",
+        "--output",
+        str(derived / "g5"),
+    ]
     derive = subprocess.run(
-        [
+        g5
+        if grid.traces
+        else [
             sys.executable,
             str(ROOT / "scripts/campaign/derive_g2v2_tables.py"),
             "all",
@@ -319,8 +334,12 @@ def main() -> None:
         "no_invalid_reruns": all("-C1-" in name for name in invalid)
         and (bool(invalid) or not cloud_cells),
         "derived_tables_built": derive.returncode == 0
-        and audit.get("evaluation_profiles_opened") == []
-        and (derived / "oracle-training" / "oracle_cells.json").exists(),
+        and (
+            (derived / "g5" / "g5_summary.json").exists()
+            if grid.traces
+            else audit.get("evaluation_profiles_opened") == []
+            and (derived / "oracle-training" / "oracle_cells.json").exists()
+        ),
     }
     report.update(
         status=status,
