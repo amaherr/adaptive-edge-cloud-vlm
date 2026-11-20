@@ -1,0 +1,138 @@
+{
+ "adaptive_minus_fixed_ms": {
+  "cloud/raw_image": {
+   "ci_high": 26.80389612083331,
+   "ci_low": 22.32490595708332,
+   "estimate": 24.351227933333323
+  },
+  "distributed/projected/int8": {
+   "ci_high": -737.3055416441667,
+   "ci_low": -816.9746679008334,
+   "estimate": -778.5325049166667
+  },
+  "distributed/projected/prompt_first": {
+   "ci_high": -1335.5056088033334,
+   "ci_low": -1414.5588699808334,
+   "estimate": -1376.6957703333333
+  },
+  "distributed/projected/synchronous": {
+   "ci_high": -1336.3209315358336,
+   "ci_low": -1415.7442465441668,
+   "estimate": -1377.7514670166668
+  },
+  "edge/full": {
+   "ci_high": -321.398622095,
+   "ci_low": -420.46163227625,
+   "estimate": -372.4623108833333
+  }
+ },
+ "answer_equals_chosen_configuration": "60/60",
+ "best_static": "cloud/raw_image",
+ "by_segment": {
+  "pilot-s0-E01-L0-r0": {
+   "adaptive_mean_ms": 473.47838483333334,
+   "best_static_mean_ms": 457.7923345666667,
+   "choices": {
+    "cloud/raw_image": 30
+   },
+   "oracle_mean_ms": 457.7923345666667,
+   "state": "E01 L0/C0"
+  },
+  "pilot-s1-E01-L1-C2-r0": {
+   "adaptive_mean_ms": 1096.2691905666666,
+   "best_static_mean_ms": 1063.2527849666667,
+   "choices": {
+    "cloud/raw_image": 30
+   },
+   "oracle_mean_ms": 1062.2597899,
+   "state": "E01 L1/C2"
+  }
+ },
+ "choices": {
+  "cloud/raw_image": 60
+ },
+ "complete_requests": 60,
+ "failed_adaptive_requests": 0,
+ "gate": {
+  "faster_than_best_static": false,
+  "median_relative_regret_ok": true,
+  "no_failed_adaptive_requests": true,
+  "pass": false
+ },
+ "label_counterfactual": {
+  "choice_matches_adaptive_percent": 100.0,
+  "mean_regret_ms": 0.4964975333333333
+ },
+ "latency": {
+  "adaptive": {
+   "mean_ms": 784.8737877,
+   "n": 60,
+   "p50_ms": 741.571896,
+   "p95_ms": 1205.3616085,
+   "sla_success_percent": 100.0
+  },
+  "cloud/raw_image": {
+   "mean_ms": 760.5225597666666,
+   "n": 60,
+   "p50_ms": 721.0628610000001,
+   "p95_ms": 1158.39675605,
+   "sla_success_percent": 100.0
+  },
+  "distributed/projected/int8": {
+   "mean_ms": 1563.4062926166666,
+   "n": 60,
+   "p50_ms": 1431.5819715,
+   "p95_ms": 1930.0868460499998,
+   "sla_success_percent": 60.0
+  },
+  "distributed/projected/prompt_first": {
+   "mean_ms": 2161.569558033333,
+   "n": 60,
+   "p50_ms": 2028.1418055,
+   "p95_ms": 2523.8910495,
+   "sla_success_percent": 0.0
+  },
+  "distributed/projected/synchronous": {
+   "mean_ms": 2162.625254716667,
+   "n": 60,
+   "p50_ms": 2027.2780404999999,
+   "p95_ms": 2533.3739861,
+   "sla_success_percent": 0.0
+  },
+  "edge/full": {
+   "mean_ms": 1157.3360985833333,
+   "n": 60,
+   "p50_ms": 1077.635926,
+   "p95_ms": 1627.902475,
+   "sla_success_percent": 85.0
+  },
+  "oracle": {
+   "mean_ms": 760.0260622333334,
+   "n": 60,
+   "p50_ms": 721.0628610000001,
+   "p95_ms": 1158.39675605,
+   "sla_success_percent": 100.0
+  }
+ },
+ "overhead_ms": {
+  "median": 23.78904,
+  "p95": 38.2985885
+ },
+ "regret": {
+  "mean_ms": {
+   "ci_high": 27.493654255833317,
+   "ci_low": 22.662480469999977,
+   "estimate": 24.847725466666656
+  },
+  "median_relative_percent": 3.2261381629368895,
+  "p90_relative_percent": 4.86659194555017,
+  "top1_agreement_percent": 98.33333333333333
+ },
+ "requests": 60,
+ "segments": 2,
+ "sensing": {
+  "cloud_accuracy_percent": 100.0,
+  "edge_accuracy_percent": 98.33333333333333
+ },
+ "switches_within_segments": 0
+}

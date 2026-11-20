@@ -1,0 +1,13 @@
+{
+ "schema": "g5-sensing",
+ "cloud_power_threshold_w": 58.0,
+ "edge_probe_threshold_ms": 20.64995567355764,
+ "edge_probe_matrix": 128,
+ "edge_probe_repetitions": 80,
+ "provenance": {
+  "cloud_power_threshold_w": "training partition (T01-T12): midpoint of C0 p95 (50.6 W) and C2 p05 (65.2 W) of the previous response's cloud GPU power",
+  "edge_probe_threshold_ms": "filled by scripts/campaign/calibrate_edge_probe.py in the pilot (amendment A4 rule)",
+  "edge_probe_shape": "amendment A4a: 128 x 128 bf16 multiplies, 80 repetitions, synchronised after each; chosen by the A4a rule on the 20 November calibration sweep"
+ },
+ "edge_probe_synchronize_each": true
+}

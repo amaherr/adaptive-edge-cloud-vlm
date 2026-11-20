@@ -1,0 +1,30 @@
+{
+ "amendments": {
+  "a4": "ab316ad4db947e06eef7cae4869c9a45ba326265b6e4e266e2ebcb39844c50d0",
+  "a4a": "c7bfe60d8f9abc0ccd03e2705211699d489ba5d26bb3a4a8f6e8053bf2c3f706",
+  "a4b": "aa04ced98b44056bb8edf050f8c912dc109d96f19ebc47374287ab7a9fdbe810"
+ },
+ "best_static": "cloud/raw_image",
+ "calibration_sha256": "16c20438649c28cf020a98e430fe23e04420455aa7594122790e2a0971cdf05a",
+ "features_sha256": "e7a18defef7b2c1476abc282a5a86a64e3e86b6934f1aa8c1bdf0e304457c81d",
+ "frozen_at_utc": "2026-11-20T19:15:00+00:00",
+ "grid": {
+  "path": "configs/profiles/aws_g5_traces.json",
+  "sha256": "771867e726670ebaa613d31580d4c14b1d7a0c41c199a02f2854993484a5e4a9"
+ },
+ "image_digest": "sha256:2cd3bd9524bf7a7946de84e90a2c1221da59533ef013fa64bd4b20d8592566b5",
+ "pilot": {
+  "first": "no-go (overhead 126 ms): amendment A4b",
+  "second": "go: valid 2/2, cloud sensing 100%, edge sensing 98.3%, median overhead 23.8 ms, answers 60/60"
+ },
+ "protocol_sha256": "a972ecdc595ab664c9914987c5aeaf71aba50daffcc86e02df2598315bf0e1d5",
+ "reference_bundle": "/artifacts/g5/reference/bundle/index.json (verified, 120 requests per GPU, rebuilt for the image)",
+ "schema": "g5-freeze",
+ "sensing": {
+  "edge_probe_threshold_ms": 20.64995567355764,
+  "path_on_edge": "/artifacts/g5/sensing.json",
+  "sha256": "4fb9a1122e0e9ed727f87b21c46193fcb9c8eedd07049f5515bf90615931d9e8"
+ },
+ "sla_ms": 1500.0,
+ "source_commit": "6cf005f6375eeee72605e1de7b9693ccb742bb5f"
+}
