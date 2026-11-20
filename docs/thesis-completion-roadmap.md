@@ -157,6 +157,19 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 
 ## Phase 4: Selector V2 and G4 (offline, evaluation cells)
 
+**Status (20 November 2026): G4 passed.** See the [G4 record](../results/aws-campaign-20261119/g4/README.md).
+- **4.1:** `scheduler.selector.select` now takes an explicit candidate set (five configurations, or the four lossless ones), fed by the frozen `r2_component` predictions. There are no constraints: quality parity holds and the edge model is resident.
+- **4.2:** the best static configuration on the validation cells is `cloud/raw_image`.
+- **4.3:** the [G4 specification](predictor-v2/g4-specification.md) was frozen by hash (`b2242d7f…`, commit `8af54cc`) before the evaluation profiles were derived from the `0948aa8` worktree, and the evaluation ran once.
+- **4.4:**
+  - median relative regret 0.00% (mean 0.06%);
+  - top-1 agreement 98.1%;
+  - mean regret 0.6 ms;
+  - 42.6 ms (5.2%) faster than always-cloud = best static, with a CI that excludes zero;
+  - 22 of 22 complete blocks, and the cell-level winner matched in 22 of 22 cells;
+  - 0 unsafe or no-feasible decisions.
+  - Evaluation-ID VQA accuracy is 70.67% for every configuration.
+
 4.1 **Update the selector** to the five-configuration list (`ALL_CONFIGURATIONS`).
 - Feasibility: memory budgets and int8 admission.
 - Quality constraint, if phase 1.4 requires one.

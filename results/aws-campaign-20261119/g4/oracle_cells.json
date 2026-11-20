@@ -1,0 +1,1673 @@
+{
+  "attempts": 1260,
+  "bootstrap_resamples": 2000,
+  "cells": [
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 60,
+      "cell_id": "E01-L0",
+      "condition_id": "E01",
+      "load_level": "L0",
+      "margin_ms": 536.1476435,
+      "margin_ms_lossless": 536.1476435,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            452.96554887499997,
+            484.273787
+          ],
+          "median_ms": 460.3133415,
+          "ok": 60,
+          "p90_ms": 529.5963429999999
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1398.080086,
+            1408.733521
+          ],
+          "median_ms": 1400.535766,
+          "ok": 60,
+          "p90_ms": 1432.43592
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1994.95667,
+            2005.41166
+          ],
+          "median_ms": 1997.3946649999998,
+          "ok": 60,
+          "p90_ms": 2031.359004
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1995.6378255,
+            2008.52451
+          ],
+          "median_ms": 2003.21654,
+          "ok": 60,
+          "p90_ms": 2038.763523
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            993.8418245,
+            1015.1280313749988
+          ],
+          "median_ms": 996.4609849999999,
+          "ok": 60,
+          "p90_ms": 1142.7869660000001
+        }
+      },
+      "rate_mbps": 20.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 60,
+      "cell_id": "E01-L0-C2",
+      "condition_id": "E01",
+      "load_level": "L0",
+      "margin_ms": 65.56642299999999,
+      "margin_ms_lossless": 65.56642299999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 8,
+          "failed": 0,
+          "median_ci_ms": [
+            1057.806335625,
+            1104.948827
+          ],
+          "median_ms": 1065.175072,
+          "ok": 60,
+          "p90_ms": 1143.2627928
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1700.6053639250001,
+            1715.6452196125
+          ],
+          "median_ms": 1703.40707,
+          "ok": 60,
+          "p90_ms": 1762.3744182
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2299.260510425,
+            2320.364458
+          ],
+          "median_ms": 2307.207845,
+          "ok": 60,
+          "p90_ms": 2355.285977
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2297.5659865125003,
+            2315.690953
+          ],
+          "median_ms": 2301.493684,
+          "ok": 60,
+          "p90_ms": 2356.280917
+        },
+        "edge/full": {
+          "attempt_wins": 52,
+          "failed": 0,
+          "median_ci_ms": [
+            994.114464,
+            1032.3359377875
+          ],
+          "median_ms": 999.608649,
+          "ok": 60,
+          "p90_ms": 1142.3164814000002
+        }
+      },
+      "rate_mbps": 20.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 60,
+      "cell_id": "E01-L1",
+      "condition_id": "E01",
+      "load_level": "L1",
+      "margin_ms": 948.7254260000002,
+      "margin_ms_lossless": 948.7254260000002,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            454.003207,
+            484.87662
+          ],
+          "median_ms": 461.06870649999996,
+          "ok": 60,
+          "p90_ms": 530.2759573
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1568.9889477500003,
+            1582.885834
+          ],
+          "median_ms": 1574.6501905,
+          "ok": 60,
+          "p90_ms": 1603.8798361
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2167.272684,
+            2184.555917
+          ],
+          "median_ms": 2171.1978555,
+          "ok": 60,
+          "p90_ms": 2202.5664231
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2166.758374,
+            2176.291844175
+          ],
+          "median_ms": 2169.867771,
+          "ok": 60,
+          "p90_ms": 2203.08288
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1403.865251,
+            1436.936228649999
+          ],
+          "median_ms": 1409.7941325000002,
+          "ok": 60,
+          "p90_ms": 1635.8711592
+        }
+      },
+      "rate_mbps": 20.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 60,
+      "cell_id": "E01-L1-C2",
+      "condition_id": "E01",
+      "load_level": "L1",
+      "margin_ms": 346.8801175000001,
+      "margin_ms_lossless": 346.8801175000001,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 59,
+          "failed": 0,
+          "median_ci_ms": [
+            1055.152149,
+            1110.985246
+          ],
+          "median_ms": 1067.373746,
+          "ok": 60,
+          "p90_ms": 1152.5268203
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1873.123467,
+            1890.209441
+          ],
+          "median_ms": 1876.53805,
+          "ok": 60,
+          "p90_ms": 1935.9600751
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2469.154547,
+            2487.329341
+          ],
+          "median_ms": 2473.7952705,
+          "ok": 60,
+          "p90_ms": 2530.5552773
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2469.0565207500003,
+            2488.673053
+          ],
+          "median_ms": 2473.888069,
+          "ok": 60,
+          "p90_ms": 2530.7740421000003
+        },
+        "edge/full": {
+          "attempt_wins": 1,
+          "failed": 0,
+          "median_ci_ms": [
+            1404.522503375,
+            1458.405884
+          ],
+          "median_ms": 1414.2538635,
+          "ok": 60,
+          "p90_ms": 1641.2420633
+        }
+      },
+      "rate_mbps": 20.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 60,
+      "cell_id": "E02-L0",
+      "condition_id": "E02",
+      "load_level": "L0",
+      "margin_ms": 537.2263515,
+      "margin_ms_lossless": 647.05464,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            344.56191575,
+            365.960045
+          ],
+          "median_ms": 352.502469,
+          "ok": 60,
+          "p90_ms": 385.7609612
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            887.716417625,
+            897.174282
+          ],
+          "median_ms": 889.7288205,
+          "ok": 60,
+          "p90_ms": 924.2846124
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1057.081975875,
+            1066.365098
+          ],
+          "median_ms": 1059.143962,
+          "ok": 60,
+          "p90_ms": 1091.015003
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1056.16772,
+            1067.78627
+          ],
+          "median_ms": 1059.769228,
+          "ok": 60,
+          "p90_ms": 1092.5114485
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            997.041127625,
+            1035.625813
+          ],
+          "median_ms": 999.557109,
+          "ok": 60,
+          "p90_ms": 1144.9628551
+        }
+      },
+      "rate_mbps": 70.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 60,
+      "cell_id": "E02-L0-C2",
+      "condition_id": "E02",
+      "load_level": "L0",
+      "margin_ms": 48.386473499999965,
+      "margin_ms_lossless": 48.386473499999965,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 47,
+          "failed": 0,
+          "median_ci_ms": [
+            946.9132625,
+            969.69204
+          ],
+          "median_ms": 957.3869605,
+          "ok": 60,
+          "p90_ms": 1015.624371
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1188.716867,
+            1203.6489032749998
+          ],
+          "median_ms": 1192.9281795000002,
+          "ok": 60,
+          "p90_ms": 1249.0422232
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1359.077203,
+            1371.557801125
+          ],
+          "median_ms": 1363.988193,
+          "ok": 60,
+          "p90_ms": 1416.6203311
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1356.5963687624999,
+            1375.233016
+          ],
+          "median_ms": 1362.3462815,
+          "ok": 60,
+          "p90_ms": 1412.4509301
+        },
+        "edge/full": {
+          "attempt_wins": 13,
+          "failed": 0,
+          "median_ci_ms": [
+            999.063154,
+            1035.476693
+          ],
+          "median_ms": 1005.773434,
+          "ok": 60,
+          "p90_ms": 1145.6129523
+        }
+      },
+      "rate_mbps": 70.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 60,
+      "cell_id": "E02-L1",
+      "condition_id": "E02",
+      "load_level": "L1",
+      "margin_ms": 709.7338155,
+      "margin_ms_lossless": 880.2291035000001,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            340.39309650000007,
+            361.744405
+          ],
+          "median_ms": 346.96235,
+          "ok": 60,
+          "p90_ms": 379.0374471
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1052.9675714,
+            1065.331416
+          ],
+          "median_ms": 1056.6961655,
+          "ok": 60,
+          "p90_ms": 1091.6065109
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1221.427370275,
+            1237.159688
+          ],
+          "median_ms": 1227.9213585,
+          "ok": 60,
+          "p90_ms": 1253.1640830000001
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1222.13123725,
+            1236.785368
+          ],
+          "median_ms": 1227.1914535,
+          "ok": 60,
+          "p90_ms": 1256.4901139
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1404.3262424999998,
+            1429.165311
+          ],
+          "median_ms": 1406.5156809999999,
+          "ok": 60,
+          "p90_ms": 1631.7120929999999
+        }
+      },
+      "rate_mbps": 70.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/synchronous",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 20.0,
+      "attempts": 60,
+      "cell_id": "E02-L1-C2",
+      "condition_id": "E02",
+      "load_level": "L1",
+      "margin_ms": 416.940116,
+      "margin_ms_lossless": 462.71610699999997,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            939.030564,
+            962.666714
+          ],
+          "median_ms": 944.9556640000001,
+          "ok": 60,
+          "p90_ms": 1002.340692
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1354.936115,
+            1373.43941
+          ],
+          "median_ms": 1361.89578,
+          "ok": 60,
+          "p90_ms": 1417.2547
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1524.191117125,
+            1536.1677998749997
+          ],
+          "median_ms": 1528.546483,
+          "ok": 60,
+          "p90_ms": 1585.80826
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1523.3208825000002,
+            1540.304433
+          ],
+          "median_ms": 1529.0150680000002,
+          "ok": 60,
+          "p90_ms": 1579.7904651
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1403.7603663749999,
+            1429.653472
+          ],
+          "median_ms": 1407.671771,
+          "ok": 60,
+          "p90_ms": 1623.5871300000001
+        }
+      },
+      "rate_mbps": 70.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 60,
+      "cell_id": "E03-L0",
+      "condition_id": "E03",
+      "load_level": "L0",
+      "margin_ms": 413.379683,
+      "margin_ms_lossless": 413.379683,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            582.2895184875,
+            610.579842
+          ],
+          "median_ms": 588.541203,
+          "ok": 60,
+          "p90_ms": 699.0758871
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1293.18389,
+            1303.205718
+          ],
+          "median_ms": 1297.8968344999998,
+          "ok": 60,
+          "p90_ms": 1327.6443272
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1423.703646,
+            1435.686945
+          ],
+          "median_ms": 1429.0628350000002,
+          "ok": 60,
+          "p90_ms": 1459.539202
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1422.8276864875002,
+            1435.092814
+          ],
+          "median_ms": 1427.622464,
+          "ok": 60,
+          "p90_ms": 1467.4535791
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            996.364212,
+            1035.996134
+          ],
+          "median_ms": 1001.920886,
+          "ok": 60,
+          "p90_ms": 1146.349629
+        }
+      },
+      "rate_mbps": 120.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 60,
+      "cell_id": "E03-L0-C2",
+      "condition_id": "E03",
+      "load_level": "L0",
+      "margin_ms": 179.39627900000005,
+      "margin_ms_lossless": 179.39627900000005,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1180.62592,
+            1245.173582
+          ],
+          "median_ms": 1194.602761,
+          "ok": 60,
+          "p90_ms": 1312.5315684000002
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1592.9916313875,
+            1607.1479153124997
+          ],
+          "median_ms": 1596.399844,
+          "ok": 60,
+          "p90_ms": 1653.6506402999998
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1724.2956455,
+            1743.164102
+          ],
+          "median_ms": 1726.9972645,
+          "ok": 60,
+          "p90_ms": 1786.2964462
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1722.413949375,
+            1740.40521
+          ],
+          "median_ms": 1729.2448915,
+          "ok": 60,
+          "p90_ms": 1784.6151361
+        },
+        "edge/full": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            1003.853148,
+            1030.0713308499992
+          ],
+          "median_ms": 1015.206482,
+          "ok": 60,
+          "p90_ms": 1141.407826
+        }
+      },
+      "rate_mbps": 120.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 60,
+      "cell_id": "E03-L1",
+      "condition_id": "E03",
+      "load_level": "L1",
+      "margin_ms": 831.2644040000001,
+      "margin_ms_lossless": 831.2644040000001,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            579.100736,
+            607.294109
+          ],
+          "median_ms": 582.994599,
+          "ok": 60,
+          "p90_ms": 696.1453219
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1464.623968,
+            1471.108683
+          ],
+          "median_ms": 1467.9972520000001,
+          "ok": 60,
+          "p90_ms": 1491.9613610000001
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1594.7959385,
+            1600.816253
+          ],
+          "median_ms": 1598.47074,
+          "ok": 60,
+          "p90_ms": 1625.635902
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1592.3517921125,
+            1602.3364274874998
+          ],
+          "median_ms": 1597.5183135000002,
+          "ok": 60,
+          "p90_ms": 1621.3181313999999
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1409.0545277375,
+            1435.3623952249998
+          ],
+          "median_ms": 1414.2590030000001,
+          "ok": 60,
+          "p90_ms": 1631.3950269
+        }
+      },
+      "rate_mbps": 120.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 100.0,
+      "attempts": 60,
+      "cell_id": "E03-L1-C2",
+      "condition_id": "E03",
+      "load_level": "L1",
+      "margin_ms": 237.88033649999988,
+      "margin_ms_lossless": 237.88033649999988,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 49,
+          "failed": 0,
+          "median_ci_ms": [
+            1173.1577895,
+            1232.561172
+          ],
+          "median_ms": 1185.760764,
+          "ok": 60,
+          "p90_ms": 1308.7057036
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1762.047088,
+            1785.309247
+          ],
+          "median_ms": 1768.743073,
+          "ok": 60,
+          "p90_ms": 1817.3758581
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1891.797404,
+            1914.5274
+          ],
+          "median_ms": 1897.224197,
+          "ok": 60,
+          "p90_ms": 1957.5759361
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1892.462508,
+            1908.3442646125
+          ],
+          "median_ms": 1898.611703,
+          "ok": 60,
+          "p90_ms": 1954.091878
+        },
+        "edge/full": {
+          "attempt_wins": 11,
+          "failed": 0,
+          "median_ci_ms": [
+            1397.5092262250002,
+            1485.589326
+          ],
+          "median_ms": 1423.6411005,
+          "ok": 60,
+          "p90_ms": 1624.3234344
+        }
+      },
+      "rate_mbps": 120.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 60,
+      "cell_id": "E04-L0",
+      "condition_id": "E04",
+      "load_level": "L0",
+      "margin_ms": 547.9241085,
+      "margin_ms_lossless": 569.8467135,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            426.155946,
+            457.381707
+          ],
+          "median_ms": 431.3099065,
+          "ok": 60,
+          "p90_ms": 493.002277
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            973.0156133875,
+            988.093394
+          ],
+          "median_ms": 979.234015,
+          "ok": 60,
+          "p90_ms": 1005.203898
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1044.2615504999999,
+            1057.869596
+          ],
+          "median_ms": 1049.3169855,
+          "ok": 60,
+          "p90_ms": 1084.3721789
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1043.7651128875,
+            1057.536846
+          ],
+          "median_ms": 1049.297486,
+          "ok": 60,
+          "p90_ms": 1084.579252
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            997.339295,
+            1007.2383875124975
+          ],
+          "median_ms": 1001.15662,
+          "ok": 60,
+          "p90_ms": 1141.739935
+        }
+      },
+      "rate_mbps": 175.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 60,
+      "cell_id": "E04-L0-C2",
+      "condition_id": "E04",
+      "load_level": "L0",
+      "margin_ms": 35.742725000000064,
+      "margin_ms_lossless": 35.742725000000064,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 16,
+          "failed": 0,
+          "median_ci_ms": [
+            1023.2109635,
+            1072.855386
+          ],
+          "median_ms": 1034.1106955,
+          "ok": 60,
+          "p90_ms": 1105.164845
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1275.7571415,
+            1292.573679
+          ],
+          "median_ms": 1278.854049,
+          "ok": 60,
+          "p90_ms": 1333.377169
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1345.8548955,
+            1362.2439000124996
+          ],
+          "median_ms": 1351.4017855,
+          "ok": 60,
+          "p90_ms": 1406.096613
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1344.3729496249998,
+            1359.4297608874992
+          ],
+          "median_ms": 1348.4502954999998,
+          "ok": 60,
+          "p90_ms": 1405.929622
+        },
+        "edge/full": {
+          "attempt_wins": 44,
+          "failed": 0,
+          "median_ci_ms": [
+            994.822765,
+            1008.1998900124979
+          ],
+          "median_ms": 998.3679705,
+          "ok": 60,
+          "p90_ms": 1141.794355
+        }
+      },
+      "rate_mbps": 175.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 30,
+      "cell_id": "E04-L0-long",
+      "condition_id": "E04",
+      "load_level": "L0",
+      "margin_ms": 553.8062850000001,
+      "margin_ms_lossless": 619.270123,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 30,
+          "failed": 0,
+          "median_ci_ms": [
+            916.2533269999999,
+            951.7850060000001
+          ],
+          "median_ms": 919.16608,
+          "ok": 30,
+          "p90_ms": 975.906389
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1467.923936,
+            1479.312845
+          ],
+          "median_ms": 1472.972365,
+          "ok": 30,
+          "p90_ms": 1481.166767
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1535.5406455,
+            1541.4422450000002
+          ],
+          "median_ms": 1538.436203,
+          "ok": 30,
+          "p90_ms": 1553.8329983
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1535.5074304999998,
+            1547.187845
+          ],
+          "median_ms": 1539.8514145,
+          "ok": 30,
+          "p90_ms": 1559.9238431
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            3413.6836270000003,
+            3438.9692219999997
+          ],
+          "median_ms": 3423.614705,
+          "ok": 30,
+          "p90_ms": 3453.1488872
+        }
+      },
+      "rate_mbps": 175.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "evaluation",
+      "task": "long",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 60,
+      "cell_id": "E04-L1",
+      "condition_id": "E04",
+      "load_level": "L1",
+      "margin_ms": 716.886572,
+      "margin_ms_lossless": 784.6155344999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            426.5499095,
+            455.889346
+          ],
+          "median_ms": 434.79732,
+          "ok": 60,
+          "p90_ms": 497.0469827
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1146.079702,
+            1157.031067
+          ],
+          "median_ms": 1151.683892,
+          "ok": 60,
+          "p90_ms": 1181.0649321
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1216.3720587374999,
+            1227.4998055375
+          ],
+          "median_ms": 1219.4128544999999,
+          "ok": 60,
+          "p90_ms": 1248.0915894999998
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1216.728031125,
+            1225.22625125
+          ],
+          "median_ms": 1220.665697,
+          "ok": 60,
+          "p90_ms": 1249.6705442
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1396.2621384875,
+            1417.122541
+          ],
+          "median_ms": 1403.316626,
+          "ok": 60,
+          "p90_ms": 1631.1560012
+        }
+      },
+      "rate_mbps": 175.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 60,
+      "cell_id": "E04-L1-C2",
+      "condition_id": "E04",
+      "load_level": "L1",
+      "margin_ms": 360.4288325,
+      "margin_ms_lossless": 360.4288325,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            1028.793408,
+            1075.651456
+          ],
+          "median_ms": 1045.2731385,
+          "ok": 60,
+          "p90_ms": 1110.9828559
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1448.4568599375,
+            1469.063022
+          ],
+          "median_ms": 1455.2914415,
+          "ok": 60,
+          "p90_ms": 1505.4336112
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1517.1867682500001,
+            1535.707865
+          ],
+          "median_ms": 1523.878539,
+          "ok": 60,
+          "p90_ms": 1580.3574259
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1517.0183015,
+            1534.322604
+          ],
+          "median_ms": 1521.0865385000002,
+          "ok": 60,
+          "p90_ms": 1583.8518330000002
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1396.883034,
+            1420.412081
+          ],
+          "median_ms": 1405.701971,
+          "ok": 60,
+          "p90_ms": 1625.8406083
+        }
+      },
+      "rate_mbps": 175.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 50.0,
+      "attempts": 30,
+      "cell_id": "E04-L1-long",
+      "condition_id": "E04",
+      "load_level": "L1",
+      "margin_ms": 711.872503,
+      "margin_ms_lossless": 779.5697169999999,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 30,
+          "failed": 0,
+          "median_ci_ms": [
+            921.2315815,
+            969.2023294999999
+          ],
+          "median_ms": 935.1856075000001,
+          "ok": 30,
+          "p90_ms": 990.9151698
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1640.524155,
+            1650.942263
+          ],
+          "median_ms": 1647.0581105,
+          "ok": 30,
+          "p90_ms": 1674.6565395
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1710.271851,
+            1723.459067
+          ],
+          "median_ms": 1714.7553245,
+          "ok": 30,
+          "p90_ms": 1742.1196973
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1713.909804,
+            1726.5016335
+          ],
+          "median_ms": 1719.1057385,
+          "ok": 30,
+          "p90_ms": 1743.1468942
+        },
+        "edge/full": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            5071.7892105,
+            5105.912919
+          ],
+          "median_ms": 5094.596134,
+          "ok": 30,
+          "p90_ms": 5178.520740200001
+        }
+      },
+      "rate_mbps": 175.0,
+      "runner_up": "distributed/projected/int8",
+      "runner_up_lossless": "distributed/projected/prompt_first",
+      "split": "evaluation",
+      "task": "long",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 60,
+      "cell_id": "E05-L0",
+      "condition_id": "E05",
+      "load_level": "L0",
+      "margin_ms": 253.47290199999998,
+      "margin_ms_lossless": 253.47290199999998,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 52,
+          "failed": 0,
+          "median_ci_ms": [
+            736.8494861,
+            768.153781
+          ],
+          "median_ms": 744.815306,
+          "ok": 60,
+          "p90_ms": 906.2389006
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1652.6120938124998,
+            1663.558539
+          ],
+          "median_ms": 1655.7987644999998,
+          "ok": 60,
+          "p90_ms": 1684.1350324
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1889.883058,
+            1900.290678
+          ],
+          "median_ms": 1892.7061285,
+          "ok": 60,
+          "p90_ms": 1923.3686442
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1886.344637,
+            1900.045379
+          ],
+          "median_ms": 1890.7819515,
+          "ok": 60,
+          "p90_ms": 1932.6194564
+        },
+        "edge/full": {
+          "attempt_wins": 8,
+          "failed": 0,
+          "median_ci_ms": [
+            993.0154745,
+            1004.9726217874971
+          ],
+          "median_ms": 998.2882079999999,
+          "ok": 60,
+          "p90_ms": 1141.126639
+        }
+      },
+      "rate_mbps": 50.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 60,
+      "cell_id": "E05-L0-C2",
+      "condition_id": "E05",
+      "load_level": "L0",
+      "margin_ms": 343.6510925,
+      "margin_ms_lossless": 343.6510925,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1337.3515305625,
+            1398.601095
+          ],
+          "median_ms": 1344.583862,
+          "ok": 60,
+          "p90_ms": 1521.5146175
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1954.332529,
+            1972.385507
+          ],
+          "median_ms": 1955.5984595,
+          "ok": 60,
+          "p90_ms": 2012.84926
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2190.9583675000003,
+            2205.1352140249996
+          ],
+          "median_ms": 2193.701435,
+          "ok": 60,
+          "p90_ms": 2250.242302
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2191.5838935,
+            2206.7265579124996
+          ],
+          "median_ms": 2197.026518,
+          "ok": 60,
+          "p90_ms": 2248.7883202
+        },
+        "edge/full": {
+          "attempt_wins": 60,
+          "failed": 0,
+          "median_ci_ms": [
+            997.2901952375,
+            1011.4956670874988
+          ],
+          "median_ms": 1000.9327695,
+          "ok": 60,
+          "p90_ms": 1144.2021412
+        }
+      },
+      "rate_mbps": 50.0,
+      "runner_up": "cloud/raw_image",
+      "runner_up_lossless": "cloud/raw_image",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "edge/full",
+      "winner_lossless": "edge/full"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 60,
+      "cell_id": "E05-L1",
+      "condition_id": "E05",
+      "load_level": "L1",
+      "margin_ms": 688.5079185,
+      "margin_ms_lossless": 688.5079185,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 59,
+          "failed": 0,
+          "median_ci_ms": [
+            738.224167625,
+            770.29232
+          ],
+          "median_ms": 744.4795790000001,
+          "ok": 60,
+          "p90_ms": 907.9322400000001
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            1823.249977,
+            1833.848076
+          ],
+          "median_ms": 1826.869665,
+          "ok": 60,
+          "p90_ms": 1857.2324551000002
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2058.9069515,
+            2069.931565
+          ],
+          "median_ms": 2062.3009094999998,
+          "ok": 60,
+          "p90_ms": 2092.2314891
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2056.5653345,
+            2068.694404
+          ],
+          "median_ms": 2062.0186795,
+          "ok": 60,
+          "p90_ms": 2093.2903041
+        },
+        "edge/full": {
+          "attempt_wins": 1,
+          "failed": 0,
+          "median_ci_ms": [
+            1395.379888,
+            1474.565267
+          ],
+          "median_ms": 1432.9874975,
+          "ok": 60,
+          "p90_ms": 1615.844977
+        }
+      },
+      "rate_mbps": 50.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    },
+    {
+      "added_rtt_ms": 150.0,
+      "attempts": 60,
+      "cell_id": "E05-L1-C2",
+      "condition_id": "E05",
+      "load_level": "L1",
+      "margin_ms": 50.84723599999984,
+      "margin_ms_lossless": 50.84723599999984,
+      "placements": {
+        "cloud/raw_image": {
+          "attempt_wins": 35,
+          "failed": 0,
+          "median_ci_ms": [
+            1345.064582,
+            1393.693771
+          ],
+          "median_ms": 1364.6258685,
+          "ok": 60,
+          "p90_ms": 1527.8758202
+        },
+        "distributed/projected/int8": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2129.2593858624996,
+            2149.30002
+          ],
+          "median_ms": 2137.1526000000003,
+          "ok": 60,
+          "p90_ms": 2188.2492642
+        },
+        "distributed/projected/prompt_first": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2364.989076375,
+            2381.4087502625
+          ],
+          "median_ms": 2367.625245,
+          "ok": 60,
+          "p90_ms": 2430.742808
+        },
+        "distributed/projected/synchronous": {
+          "attempt_wins": 0,
+          "failed": 0,
+          "median_ci_ms": [
+            2368.7866276249997,
+            2384.580409
+          ],
+          "median_ms": 2373.33842,
+          "ok": 60,
+          "p90_ms": 2414.1708717
+        },
+        "edge/full": {
+          "attempt_wins": 25,
+          "failed": 0,
+          "median_ci_ms": [
+            1405.6865994875002,
+            1453.72582
+          ],
+          "median_ms": 1415.4731044999999,
+          "ok": 60,
+          "p90_ms": 1629.0674441
+        }
+      },
+      "rate_mbps": 50.0,
+      "runner_up": "edge/full",
+      "runner_up_lossless": "edge/full",
+      "split": "evaluation",
+      "task": "short",
+      "tie": false,
+      "tie_lossless": false,
+      "winner": "cloud/raw_image",
+      "winner_lossless": "cloud/raw_image"
+    }
+  ],
+  "configurations": [
+    "edge/full",
+    "cloud/raw_image",
+    "distributed/projected/synchronous",
+    "distributed/projected/prompt_first",
+    "distributed/projected/int8"
+  ],
+  "files": {
+    "oracle_attempts.jsonl": "73c809e51b99b70e73a41d6b950c00b66a53ae4065aacbfb167a8e5a2057766d",
+    "oracle_cells.csv": "a718146b984121baae05d2913d0cdf883c185be0b9d9d6794965741173fc76bc"
+  },
+  "profiles_index_sha256": "26cd21bf9b13919b8f9dca71acc5b3972681faa6913e38ee4fa80aa4c530d2af",
+  "schema_version": 1,
+  "seed": 1707,
+  "splits": [
+    "evaluation"
+  ]
+}

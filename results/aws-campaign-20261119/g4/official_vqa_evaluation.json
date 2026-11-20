@@ -1,0 +1,446 @@
+{
+ "annotations_sha256": "0564650e712b34c246e4ad142894692bf2e45dee8e9cc6ebb2cedbe85731c4bf",
+ "evaluator": "GT-Vision-Lab/VQA a013f0043c1e2cdc995922dfe257f7149aa9af06",
+ "manifest_sha256": "4f8bfe63f245db948274d7e0717bde3bab388e5ffe65505a3f841a35e3f9b89d",
+ "questions_sha256": "f34d9c9909dea76700d361baddd63dd47b4494945097459b542d9fe840244811",
+ "schema_version": 1,
+ "splits": {
+  "evaluation": {
+   "configurations": {
+    "cloud/raw_image": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 70.67,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 60.77,
+        "yes/no": 100.0
+       },
+       "perQuestionType": {
+        "are the": 100.0,
+        "are there": 100.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "what animal is": 100.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 100.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "ccdcbcc7a8e8ad8c0b11fc18a2115f1b83e9ce5c7a2f1827d52e230fb261e9a2",
+      "predictions_sha256": "0457b659ede7b6f6f0995b391fcb3ae00b2afbbd0e4c12436f715070d2da53df"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 47.33,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 45.38,
+        "yes/no": 54.55
+       },
+       "perQuestionType": {
+        "are the": 50.0,
+        "are there": 0.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 0.0,
+        "is this": 0.0,
+        "what animal is": 0.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 0.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "d7abe48e71f5638401e921f267a7a53479669a76ad86662611a859bccff20788",
+      "predictions_sha256": "10c8f257ebc884b1a4f80d3adabe2fb219204e0e46fd6f8ce9168b7a58d86b06"
+     }
+    },
+    "distributed/projected/int8": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 70.67,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 60.77,
+        "yes/no": 100.0
+       },
+       "perQuestionType": {
+        "are the": 100.0,
+        "are there": 100.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "what animal is": 100.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 100.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "ccdcbcc7a8e8ad8c0b11fc18a2115f1b83e9ce5c7a2f1827d52e230fb261e9a2",
+      "predictions_sha256": "0457b659ede7b6f6f0995b391fcb3ae00b2afbbd0e4c12436f715070d2da53df"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 47.33,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 45.38,
+        "yes/no": 54.55
+       },
+       "perQuestionType": {
+        "are the": 50.0,
+        "are there": 0.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 0.0,
+        "is this": 0.0,
+        "what animal is": 0.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 0.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "d7abe48e71f5638401e921f267a7a53479669a76ad86662611a859bccff20788",
+      "predictions_sha256": "10c8f257ebc884b1a4f80d3adabe2fb219204e0e46fd6f8ce9168b7a58d86b06"
+     }
+    },
+    "distributed/projected/prompt_first": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 70.67,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 60.77,
+        "yes/no": 100.0
+       },
+       "perQuestionType": {
+        "are the": 100.0,
+        "are there": 100.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "what animal is": 100.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 100.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "ccdcbcc7a8e8ad8c0b11fc18a2115f1b83e9ce5c7a2f1827d52e230fb261e9a2",
+      "predictions_sha256": "0457b659ede7b6f6f0995b391fcb3ae00b2afbbd0e4c12436f715070d2da53df"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 47.33,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 45.38,
+        "yes/no": 54.55
+       },
+       "perQuestionType": {
+        "are the": 50.0,
+        "are there": 0.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 0.0,
+        "is this": 0.0,
+        "what animal is": 0.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 0.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "d7abe48e71f5638401e921f267a7a53479669a76ad86662611a859bccff20788",
+      "predictions_sha256": "10c8f257ebc884b1a4f80d3adabe2fb219204e0e46fd6f8ce9168b7a58d86b06"
+     }
+    },
+    "distributed/projected/synchronous": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 70.67,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 60.77,
+        "yes/no": 100.0
+       },
+       "perQuestionType": {
+        "are the": 100.0,
+        "are there": 100.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "what animal is": 100.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 100.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "ccdcbcc7a8e8ad8c0b11fc18a2115f1b83e9ce5c7a2f1827d52e230fb261e9a2",
+      "predictions_sha256": "0457b659ede7b6f6f0995b391fcb3ae00b2afbbd0e4c12436f715070d2da53df"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 47.33,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 45.38,
+        "yes/no": 54.55
+       },
+       "perQuestionType": {
+        "are the": 50.0,
+        "are there": 0.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 0.0,
+        "is this": 0.0,
+        "what animal is": 0.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 0.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "d7abe48e71f5638401e921f267a7a53479669a76ad86662611a859bccff20788",
+      "predictions_sha256": "10c8f257ebc884b1a4f80d3adabe2fb219204e0e46fd6f8ce9168b7a58d86b06"
+     }
+    },
+    "edge/full": {
+     "lowercased": {
+      "accuracy_percent": {
+       "overall": 70.67,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 60.77,
+        "yes/no": 100.0
+       },
+       "perQuestionType": {
+        "are the": 100.0,
+        "are there": 100.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 100.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 100.0,
+        "is this": 100.0,
+        "what animal is": 100.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 100.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "ccdcbcc7a8e8ad8c0b11fc18a2115f1b83e9ce5c7a2f1827d52e230fb261e9a2",
+      "predictions_sha256": "0457b659ede7b6f6f0995b391fcb3ae00b2afbbd0e4c12436f715070d2da53df"
+     },
+     "unchanged": {
+      "accuracy_percent": {
+       "overall": 47.33,
+       "perAnswerType": {
+        "number": 38.33,
+        "other": 45.38,
+        "yes/no": 54.55
+       },
+       "perQuestionType": {
+        "are the": 50.0,
+        "are there": 0.0,
+        "do you": 100.0,
+        "does the": 100.0,
+        "how many": 32.5,
+        "how many people are": 100.0,
+        "is that a": 0.0,
+        "is the": 100.0,
+        "is the man": 100.0,
+        "is there a": 0.0,
+        "is this": 0.0,
+        "what animal is": 0.0,
+        "what are": 30.0,
+        "what color is": 60.0,
+        "what color is the": 0.0,
+        "what is": 100.0,
+        "what is on the": 100.0,
+        "what is the": 0.0,
+        "what is the man": 100.0,
+        "what time": 0.0,
+        "what type of": 100.0,
+        "which": 0.0,
+        "why": 0.0
+       }
+      },
+      "official_sha256": "d7abe48e71f5638401e921f267a7a53479669a76ad86662611a859bccff20788",
+      "predictions_sha256": "10c8f257ebc884b1a4f80d3adabe2fb219204e0e46fd6f8ce9168b7a58d86b06"
+     }
+    }
+   },
+   "parity": {
+    "cloud/raw_image vs distributed/projected/int8": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs distributed/projected/prompt_first": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "cloud/raw_image vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs distributed/projected/prompt_first": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/int8 vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/prompt_first vs distributed/projected/synchronous": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/prompt_first vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    },
+    "distributed/projected/synchronous vs edge/full": {
+     "accuracy_difference_pp": 0.0,
+     "questions_differing": 0,
+     "within_2pp": true
+    }
+   },
+   "request_ids": 30
+  }
+ }
+}
