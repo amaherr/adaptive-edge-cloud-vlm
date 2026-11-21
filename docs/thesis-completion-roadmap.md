@@ -232,6 +232,21 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 
 ## Phase 6: G5 on AWS
 
+**Status (21 November 2026): G5 passed.** See the [G5 record](../results/g5-aws-20261120/README.md).
+- **6.1:**
+  - The image was built at `6cf005f` (`sha256:2cd3bd95…`); build-time HTTP egress was opened and closed through reviewed Terraform plans.
+  - References were rebuilt and verified.
+  - The edge-probe calibration was a no-go, so [A4a](protocols/g2-v2-amendment-a4a.md) changed the probe shape; its calibration was a go.
+- **6.2:**
+  - Pilot 1 was a no-go on overhead, so [A4b](protocols/g2-v2-amendment-a4b.md) moved cloud sensing to a background sampler.
+  - Pilot 2 was a go, and everything was pinned in the freeze record before the campaign.
+- **6.3:** two sessions, with 80 of 80 segments and 14,400 of 14,400 attempts valid and no failures.
+  - **Speed:** the adaptive policy is 118 ms (11.5%) faster than always-cloud (CI 95–143 ms).
+  - **Regret:** median 2.2% against the per-request oracle.
+  - **Sensing:** 100% for the cloud and 97.8% for the edge, with 15.9 ms median overhead.
+  - **Quality:** identical.
+- **6.4:** the S3 checkpoint is mirrored and verified (2,722 objects). The edge data volume, which holds the final status and the preflights, is archived in phase 8.
+
 6.1 **Bring the pair up:**
 - start the stopped instances, or recreate them if 0.4 removed them;
 - deploy the new image digest on both hosts;
