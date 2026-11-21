@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from adaptive_vlm.prediction.r2.g5 import analyse, requests
+from adaptive_vlm.prediction.r2.g5 import analyse, phase7, requests
 from adaptive_vlm.prediction.r2.models import fit_component
 from tests.prediction.test_r2 import _world
 
@@ -80,6 +80,11 @@ def _campaign(tmp_path: Path, *, chosen: str, sensed_cloud: str) -> Path:
                     "adaptive_sensed_cloud_load": sensed_cloud,
                     "adaptive_overhead_ms": 4.0,
                     "adaptive_sensed_uplink_bps": 2e7,
+                    "adaptive_sensed_sensing_ms": 3.5,
+                    "adaptive_selection_ms": 0.2,
+                    "adaptive_sensed_edge_probe_ms": 3.0,
+                    "adaptive_sensed_cloud_state_age_s": 0.4,
+                    "request_wire_bytes": 1000 if chosen == "cloud" else 0,
                     "adaptive_sensed_rtt_ms": 50.0,
                 },
             }
@@ -136,3 +141,25 @@ def test_g5_gate_fails_when_slower_than_best_static(tmp_path: Path) -> None:
     assert summary["gate"]["faster_than_best_static"] is False
     assert summary["gate"]["pass"] is False
     assert summary["sensing"]["cloud_accuracy_percent"] == 0.0
+
+
+def test_phase7_breakdowns(tmp_path: Path) -> None:
+    records = requests(_campaign(tmp_path, chosen="cloud", sensed_cloud="C2"))
+    analyse(
+        records,
+        calibration=_calibration(),
+        features=_features(),
+        best_static="edge/full",
+        sla_ms=950.0,
+    )
+    result = phase7(records, _features())
+    state = result["by_load_state"]["L0/C2"]
+    assert state["n"] == 4 and state["top1_agreement_percent"] == 100.0
+    assert state["minus_oracle_ms"]["estimate"] == 5.0
+    assert result["bytes_per_request_mean"]["adaptive"] == 1000
+    assert result["bytes_per_request_mean"]["edge/full"] == 0
+    assert result["overhead"]["overhead_ms_mean"] == 4.0
+    assert result["overhead"]["overhead_share_of_regret_percent"] == 80.0
+    assert result["stability"]["switches"] == 0
+    assert result["state_changes"]["first_request_top1_percent"] == 100.0
+    assert result["edge_misreads"]["count"] == 0

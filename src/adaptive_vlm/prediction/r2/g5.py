@@ -35,6 +35,17 @@ MEDIAN_RELATIVE_REGRET_LIMIT = 10.0
 FIXED = {spec.placement: spec.id.value for spec in SPEC_BY_PLACEMENT.values()}
 
 
+def wire_bytes(row: Mapping[str, Any]) -> int:
+    """Application bytes on the link for one attempt (0 for the edge)."""
+
+    metrics = row.get("metrics") or {}
+    if "total_wire_bytes" in metrics:
+        return int(metrics["total_wire_bytes"])
+    return int(metrics.get("request_wire_bytes") or 0) + int(
+        metrics.get("response_wire_bytes") or 0
+    )
+
+
 def _rows(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
@@ -98,6 +109,16 @@ def requests(campaign: Path) -> list[dict[str, Any]]:
                         c: r.get("output_text")
                         for c, r in fixed[row["trial_id"]].items()
                     },
+                    "fixed_bytes": {
+                        c: wire_bytes(r) for c, r in fixed[row["trial_id"]].items()
+                    },
+                    "adaptive_bytes": wire_bytes(row),
+                    "sensing_ms": metrics.get("adaptive_sensed_sensing_ms"),
+                    "selection_ms": metrics.get("adaptive_selection_ms"),
+                    "cloud_state_age_s": metrics.get(
+                        "adaptive_sensed_cloud_state_age_s"
+                    ),
+                    "load_state_label": f"{plan['load_level']}/{plan['cloud_load']}",
                 }
             )
     return out
@@ -286,3 +307,151 @@ def _group(
     for r in records:
         grouped[r[key]].append(r)
     return grouped
+
+
+# --------------------------------------------------------------------------
+# Phase 7: paired breakdowns, communication, overhead, stability
+
+
+def _paired(
+    records: Sequence[dict[str, Any]], other: Callable[[dict[str, Any]], float]
+) -> dict[str, float]:
+    groups: dict[str, list[float]] = defaultdict(list)
+    for r in records:
+        groups[r["request_id"]].append(r["latency_ms"] - other(r))
+    return _bootstrap(groups, mean)
+
+
+def _comparisons(records: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "n": len(records),
+        "adaptive_mean_ms": mean(r["latency_ms"] for r in records),
+        "cloud_mean_ms": mean(r["fixed_ms"]["cloud/raw_image"] for r in records),
+        "edge_mean_ms": mean(r["fixed_ms"]["edge/full"] for r in records),
+        "oracle_mean_ms": mean(r["oracle_ms"] for r in records),
+        "minus_cloud_ms": _paired(records, lambda r: r["fixed_ms"]["cloud/raw_image"]),
+        "minus_edge_ms": _paired(records, lambda r: r["fixed_ms"]["edge/full"]),
+        "minus_oracle_ms": _paired(records, lambda r: r["oracle_ms"]),
+        "top1_agreement_percent": 100.0
+        * sum(r["selected"] == r["oracle"] for r in records)
+        / len(records),
+    }
+
+
+def phase7(
+    records: Sequence[dict[str, Any]], features: Mapping[str, Mapping[str, Any]]
+) -> dict[str, Any]:
+    """Breakdowns for the final analysis; ``records`` went through ``analyse``."""
+
+    from adaptive_vlm.prediction.r2.features import crop_count
+
+    complete = [r for r in records if "oracle" in r]
+    crops = {
+        rid: crop_count(int(f["image_width"]), int(f["image_height"]))
+        for rid, f in features.items()
+    }
+    out: dict[str, Any] = {
+        "by_load_state": {
+            k: _comparisons(v)
+            for k, v in sorted(_group(complete, "load_state_label").items())
+        },
+        "by_trace": {
+            k: _comparisons(v) for k, v in sorted(_group(complete, "trace").items())
+        },
+        "by_repetition": {
+            str(k): _comparisons(v)
+            for k, v in sorted(_group(complete, "repetition").items())
+        },
+    }
+    bytes_mean: dict[str, float] = {
+        c: mean(r["fixed_bytes"][c] for r in complete) for c in CONFIGURATIONS
+    }
+    bytes_mean["adaptive"] = mean(r["adaptive_bytes"] for r in complete)
+    bytes_mean["oracle"] = mean(r["fixed_bytes"][r["oracle"]] for r in complete)
+    out["bytes_per_request_mean"] = bytes_mean
+    overhead = [float(r["overhead_ms"]) for r in complete]
+    regret = mean(r["regret_ms"] for r in complete)
+    probe = {
+        level: [float(r["edge_probe_ms"]) for r in complete if r["edge_load"] == level]
+        for level in ("L0", "L1")
+    }
+    ages = [
+        float(r["cloud_state_age_s"])
+        for r in complete
+        if r["cloud_state_age_s"] is not None
+    ]
+    out["overhead"] = {
+        "overhead_ms_mean": mean(overhead),
+        "sensing_ms_median": percentile(
+            [float(r["sensing_ms"]) for r in complete], 0.5
+        ),
+        "selection_ms_median": percentile(
+            [float(r["selection_ms"]) for r in complete], 0.5
+        ),
+        "edge_probe_ms_median": {k: percentile(v, 0.5) for k, v in probe.items() if v},
+        "cloud_state_age_s_median": percentile(ages, 0.5) if ages else None,
+        "saved_vs_cloud_ms_mean": mean(
+            r["fixed_ms"]["cloud/raw_image"] - r["latency_ms"] for r in complete
+        ),
+        "regret_ms_mean": regret,
+        "overhead_share_of_regret_percent": 100.0 * mean(overhead) / regret,
+    }
+    kinds = {"different_crop_counts": 0, "equal_crop_counts": 0}
+    flip_flops = 0
+    per_segment: list[int] = []
+    for _, rows in sorted(_group(complete, "subblock_id").items()):
+        rows = sorted(rows, key=lambda r: r["interleave_position"])
+        count = 0
+        for a, b in itertools.pairwise(rows):
+            if a["selected"] != b["selected"]:
+                count += 1
+                same = crops[a["request_id"]] == crops[b["request_id"]]
+                kinds["equal_crop_counts" if same else "different_crop_counts"] += 1
+        for a, b, c in zip(rows, rows[1:], rows[2:], strict=False):
+            if (
+                a["selected"] == c["selected"] != b["selected"]
+                and crops[a["request_id"]]
+                == crops[b["request_id"]]
+                == crops[c["request_id"]]
+            ):
+                flip_flops += 1
+        per_segment.append(count)
+    out["stability"] = {
+        "switches": sum(per_segment),
+        "per_segment_mean": mean(per_segment),
+        "per_segment_max": max(per_segment),
+        "between_different_crop_counts": kinds["different_crop_counts"],
+        "between_equal_crop_counts": kinds["equal_crop_counts"],
+        "flip_flops_equal_crops": flip_flops,
+    }
+    first_ids = {
+        id(min(rows, key=lambda r: r["interleave_position"]))
+        for rows in _group(complete, "subblock_id").values()
+    }
+    first = [r for r in complete if id(r) in first_ids]
+    rest = [r for r in complete if id(r) not in first_ids]
+
+    def top1(rows: Sequence[dict[str, Any]]) -> float:
+        return float(
+            100.0 * sum(r["selected"] == r["oracle"] for r in rows) / len(rows)
+        )
+
+    out["state_changes"] = {
+        "first_request_top1_percent": top1(first),
+        "later_requests_top1_percent": top1(rest),
+        "first_request_sensing_correct_percent": 100.0
+        * sum(
+            r["sensed_edge_load"] == r["edge_load"]
+            and r["sensed_cloud_load"] == r["cloud_load"]
+            for r in first
+        )
+        / len(first),
+    }
+    wrong = [r for r in complete if r["sensed_edge_load"] != r["edge_load"]]
+    out["edge_misreads"] = {
+        "count": len(wrong),
+        "by_true_level": dict(sorted(_counts(r["edge_load"] for r in wrong).items())),
+        "regret_ms_mean": mean(r["regret_ms"] for r in wrong) if wrong else None,
+        "top1_percent": top1(wrong) if wrong else None,
+    }
+    return out

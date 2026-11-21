@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 430" width="1080" height="430" role="img" aria-labelledby="title desc">
+<title id="title">G5 traces: latency per segment</title>
+<desc id="desc">For each of the four traces, the mean latency per segment of the adaptive policy, always-cloud, always-edge and the per-request oracle, averaged over four repetitions.</desc>
+
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; } .ink2 { fill: #52514e; } .muted { fill: #898781; }
+  .on-fill { fill: #ffffff; }
+  .grid { stroke: #e1e0d9; stroke-width: 1; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .ring { stroke: #fcfcfb; }
+  .f-cloud { fill: #2a78d6; } .k-cloud { stroke: #2a78d6; }
+  .f-edge { fill: #eb6834; } .k-edge { stroke: #eb6834; }
+  .f-synchronous { fill: #1baf7a; } .k-synchronous { stroke: #1baf7a; }
+  .f-int8 { fill: #eda100; } .k-int8 { stroke: #eda100; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #f0efec; } .ink2 { fill: #c3c2b7; }
+    .grid { stroke: #2c2c2a; } .axis { stroke: #383835; }
+    .ring { stroke: #1a1a19; }
+    .f-cloud { fill: #3987e5; } .k-cloud { stroke: #3987e5; }
+    .f-edge { fill: #d95926; } .k-edge { stroke: #d95926; }
+    .f-synchronous { fill: #199e70; } .k-synchronous { stroke: #199e70; }
+    .f-int8 { fill: #c98500; } .k-int8 { stroke: #c98500; }
+  }
+</style>
+
+<rect class="surface" width="1080" height="430"/>
+<text x="24.0" y="32.0" class="ink" font-size="16" font-weight="600">G5 on AWS: mean latency per trace segment (four repetitions)</text>
+<text x="24.0" y="52.0" class="ink2" font-size="12">Adaptive includes its sensing and selection time; the oracle is the fastest fixed configuration per request, in hindsight.</text>
+<text x="70.0" y="82.0" class="ink" font-size="12" font-weight="600">Cloud-load episodes (E01)</text>
+<line class="axis" x1="70" x2="285" y1="346.0" y2="346.0"/>
+<text x="64.0" y="350.0" class="muted" font-size="10" text-anchor="end">0</text>
+<line class="grid" x1="70" x2="285" y1="304.3" y2="304.3"/>
+<text x="64.0" y="308.3" class="muted" font-size="10" text-anchor="end">0.25</text>
+<line class="grid" x1="70" x2="285" y1="262.7" y2="262.7"/>
+<text x="64.0" y="266.7" class="muted" font-size="10" text-anchor="end">0.5</text>
+<line class="grid" x1="70" x2="285" y1="221.0" y2="221.0"/>
+<text x="64.0" y="225.0" class="muted" font-size="10" text-anchor="end">0.75</text>
+<line class="grid" x1="70" x2="285" y1="179.3" y2="179.3"/>
+<text x="64.0" y="183.3" class="muted" font-size="10" text-anchor="end">1</text>
+<line class="grid" x1="70" x2="285" y1="137.7" y2="137.7"/>
+<text x="64.0" y="141.7" class="muted" font-size="10" text-anchor="end">1.25</text>
+<line class="grid" x1="70" x2="285" y1="96.0" y2="96.0"/>
+<text x="64.0" y="100.0" class="muted" font-size="10" text-anchor="end">1.5</text>
+<text x="85.0" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C0</text>
+<text x="131.2" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="177.5" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C0</text>
+<text x="223.8" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="270.0" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C0</text>
+<polyline class="k-cloud" fill="none" stroke-width="2" points="85.0,269.3 131.2,169.4 177.5,269.4 223.8,169.7 270.0,269.4"/>
+<g><title>always cloud: 460 ms</title><circle cx="85.0" cy="269.3" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1059 ms</title><circle cx="131.2" cy="169.4" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 460 ms</title><circle cx="177.5" cy="269.4" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1058 ms</title><circle cx="223.8" cy="169.7" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 460 ms</title><circle cx="270.0" cy="269.4" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<polyline class="k-edge" fill="none" stroke-width="2" points="85.0,186.9 131.2,186.5 177.5,187.0 223.8,186.8 270.0,186.8"/>
+<g><title>always edge: 954 ms</title><circle cx="85.0" cy="186.9" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 957 ms</title><circle cx="131.2" cy="186.5" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 954 ms</title><circle cx="177.5" cy="187.0" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 955 ms</title><circle cx="223.8" cy="186.8" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 955 ms</title><circle cx="270.0" cy="186.8" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<polyline class="k-synchronous" fill="none" stroke-width="3" points="85.0,266.6 131.2,184.4 177.5,266.8 223.8,183.3 270.0,266.5"/>
+<g><title>adaptive: 476 ms</title><circle cx="85.0" cy="266.6" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 970 ms</title><circle cx="131.2" cy="184.4" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 475 ms</title><circle cx="177.5" cy="266.8" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 976 ms</title><circle cx="223.8" cy="183.3" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 477 ms</title><circle cx="270.0" cy="266.5" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<polyline class="k-int8" fill="none" stroke-width="2" points="85.0,269.3 131.2,187.1 177.5,269.4 223.8,187.3 270.0,269.4"/>
+<g><title>oracle: 460 ms</title><circle cx="85.0" cy="269.3" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 953 ms</title><circle cx="131.2" cy="187.1" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 460 ms</title><circle cx="177.5" cy="269.4" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 952 ms</title><circle cx="223.8" cy="187.3" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 460 ms</title><circle cx="270.0" cy="269.4" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<text x="335.0" y="82.0" class="ink" font-size="12" font-weight="600">Edge-load episodes under C2 (E05)</text>
+<line class="axis" x1="335" x2="550" y1="346.0" y2="346.0"/>
+<line class="grid" x1="335" x2="550" y1="304.3" y2="304.3"/>
+<line class="grid" x1="335" x2="550" y1="262.7" y2="262.7"/>
+<line class="grid" x1="335" x2="550" y1="221.0" y2="221.0"/>
+<line class="grid" x1="335" x2="550" y1="179.3" y2="179.3"/>
+<line class="grid" x1="335" x2="550" y1="137.7" y2="137.7"/>
+<line class="grid" x1="335" x2="550" y1="96.0" y2="96.0"/>
+<text x="350.0" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="396.2" y="361.0" class="muted" font-size="9" text-anchor="middle">L1/C2</text>
+<text x="442.5" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="488.8" y="361.0" class="muted" font-size="9" text-anchor="middle">L1/C2</text>
+<text x="535.0" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<polyline class="k-cloud" fill="none" stroke-width="2" points="350.0,115.9 396.2,115.5 442.5,115.6 488.8,115.7 535.0,116.1"/>
+<g><title>always cloud: 1380 ms</title><circle cx="350.0" cy="115.9" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1383 ms</title><circle cx="396.2" cy="115.5" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1383 ms</title><circle cx="442.5" cy="115.6" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1382 ms</title><circle cx="488.8" cy="115.7" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1379 ms</title><circle cx="535.0" cy="116.1" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<polyline class="k-edge" fill="none" stroke-width="2" points="350.0,186.7 396.2,120.4 442.5,186.7 488.8,119.2 535.0,186.6"/>
+<g><title>always edge: 956 ms</title><circle cx="350.0" cy="186.7" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 1354 ms</title><circle cx="396.2" cy="120.4" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 956 ms</title><circle cx="442.5" cy="186.7" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 1361 ms</title><circle cx="488.8" cy="119.2" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 956 ms</title><circle cx="535.0" cy="186.6" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<polyline class="k-synchronous" fill="none" stroke-width="3" points="350.0,183.2 396.2,123.5 442.5,183.1 488.8,122.4 535.0,183.6"/>
+<g><title>adaptive: 977 ms</title><circle cx="350.0" cy="183.2" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 1335 ms</title><circle cx="396.2" cy="123.5" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 977 ms</title><circle cx="442.5" cy="183.1" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 1342 ms</title><circle cx="488.8" cy="122.4" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 975 ms</title><circle cx="535.0" cy="183.6" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<polyline class="k-int8" fill="none" stroke-width="2" points="350.0,186.7 396.2,128.9 442.5,186.7 488.8,128.1 535.0,186.6"/>
+<g><title>oracle: 956 ms</title><circle cx="350.0" cy="186.7" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 1303 ms</title><circle cx="396.2" cy="128.9" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 956 ms</title><circle cx="442.5" cy="186.7" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 1307 ms</title><circle cx="488.8" cy="128.1" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 956 ms</title><circle cx="535.0" cy="186.6" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<text x="600.0" y="82.0" class="ink" font-size="12" font-weight="600">Both loads (E03)</text>
+<line class="axis" x1="600" x2="815" y1="346.0" y2="346.0"/>
+<line class="grid" x1="600" x2="815" y1="304.3" y2="304.3"/>
+<line class="grid" x1="600" x2="815" y1="262.7" y2="262.7"/>
+<line class="grid" x1="600" x2="815" y1="221.0" y2="221.0"/>
+<line class="grid" x1="600" x2="815" y1="179.3" y2="179.3"/>
+<line class="grid" x1="600" x2="815" y1="137.7" y2="137.7"/>
+<line class="grid" x1="600" x2="815" y1="96.0" y2="96.0"/>
+<text x="615.0" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C0</text>
+<text x="661.2" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="707.5" y="361.0" class="muted" font-size="9" text-anchor="middle">L1/C2</text>
+<text x="753.8" y="361.0" class="muted" font-size="9" text-anchor="middle">L1/C0</text>
+<text x="800.0" y="361.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<polyline class="k-cloud" fill="none" stroke-width="2" points="615.0,246.8 661.2,147.1 707.5,145.7 753.8,246.5 800.0,147.4"/>
+<g><title>always cloud: 595 ms</title><circle cx="615.0" cy="246.8" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1193 ms</title><circle cx="661.2" cy="147.1" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1202 ms</title><circle cx="707.5" cy="145.7" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 597 ms</title><circle cx="753.8" cy="246.5" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1191 ms</title><circle cx="800.0" cy="147.4" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<polyline class="k-edge" fill="none" stroke-width="2" points="615.0,186.9 661.2,186.6 707.5,119.6 753.8,119.1 800.0,186.6"/>
+<g><title>always edge: 955 ms</title><circle cx="615.0" cy="186.9" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 957 ms</title><circle cx="661.2" cy="186.6" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 1358 ms</title><circle cx="707.5" cy="119.6" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 1361 ms</title><circle cx="753.8" cy="119.1" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 956 ms</title><circle cx="800.0" cy="186.6" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<polyline class="k-synchronous" fill="none" stroke-width="3" points="615.0,244.4 661.2,183.3 707.5,142.9 753.8,240.4 800.0,183.0"/>
+<g><title>adaptive: 609 ms</title><circle cx="615.0" cy="244.4" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 976 ms</title><circle cx="661.2" cy="183.3" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 1219 ms</title><circle cx="707.5" cy="142.9" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 633 ms</title><circle cx="753.8" cy="240.4" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 978 ms</title><circle cx="800.0" cy="183.0" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<polyline class="k-int8" fill="none" stroke-width="2" points="615.0,246.8 661.2,186.6 707.5,148.7 753.8,246.5 800.0,186.6"/>
+<g><title>oracle: 595 ms</title><circle cx="615.0" cy="246.8" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 957 ms</title><circle cx="661.2" cy="186.6" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 1184 ms</title><circle cx="707.5" cy="148.7" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 597 ms</title><circle cx="753.8" cy="246.5" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 956 ms</title><circle cx="800.0" cy="186.6" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<text x="865.0" y="82.0" class="ink" font-size="12" font-weight="600">Network changes under C2</text>
+<line class="axis" x1="865" x2="1080" y1="346.0" y2="346.0"/>
+<line class="grid" x1="865" x2="1080" y1="304.3" y2="304.3"/>
+<line class="grid" x1="865" x2="1080" y1="262.7" y2="262.7"/>
+<line class="grid" x1="865" x2="1080" y1="221.0" y2="221.0"/>
+<line class="grid" x1="865" x2="1080" y1="179.3" y2="179.3"/>
+<line class="grid" x1="865" x2="1080" y1="137.7" y2="137.7"/>
+<line class="grid" x1="865" x2="1080" y1="96.0" y2="96.0"/>
+<text x="880.0" y="361.0" class="muted" font-size="9" text-anchor="middle">E02</text>
+<text x="880.0" y="373.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="926.2" y="361.0" class="muted" font-size="9" text-anchor="middle">E01</text>
+<text x="926.2" y="373.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="972.5" y="361.0" class="muted" font-size="9" text-anchor="middle">E04</text>
+<text x="972.5" y="373.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="1018.8" y="361.0" class="muted" font-size="9" text-anchor="middle">E05</text>
+<text x="1018.8" y="373.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<text x="1065.0" y="361.0" class="muted" font-size="9" text-anchor="middle">E02</text>
+<text x="1065.0" y="373.0" class="muted" font-size="9" text-anchor="middle">L0/C2</text>
+<polyline class="k-cloud" fill="none" stroke-width="2" points="880.0,189.8 926.2,168.3 972.5,174.4 1018.8,116.4 1065.0,190.0"/>
+<g><title>always cloud: 937 ms</title><circle cx="880.0" cy="189.8" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1066 ms</title><circle cx="926.2" cy="168.3" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1029 ms</title><circle cx="972.5" cy="174.4" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 1378 ms</title><circle cx="1018.8" cy="116.4" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<g><title>always cloud: 936 ms</title><circle cx="1065.0" cy="190.0" r="3.5" class="f-cloud ring" stroke-width="1.5"/></g>
+<polyline class="k-edge" fill="none" stroke-width="2" points="880.0,186.7 926.2,186.5 972.5,186.7 1018.8,186.6 1065.0,186.8"/>
+<g><title>always edge: 956 ms</title><circle cx="880.0" cy="186.7" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 957 ms</title><circle cx="926.2" cy="186.5" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 956 ms</title><circle cx="972.5" cy="186.7" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 957 ms</title><circle cx="1018.8" cy="186.6" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<g><title>always edge: 955 ms</title><circle cx="1065.0" cy="186.8" r="3.5" class="f-edge ring" stroke-width="1.5"/></g>
+<polyline class="k-synchronous" fill="none" stroke-width="3" points="880.0,192.2 926.2,183.1 972.5,184.3 1018.8,183.0 1065.0,192.4"/>
+<g><title>adaptive: 923 ms</title><circle cx="880.0" cy="192.2" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 978 ms</title><circle cx="926.2" cy="183.1" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 970 ms</title><circle cx="972.5" cy="184.3" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 978 ms</title><circle cx="1018.8" cy="183.0" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<g><title>adaptive: 922 ms</title><circle cx="1065.0" cy="192.4" r="3.5" class="f-synchronous ring" stroke-width="1.5"/></g>
+<polyline class="k-int8" fill="none" stroke-width="2" points="880.0,194.6 926.2,187.0 972.5,188.0 1018.8,186.6 1065.0,194.9"/>
+<g><title>oracle: 908 ms</title><circle cx="880.0" cy="194.6" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 954 ms</title><circle cx="926.2" cy="187.0" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 948 ms</title><circle cx="972.5" cy="188.0" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 957 ms</title><circle cx="1018.8" cy="186.6" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<g><title>oracle: 907 ms</title><circle cx="1065.0" cy="194.9" r="3.5" class="f-int8 ring" stroke-width="1.5"/></g>
+<line class="k-cloud" x1="70" x2="92" y1="410" y2="410" stroke-width="2.5"/>
+<text x="98.0" y="414.0" class="ink2" font-size="12">always cloud</text>
+<line class="k-edge" x1="214" x2="236" y1="410" y2="410" stroke-width="2.5"/>
+<text x="242.0" y="414.0" class="ink2" font-size="12">always edge</text>
+<line class="k-synchronous" x1="351" x2="373" y1="410" y2="410" stroke-width="2.5"/>
+<text x="379.0" y="414.0" class="ink2" font-size="12">adaptive</text>
+<line class="k-int8" x1="467" x2="489" y1="410" y2="410" stroke-width="2.5"/>
+<text x="495.0" y="414.0" class="ink2" font-size="12">oracle</text>
+<text x="24.0" y="221.0" class="muted" font-size="11" text-anchor="middle" transform="rotate(-90 24 221.0)">Mean latency (s)</text>
+</svg>

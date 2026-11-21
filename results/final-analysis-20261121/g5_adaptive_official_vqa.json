@@ -1,0 +1,79 @@
+{
+  "accuracy_percent": {
+    "overall": 70.67, 
+    "perAnswerType": {
+      "number": 38.33, 
+      "other": 60.77, 
+      "yes/no": 100.0
+    }, 
+    "perQuestionType": {
+      "are the": 100.0, 
+      "are there": 100.0, 
+      "do you": 100.0, 
+      "does the": 100.0, 
+      "how many": 32.5, 
+      "how many people are": 100.0, 
+      "is that a": 100.0, 
+      "is the": 100.0, 
+      "is the man": 100.0, 
+      "is there a": 100.0, 
+      "is this": 100.0, 
+      "what animal is": 100.0, 
+      "what are": 30.0, 
+      "what color is": 60.0, 
+      "what color is the": 100.0, 
+      "what is": 100.0, 
+      "what is on the": 100.0, 
+      "what is the": 0.0, 
+      "what is the man": 100.0, 
+      "what time": 0.0, 
+      "what type of": 100.0, 
+      "which": 0.0, 
+      "why": 0.0
+    }
+  }, 
+  "evaluator": "GT-Vision-Lab/VQA/PythonEvaluationTools", 
+  "evaluator_source_sha256": {
+    "vqa.py": "1b468129016f56e7c5050b0c2c02591e61d5f29860e8fedeffaff638b8232fae", 
+    "vqaEval.py": "f08edfcad5be0112500993e245c706b6cb928eadebe203f89f838e5e0d04bec8"
+  }, 
+  "input_sha256": {
+    "annotations": "fbef2b0bd375b8c2e9dfd0a579735fca7469f4554c5a253742ef877c021b97f5", 
+    "predictions": "0457b659ede7b6f6f0995b391fcb3ae00b2afbbd0e4c12436f715070d2da53df", 
+    "questions": "66c5006836623a720a53e6afd04b6d1974df248ebb3558cf98d1be034dec97e6"
+  }, 
+  "per_question_accuracy_percent": {
+    "10192002": 100.0, 
+    "111789004": 100.0, 
+    "138115001": 0.0, 
+    "150872002": 100.0, 
+    "188416001": 100.0, 
+    "223746002": 60.0, 
+    "267664002": 100.0, 
+    "271548002": 100.0, 
+    "297819004": 0.0, 
+    "315696000": 100.0, 
+    "335644001": 100.0, 
+    "337653004": 100.0, 
+    "342006000": 0.0, 
+    "342476001": 100.0, 
+    "344197000": 100.0, 
+    "358707002": 100.0, 
+    "367929000": 30.0, 
+    "412440006": 30.0, 
+    "422833002": 100.0, 
+    "429174003": 0.0, 
+    "458781000": 0.0, 
+    "463876009": 100.0, 
+    "466565004": 100.0, 
+    "476008002": 100.0, 
+    "492472003": 0.0, 
+    "500765000": 100.0, 
+    "520047005": 0.0, 
+    "520531000": 100.0, 
+    "570171000": 100.0, 
+    "573853003": 100.0
+  }, 
+  "question_count": 30, 
+  "schema_version": 1
+}

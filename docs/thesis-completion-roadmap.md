@@ -260,6 +260,17 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 
 ## Phase 7: final analysis
 
+**Status (21 November 2026): done.** See the [final analysis](../results/final-analysis-20261121/README.md).
+- **7.1, paired analysis** (`prediction/r2/g5.py` `phase7`, `scripts/campaign/final_analysis.py`):
+  - by load state, adaptive − always-cloud is −199 ms at L0/C2, −24 ms under both loads (CI includes zero), and +16 to +37 ms at C0 (sensing cost only);
+  - repetitions agree within 6 ms.
+  - The G2 v2 prototype's `thesis_analysis.py` is superseded by this analysis for the AWS campaigns.
+- **7.2, bytes:** the adaptive policy averages 70 KB per request against 160 KB for always-cloud (−56%).
+- **7.3, overhead:** 18.4 ms per request, which is 84% of the 22 ms regret; the sensing saves 6.4× what it costs.
+- **7.4, stability:** 4 switches per segment, two-thirds of them image-driven; the first request after a state change is as accurate as the rest.
+- **7.5, quality:** the adaptive answers' official VQA accuracy is 70.67%, identical to every fixed configuration.
+- **7.6, figures:** the crossover map, latency against rate, G3 predicted against observed, and the G5 traces.
+
 7.1 **Phase 7 paired analysis** (`thesis-analysis`, updated): adaptive against each baseline and the oracle on the same trace segments, with paired bootstrap CIs.
 
 7.2 **Communication:** bytes per request by configuration and policy. Under the int8 split, bytes fall at a latency cost; the cloud sends the raw image.
