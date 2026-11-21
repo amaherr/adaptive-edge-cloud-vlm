@@ -1,5 +1,7 @@
 # Moondream split-boundary inspection
 
+> **Still current.** Every split configuration (synchronous, prompt-first, int8) uses the projected-feature boundary in the first row.
+
 This inspection uses the verified cached Moondream revision `9a7d4024050840e001defacec2b00727e89149e6`, specifically `vision.py`, `moondream.py`, `image_crops.py`, `text.py`, and `config.py` under `.model-cache/audit/moondream2-9a7d4024/`. Those cached model files are pinned by the artifact manifest. The findings identify possible graph boundaries; they do **not** activate another configuration.
 
 | Boundary | Tensor and minimum BF16 payload | Required server work and side inputs | Feasibility status |

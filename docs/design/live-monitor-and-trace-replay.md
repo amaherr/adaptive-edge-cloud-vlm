@@ -1,5 +1,7 @@
 # Live monitor and network trace replay
 
+> **Local prototype (October 2026).** This specification belongs to the local CPU/loopback prototype (three configurations, schema-1 predictor); the commands still work. The AWS campaigns use the [adaptive runtime](adaptive-runtime.md) instead: background cloud sensing, an edge timing probe and the periodic network probe.
+
 Phase 6 adds a deterministic network trace replay and an optional live monitor to `adaptive-benchmark`. The current Moondream calibration is still limited to uncontrolled loopback and failed G3 ranking. Live monitoring is therefore a **diagnostic integration path**; it does not authorize automatic performance selection or replace the physical network measurements required by G2–G4.
 
 ## Trace replay

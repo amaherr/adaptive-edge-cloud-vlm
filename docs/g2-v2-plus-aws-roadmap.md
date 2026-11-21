@@ -1,5 +1,7 @@
 # G2 v2+ on AWS: roadmap
 
+> **Executed (17–19 November 2026).** This is the working record of the move to AWS: decisions D1–D11 and phases A–F with their results. The frozen [protocol](protocols/g2-v2-protocol.md) links to it. Results: [G2 v2+ campaign](../results/aws-campaign-20261119/README.md); how to run a campaign now: [AWS campaign runbook](runbooks/aws-campaign.md). Branch names below (`cloud-infrastructure`, `feature/aws-phase-*`) were merged into `main` and deleted; the `cloud/` documents mentioned in phase A1 were later consolidated into the [container runtime contract](design/container-runtime.md).
+
 **Status: plan, 17 November 2026; account inventory added the same day (section 8).** The GPU quota appeal for the AWS pair was granted. This roadmap moves the G2 v2+ campaign ([plan, B0–B9](g2-v2-plus-plan.md)) from the physical RTX 3050 / RTX 2070 SUPER pair to two AWS VMs, built with the Terraform and container work on the `cloud-infrastructure` branch. It **reverses the earlier "AWS/Vultr out of scope" decision** recorded in the Predictor V2 specification; record that reversal in the protocol (amendment A2).
 
 The physical results are unaffected: G2 and its analysis stay as they are, as the real-hardware baseline. The physical G2 v2 campaign is not run; its frozen prompt, long task, dataset, splits and tooling carry over unchanged.
@@ -66,7 +68,7 @@ A, B-code and C can run in parallel. D needs C, plus enough of A to run the imag
 - **A3:** `ClassifiedNetwork`.
 - **A4:** the `platform` setting (spill metric: Windows dedicated or NVML used memory; an L0 CUDA OOM invalidates a sub-block).
 - **A5:** image build record as source identity; same image digest on both hosts; `campaign/checkpoint.py` (S3 sync with receipts, edge and cloud heartbeats).
-- **A6:** `orchestrator` service; `adaptive-vlm-inference` container name; `iproute2` and `awscli` in the image; [runtime contract v2](cloud/container_runtime_contract_v2.md); `configs/campaigns/g2v2_aws.example.json`.
+- **A6:** `orchestrator` service; `adaptive-vlm-inference` container name; `iproute2` and `awscli` in the image; [runtime contract v2](design/container-runtime.md); `configs/campaigns/g2v2_aws.example.json`.
 - **A7:** tests.
 - **Also:** the correctness smoke now runs a few **training IDs of the campaign manifest** through the campaign config instead of the fixture config. The old version would have failed preflight: its fixture IDs aren't in the v2 reference, and it pointed at the physical cloud's IP.
 - **AWS grid:** `configs/profiles/aws_network_grid_v2plus.json`, created with amendment A2b (18 November 2026).

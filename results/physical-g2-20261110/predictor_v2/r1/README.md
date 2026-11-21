@@ -2,7 +2,7 @@
 
 **G3 FAILED — no selected or deployment-approved predictor.** Only the physical laptop/university-PC baseline was used; AWS and Vultr are excluded. All three placements remain visible.
 
-See the [complete handoff](../../../../docs/phase3_physical_g3_handoff.md) for identity, equations, exact partitions, validation tables, limitations and reproduction commands.
+See the [complete handoff](../../../../docs/predictor-v2/validation-report.md) for identity, equations, exact partitions, validation tables, limitations and reproduction commands.
 
 - `validation_summary.csv`: every model × N2/N7 × placement, including invalid/diagnostic coverage.
 - `validation-r1/evaluation_validation.json`: the single actual validation report.

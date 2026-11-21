@@ -1,16 +1,16 @@
 # Selector and offline oracle
 
-The selector is an offline, pure decision function in `src/adaptive_vlm/scheduler/selector.py`. It consumes exactly one `CandidateSnapshot` for each of the three stable `ConfigurationId` values. A snapshot contains the existing capability result, a Phase 3 prediction or `None`, a health flag, and optionally a validated quality score. `SelectionConstraints` contains an optional latency SLA, quality floor, and edge memory budget. No measured outcome or model inference enters `select`.
+The selector is a pure decision function in `src/adaptive_vlm/scheduler/selector.py`. It consumes exactly one `CandidateSnapshot` for each configuration of a candidate set: by default the three prototype configurations (`CONFIGURATIONS`), or all five with `configurations=ALL_CONFIGURATIONS`, as in G4 and G5. A snapshot contains the existing capability result, a Phase 3 prediction or `None`, a health flag, and optionally a validated quality score. `SelectionConstraints` contains an optional latency SLA, quality floor, and edge memory budget. No measured outcome or model inference enters `select`.
 
 ## Selection rules
 
-1. Enumerate configurations in registry order: edge/full, cloud/raw image, distributed/projected synchronous. Missing or duplicate snapshots are an input error.
+1. Enumerate configurations in registry order: edge/full, cloud/raw image, distributed/projected synchronous, then (five-configuration set) prompt-first and int8. Missing or duplicate snapshots are an input error.
 2. Exclude unavailable executors, unhealthy endpoints, missing/invalid/nonfinite/nonpositive predictions, unknown or below-floor quality when a floor is requested, and unknown or excessive edge memory for edge/split when a memory budget is requested. Every exclusion remains in `CandidateDecision` with its reason and full prediction. The existing `CapabilityRegistry` supplies model fingerprint, remote path/readiness, loaded policy, and memory checks; the selector still validates its own inputs.
 3. Choose the lowest predicted total latency from feasible candidates. Registry order breaks exact ties. If an SLA is set and no feasible prediction meets it, choose the fastest safe candidate with status `sla_unmet`; the status is visible to the caller. If no candidate is feasible, return `selected_configuration_id=null` and `no_feasible_candidate`. The selector never silently dispatches.
 
 `predicted_oracle(decision)` independently computes the minimum over the logged feasible predictions. It checks the ranking operation, while the synthetic tests check eligibility reasons. An SLA cannot change the minimum because every prediction meeting the SLA is lower than every prediction above it. SLA values are predictions; the retrospective evaluator separately counts observed SLA violations.
 
-The decision's `to_dict()` is a versioned JSON record of the selected ID, status, constraints, and all three candidate snapshots, including each complete prediction. Host/model/placement/task/network coverage is enforced in the Phase 3 predictor. A live integration must capture capability and health **before** selection and must not reuse stale snapshots.
+The decision's `to_dict()` is a versioned JSON record of the selected ID, status, constraints, and every candidate snapshot, including each complete prediction. Host/model/placement/task/network coverage is enforced in the Phase 3 predictor. A live integration must capture capability and health **before** selection and must not reuse stale snapshots.
 
 ## Retrospective measured oracle
 
@@ -32,3 +32,7 @@ The full G4 gate is evaluable only for a declared `physical-controlled` campaign
 ```
 
 The output directory must be new. Read `evaluation.json` for aggregate metrics and gate flags, then `decisions.jsonl` for each complete decision and any incomplete block. For a new physical campaign, point the command at the **new** Phase 3 prediction file and a new frozen oracle specification with its SHA-256, calibration ID, held-out IDs, availability snapshot and evidence scope. Do not edit the local diagnostic specification to pretend it describes the new host.
+
+## Use in G4 and G5
+
+The same `select` function is the thesis selector. `prediction/r2/g4.py` `decide` feeds it frozen `r2_component` predictions for all five configurations, with no SLA, quality floor or memory budget, so it picks the lowest predicted latency. G4 evaluated it offline against the measured oracle on the unseen evaluation networks ([G4 specification](../predictor-v2/g4-specification.md), [result](../../results/aws-campaign-20261119/g4/README.md)); G5 ran it live ([adaptive runtime](adaptive-runtime.md)). Those evaluations use their own oracle code in `prediction/r2/`; the `evaluate-selector` command above belongs to the local prototype.

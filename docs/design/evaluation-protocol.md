@@ -1,5 +1,7 @@
 # Paired evaluation protocol
 
+> **Local prototype (October 2026).** This specification belongs to the local CPU/loopback prototype (three configurations, schema-1 predictor); the commands still work. The AWS campaigns use the frozen [G2 v2 protocol](../protocols/g2-v2-protocol.md) with amendments A3–A4b, and the [final analysis](../../results/final-analysis-20261121/README.md) replaces `analyze-thesis`.
+
 Frozen on 2026-10-26 before running the Phase 7 analysis command. The accompanying machine-readable local specification is [`configs/evaluation/local_thesis_diagnostic.json`](../../configs/evaluation/local_thesis_diagnostic.json). The existing Phase 2–6 observations and Phase 3 holdout have already been inspected, so this local analysis is **retrospective and descriptive**. It cannot satisfy the independent thesis gate.
 
 ## Primary prospective campaign

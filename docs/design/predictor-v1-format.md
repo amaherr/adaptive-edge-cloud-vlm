@@ -1,5 +1,7 @@
 # Component predictor format (schema version 1)
 
+> **Local prototype (October 2026).** This specification belongs to the local CPU/loopback prototype (three configurations, schema-1 predictor); the commands still work. The AWS campaigns use Predictor V2: [r1](../predictor-v2/specification.md) on the physical pair and [r2](../predictor-v2/r2-specification.md) on AWS.
+
 `adaptive-vlm calibrate-predictor` reads a Phase 2 `profile.jsonl` and a frozen train/holdout specification. It verifies the profile SHA-256 in the specification, exact model/dataset/host identity, disjoint request IDs, and enough successful training rows for all three baseline configurations. Warmups and failed trials do not fit coefficients; held-out request IDs and declared held-out network buckets never enter fitting. The command writes a hash-identified `calibration.json`, `evaluation.json`, `environment.json`, and one `predictions.jsonl` row per held-out attempt. It refuses an existing output directory.
 
 ## Predictor inputs and coverage

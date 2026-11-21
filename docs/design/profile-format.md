@@ -1,5 +1,7 @@
 # Profile format (schema version 1)
 
+> **Schema 1 is still current.** The interleaved benchmark writes the same raw rows, and the G2 v2+ derivations (`scripts/campaign/derive_g2v2_tables.py profiles`) build on these timing boundaries and field names.
+
 `adaptive-vlm profile-runs` converts completed, resumable `benchmark` runs into an immutable `profile.jsonl` and `summary.json`. The command requires a predeclared specification such as [`phase2_local_fixture.json`](../../configs/profiles/local_fixture.json). It regenerates the seeded schedule with `make_schedule` and the frozen manifest, then rejects an existing output directory, incomplete schedules, duplicate trials or modes, mismatched model/config/manifest hashes, image hashes, token counts, and invalid wire-byte bounds. Warmups stay in the raw profile with `warmup=true` but are excluded from coverage and failure-rate denominators. Failed measured attempts stay in both the rows and the denominators.
 
 ## Timing boundaries

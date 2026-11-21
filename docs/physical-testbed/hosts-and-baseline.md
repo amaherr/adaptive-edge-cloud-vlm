@@ -54,11 +54,11 @@ Record the commit SHA, whether the working tree is dirty, and the model/configur
 
 This baseline freezes the implemented three-placement scheduler, diagnostic predictor/selector, bounded live monitor and evaluation pipeline after [Phase A1](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/phase_a1_handoff.md). The separate physical cloud PC has not yet been validated. The existing local predictor ranking gate failed and physical G0/G2–G7 remain open. Keep the pinned Moondream revision, BF16 precision, preprocessing and 32-new-token generation contract unchanged for the first physical correctness campaign. Any later source, model or generation change needs a new identified experiment revision and fresh equivalence/profiling evidence.
 
-The next step is Phase B of the [physical validation roadmap](../roadmap.md): assign fixed edge/cloud roles and collect verified inventories. Do not treat this baseline tag as evidence that the physical-host or controlled-network gates have passed.
+The next step is Phase B of the [physical validation roadmap](../history/physical-validation-roadmap.md): assign fixed edge/cloud roles and collect verified inventories. Do not treat this baseline tag as evidence that the physical-host or controlled-network gates have passed.
 
 ## Baseline tag freeze record
 
-Date: 2026-10-27 (Africa/Cairo). Phase A2 of the [physical validation roadmap](../roadmap.md) is complete. The immutable source starting point for future two-machine experiments is:
+Date: 2026-10-27 (Africa/Cairo). Phase A2 of the [physical validation roadmap](../history/physical-validation-roadmap.md) is complete. The immutable source starting point for future two-machine experiments is:
 
 ```text
 Tag:        physical-experiment-baseline-v1

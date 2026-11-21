@@ -40,3 +40,9 @@ AWSServiceRoleForImageBuilder already exists; if it does, import it instead of
 attempting a duplicate creation. No host image has been built yet: quota is
 pending, and the recipe's installation commands remain unverified on AWS.
 The final app's CUDA/BF16/model tests on both nodes remain mandatory after baking.
+
+**Status (17 November 2026):** built. Recipe 1.1.0 (30 GiB root) produced
+`ami-0a331de1e023447bf`, which passed Image Builder's tests (`nvidia-smi`, driver
+580.159.03, Docker Compose, container toolkit) and served both roles in the
+G2 v2+ and G5 campaigns: the GRID driver also drives the full L4 on G6. The
+paragraphs above describe the state before that build.

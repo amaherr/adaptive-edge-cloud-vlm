@@ -110,7 +110,7 @@ Over 2,400 measured requests:
 
 **Raw data (git-ignored).** The data is in `artifacts/g5-aws/campaign/`, a mirror of `s3://…/cloud-v1/edge/g5-campaign/`. All 2,722 objects (77 MB) match S3 by key and size.
 
-**The edge data volume** holds the final supervisor status (`completed`, 80 of 80 valid, 14,400 of 14,400) and the preflights. It stays on the stopped edge instance; archiving it is roadmap phase 8.
+**The edge data volume** holds the final supervisor status (`completed`, 80 of 80 valid, 14,400 of 14,400) and the preflights. It was copied to S3 and archived in roadmap phase 8 ([archive record](../archive-20261121/README.md)).
 
 ## Limits
 

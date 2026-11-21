@@ -1,1709 +1,369 @@
-# Physical Adaptive VLM Validation Roadmap
+# Thesis roadmap
 
-> Current status of each gate: see the [documentation index](README.md#where-things-stand). The next physical step is the revised baseline described in [G2 v2 preparation](g2-v2-preparation.md).
+**Status (21 November 2026): phases 0–8 are done; phase 9, the thesis itself, is open.** Every gate passed: G2 v2+ (196 of 196 sub-blocks valid), G3, G4 and G5. Per-phase status notes are kept below, followed by the plan as written.
 
-**Implementation checkpoint (2026-10-27):** Phase A1 passes with 185 tests, Ruff, mypy, and 80.54% local coverage under the unchanged 80% threshold. Phase A2 froze commit `867f11d68882faae63b83a823489f36d5d57e519` as the pushed, CI-green `physical-experiment-baseline-v1` tag. The [A1 handoff](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/phase_a1_handoff.md), [baseline record](physical-testbed/hosts-and-baseline.md#pre-physical-source-baseline) and [A2 handoff](physical-testbed/hosts-and-baseline.md#baseline-tag-freeze-record) provide checks and checkout steps. Physical-host work has not started.
+> Written 20 November 2026, after the G2 v2+ campaign on AWS finished (196/196 sub-blocks valid, [record](../results/aws-campaign-20261119/README.md)). It replaces the "later phases" of the [physical roadmap](history/physical-validation-roadmap.md) (phases Q–AR) and section 8 of the [G2 v2+ plan](g2-v2-plus-plan.md). The gates and criteria stay as they were predeclared.
 
-Since access to the second machine is imminent, the project should now move from **framework-development mode** to **physical experimental-validation mode**.
+The thesis claim we are working towards:
 
-The key principle is:
+> Under changing network, edge-load and cloud-load conditions, the system observes the current state, predicts the latency of each feasible configuration of one VLM, and selects a configuration per request. It comes close to the measured oracle and beats the fixed-placement baselines where adapting pays off, with no loss in answer quality.
 
-> **Do not add more scheduler sophistication until the current three-configuration scheduler is proven on two physical machines under controlled network conditions.**
+What the G2 v2+ data shows (training cells; [baseline report](../results/aws-campaign-20261119/baseline/README.md)):
+- Cloud wins most cells. The edge wins only under heavy cloud load on slower or higher-latency links. Split inference wins none.
+- The two loads add independent, roughly fixed costs, so a simple predictor is plausible.
+- The gain from adapting is concentrated in specific conditions rather than spread on average.
 
-The software pipeline is already mature enough. The next major risk is experimental validity, not missing architecture.
+That makes G4 and G5 (selection under changing conditions) the core of the thesis, and the split-inference negative result a reportable finding.
 
----
+## Overview
 
-# Target End State
+| Phase | What | Where | Depends on | Effort | Cost |
+| --- | --- | --- | --- | --- | --- |
+| **0** | Close out the run: data isolation, commit, AWS cost | local | — | ½ day | — |
+| **1** | Fix the analysis code; derive the G2 v2+ tables | local | 0 | 1–2 days | — |
+| **2** | G2 v2+ baseline report (training cells), quality, comparison with physical G2 | local | 1 | 2–3 days | — |
+| **3** | Predictor V2 r2 and **G3** (validation cells opened once) | local | 2 | 4–6 days | — |
+| **4** | Selector V2 and **G4** offline (evaluation cells unsealed) | local | 3 | 2–3 days | — |
+| **5** | Adaptive runtime for the five configurations; dynamic protocol (amendment A4) | local | 4 (or 3 if G4 is offline-only) | 4–6 days | — |
+| **6** | **G5** dynamic evaluation on AWS | AWS | 5 | 3–4 days | ~$50 |
+| **7** | Final paired analysis (Phase 7), communication, overheads, stability | local | 6 | 3–4 days | — |
+| **8** | Archive, reproducibility package, AWS teardown | local + AWS | 7 | 1 day | — |
+| **9** | Thesis writing | — | 2 onward, in parallel | 3–5 weeks | — |
 
-By the end of this roadmap, the project should support a defensible claim like:
+Critical path: 0 → 1 → 3 → 4 → 5 → 6 → 7. Phase 2 and the writing of chapters 1–4 can run alongside phases 3–5.
 
-> Under varying network and task conditions, the proposed system observes the current system/task state, predicts the latency of multiple VLM execution configurations, selects a feasible configuration dynamically, and achieves performance close to the measured oracle while outperforming appropriate fixed-placement baselines under conditions where adaptation is beneficial.
-
-The final runtime should look approximately like:
-
-```text
-                         REQUEST
-                            │
-             ┌──────────────┴──────────────┐
-             │                             │
-             ▼                             ▼
-       Task Analyzer                 System Monitor
-   image dimensions                  uplink goodput
-   image bytes                       downlink goodput
-   prompt tokens                     RTT
-   task type                         edge memory
-   output estimate                   edge/cloud load
-             │                             │
-             └──────────────┬──────────────┘
-                            ▼
-                    Performance Predictor
-                            │
-           ┌────────────────┼────────────────┐
-           ▼                ▼                ▼
-      Edge/full        Cloud/raw       Distributed
-         L̂1               L̂2               L̂3
-           └────────────────┼────────────────┘
-                            ▼
-                         Selector
-                            │
-                            ▼
-                   Selected configuration
-                            │
-                            ▼
-                       VLM execution
-                            │
-                            ▼
-                  observed metrics + logs
-```
+Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65 contingency. The stopped pair costs about $0.35 a day.
 
 ---
 
-# Phase A — Clean the Repository Before Touching the Second Machine
-
-Do this first because the physical campaign should start from a clean, reproducible commit.
-
-## A1. Fix the Failed CI
-
-At the start of A1, all 171 tests passed, Ruff and mypy passed, but CI failed because coverage was **79.15%** while the threshold was 80%.
-
-Do **not** lower the threshold.
-
-Add tests to the lowest-coverage areas, especially:
-
-```text
-adaptive_runner.py
-network_trace.py
-adaptive_analysis.py
-thesis_eval.py
-monitor_eval.py
-```
-
-Only a small increase is needed.
-
-### Gate A1
-
-Require:
-
-```text
-ruff        PASS
-mypy        PASS
-pytest      PASS
-coverage    >= 80%
-GitHub CI   GREEN
-```
-
-Do not start the publication-quality physical campaign from a red commit.
-
----
-
-## A2. Freeze a Physical-Experiment Starting Commit
-
-Once CI is green:
-
-```bash
-git status
-git add .
-git commit -m "chore: freeze pre-physical adaptive VLM baseline"
-git push
-```
-
-Record the commit SHA.
-
-This commit becomes:
-
-> **Physical Experiment Baseline v1**
-
-Every future experiment should identify exactly which Git commit generated it.
-
----
-
-# Phase B — Prepare the Two-Machine Environment
-
-When the second machine is available, define fixed roles:
-
-```text
-Machine E = Edge
-
-Machine C = Cloud
-```
-
-Do not casually switch their roles between experiments.
-
----
-
-# Phase C — Hardware Inventory
-
-Record exact hardware on both machines.
-
-## Edge Machine
-
-Record:
-
-```text
-CPU
-RAM
-GPU
-GPU VRAM
-CUDA version
-NVIDIA driver
-OS
-Python version
-PyTorch version
-network interface
-```
-
-For example:
-
-```text
-Edge:
-CPU: ...
-RAM: 16 GB
-GPU: RTX ....
-VRAM: 8 GB
-CUDA: ...
-```
-
-## Cloud Machine
-
-Record the same information.
-
-Also record:
-
-```bash
-nvidia-smi
-python --version
-pip freeze
-```
-
-and ideally:
-
-```bash
-lscpu
-free -h
-uname -a
-```
-
-or Windows equivalents.
-
-### Deliverable
-
-Create something like:
-
-```text
-artifacts/physical/environment/
-    edge_environment.json
-    cloud_environment.json
-```
-
----
-
-# Phase D — Reproduce the Model on Both Machines
-
-Before benchmarking anything, ensure the exact same model revision works on both hosts.
-
-Keep the current pinned Moondream configuration unchanged initially.
-
-Verify:
-
-```text
-model ID
-model revision
-tokenizer
-preprocessing
-precision
-max_new_tokens
-greedy decoding
-model fingerprint
-```
-
-The most important rule:
-
-> **Do not change the model while validating the scheduler.**
-
-Otherwise scheduler effects cannot be separated from model changes.
-
----
-
-# Phase E — Establish Actual Network Connectivity
-
-Connect:
-
-```text
-EDGE ───────── network ───────── CLOUD
-```
-
-Verify:
-
-```text
-ping
-TCP connection
-adaptive server health
-model fingerprint
-server capabilities
-raw-image path
-projected-feature path
-```
-
-The cloud server should simultaneously support:
-
-```text
-cloud/raw_image
-
-distributed/projected/synchronous
-```
-
-without restarting between requests.
-
----
-
-# Phase F — Re-run Physical Correctness First
-
-Do **not** begin latency benchmarking yet.
-
-First prove that:
-
-```text
-edge/full
-
-cloud/raw_image
-
-distributed/projected/synchronous
-```
-
-produce equivalent outputs on the two-machine deployment.
-
-Use the frozen correctness manifest.
-
-For each request compare:
-
-```text
-output token IDs
-decoded answer
-model fingerprint
-prompt token count
-generation count
-```
-
-### Required Outcome
-
-Ideally:
-
-```text
-Edge vs Cloud           100% token agreement
-Edge vs Distributed     100% token agreement
-Cloud vs Distributed    100% token agreement
-```
-
-If numerical hardware differences create tiny deviations, document them rather than hiding them.
-
-### Gate G0-physical
-
-No performance experiment until the physical correctness gate passes.
-
----
-
-# Phase G — Measure Actual Edge Memory
-
-This is currently one of the biggest missing safety measurements.
-
-Do not rely on process RSS.
-
-Measure CUDA memory properly.
-
-For each configuration record:
-
-```text
-peak allocated VRAM
-peak reserved VRAM
-resident memory
-available VRAM before request
-available VRAM after request
-```
-
-You want something like:
-
-```text
-Configuration                  Edge peak VRAM
-------------------------------------------------
-edge/full                      6.4 GB
-cloud/raw_image                0.2 GB
-distributed/projected          2.1 GB
-```
-
-Then define safe headroom.
-
-For example:
-
-\[
-M_{required}
-=
-M_{peak}
-	imes 1.10
-\]
-
-or another predeclared safety margin.
-
-Then the selector can correctly evaluate:
-
-\[
-M_{required}(C)
-\le
-M_{available}
-\]
-
----
-
-# Phase H — Build the Controlled Network Environment
-
-This is probably the most important experimental infrastructure step.
-
-Control:
-
-## Bandwidth
-
-For example:
-
-```text
-1 Mbps
-2 Mbps
-5 Mbps
-10 Mbps
-20 Mbps
-50 Mbps
-100 Mbps
-```
-
-## RTT
-
-For example:
-
-```text
-5 ms
-20 ms
-50 ms
-100 ms
-```
-
-A manageable initial grid could be:
-
-| Network ID | Bandwidth | RTT |
-|---|---:|---:|
-| N1 | 2 Mbps | 20 ms |
-| N2 | 5 Mbps | 20 ms |
-| N3 | 10 Mbps | 20 ms |
-| N4 | 25 Mbps | 20 ms |
-| N5 | 50 Mbps | 20 ms |
-| N6 | 100 Mbps | 20 ms |
-| N7 | 10 Mbps | 5 ms |
-| N8 | 10 Mbps | 50 ms |
-| N9 | 10 Mbps | 100 ms |
-
-This is enough to start seeing crossovers.
-
----
-
-# Phase I — Verify the Network Condition Independently
-
-This is critical.
-
-Do not simply configure:
-
-```text
-10 Mbps
-```
-
-and assume the connection is 10 Mbps.
-
-Measure:
-
-```text
-actual uplink goodput
-actual downlink goodput
-actual RTT
-```
-
-using independent network tools.
-
-For every network block archive:
-
-```text
-configured bandwidth
-measured bandwidth
-configured RTT
-measured RTT
-timestamp
-```
-
-Do not substitute application socket-send rate for physical-path throughput.
-
----
-
-# Phase J — Freeze the Physical Task Dataset
-
-Stop using the 4×4 synthetic fixture for performance experiments.
-
-Keep it for correctness testing.
-
-For real experiments create a frozen task set.
-
-## Task Group 1 — Short-Answer VQA
-
-Example:
-
-```text
-image
-question
-short answer
-max_new_tokens = 32
-```
-
-## Task Group 2 — Descriptive / Caption Task
-
-Example:
-
-```text
-image
-describe the image
-longer output
-```
-
-If changing the output-token contract complicates calibration, keep this as a later campaign.
-
-For the first physical scheduler validation, **short-answer VQA alone is enough**.
-
----
-
-# Phase K — Import Official VQA Data
-
-The required tooling already exists.
-
-Create a fixed VQA subset.
-
-For example:
-
-```text
-100–500 questions
-```
-
-depending on runtime.
-
-Freeze:
-
-```text
-request IDs
-images
-questions
-annotations
-seed
-dataset revision
-```
-
-Do not repeatedly resample during development.
-
----
-
-# Phase L — Design the Data Split Before Profiling
-
-Do **not** profile everything and then decide which samples are test samples.
-
-Freeze the split first.
-
-For example:
-
-```text
-Training requests     60%
-Validation requests   20%
-Evaluation requests   20%
-```
-
-Also split network conditions.
-
-Example:
-
-```text
-Training bandwidth:
-2, 10, 50, 100 Mbps
-
-Held-out network:
-5, 25 Mbps
-```
-
-This allows interpolation/generalization testing.
-
-The predictor should never train on the final evaluation conditions.
-
----
-
-# Phase M — Run the Physical Phase 2 Profiling Campaign
-
-Execute every fixed configuration:
-
-```text
-edge/full
-cloud/raw_image
-distributed/projected/synchronous
-```
-
-across the controlled network and task grid.
-
-Conceptually:
-
-\[
-Configuration
-	imes
-Task
-	imes
-NetworkState
-	imes
-Repetition
-\]
-
-## Minimum Repetitions
-
-For publication-quality analysis, preferably aim for:
-
-```text
-5–10 repetitions/request/network state
-```
-
-depending on total runtime.
-
-At minimum:
-
-```text
->= 3 distinct request IDs
->= 10 samples/configuration/bucket
-```
-
----
-
-# Phase N — Randomize / Interleave Configurations
-
-Do not run:
-
-```text
-100 edge requests
-then
-100 cloud
-then
-100 split
-```
-
-because temperature/load/system drift can bias results.
-
-Prefer:
-
-```text
-Request 1:
- edge
- cloud
- split
-
-Request 2:
- split
- edge
- cloud
-
-Request 3:
- cloud
- split
- edge
-```
-
-Rotate order.
-
-Even better:
-
-```text
-randomized block design
-```
-
-with a fixed seed.
-
----
-
-# Phase O — Capture All Measurements
-
-For every trial, keep:
-
-## Task Features
-
-```text
-image bytes
-image width
-image height
-prompt tokens
-task type
-max output tokens
-```
-
-## System State
-
-```text
-uplink goodput
-downlink goodput
-RTT
-edge memory
-edge GPU utilization
-cloud GPU utilization
-cloud queue/load if available
-```
-
-## Execution
-
-```text
-edge compute
-serialization
-transfer
-cloud compute
-decode
-total latency
-```
-
-## Communication
-
-```text
-payload bytes
-request wire bytes
-response bytes
-```
-
-## Output
-
-```text
-generated tokens
-output hash
-quality score
-```
-
-## Provenance
-
-```text
-Git SHA
-model SHA
-dataset SHA
-host pair
-network block
-timestamp
-```
-
----
-
-# Phase P — Add Real GPU / System-State Monitoring
-
-Once the basic physical profiler works, add:
-
-\[
-S =
-[
-B_{up},
-B_{down},
-RTT,
-U_e,
-M_e,
-U_c,
-Q_c
-]
-\]
-
-where:
-
-- \(U_e\) = edge GPU utilization
-- \(M_e\) = available edge memory
-- \(U_c\) = cloud GPU utilization
-- \(Q_c\) = cloud queue/backlog
-
-Not all of these need to be used by Predictor V1.
-
-But they should be **recorded** now.
-
-They may become useful during analysis.
-
----
-
-# Phase Q — Complete Physical G2
-
-At this point you should have:
-
-```text
-real edge host
-real cloud host
-controlled bandwidth
-controlled RTT
-real images
-real prompts
-multiple repetitions
-real memory measurements
-verified byte accounting
-stage timing
-exact output equivalence
-```
-
-Then generate the new physical profile.
-
-Do not reuse the old localhost calibration.
-
-Create something like:
-
-```text
-configs/profiles/phase2_physical_v1.json
-
-artifacts/phase2/physical-v1/
-```
-
-### G2 Must Show
-
-- sufficient samples,
-- zero unexplained negative residuals,
-- consistent units,
-- task coverage,
-- network coverage,
-- memory measurements,
-- equality/correctness evidence,
-- independent network verification.
-
----
-
-# Phase R — Fit Predictor V2 on Physical Data
-
-Recalibrate using only:
-
-```text
-training request IDs
-
-training network blocks
-```
-
-The predictor equation can remain simple.
-
-Do not switch to ML yet.
-
-For example:
-
-\[
-\hat L(C)
-=
-L_{compute}(C,T)
-+
-L_{network}(C,S)
-\]
-
-with:
-
-\[
-L_{network}
-=
-lpha
-+
-eta RTT
-+
-rac{8D_{up}}{B_{up}}
-+
-rac{8D_{down}}{B_{down}}
-\]
-
----
-
-# Phase S — Evaluate Latency Prediction
-
-For held-out requests/network states compute:
-
-## Median APE
-
-\[
-Median\left(
-rac{|\hat L-L|}{L}
-
-ight)
-\]
-
-## p90 APE
-
-## Bias
-
-\[
-\hat L-L
-\]
-
-## Interval Coverage
-
-These are important, but secondary to ranking.
-
----
-
-# Phase T — Evaluate Ranking Accuracy
-
-This is the crucial metric.
-
-For each condition:
-
-\[
-C_{predicted}
-=
-rg\min_C\hat L(C)
-\]
-
-Compare with:
-
-\[
-C_{measured}
-=
-rg\min_C L(C)
-\]
-
-Measure:
-
-\[
-Top1Accuracy
-=
-P(C_{predicted}=C_{measured})
-\]
-
-The real goal of Predictor V2 should be:
-
-> **reliably rank configurations.**
-
----
-
-# Phase U — Compare Against a Simple Baseline Predictor
-
-Keep the constant-median predictor.
-
-Compare:
-
-```text
-Component predictor
-
-vs
-
-Constant median
-```
-
-The new predictor should be meaningfully better at configuration ranking.
-
-If it is not, investigate rather than hiding the result.
-
----
-
-# Phase V — Pass Physical G3
-
-The current proposed criteria are good:
-
-```text
-median APE ≤ 15%
-
-p90 APE ≤ 30%
-
-ranking accuracy >= constant-median baseline
-
-out-of-coverage handling correct
-```
-
-Once G3 passes, you finally have evidence that the scheduler's performance model is useful.
-
----
-
-# Phase W — Evaluate Selector V1 Against the Measured Oracle
-
-Take held-out conditions.
-
-For every:
-
-```text
-request
-network state
-```
-
-collect observed latency for all three fixed configurations.
-
-The measured oracle is:
-
-\[
-C_{oracle}
-=
-rg\min_C L(C)
-\]
-
-The scheduler chooses:
-
-\[
-C_{scheduler}
-=
-rg\min_C \hat L(C)
-\]
-
-Then calculate:
-
-## Top-1 Agreement
-
-\[
-C_{scheduler}=C_{oracle}
-\]
-
-## Absolute Regret
-
-\[
-R =
-L(C_{scheduler})
--
-L(C_{oracle})
-\]
-
-## Relative Regret
-
-\[
-R_\%
-=
-rac{L(C_{scheduler})-L(C_{oracle})}
-{L(C_{oracle})}
-\]
-
----
-
-# Phase X — Pass Physical G4
-
-A reasonable target is:
-
-```text
-median regret <= 10%
-
->= 10 complete paired blocks
-
-network holdout included
-```
-
-Also report:
-
-```text
-no-feasible decisions
-SLA violations
-unsafe selections
-out-of-coverage states
-```
-
----
-
-# Phase Y — Enable Automatic Performance Selection
-
-Only after G3 and G4 pass.
-
-At that point you should be able to remove:
-
-```text
---diagnostic-allow-unpassed-gates
-```
-
-for the physical adaptive experiment.
-
-Now the scheduler can legitimately select configurations automatically.
-
----
-
-# Phase Z — Run Real Adaptive Network Traces
-
-Create realistic changing-network traces.
-
-For example:
-
-```text
-time       bandwidth
---------------------
-0–20s      100 Mbps
-20–40s      10 Mbps
-40–60s       2 Mbps
-60–80s      25 Mbps
-80–100s    100 Mbps
-```
-
-and optionally vary RTT too.
-
-Then observe:
-
-```text
-selected configuration
-predicted latency
-observed latency
-switch count
-selection overhead
-monitoring overhead
-```
-
----
-
-# Phase AA — Evaluate Switching Stability
-
-A scheduler should not oscillate:
-
-```text
-edge
-cloud
-edge
-cloud
-edge
-cloud
-```
-
-because bandwidth fluctuates slightly.
-
-Test noisy conditions around the decision boundary.
-
-If oscillation occurs, introduce hysteresis.
-
-For example:
-
-\[
-L_{new}
-<
-0.9L_{current}
-\]
-
-before switching.
-
-Do **not** introduce hysteresis unless a real problem is observed.
-
----
-
-# Phase AB — Run the Full Phase 7 Experiment
-
-You should have four policies:
-
-```text
-1. Edge fixed
-2. Cloud fixed
-3. Distributed fixed
-4. Adaptive
-```
-
-For every network block use the same:
-
-```text
-requests
-warmups
-repetitions
-model
-generation parameters
-```
-
-Then compare them.
-
----
-
-# Phase AC — Select the Best Static Baseline Using Validation Only
-
-Do not select the best fixed policy after looking at the evaluation set.
-
-Use validation:
-
-```text
-Edge
-Cloud
-Distributed
-```
-
-Choose best static.
-
-Then freeze it.
-
----
-
-# Phase AD — Final Latency Metrics
-
-Report at least:
-
-```text
-median latency
-p95 latency
-SLA success
-failure rate
-```
-
-for:
-
-```text
-adaptive
-best-static
-edge
-cloud
-distributed
-oracle
-```
-
----
-
-# Phase AE — Final Scheduler Metrics
-
-Also report:
-
-```text
-top-1 oracle agreement
-
-absolute regret
-
-relative regret
-
-configuration distribution
-
-number of switches
-
-selection overhead
-
-monitoring overhead
-```
-
-These are some of the most important results for the thesis.
-
----
-
-# Phase AF — Communication Evaluation
-
-Report:
-
-```text
-mean uplink bytes/request
-mean total wire bytes/request
-```
-
-for each policy.
-
-For example:
-
-```text
-Edge:
-0 network bytes
-
-Cloud:
-image bytes
-
-Projected:
-~3 MB features
-```
-
-At low bandwidth, the projected split may be worse than uploading a compressed image.
-
-That could become an important thesis result.
-
----
-
-# Phase AG — Run Official VQA Evaluation
-
-After physical VQA runs, export:
-
-```text
-edge predictions
-cloud predictions
-distributed predictions
-adaptive predictions
-```
-
-Then run the official VQA evaluator.
-
-Report:
-
-```text
-official VQA accuracy
-```
-
-per policy.
-
-Ideally:
-
-\[
-Accuracy_{edge}
-pprox
-Accuracy_{cloud}
-pprox
-Accuracy_{distributed}
-pprox
-Accuracy_{adaptive}
-\]
-
-This establishes:
-
-> placement changes performance, not model semantics.
-
----
-
-# Phase AH — Make Task Awareness Stronger
-
-Only after the basic physical system works.
-
-Right now the task state includes:
-
-```text
-image dimensions
-image bytes
-prompt tokens
-task bucket
-expected output tokens
-```
-
-Next expand to:
-
-```text
-VQA
-captioning
-reasoning
-```
-
-Then analyze whether the best configuration changes by task.
-
-For example:
-
-```text
-short VQA
-   ↓
-LLM work small
-   ↓
-vision/network trade-off matters more
-
-long reasoning
-   ↓
-LLM dominates
-   ↓
-cloud execution potentially dominates
-```
-
----
-
-# Phase AI — Improve Expected-Output-Length Prediction
-
-Currently the predictor often uses:
-
-```text
-training median output length
-```
-
-which is safe but simplistic.
-
-Eventually use task-specific estimates:
-
-```text
-VQA:
-~5 tokens
-
-caption:
-~30 tokens
-
-description:
-~100 tokens
-```
-
-or a lightweight estimator.
-
-Do not use the actual generated output length because that leaks future information into the decision.
-
----
-
-# Phase AJ — Add Task-Aware Analysis
-
-The final system should ideally be able to produce results like:
-
-| Task | Network | Best configuration |
-|---|---|---|
-| VQA | slow | Edge |
-| VQA | fast | Cloud |
-| Caption | slow | Edge / Split |
-| Caption | fast | Cloud |
-| Reasoning | most states | Cloud |
-
-That type of result would be powerful in the final thesis.
-
----
-
-# Phase AK — Add Cloud / Edge Load Experiments
-
-After network adaptation works, introduce compute contention.
-
-For example:
-
-```text
-Cloud load:
-0%
-25%
-50%
-75%
-
-Edge load:
-0%
-25%
-50%
-75%
-```
-
-Then test whether the scheduler correctly changes configuration.
-
-Ultimately:
-
-\[
-C^*
-=
-F(
-Bandwidth,
-RTT,
-EdgeLoad,
-CloudLoad,
-Task
-)
-\]
-
-rather than merely:
-
-\[
-C^*=F(Bandwidth)
-\]
-
----
-
-# Phase AL — Add Queue Awareness
-
-If multiple cloud requests are possible, track:
-
-```text
-queue depth
-request backlog
-```
-
-This becomes especially useful because:
-
-```text
-fast network + overloaded cloud
-```
-
-may make edge execution preferable.
-
-This is optional for the first thesis version but valuable if time permits.
-
----
-
-# Phase AM — Only Then Add Another Internal Split
-
-Once the three-config scheduler is validated, return to dynamic partitioning.
-
-Prioritize a **vision-encoder split**, not an LLM split.
-
-LLM splitting is much more complex because of:
-
-```text
-per-token communication
-KV cache ownership
-session state
-```
-
-A more realistic extension is:
-
-```text
-Vision Encoder
-─────────────────────────
-
-blocks 0 ... k
-      EDGE
-        │
-        ▼
-activation
-        │
-        ▼
-blocks k+1 ... 26
-      CLOUD
-        │
-        ▼
-projector
-        │
-        ▼
-LLM
-```
-
----
-
-# Phase AN — Profile Candidate Internal Boundaries
-
-For each candidate \(k\), record:
-
-```text
-activation shape
-dtype
-bytes
-edge compute
-cloud compute
-edge memory
-cloud memory
-```
-
-Do not assume deeper edge execution always sends less data.
-
-Transformer hidden-state dimensions may remain constant across blocks.
-
----
-
-# Phase AO — Implement Only the Best 1–2 Internal Candidates
-
-Do not add 27 splits just because there are 27 blocks.
-
-After analysis, perhaps choose:
-
-```text
-Vision split early
-
-Vision split late
-```
-
-plus the current projector split.
-
-The candidate space might become:
-
-```text
-edge/full
-
-cloud/raw_image
-
-vision/block-8
-
-vision/block-20
-
-distributed/projected
-```
-
-That is already enough for a strong paper.
-
----
-
-# Phase AP — Recalibrate Everything
-
-New configurations mean:
-
-> new profiling.
-
-Do **not** reuse the old predictor.
-
-Repeat:
-
-```text
-profile
-↓
-calibrate
-↓
-G3
-↓
-G4
-↓
-adaptive evaluation
-```
-
-for the expanded configuration space.
-
----
-
-# Phase AQ — Optional ML Scheduler
-
-Only after a large profiling dataset exists.
-
-Possible comparisons:
-
-## Analytical Predictor
-
-\[
-f(S,T,C)
-ightarrow latency
-\]
-
-vs.
-
-## Regression Model
-
-```text
-Random Forest
-XGBoost
-```
-
-or classification:
-
-\[
-f(S,T)
-ightarrow C^*
-\]
-
-But this should be an **extension experiment**, not the core framework.
-
-The deterministic cost model is already appropriate for the thesis.
-
----
-
-# Phase AR — Optional Energy Experiment
-
-Only do this if proper measurement hardware/software exists.
-
-You would need:
-
-```text
-sensor
-sampling frequency
-idle baseline
-measurement boundary
-edge/cloud accounting
-```
-
-Otherwise omit energy entirely.
-
----
-
-# Final Experimental Matrix
-
-By the end, the core evaluation should look roughly like:
-
-\[
-Network
-	imes
-Task
-	imes
-Policy
-	imes
-Repetition
-\]
-
-For example:
-
-```text
-6 network states
-×
-100 VQA requests
-×
-4 policies
-×
-3 repetitions
-```
-
-which gives:
-
-\[
-6	imes100	imes4	imes3
-=
-7200
-\]
-
-trials.
-
-You do not necessarily need that exact number, but it illustrates why the experimental design must be frozen before running.
-
----
-
-# Final Research Comparisons
-
-The thesis should ultimately compare:
-
-| Policy | Purpose |
-|---|---|
-| Edge-only | Baseline |
-| Cloud-only | Baseline |
-| Fixed distributed | Distributed VLM baseline |
-| Best static | Strong static baseline |
-| Adaptive | Proposed framework |
-| Measured oracle | Upper reference |
-
-And evaluate:
-
-| Metric |
-|---|
-| Median latency |
-| p95 latency |
-| SLA success |
-| Communication bytes |
-| Failure rate |
-| VQA accuracy |
-| Oracle agreement |
-| Regret |
-| Switching frequency |
-| Scheduler overhead |
-| Monitor overhead |
-
----
-
-# Mandatory vs Optional Work
-
-## Must Have for a Strong Bachelor Thesis
-
-1. Green CI.
-2. Two physical machines.
-3. Verified model equivalence.
-4. Measured GPU memory.
-5. Controlled physical bandwidth/RTT.
-6. Real task dataset.
-7. Physical profiling.
-8. Fresh physical predictor calibration.
-9. Held-out request + network evaluation.
-10. G3 predictor validation.
-11. G4 scheduler validation.
-12. Adaptive physical execution.
-13. Fixed baselines.
-14. Measured oracle.
-15. Regret analysis.
-16. Phase 7 paired evaluation.
-17. Official VQA scoring.
-18. Statistical uncertainty / repetitions.
-19. Reproducible artifacts.
-20. Honest negative results if adaptation does not win.
-
-## Strong Additions
-
-- task-aware scheduling,
-- edge/cloud load,
-- cloud queue,
-- dynamic network traces,
-- hysteresis,
-- one or two new internal vision splits.
-
-## Optional / Probably Unnecessary
-
-- RL,
-- neural scheduler,
-- pruning,
-- quantization,
-- energy,
-- LLM-layer splitting,
-- multiple different VLMs.
-
----
-
-# Immediate Sequence When the Second Machine Is Available
-
-If everything above is reduced to the concrete first steps, follow this order:
-
-1. **Fix CI and freeze a clean Git commit.**
-2. **Inventory both machines.**
-3. **Install identical software/model artifacts.**
-4. **Start the cloud server.**
-5. **Verify health + capability paths.**
-6. **Run edge/cloud/distributed correctness.**
-7. **Verify token equality.**
-8. **Measure real edge/cloud GPU memory.**
-9. **Set up bandwidth + RTT shaping.**
-10. **Verify actual goodput/RTT independently.**
-11. **Freeze real VQA/task manifests.**
-12. **Freeze train/validation/test request IDs and network blocks.**
-13. **Run physical fixed-policy profiling.**
-14. **Generate the new Phase 2 profile.**
-15. **Fit a completely new physical predictor.**
-16. **Evaluate ranking + latency error on untouched data.**
-17. **Pass G3.**
-18. **Evaluate scheduler vs measured oracle.**
-19. **Pass G4.**
-20. **Run automatic adaptive execution on new held-out conditions.**
-21. **Run best-static and all fixed baselines.**
-22. **Run Phase 7 paired analysis.**
-23. **Run official VQA evaluation.**
-24. **Only then add stronger task awareness / internal splits.**
-
----
-
-# Recommended Strategy Going Forward
-
-The most important change in strategy now is:
-
-> **Stop building horizontally and start validating vertically.**
-
-The project already has enough components.
-
-The next milestone is a complete, controlled path from:
-
-> **real network state → prediction → selection → execution → measured oracle comparison**
-
-Once that works, every additional feature—task awareness, compute load, queue awareness, or new split points—becomes a clean research extension rather than another unvalidated subsystem.
+## Phase 0: close out the run
+
+**Status (20 November 2026):**
+- **Done:** 0.1 ([amendment A3](protocols/g2-v2-amendment-a3.md), kept in a separate file so the pinned protocol hash stays valid; the pre-run phase E estimate had predicted all 98 winners), 0.2, 0.3 (pushed) and 0.5.
+- **0.4 decided:** keep the stopped pair until G5 (~$0.35 a day). The compute-down plan was not applied, and the ECR images are kept.
+
+0.1 **Record the split exposure (amendment A3).** On 19–20 November, per-cell medians and descriptive winners for **all** 98 cells were computed and viewed. That includes the validation (V01–V05) and evaluation (E01–E05) cells, which the protocol keeps unopened until G3 and sealed until G4 (section 9, "Isolation").
+- Write down exactly what was seen: cell medians and winners, not per-request rows.
+- Declare that no predictor or selector design choice may use V or E data, and that the predictor's model form (phase 3) is fixed from **training cells only**.
+- If phase 3 adopts the additive "edge × load factor, cloud + load penalty" form, the amendment must say so honestly: it was suggested by a view of all cells, but it is justified and fitted on training cells.
+- Report this in the thesis's threats-to-validity section.
+
+0.2 **Reseal the committed record.**
+- Keep only training rows in `subblock_medians.csv` and `descriptive_winners.json`.
+- Move the V and E rows to `artifacts/` (ignored).
+- Keep `runs.csv` and `SHA256SUMS` complete, since they contain hashes only.
+- Rewrite the README's "first look" section to training cells only.
+
+0.3 **Commit** the record and the roadmap. Push when you say "Commit and merge"; this includes the unpushed phase E/F commits `6e9b88a`…`883d132`.
+
+0.4 **AWS cost decision.**
+- Option one: keep the stopped pair until G5 (~$0.35 a day).
+- Option two: apply the reviewed compute-down plan (15 resources destroyed: instances, system disks, alarms and the budget stop action), bringing it to ~$0.17 a day. The trade-off is a ~20 min rebuild for G5, with g6.xlarge capacity risk in us-east-1d.
+- Either way, the data volumes, bucket and ECR stay.
+- Optionally delete the four superseded ECR images and keep `4049c069` (frozen) only.
+
+0.5 **Update the [documentation index](README.md#status):** G2 v2+ is done on AWS, and physical G2 v2 has been superseded.
+
+## Phase 1: analysis code and derived tables
+
+**Status (20 November 2026):** see [derived checks](../results/aws-campaign-20261119/derived/README.md).
+- **1.1 done.** Scope fixed, plus two related defects: empty groups and timed-only rows.
+- **1.2 done.** 196/196 sub-blocks pass, with 0 reference mismatches and 0 cross-GPU disagreements.
+- **1.4 done.** All five configurations score identically (training 75.33%, validation 79.67%, lowercased), so parity holds.
+- **1.3 done.** The derivation ran in WSL with temporary `/app` and `/artifacts` links.
+  - 108 training profiles pass.
+  - Oracle: cloud wins 48 of 54 cells, the edge 6; 2 are ties.
+  - The task-feature bundles (120 short and 60 long requests), which feed phase 3, are derived too.
+
+**Gate passed:** correctness is clean, the training oracle is derived, and parity holds.
+
+1.1 **Fix `evaluate_rows` scope** (`benchmark/heterogeneous_correctness.py`).
+- Scope coverage, quality equality and repeatability to the IDs and repetitions a sub-block actually measured.
+- Remove the `defaultdict` side effect in the `insufficient` comprehension.
+- Add tests: a single-repetition subset passes, and a genuine mismatch still fails.
+
+1.2 **Recompute row-level correctness** for all 196 sub-blocks: reference mismatches and cross-GPU disagreements against the short and long bundles. This compares outputs only, not latency, so it doesn't open any split. The result must be zero mismatches, as in the pilot.
+
+1.3 **Run `derive_g2v2_tables.py` on the AWS campaign** with the dataset contract `aws_g2v2plus_dataset_contract.json`.
+- Produce per-sub-block profiles and the section 9 oracle: median, p90, bootstrap 95% CI with seed 1707 and 2,000 resamples, measured winner, margin and ties.
+- Run it for **training cells only** (the evaluation stays sealed; no `--unseal-evaluation`).
+- Check that the script handles five configurations, the cloud-load levels and the long task; extend it if not.
+
+1.4 **Official VQA accuracy** per configuration on the training and validation IDs (`run_official_vqa_eval.py`).
+- Score both lowercased (primary) and unchanged answers.
+- Check placement parity: at most 2 pp between any two configurations on the same IDs.
+- int8 is covered by its admission evidence, but it must also pass parity here.
+- The evaluation-split accuracy waits until phase 4.
+
+**Gate:** row-level correctness is clean, the training oracle table is derived, and parity holds. If parity fails, the selector must treat quality as configuration-dependent (section 9).
+
+## Phase 2: G2 v2+ baseline report
+
+**Status (20 November 2026): done.** See the [baseline report](../results/aws-campaign-20261119/baseline/README.md).
+- **2.1:** the record stays in `results/aws-campaign-20261119/`, now with an S3 receipt (12,442 objects verified by MD5).
+- **2.2:** crossover map, load effects with CIs, the long task, split anatomy, int8 gain, the `prompt_first` null result and static policies.
+  - The loads are independent: cloud load adds +606 ms to the cloud, edge load multiplies the edge by ×1.415, and the interaction is at most 18 ms.
+  - The split is dominated by the cloud in every load state.
+  - Always-cloud regret is 2.5%.
+- **2.3:** the hardware ratio and what carries over from physical G2. Whether splitting pays depends on the edge-vision to cloud-vision speed ratio.
+- **2.4:** G2 v2+ passed, with the section 8 gate evidence for all 196 sub-blocks.
+
+2.1 **Results record** `results/aws-g2v2plus-<date>/` with `SHA256SUMS` and S3 receipts (roadmap phase G).
+
+2.2 **Training-cell findings:**
+- **Crossover map:** winner against link rate and RTT for each load state.
+- **Load effects with CIs:** the cloud-load penalty and the edge-load factor, and whether they are independent.
+- **Long task.**
+- **Split inference:** why it loses (payload, two-stage overhead), the int8 gain against link rate, and the `prompt_first` null result.
+- **Static policies:** the cost of always choosing one configuration, as motivation for adapting.
+
+2.3 **Comparison with physical G2:**
+- the hardware ratio (RTX 3050 laptop against L4-6Q, and the cloud PC against L4);
+- which conclusions carry over, and why G2 v2+ is a new baseline rather than a replication.
+
+2.4 **Write it up as G2 v2+ passed**, with the validity gates as evidence (protocol section 8).
+
+## Phase 3: Predictor V2 r2 and G3
+
+**Status (20 November 2026): G3 passed.** `r2_component` is selected and frozen. See the [r2 record](../results/aws-campaign-20261119/predictor_r2/README.md).
+- **3.1:** the [r2 specification](predictor-v2/r2-specification.md) was committed (`1d01508`) before any fit.
+- **3.2:** partitions came from `0948aa8`, with the validation targets sealed. The models were fitted on T01–T12 only. Training review: grouped-CV P90 APE at most 8.0%, 98.0% top-1 agreement.
+- **3.3:** the single validation pass on V01–V05 (630 request-cells × 5 configurations):
+  - median APE 0.4–3.5% and P90 APE 1.4–6.0% per configuration;
+  - top-1 agreement 98.3% against 79.8% for the constant baseline;
+  - mean regret 0.8 ms;
+  - 0 unsafe choices.
+- **Source hash:** the r2 code changes the reference verifier's source hash. G4's evaluation profiles must therefore be derived from a worktree of `0948aa8`.
+
+3.1 **Predeclare r2 before fitting** (spec revision plus amendment):
+- **Inputs:** the schema-3 edge state, `cloud_load_level`, `previous_cloud_state` (B8), the measured network (pre-sub-block probe), task (short or long, crop count, prompt tokens), and configuration (five).
+- **Models:**
+  - the primary component model;
+  - a simple additive or analytical baseline (roadmap phase U);
+  - the constant-median baseline for ranking.
+- **Lessons from r1:**
+  - r1 failed on cloud error tails, so model the cloud-load penalty explicitly and report tails;
+  - r1 also failed on edge memory coverage, which is resolved on AWS: the L4-6Q edge is resident, with no swap.
+- **Gate:** unchanged.
+  - median APE ≤ 15% and P90 APE ≤ 30% per configuration;
+  - top-1 feasible agreement at least the constant-median baseline;
+  - coverage and safety as in the [specification](predictor-v2/specification.md);
+  - model choice rule fixed in advance (seed 1707, 2,000 resamples).
+- **Fallback:** if the primary model fails, decide in advance whether the simpler model may be selected, and on what rule. Never refit after validation.
+
+3.2 **Update the data preparation** (`prepare_predictor_v2_data.py`) for the AWS layout, the five configurations, both loads and the long task. Fit on **T01–T12 only**.
+
+3.3 **Single validation pass** on V01–V05. Write the validation report and the G3 decision. Issue `model_freeze_marker.json` only on a pass.
+
+3.4 **If G3 fails:** report it honestly. A failed G3 still allows an offline G4 with the oracle and simple policies, but the thesis claim weakens to "a simple rule-based selector" and must be stated that way.
+
+## Phase 4: Selector V2 and G4 (offline, evaluation cells)
+
+**Status (20 November 2026): G4 passed.** See the [G4 record](../results/aws-campaign-20261119/g4/README.md).
+- **4.1:** `scheduler.selector.select` now takes an explicit candidate set (five configurations, or the four lossless ones), fed by the frozen `r2_component` predictions. There are no constraints: quality parity holds and the edge model is resident.
+- **4.2:** the best static configuration on the validation cells is `cloud/raw_image`.
+- **4.3:** the [G4 specification](predictor-v2/g4-specification.md) was frozen by hash (`b2242d7f…`, commit `8af54cc`) before the evaluation profiles were derived from the `0948aa8` worktree, and the evaluation ran once.
+- **4.4:**
+  - median relative regret 0.00% (mean 0.06%);
+  - top-1 agreement 98.1%;
+  - mean regret 0.6 ms;
+  - 42.6 ms (5.2%) faster than always-cloud = best static, with a CI that excludes zero;
+  - 22 of 22 complete blocks, and the cell-level winner matched in 22 of 22 cells;
+  - 0 unsafe or no-feasible decisions.
+  - Evaluation-ID VQA accuracy is 70.67% for every configuration.
+
+4.1 **Update the selector** to the five-configuration list (`ALL_CONFIGURATIONS`).
+- Feasibility: memory budgets and int8 admission.
+- Quality constraint, if phase 1.4 requires one.
+- Load-aware inputs.
+
+4.2 **Best static baseline** (roadmap phase AC): choose the best single configuration on **validation cells only**.
+
+4.3 **Freeze** the selector and its oracle specification (hashes) **before** unsealing. Then run `derive_g2v2_tables.py --unseal-evaluation` and `evaluate-selector` on E01–E05.
+
+4.4 **G4 metrics:**
+- top-1 agreement;
+- absolute and relative regret against the measured oracle, with the paired bootstrap;
+- the same against always-edge, always-cloud, always-int8 and best static;
+- quality on the evaluation IDs.
+
+**Gate:** median regret ≤ 10%, at least 10 complete paired blocks, and a network holdout ([selector and oracle](design/selector-and-oracle.md)).
+
+## Phase 5: adaptive runtime and dynamic protocol
+
+**Status (20 November 2026): done locally.** Image build and reference rebuild are carried into phase 6.1, because they need AWS.
+- **5.1 Runtime:**
+  - The live adaptive policy (`prediction/r2/live.py`) senses its inputs, predicts with the frozen `r2_component`, selects with the five-configuration selector and runs the chosen configuration.
+  - It runs as a sixth interleaved placement, so the fixed configurations give a per-request oracle on the same requests.
+  - **Sensing** is chosen by you and lives in `scheduler/sensing.py`:
+    - cloud load from the server's GPU power, which the health response now carries, with a threshold of 58 W from training;
+    - edge load from a timing probe on the edge GPU, with its threshold set by a pilot rule;
+    - the network from the segment's periodic probe.
+  - **Traces:** campaign grids gain ordered trace segments, which switch netem, edge load and cloud load between segments.
+  - **Analysis:** `scripts/campaign/analyze_g5.py`. The older `thesis_analysis.py` is left for phase 7.
+- **5.2 Switching cost:** none measurable. The paired latency after the same versus a different configuration differs by −0.12% to +0.9%, and stage preparation takes 0 ms. So there is no hysteresis and no dwell; decisions are per request.
+- **5.3:** [amendment A4](protocols/g2-v2-amendment-a4.md) fixes the sensing rules, the four traces × five segments × four repetitions (80 segments, 14,400 measured attempts, about 9 h), the metrics, the pilot go/no-go and the G5 gate.
+- **5.4:** the [loopback rehearsal with fault injection](../results/g5-rehearsal-20261120/README.md) passed all checks. The full suite passes (471 passed, 1 skipped), as do Ruff and mypy.
+- **5.5:** committed. Left for 6.1:
+  - build and push the image;
+  - rebuild the reference bundles, since `src` changed;
+  - run the edge-probe calibration and the pilot;
+  - pin the hashes.
+
+5.1 **Bring the Phase 5–7 runtime up to the v2+ configuration space:**
+- `adaptive-benchmark`, the dispatcher and the live monitor support five configurations;
+- the monitor gains cloud-load and edge-load sensing (server state, edge GPU utilization);
+- `thesis_analysis.py` still assumes three modes and needs updating;
+- trace replay drives netem changes plus edge and cloud load switching on and off.
+
+5.2 **Switching stability:** hysteresis and minimum dwell (roadmap phase AA), predeclared. Measure the cost of changing configuration, such as server warm state.
+
+5.3 **Dynamic protocol (amendment A4):**
+- **Traces:** network steps and ramps within the training ranges, plus load episodes (C2 and L1 on and off), on evaluation request IDs only.
+- **Policies:** adaptive, each fixed configuration, and best static. The oracle reference comes from interleaved fixed runs on the same trace segments.
+- **Metrics:** p50/p95 latency, SLA success, bytes, failure rate, VQA accuracy, switching frequency, and selector and monitor overhead.
+- **Size, repetitions and session plan**, sized for about 24 h of pair time.
+- **Pilot go/no-go rules.**
+
+5.4 **Local rehearsal** on loopback with fault injection, as for G2 v2. Run the full test suite, Ruff and mypy.
+
+5.5 **Freeze:**
+- commit;
+- build and push the image;
+- rebuild the reference bundles if `src` changed (~1 h on AWS).
+
+## Phase 6: G5 on AWS
+
+**Status (21 November 2026): G5 passed.** See the [G5 record](../results/g5-aws-20261120/README.md).
+- **6.1:**
+  - The image was built at `6cf005f` (`sha256:2cd3bd95…`); build-time HTTP egress was opened and closed through reviewed Terraform plans.
+  - References were rebuilt and verified.
+  - The edge-probe calibration was a no-go, so [A4a](protocols/g2-v2-amendment-a4a.md) changed the probe shape; its calibration was a go.
+- **6.2:**
+  - Pilot 1 was a no-go on overhead, so [A4b](protocols/g2-v2-amendment-a4b.md) moved cloud sensing to a background sampler.
+  - Pilot 2 was a go, and everything was pinned in the freeze record before the campaign.
+- **6.3:** two sessions, with 80 of 80 segments and 14,400 of 14,400 attempts valid and no failures.
+  - **Speed:** the adaptive policy is 118 ms (11.5%) faster than always-cloud (CI 95–143 ms).
+  - **Regret:** median 2.2% against the per-request oracle.
+  - **Sensing:** 100% for the cloud and 97.8% for the edge, with 15.9 ms median overhead.
+  - **Quality:** identical.
+- **6.4:** the S3 checkpoint is mirrored and verified (2,722 objects). The edge data volume, which holds the final status and the preflights, is archived in phase 8.
+
+6.1 **Bring the pair up:**
+- start the stopped instances, or recreate them if 0.4 removed them;
+- deploy the new image digest on both hosts;
+- run the references and the preflight.
+
+6.2 **Pilot**, then the go/no-go decision, then the protocol hash pin.
+
+6.3 **Run** in sessions with the existing monitor and session scripts. Have someone sign in to AWS mid-session for runs longer than 5 h.
+
+6.4 **Mirror S3 and the data volumes locally** and verify by key, size and hash, as on 19 November.
+
+## Phase 7: final analysis
+
+**Status (21 November 2026): done.** See the [final analysis](../results/final-analysis-20261121/README.md).
+- **7.1, paired analysis** (`prediction/r2/g5.py` `phase7`, `scripts/campaign/final_analysis.py`):
+  - by load state, adaptive − always-cloud is −199 ms at L0/C2, −24 ms under both loads (CI includes zero), and +16 to +37 ms at C0 (sensing cost only);
+  - repetitions agree within 6 ms.
+  - The G2 v2 prototype's `thesis_analysis.py` is superseded by this analysis for the AWS campaigns.
+- **7.2, bytes:** the adaptive policy averages 70 KB per request against 160 KB for always-cloud (−56%).
+- **7.3, overhead:** 18.4 ms per request, which is 84% of the 22 ms regret; the sensing saves 6.4× what it costs.
+- **7.4, stability:** 4 switches per segment, two-thirds of them image-driven; the first request after a state change is as accurate as the rest.
+- **7.5, quality:** the adaptive answers' official VQA accuracy is 70.67%, identical to every fixed configuration.
+- **7.6, figures:** the crossover map, latency against rate, G3 predicted against observed, and the G5 traces.
+
+7.1 **Phase 7 paired analysis** (`thesis-analysis`, updated): adaptive against each baseline and the oracle on the same trace segments, with paired bootstrap CIs.
+
+7.2 **Communication:** bytes per request by configuration and policy. Under the int8 split, bytes fall at a latency cost; the cloud sends the raw image.
+
+7.3 **Overheads:** selector and monitor time per request, against the regret saved.
+
+7.4 **Stability:** the number of switches and oscillation under each trace.
+
+7.5 **Quality:** official VQA accuracy for each policy on the evaluation IDs, checked against parity.
+
+7.6 **Final tables and figures** (list in phase 9).
+
+## Phase 8: archive and teardown
+
+**Status (21 November 2026): done, except the off-machine copy (manual).** See the [archive record](../results/archive-20261121/README.md).
+- **8.1:**
+  - both data volumes are copied to S3 (`ebs-final`) after G5;
+  - the whole bucket is mirrored and verified (25,209 objects, 0 problems);
+  - a backup tarball (265 MB) test-restores with 0 checksum failures for both campaigns;
+  - every result commit is tagged.
+  - **Still to do by hand:** copy the tarball off the laptop.
+- **8.2:** [reproducibility guide](reproducibility.md).
+- **8.3:** the disposable `cloud-v1` stack is destroyed through a reviewed plan, applied after the user's approval (45 resources; both instances terminated).
+  - **Retained:** the two 20 GB data volumes, the S3 bucket, the ECR repository and the budget, all under `prevent_destroy`. Decide after thesis acceptance.
+  - **Cost:** the retained resources cost a few dollars a month, so the bill is not zero until they are removed.
+
+8.1 **Archive:**
+- the raw data mirrors (G2 v2+ and G5) with SHA256SUMS;
+- tag the source commits used, with image digests and protocol hashes;
+- keep an off-machine backup of `artifacts/aws-s3-mirror/` and the G5 mirror (external disk or university storage).
+
+8.2 **Reproducibility package:** the commands, configs, protocol and amendments that regenerate every table and figure from the archived data.
+
+8.3 **AWS teardown:**
+- destroy the disposable stack;
+- confirm that the backups are restorable before removing the data volumes;
+- the retained stack (bucket, ECR, budget) has `prevent_destroy`, so decide after thesis acceptance;
+- check that the account bill is zero.
+
+## Phase 9: thesis writing (in parallel from phase 2)
+
+| Chapter | Content | Available from |
+| --- | --- | --- |
+| 1 Introduction | Motivation, research question, contributions | now |
+| 2 Background and related work | VLMs, split computing, edge–cloud offloading, latency prediction, adaptive scheduling | now |
+| 3 System design | Configurations and split boundary, transport, monitor, predictor, selector | now |
+| 4 Methodology | Testbeds (physical and AWS), frozen protocol and amendments, the network grid and its verification, the loads, the dataset and splits, validity gates, statistics | now |
+| 5 Baseline results (G2 v2+) | Crossover map, load effects, split-inference analysis, quality parity, comparison with physical G2 | phase 2 |
+| 6 Prediction and selection (G3, G4) | Predictor accuracy, ranking, regret against the oracle and static baselines | phases 3–4 |
+| 7 Dynamic evaluation (G5) | Adaptive against baselines under traces, overheads, stability, bytes | phase 7 |
+| 8 Discussion | When adapting pays off, why split inference loses here, generalization limits, threats to validity (emulated network, vGPU edge, one model, split exposure) | phase 7 |
+| 9 Conclusion and future work | Reduced vision budget, queue awareness, energy, other VLMs | end |
+| Appendices | Protocol, amendments, reproducibility, hashes | phase 8 |
+
+Key figures:
+1. Architecture.
+2. Configuration pipelines.
+3. Network grid with measured verification.
+4. Crossover map by load state.
+5. Load-effect plot.
+6. Static-policy regret.
+7. Predictor error (APE CDF per configuration).
+8. G4 regret against the oracle.
+9. G5 latency over a trace with the selected configuration.
+10. Bytes against latency.
+
+## Must-have checklist ([roadmap](history/physical-validation-roadmap.md#must-have-for-a-strong-bachelor-thesis))
+
+| # | Item | Status |
+| --- | --- | --- |
+| 1–5 | CI, two machines, model equivalence, measured memory, controlled network | **Done**: physical G2 and AWS |
+| 6–7 | Real task dataset, profiling | **Done**: G2 v2+, 43,200 requests |
+| 8–10 | Fresh predictor calibration, held-out evaluation, G3 | Phase 3 (r1 failed on the physical pair) |
+| 11, 14, 15 | G4, measured oracle, regret | Phase 4 |
+| 12, 13 | Adaptive execution, fixed baselines | Phases 5–6 |
+| 16 | Phase 7 paired evaluation | Phase 7 |
+| 17 | Official VQA scoring | Phases 1.4, 4.4 and 7.5 |
+| 18 | Statistical uncertainty and repetitions | Done for G2 v2+; continues in phases 3–7 |
+| 19 | Reproducible artifacts | Phase 8 |
+| 20 | Honest negative results | Split inference (phase 2); G3 if it fails |
+
+**Already covered "strong additions":** edge and cloud load, and task awareness (short and long tasks, crop strata). **Phase 6 adds:** dynamic traces and hysteresis. **Out of scope unless time is left over:** the reduced-vision-budget configuration, queue awareness, energy, other VLMs, and learned or RL schedulers.
+
+## Risks
+
+| Risk | Effect | Mitigation |
+| --- | --- | --- |
+| The predictor fails G3 again | Weaker adaptive claim | Predeclared simpler-model fallback; a load-aware additive model fits the observed structure |
+| Small average adaptive gain | "Always cloud is enough" critique | Predeclare where adapting matters (overloaded cloud, high RTT); G5 traces exercise exactly those transitions |
+| The V/E exposure on 19–20 November | Validity critique | Amendment A3, training-only design choices, and threats-to-validity disclosure |
+| AWS capacity (g6.xlarge in us-east-1d) | G5 delay | Keep the stopped pair (0.4); the capacity-reservation retry in `up.sh` |
+| AWS sign-in expires mid-session | The monitor can't stop the VMs on time | Sign in again before each 5 h window; idle watchdog and budget stop action |
+| Changes to `src` after the G5 freeze | References invalid | Freeze only after phase 5.4; rebuilding references takes ~1 h |
+| Budget | Lost runs | ~$65 contingency after G5; check spend before every phase |

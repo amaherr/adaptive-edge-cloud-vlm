@@ -1,7 +1,7 @@
 # Retained campaign infrastructure
 
 This independent encrypted/versioned S3 state owns the private artifact bucket,
-ECR repository, monthly budget and optional persistent data volumes. The
+ECR repository, the project budget ($180 cumulative from 1 November 2026) and optional persistent data volumes. The
 `cloud-v1` disposable stack reads its outputs; destroying compute/network/SSM
 roles cannot delete these retained resources or remove the budget notifications.
 The backend bucket remains in its own protected bootstrap state.
@@ -18,8 +18,8 @@ Fresh deployment order:
 4. After quota, AMI and notification checks, explicitly provision the two data
    volumes here, review that plan, then review and enable endpoints/compute in
    cloud-v1. The volume IDs and AZ must match; the compute module refuses a
-   different AZ or incomplete pair. Defaults are two encrypted 50 GiB gp3
-   volumes, not the superseded 150 GiB allocation.
+   different AZ or incomplete pair. Defaults are two encrypted 20 GiB gp3
+   volumes (decision D11), not the superseded 150 GiB allocation.
 
 Existing-deployment migration completed on 5 November 2026:
 
@@ -31,10 +31,13 @@ Existing-deployment migration completed on 5 November 2026:
 - No EBS data volumes existed during migration, so none required transfer.
 - Both real stacks must show clean plans; retain remote version history.
 
-The current disposable destroy plan lists 29 foundation resources and excludes
-S3/ECR/budget/EBS/backend deletion. It was reviewed, **not applied**. Regenerate
-and review it after real nodes are provisioned. Archive all logs/results and
-verify independent S3 restore before teardown. Retain the content hashes and
+**Teardown (21 November 2026):** after the archive was verified, the disposable
+`cloud-v1` stack (45 resources, including both instances) was destroyed through
+a reviewed plan. This stack still holds the bucket, ECR, the budget and the two
+20 GiB data volumes.
+
+Before removing anything else, archive all logs and results and verify an
+independent restore. Retain the content hashes and
 review receipt in ignored artifacts/infra; raw plan files may contain private
 configuration and must not be committed.
 

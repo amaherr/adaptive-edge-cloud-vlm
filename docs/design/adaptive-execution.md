@@ -1,5 +1,7 @@
 # Adaptive execution contract
 
+> **Local prototype (October 2026).** This specification belongs to the local CPU/loopback prototype (three configurations, schema-1 predictor); the commands still work. The AWS campaigns use the [adaptive runtime](adaptive-runtime.md) instead.
+
 `adaptive-benchmark` runs the Phase 4 selector through the three resident Phase 1 policies. It requires a frozen manifest, Phase 3 calibration, and versioned replay JSON. The current local calibration has **failed G3** and the physical G4 gate is open. Its run is enabled only with the explicit `--diagnostic-allow-unpassed-gates` flag; a later campaign can omit that flag only when both `--predictor-evaluation` and `--selector-evaluation` report passing full gates for the same calibration ID. Phase 5 never silently promotes the local fit.
 
 ## Inputs and preflight

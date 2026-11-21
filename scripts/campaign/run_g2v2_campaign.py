@@ -2,7 +2,7 @@
 
 ``start`` detaches a supervisor and returns once it holds the writer lock;
 ``run`` stays in the foreground; ``preflight`` checks everything and runs the
-correctness smoke without measuring. See docs/runbooks/physical-campaign.md.
+correctness smoke without measuring. See docs/runbooks/aws-campaign.md.
 """
 
 from __future__ import annotations

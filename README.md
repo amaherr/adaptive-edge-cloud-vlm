@@ -1,646 +1,139 @@
-# Adaptive Edge–Cloud VLM Inference
+# Adaptive Edge–Cloud Inference for a Vision–Language Model
 
-Research prototype for distributing inference from a single pretrained vision–language model (VLM) between an edge device and a cloud machine. The project aims to select an internal execution configuration per image-and-text request using network conditions, available compute and memory, and request characteristics. The intended outcome is lower end-to-end latency and communication cost without changing the model's answer quality or exceeding edge resources.
+**Per-request selection of where to run each stage of one VLM, between a resource-constrained edge device and a cloud GPU, under changing network and load conditions.**
 
-The project implements three fixed policies, a manual dispatcher, a predictor and selector, mixed adaptive execution, bounded live health sensing, and a paired evaluation pipeline. The local CPU/loopback campaigns validate integration. A separate physical edge/cloud pair has now completed a clean 12-request GPU placement campaign with exact output equivalence. The local predictor missed its fastest-choice ranking target, and controlled physical profiling and official VQA data remain open, so automatic performance and public-dataset accuracy claims remain open. The pinned model, preprocessing, precision and greedy decoding are shared across placements.
+A vision–language model (VLM) can answer an image question entirely on the edge, entirely in the cloud, or split between them: the edge encodes the image and sends the visual features, and the cloud runs the language model. Which of these is fastest depends on the link, on how busy each side is, and on the request itself. This project builds and evaluates a system that **senses the current state, predicts the latency of every configuration, and runs the fastest one, per request**, with the same model and the same answers in every configuration.
 
-## Contents
+The system is evaluated on [Moondream2](https://huggingface.co/vikhyatk/moondream2) with VQA v2 questions, first on a physical laptop/PC pair and then on a two-VM AWS testbed with emulated network conditions and controlled GPU load. Every experiment follows a protocol frozen before its data was collected.
 
-- [Project architecture and scope](#project-architecture-and-scope)
-- [Current implementation and methodology](#current-implementation-and-methodology)
-- [Setup](#setup)
-- [Usage](#usage)
-- [CLI reference](#cli-reference)
-- [Using a separate cloud PC](#using-a-separate-cloud-pc)
-- [Results and limitations](#results-and-limitations)
-- [Next research steps](#next-research-steps)
-- [Technology and repository layout](#technology-and-repository-layout)
-- [Documentation index](docs/README.md): current gate status, testbed records, design specs
+## Key results
 
-## Project architecture and scope
-
-The runtime accepts an image and prompt, derives task features before inference, observes a replayed or bounded live health state, and selects a feasible placement of the same VLM. The current predictor and selector execute in diagnostic campaigns; validated automatic performance selection awaits a fresh physical-host calibration and passing G3/G4 gates. Memory peaks and idle GPU headroom have been measured on both hosts; independently verified network blocks remain open.
-
-~~~mermaid
-flowchart LR
-    R["Image + prompt"] --> S["Adaptive selector<br/>(diagnostic)"]
-    T["Replay/live health +<br/>pre-inference features"] -.-> S
-    S --> E["All edge<br/>(implemented)"]
-    S --> C["All cloud<br/>(implemented)"]
-    S --> D["Edge vision + cloud LLM<br/>(implemented)"]
-    E --> O["Answer + timings + resource/byte records"]
-    C --> O
-    D --> O
-    O -. "bounded health update" .-> S
-~~~
-
-The research question is whether dynamic selection among these configurations improves latency and communication efficiency under changing conditions. The scheduler exists as a research implementation; controlled physical edge–cloud evaluation, official VQA scoring, and a validated improvement claim remain pending.
-
-## Current implementation and methodology
-
-### Three execution policies
-
-| Policy | Edge process | Cloud process | Request crossing the link |
-| --- | --- | --- | --- |
-| `edge` | Image preprocessing, vision encoder, projector, and LLM | None | None |
-| `cloud` | Reads the image and sends the request | Complete VLM, including vision and LLM | Original encoded image bytes and prompt |
-| `distributed` | Image preprocessing, vision encoder, and projector | LLM image/prompt prefill and greedy generation | Prompt and unmodified projected visual tensor |
-
-All policies use the pinned [Moondream2 model configuration](configs/model/moondream2.yaml): revision `9a7d4024050840e001defacec2b00727e89149e6`, BF16, Pillow preprocessing, batch size one, no sampling, and at most 32 new tokens. The [artifact manifest](configs/model/moondream2_artifact.yaml) pins the weights, tokenizer, and reviewed remote-code hashes. Model loading verifies the artifact before inference.
-
-For the split path, the adapter captures the tensor returned after the vision encoder and projector, **before** LLM image prefill. The current tensor is BF16 `[729, 2048]`: 729 visual tokens and 2,985,984 raw bytes. The public model image-encoding API is not the boundary because it proceeds into LLM prefill. The distributed server does not recompute vision, and the edge vision process does not generate language tokens.
-
-~~~mermaid
-flowchart LR
-    I["Image + prompt"] --> L["Edge: full Moondream<br/>edge policy"]
-    L --> O["Answer"]
-    I --> RC["Edge: raw-image client"]
-    RC -- "image bytes + prompt<br/>versioned TCP" --> FM["Cloud role: full Moondream"]
-    FM --> O
-    I --> VP["Edge: image preprocessing<br/>vision encoder + projector"]
-    VP -- "projected BF16 tensor + prompt<br/>versioned TCP" --> TM["Cloud role: text-only Moondream"]
-    TM --> O
-~~~
-
-`distributed` defaults to the verified `synchronous` pipeline. The optional `prompt_first` variant sends text ahead of vision encoding so the server can prepare it while the edge works; it remains the **same policy**, not a fourth placement. Both variants were checked for 32-token equivalence on a fixture. The loader currently constructs the full checkpoint before pruning unneeded modules, so **load-time RAM is not partitioned**, even though steady-state components are.
-
-### Transport and the localhost cloud
-
-The cloud role is currently mimicked by a **separate server process on the same PC**, bound to `127.0.0.1:5050`. This validates component separation, actual TCP framing, health checks, and exact application bytes; it does not model an independent cloud CPU/GPU or a WAN/LAN link. Only one cloud-role server should use port 5050 at a time: stop `cloud-server` before starting `distributed-server`.
-
-The protocol uses versioned, length-prefixed frames with bounded JSON metadata, a binary payload and SHA-256 checksum. The client checks the model contract fingerprint and protocol version. Bad frames, mismatched contracts, timeouts, and server errors are rejected or recorded. Cloud requests carry the original image bytes; distributed requests carry the contiguous native-dtype tensor without baseline compression or quantization. The server processes requests sequentially for the batch-size-one latency experiment. There is **no TLS, authentication, or authorization**; see [separate-host deployment](#using-a-separate-cloud-pc).
-
-### Correctness, benchmarking, and observability
-
-- A [12-request correctness manifest](data/manifests/correctness.jsonl) and a [100-request fixture manifest](data/manifests/benchmark_fixture.jsonl) are checked in. The loader verifies manifest revision, unique IDs, and each image's SHA-256 before running.
-- The unified `benchmark` command selects any of the three policies against one resolved experiment configuration. It seeds the runtime, runs warm-ups first, shuffles each measured sweep reproducibly, and records one attempt per request/repetition. The model is loaded once per run; cold load time is separate from steady-state request latency.
-- Each run writes `plan.json`, `run_manifest.json`, fsynced `requests.jsonl`, and `summary.json` to its unique run directory. The run manifest includes resolved config, dataset/dependency hashes, Git state, host/Python/GPU inventory, and seed. Raw rows include config/model/dataset/image hashes, output tokens, timings, bytes, status, and any error.
-- The runner preserves failed and out-of-memory attempts in the denominator, but excludes their latency from successful-latency summaries. Summaries provide median, p95, IQR, mean, failure rate, wire bytes where relevant, and scored-task counts. `--resume` accepts only the original plan and skips already recorded trials.
-- `compare-runs` verifies provenance and compares **every measured request/repetition pair** across policies. It reports exact-token and decoded-text mismatches, first divergent token, failures, and per-policy task scores.
-- Per-request metrics include client-observed end-to-end time, available vision/projector/prefill/generation stage times, process RSS/CUDA memory, and exact application-layer wire bytes. The adaptive path also records bounded live health/capability probes and selection overhead. Application bytes, socket-send rate, and localhost timings are not physical link throughput or one-way delay.
-
-The synthetic fixture quality score is case-insensitive exact match after trimming whitespace. It is only a correctness diagnostic. The VQA importer accepts local VQA v2 validation files and preserves ten annotator answers, but the runner's VQA consensus normalization is provisional: use the [official VQA evaluation procedure](https://visualqa.org/evaluation.html) before reporting public-dataset accuracy.
-
-## Setup
-
-Run commands from the repository root. The model environment and lock are targeted at Linux/WSL with Python 3.11 and CUDA 12.8 PyTorch; the dependency-light development environment also works with Python 3.12. The full model weights are **not** committed and require a first download and several gigabytes of disk space. The current 4 GiB RTX 3050 cannot reliably load the complete BF16 model; use CPU for exact all-policy reference runs.
-
-### 1. Development environment
-
-~~~bash
-python3.11 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -e ".[dev]"
-.venv/bin/adaptive-vlm config validate configs/experiments/local_campaign.yaml
-.venv/bin/pytest -q
-~~~
-
-Python 3.12 may be used for this CPU-only development/test environment. `.venv/bin/adaptive-vlm` is the installed entry point; `.venv/bin/python -m adaptive_vlm.cli` is equivalent.
-
-### 2. Pinned model environment
-
-~~~bash
-python3.11 -m venv .venv-model
-.venv-model/bin/python -m pip install --upgrade pip
-.venv-model/bin/python -m pip install -r requirements/model-cu128.lock
-~~~
-
-The lock includes an editable install of this package and pinned PyTorch, Transformers, Hugging Face Hub, Safetensors, Pillow, NumPy, and psutil versions. Use a Linux/WSL machine for the CUDA lock. Check `nvidia-smi` and PyTorch CUDA visibility separately if using a GPU; CPU execution does not require CUDA visibility.
-
-For the **first** model run, omit `--offline` so the exact pinned weights, tokenizer, and remote code can populate `.model-cache`. This downloads a multi-gigabyte checkpoint and verifies it against [the artifact manifest](configs/model/moondream2_artifact.yaml):
-
-~~~bash
-.venv-model/bin/adaptive-vlm edge-infer \
-  --config configs/experiments/baseline_edge.yaml \
-  --artifact-manifest configs/model/moondream2_artifact.yaml \
-  --cache-dir .model-cache --vision-device cpu --text-device cpu \
-  --image tests/fixtures/moondream_smoke.ppm \
-  --prompt "Describe this image." --output-dir artifacts/first-model-run
-~~~
-
-After the cache is populated, add `--offline` to require local artifacts only. A model server or split client on a different PC needs its own verified local cache. The baseline templates are valid for one-off inference, but their pending dataset/cloud fields are **not** ready for a physical benchmark.
-
-### 3. Configuration files
-
-Every experiment YAML references a model file and edge/cloud hardware inventories and supplies a dataset manifest/revision, seed, warm-up count, repetition count, transport address/timeout/version, and artifact directory. Paths are resolved relative to the experiment file. Validate a new configuration with `adaptive-vlm config validate PATH`; unknown fields, moving model revisions, sampling, and non-unit batch sizes are rejected.
-
-| Experiment file | Use today |
-| --- | --- |
-| [`fake_smoke.yaml`](configs/experiments/fake_smoke.yaml) | Dependency-free `fake-infer` sanity check. |
-| [`fake_cloud.yaml`](configs/experiments/fake_cloud.yaml) | Fake localhost server/client and transport tests. |
-| [`local_cloud.yaml`](configs/experiments/local_cloud.yaml) | Real localhost full-model cloud server and one-off client. |
-| [`local_distributed.yaml`](configs/experiments/local_distributed.yaml) | Real localhost text-only server and vision client. |
-| [`fake_benchmark.yaml`](configs/experiments/fake_benchmark.yaml) | Fast benchmark-runner checks without a VLM; edge or fake cloud. |
-| [`local_campaign.yaml`](configs/experiments/local_campaign.yaml) | Shared real-model correctness/benchmark config for `--mode edge`, `cloud`, or `distributed`. |
-| [`baseline_edge.yaml`](configs/experiments/baseline_edge.yaml), [`baseline_cloud.yaml`](configs/experiments/baseline_cloud.yaml), [`baseline_distributed.yaml`](configs/experiments/baseline_distributed.yaml) | Physical-host templates with pending dataset/cloud details; copy and fill before physical experiments. |
-
-The one-off server commands require an experiment file whose YAML `mode` matches the server role. In contrast, `benchmark --mode` selects the policy independently of the YAML `mode`, allowing all three runs to share the exact same resolved model/data/generation configuration. Remote server and benchmark files must still agree on model contract, address, port, and protocol. `configs/hardware/local_model_cloud.yaml` describes the **same host** acting as cloud, not a second PC.
-
-## Usage
-
-All commands below assume setup is complete and are run from the repository root. A one-off inference saves a run manifest and request record under `--output-dir/RUN_ID/` when that option is supplied. Final JSON is printed to stdout; progress is generally printed to stderr, while `benchmark` also prints trial progress to stdout. For automation, read its saved `summary.json` instead of assuming stdout contains JSON alone.
-
-### Fake smoke tests
-
-~~~bash
-.venv/bin/adaptive-vlm fake-infer \
-  --config configs/experiments/fake_smoke.yaml \
-  --image tests/fixtures/smoke_image.txt \
-  --prompt "Describe this fixture." --output-dir artifacts/fake-smoke
-
-# In a separate terminal, start this server before the client:
-.venv/bin/adaptive-vlm cloud-server --config configs/experiments/fake_cloud.yaml
-.venv/bin/adaptive-vlm cloud-infer \
-  --config configs/experiments/fake_cloud.yaml \
-  --image tests/fixtures/smoke_image.txt --prompt "Describe this fixture."
-~~~
-
-Stop a server with Ctrl+C. The fake adapter hashes input bytes and text; it tests infrastructure, **not** VLM task quality.
-
-### Give the real model a photo and prompt
-
-~~~bash
-.venv-model/bin/adaptive-vlm edge-infer \
-  --config configs/experiments/baseline_edge.yaml \
-  --artifact-manifest configs/model/moondream2_artifact.yaml \
-  --cache-dir .model-cache --offline \
-  --vision-device cpu --text-device cpu \
-  --image /path/to/photo.jpg --prompt "What is happening in this photo?" \
-  --output-dir artifacts/manual-edge
-~~~
-
-Use a real JPEG/PNG or the repository PPM fixture. The CPU/CPU placement is the exact-equivalence reference. `--vision-device cuda:0 --text-device cpu` is an experimental mixed-device placement: it has faster vision inference on this machine, but its complete greedy token sequence differed from the CPU reference after a 19-token common prefix. Do not silently use it for same-device correctness claims.
-
-### All-cloud on localhost
-
-Terminal A:
-
-~~~bash
-.venv-model/bin/adaptive-vlm cloud-server \
-  --config configs/experiments/local_cloud.yaml \
-  --artifact-manifest configs/model/moondream2_artifact.yaml \
-  --cache-dir .model-cache --offline --device cpu
-~~~
-
-After the readiness JSON appears, terminal B:
-
-~~~bash
-.venv-model/bin/adaptive-vlm cloud-infer \
-  --config configs/experiments/local_cloud.yaml \
-  --image /path/to/photo.jpg --prompt "What is happening in this photo?" \
-  --output-dir artifacts/manual-cloud
-~~~
-
-The edge client sends raw image bytes and text, while the server runs the complete model. The client does not need model weights in this mode.
-
-### Split vision and language on localhost
-
-Stop `cloud-server` first, then start the text-only server in terminal A:
-
-~~~bash
-.venv-model/bin/adaptive-vlm distributed-server \
-  --config configs/experiments/local_distributed.yaml \
-  --artifact-manifest configs/model/moondream2_artifact.yaml \
-  --cache-dir .model-cache --offline --device cpu
-~~~
-
-Terminal B:
-
-~~~bash
-.venv-model/bin/adaptive-vlm distributed-infer \
-  --config configs/experiments/local_distributed.yaml \
-  --artifact-manifest configs/model/moondream2_artifact.yaml \
-  --cache-dir .model-cache --offline --vision-device cpu \
-  --pipeline synchronous --image /path/to/photo.jpg \
-  --prompt "What is happening in this photo?" \
-  --output-dir artifacts/manual-distributed
-~~~
-
-Change `--pipeline` to `prompt_first` only when testing that explicit overlap variant. Each side verifies the same model/generation fingerprint.
-
-### Reproducible benchmark and comparison
-
-Start with the [real shared configuration](configs/experiments/local_campaign.yaml). The following is a **one-sweep correctness check**; the config defaults to 10 warm-ups and 30 full measured sweeps if overrides are omitted. A sweep processes every manifest request once in seeded random order.
-
-~~~bash
-# No server needed:
-.venv-model/bin/adaptive-vlm benchmark \
-  --config configs/experiments/local_campaign.yaml \
-  --mode edge --run-dir artifacts/example-edge \
-  --artifact-manifest configs/model/moondream2_artifact.yaml \
-  --cache-dir .model-cache --offline \
-  --vision-device cpu --text-device cpu --warmups 1 --repetitions 1
-
-# Start cloud-server with local_cloud.yaml in another terminal:
-.venv-model/bin/adaptive-vlm benchmark \
-  --config configs/experiments/local_campaign.yaml \
-  --mode cloud --run-dir artifacts/example-cloud \
-  --warmups 1 --repetitions 1
-
-# Stop cloud-server; start distributed-server with local_distributed.yaml:
-.venv-model/bin/adaptive-vlm benchmark \
-  --config configs/experiments/local_campaign.yaml \
-  --mode distributed --run-dir artifacts/example-distributed \
-  --artifact-manifest configs/model/moondream2_artifact.yaml \
-  --cache-dir .model-cache --offline --vision-device cpu \
-  --pipeline synchronous --warmups 1 --repetitions 1
-
-.venv/bin/adaptive-vlm compare-runs \
-  artifacts/example-edge artifacts/example-cloud artifacts/example-distributed \
-  --output artifacts/example-comparison.json
-~~~
-
-Choose **fresh** run directories; an existing directory is refused unless `--resume` is given with the same arguments, config, manifest, and plan. The benchmark records individual failures but may still exit successfully after completing the schedule; inspect `status_counts`/`failure_rate`. Likewise, inspect `compare-runs`'s `complete_and_equal` field rather than relying only on its exit code.
-
-**Interleaved placements (G2 v2).** `interleaved-benchmark` runs every placement for each request back to back, in a seeded random order, so slow drift affects all placements alike. One edge model serves edge/full and the vision half of distributed. Before each timed request, the needed stage is activated outside the timer and its cost recorded as `stage_prepare_ms`. Each placement gets its own run directory under `--run-dir` that `profile-runs` accepts; the global order is in `interleave.json`. If the local CUDA context fails, the command records the attempt and exits with code 75 so a supervisor can resume with `--resume`. Core dumps are disabled.
-
-~~~bash
-# Start adaptive-server (fake or Moondream) first; then:
-.venv-model/bin/adaptive-vlm interleaved-benchmark   --config configs/experiments/physical_vqa_v2.yaml   --run-dir artifacts/example-interleaved   --split configs/evaluation/physical_vqa_split_v2.json --split-name training   --order-seed 5113 --repetition-indices 0   --artifact-manifest configs/model/moondream2_artifact.yaml   --cache-dir .model-cache --offline --edge-residency swap
-~~~
-
-For a fast 100-request storage/scheduling run without Moondream, use `fake_benchmark.yaml`, `--mode edge`, `--manifest data/manifests/benchmark_fixture.jsonl`, `--warmups 10`, and `--repetitions 1`. That fixture has no task-quality references.
-
-### Phase 2 profiling
-
-The fixed-policy benchmark now records trial start time, exact model prompt-token count, prompt prefill/decode durations, transport subintervals, response bytes, and memory readings. After three completed runs with the same frozen schedule, build a validated profile:
-
-~~~bash
-.venv/bin/adaptive-vlm profile-runs \
-  artifacts/example-edge artifacts/example-cloud artifacts/example-distributed \
-  --specification configs/profiles/local_fixture.json \
-  --output-dir artifacts/example-profile
-~~~
-
-Inspect `artifacts/example-profile/summary.json` for coverage/failures and `profile.jsonl` for each warmup, measured success, and failure. The [schema note](docs/design/profile-format.md) defines timing boundaries, null reasons, residuals, and units. The [split inspection](docs/design/split-boundary.md) documents candidate graph boundaries that remain inactive. The supplied specification labels the local loopback network as uncontrolled; it cannot support physical-network crossover claims.
-
-### Phase 3 predictor calibration
-
-Fit the component predictor and evaluate the frozen request holdout from the Phase 2 local profile:
-
-~~~bash
-.venv/bin/adaptive-vlm calibrate-predictor \
-  --profile artifacts/phase2/2026-10-26/local-1/profile/profile.jsonl \
-  --split configs/predictor/local_holdout.json \
-  --output-dir artifacts/example-predictor
-~~~
-
-Read `evaluation.json` for per-candidate error, interval coverage, ranking against the constant-median baseline, and gate flags. `calibration.json` contains the fitted components and coverage bounds; `predictions.jsonl` keeps each held-out task snapshot and prediction. The [Phase 3 handoff](docs/history/local-prototype-validation.md#local-component-predictor-and-holdout) reports the local gate miss and the [predictor contract](docs/design/predictor-v1-format.md) defines units and out-of-coverage behavior. This calibration is used only by explicitly flagged diagnostic adaptive runs.
-
-### Phase 4 offline selector and oracle
-
-Evaluate the pure selector on the frozen local Phase 3 predictions and matched observed outcomes:
-
-~~~bash
-.venv/bin/adaptive-vlm evaluate-selector \
-  --predictions artifacts/phase3/2026-10-26/clean-1/predictions.jsonl \
-  --specification configs/oracle/local_holdout.json \
-  --output-dir artifacts/example-selector
-~~~
-
-Read `evaluation.json` for regret, top-choice agreement, uncertainty, exclusions, and gate flags. `decisions.jsonl` preserves each candidate prediction and reason beside the retrospective measured oracle. The [Phase 4 handoff](docs/history/local-prototype-validation.md#selector-and-offline-oracle) gives the local result and second-machine steps; the [selector contract](docs/design/selector-and-oracle.md) defines eligibility and pairing. The local G4 performance gate remains open; the adaptive command requires a diagnostic override until G3/G4 pass.
-
-### Phase 5 adaptive diagnostic run
-
-With the pinned Moondream cache, start `adaptive-server` as in the [Phase 5 handoff](docs/history/local-prototype-validation.md#mixed-adaptive-execution), then run the frozen local mixed-choice campaign:
-
-~~~bash
-.venv-model/bin/adaptive-vlm adaptive-benchmark \
-  --config configs/experiments/local_campaign.yaml \
-  --manifest data/manifests/correctness.jsonl \
-  --calibration artifacts/phase3/2026-10-26/clean-1/calibration.json \
-  --replay configs/adaptive/local_replay_health.json \
-  --run-dir artifacts/example-adaptive \
-  --artifact-manifest configs/model/moondream2_artifact.yaml \
-  --cache-dir .model-cache --offline \
-  --warmups 1 --repetitions 1 --diagnostic-allow-unpassed-gates
-~~~
-
-The diagnostic flag explicitly permits the current failed G3/open G4 fit for an integration check; it does not approve performance selection. `requests.jsonl` contains every candidate prediction, decision, actual result, overhead and any retry. Use `analyze-adaptive` with matching edge/cloud/distributed fixed controls, as described in the [execution contract](docs/design/adaptive-execution.md). The command requires a resident full edge adapter for exact prompt-token counting.
-
-### Phase 6 network trace and live monitor
-
-Replay the [synthetic controlled trace](configs/network_traces/synthetic_trace.json) through the predictor and selector without loading a model:
-
-~~~bash
-.venv/bin/adaptive-vlm replay-network-trace \
-  --calibration configs/network_traces/synthetic_calibration.json \
-  --trace configs/network_traces/synthetic_trace.json \
-  --output-dir artifacts/example-network-trace
-~~~
-
-For a real diagnostic, add `--monitor-mode live --probe-timeout-ms 2000 --probe-max-age-ms 5000` to `adaptive-benchmark`, then run `analyze-monitor RUN_DIR --output RUN_DIR/monitor_analysis.json`. The [Phase 6 handoff](docs/history/local-prototype-validation.md#live-probes-and-network-trace-replay) gives the complete local commands and second-machine setup; the [monitor contract](docs/design/live-monitor-and-trace-replay.md) defines probe age, failure behavior and passive-rate limits. Health-probe round trip and socket-send rate are recorded as distinct application observations and are not fed to the current loopback predictor.
-
-### Import a VQA validation subset
-
-The repository does not redistribute VQA questions, answers, or COCO images. Once the official VQA v2 val2014 JSON files and images are available locally, freeze a deterministic subset:
-
-~~~bash
-.venv/bin/adaptive-vlm import-vqa-v2 \
-  --questions data/raw/vqa/v2_OpenEnded_mscoco_val2014_questions.json \
-  --annotations data/raw/vqa/v2_mscoco_val2014_annotations.json \
-  --images-dir data/raw/coco/val2014 \
-  --output data/manifests/vqa_val2014_seed42.jsonl \
-  --count 100 --seed 42 --revision vqa-v2-val2014-local
-~~~
-
-Set a copied experiment YAML's `dataset.manifest_path` and `dataset.revision` to the new file and exact revision. The importer samples paired question/annotation IDs with a seed, stores ten human answers and image hashes, and refuses to overwrite an existing manifest. See the [official VQA data format](https://visualqa.org/download.html). Before thesis-quality claims, run the official evaluator: the in-run VQA consensus score lacks full official answer normalization.
-
-The physical v1 campaign already freezes 100 official validation requests in `data/manifests/physical_vqa_v1.jsonl`, with a disjoint split in `configs/evaluation/physical_vqa_split_v1.json` and experiment config `configs/experiments/physical_vqa_v1.yaml`. Its [dataset protocol](docs/physical-testbed/vqa-dataset.md) records source hashes and edge setup. `scripts/vqa/fetch_vqa_subset_images.py` fetches only the seeded image subset from the official COCO bucket; source files remain ignored under `data/raw/`.
-
-### Phase 7 paired evaluation
-
-The frozen [Phase 7 protocol](docs/design/evaluation-protocol.md) defines the split, metrics, confidence intervals and open gates. Reproduce the local descriptive report from the archived Phase 2 and Phase 5 runs:
-
-~~~bash
-.venv/bin/adaptive-vlm analyze-thesis \
-  --specification configs/evaluation/local_thesis_diagnostic.json \
-  --adaptive-run artifacts/phase5/2026-10-26/local-1 \
-  --fixed-runs artifacts/phase2/2026-10-26/local-1/edge \
-    artifacts/phase2/2026-10-26/local-1/cloud \
-    artifacts/phase2/2026-10-26/local-1/distributed \
-  --output-dir artifacts/phase7-reproduction
-~~~
-
-`report.json` contains validation-only best-static choice, paired latency/SLA intervals, failure counts, bytes, prediction error and measured-oracle regret. `paired_trials.jsonl` keeps the request-level evidence. Each input file and the frozen specification is hashed. This 2-request local holdout was already inspected, so its intervals are descriptive, not independent evidence. The [Phase 7 handoff](docs/history/local-prototype-validation.md#task-aware-evaluation-pipeline) explains the second-machine campaign.
-
-For VQA, run `prepare-vqa-eval-subset` with the imported manifest and original official question/annotation JSONs, then `export-vqa-predictions` for each policy run and repetition. Feed those files to `scripts/vqa/run_official_vqa_eval.py` with a pinned checkout of the [official VQA evaluator](https://github.com/GT-Vision-Lab/VQA/tree/master/PythonEvaluationTools). The upstream source uses Python 2 syntax, so run the adapter in a compatible Python 2 environment. The exporter includes failed requests as empty answers and writes a hash/provenance sidecar. The official loader requires predictions for exactly the annotation IDs, which is why the subset command is needed. Record the upstream commit and the adapter's hashed evaluation output with the campaign. The repository does not claim official accuracy until that evaluation has run.
-
-### Validation and helper scripts
-
-~~~bash
-.venv/bin/ruff check .
-.venv/bin/mypy
-.venv/bin/pytest --cov=adaptive_vlm --cov-report=term-missing
-.venv/bin/adaptive-vlm environment --output artifacts/environment.json
-~~~
-
-CPU-only CI runs Ruff, strict mypy, and pytest with an 80% coverage threshold without downloading model weights. The real TCP subprocess test uses an ephemeral port and skips only when a restricted sandbox forbids loopback binding. `scripts/verification/verify_local_decomposition.py`, `verify_cloud_equivalence.py`, and `verify_distributed_equivalence.py` reproduce focused model correctness checks; `verify_cloud_stability.py` and `verify_distributed_stability.py` exercise repeated requests. `scripts/model/probe_moondream.py` probes feasibility, and `inspect_model_artifact.py` inspects local safetensors. Use `--help` on a script for its experiment-specific options.
-
-## CLI reference
-
-Run `adaptive-vlm --help` or `adaptive-vlm COMMAND --help` for machine-readable, version-matched usage. This table covers the current public commands; bracketed flags are optional.
-
-The parser and command routing live in `cli.py`; command execution lives in [`commands/`](src/adaptive_vlm/commands). The [CLI refactor handoff](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/cli_refactor_handoff.md) maps each workflow to its module and records verification. The public command names and flags are unchanged.
-
-| Command | Required arguments | Optional arguments and defaults |
+| Gate | Question | Result |
 | --- | --- | --- |
-| `config validate` | `PATH` | `--output PATH` writes resolved JSON; it is always printed. |
-| `environment` | None | `--workdir PATH` (current directory), `--output PATH`. |
-| `fake-infer` | `--config PATH --image PATH --prompt TEXT` | `--request-id` (`smoke-0001`), `--output-dir PATH`, `-v/--verbose`. |
-| `edge-infer` | `--config PATH --artifact-manifest PATH --image PATH --prompt TEXT` | `--cache-dir` (`.model-cache`), `--request-id` (`edge-0001`), `--vision-device` (`cpu`), `--text-device` (`cpu`), `--offline`, `--output-dir PATH`, `-v/--verbose`. |
-| `cloud-server` | `--config PATH` | `--artifact-manifest PATH` (required for Moondream, not fake), `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST` (otherwise config host), `-v/--verbose`. |
-| `adaptive-server` | `--config PATH --artifact-manifest PATH` | Loads one full Moondream model for raw-image and projected-tensor requests. `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST`, `--report-resource-state` (attach the latest background GPU/memory sample to each response as `server_state_*`), `-v/--verbose`. |
-| `cloud-infer` | `--config PATH --image PATH --prompt TEXT` | `--request-id` (`cloud-0001`), `--output-dir PATH`, `-v/--verbose`. |
-| `adaptive-infer` | `--config PATH --configuration-id ID --image PATH --prompt TEXT` | Manual Phase 1 selection among `edge/full`, `cloud/raw_image`, and `distributed/projected/synchronous`; see the [Phase 1 handoff](docs/history/local-prototype-validation.md#executable-configuration-space-and-resident-dispatcher) for edge component, memory, network-state and artifact options. |
-| `distributed-server` | `--config PATH --artifact-manifest PATH` | `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST`, `-v/--verbose`. |
-| `distributed-infer` | `--config PATH --artifact-manifest PATH --image PATH --prompt TEXT` | `--cache-dir` (`.model-cache`), `--request-id` (`distributed-0001`), `--vision-device` (`cpu`), `--pipeline` (`synchronous` or `prompt_first`), `--offline`, `--output-dir PATH`, `-v/--verbose`. |
-| `benchmark` | `--config PATH --mode edge|cloud|distributed --run-dir PATH` | `--manifest PATH` (config dataset path), `--artifact-manifest PATH` (required for real edge/distributed), `--cache-dir` (`.model-cache`), `--vision-device` (`cpu`), `--text-device` (`cpu`), `--offline`, `--warmups N` and `--repetitions N` (config values), `--pipeline` (`synchronous` or `prompt_first`), `--resume`, `-v/--verbose`. |
-| `interleaved-benchmark` | `--config PATH --run-dir PATH --order-seed N` | `--split PATH --split-name NAME` (default: all manifest IDs), `--placements` (all three), `--repetition-indices N…` (all configured), `--warmups N` (config), `--edge-device` (`cuda:0`), `--edge-residency` (`resident` or `swap`), `--artifact-manifest PATH`, `--cache-dir`, `--offline`, `--resume`, `--max-consecutive-failures N`, `--resource-state` (edge NVML, host memory and Windows GPU counters in every record), `--edge-load-config PATH --edge-load-level L1` (run the edge load generator; `L0` = none). Exit code 75: the local CUDA context failed; 76: the load generator failed. Resume after either. |
-| `compare-runs` | At least two `RUN_DIR` paths | `--output PATH` saves comparison JSON; comparison is always printed. |
-| `profile-runs` | Completed matching `RUN_DIR` paths | `--specification PATH --output-dir PATH`; validates raw trials, hashes and coverage and writes versioned profile rows. |
-| `calibrate-predictor` | `--profile PATH --split PATH --output-dir PATH` | Fits only frozen training rows and writes a calibration, held-out evaluation and per-trial predictions. |
-| `evaluate-selector` | `--predictions PATH --specification PATH --output-dir PATH` | Checks a frozen predictions hash and writes offline decisions plus matched measured-oracle metrics. |
-| `adaptive-benchmark` | `--config PATH --manifest PATH --calibration PATH --replay PATH --run-dir PATH --artifact-manifest PATH` | Runs a resumable mixed-choice campaign; requires passing G3/G4 reports or explicit `--diagnostic-allow-unpassed-gates`. |
-| `analyze-adaptive` | `ADAPTIVE_RUN_DIR EDGE_DIR CLOUD_DIR DISTRIBUTED_DIR` | Matches each choice to a fixed control and audits tokens, placement, wire bytes, and decisions. |
-| `replay-network-trace` | `--calibration PATH --trace PATH --output-dir PATH` | Replays frozen bandwidth/RTT/health states through the predictor and selector; reports switches and safety. |
-| `analyze-monitor` | `RUN_DIR --output PATH` | Audits live probe timestamps, age, fail-closed decisions, passive updates, and monitor overhead. |
-| `import-vqa-v2` | `--questions PATH --annotations PATH --images-dir PATH --output PATH --revision LABEL` | `--count N` (100), `--seed N` (42), `--candidates PATH` (frozen candidate order), `--two-crop-count N`, `--prompt-template TEXT`. |
-| `analyze-thesis` | `--specification PATH --adaptive-run DIR --fixed-runs EDGE_DIR CLOUD_DIR DISTRIBUTED_DIR --output-dir DIR` | Split-safe paired analysis with raw trial table and input hashes. |
-| `prepare-vqa-eval-subset` | `--manifest PATH --questions PATH --annotations PATH --output-dir DIR` | Writes official-schema question/annotation files for exactly the frozen IDs. |
-| `export-vqa-predictions` | `--manifest PATH --run-dir DIR --output PATH` | `--repetition N` (0); writes official-format answers and provenance. |
+| **G2 v2+** baseline | Do the configurations trade places as conditions change? | 43,200 measured requests over 22 network conditions × edge and cloud load: all 196 sub-blocks valid, answers identical across configurations. The cloud wins most conditions; the edge wins under heavy cloud load; **split inference never wins on this pair** |
+| **G3** prediction | Can latency be predicted before running? | P90 error **1.4–6.0%** per configuration on unseen networks, **98.3%** top-1 agreement |
+| **G4** offline selection | Does selecting by prediction approach the measured oracle? | Median relative regret **0.00%**; **42.6 ms** faster than the best static configuration |
+| **G5** live adaptation | Does the full system pay off under changing conditions? | **118 ms (11.5%) faster** than always-cloud (95% CI 95–143 ms), **2.2%** median regret against the per-request hindsight oracle, **identical answer quality** (70.67% official VQA accuracy), 15.9 ms median decision overhead |
 
-`--config` references an experiment YAML, not a model YAML. `--artifact-manifest` references [the pinned artifact manifest](configs/model/moondream2_artifact.yaml); it is distinct from the request `--manifest` used by `benchmark`. `--device` places the cloud server's model/text stage; `--vision-device` and `--text-device` name edge-side placements. `--offline` forbids model downloads and is appropriate only after the cache is populated. `--bind-host` controls the listening interface, while `transport.host` in the config is the client-reachable address. `-v` adds detail; core phase milestones and benchmark trials are already visible by default.
+![G5 traces: latency of each policy and the adaptive choice over the trace segments](results/final-analysis-20261121/g5_traces.svg)
 
-## Using a separate cloud PC
+*G5: the adaptive policy against always-cloud, always-edge and the per-request oracle, per trace segment. It stays with the cloud while the cloud is idle and moves to the edge when the cloud is loaded.* Details: [final analysis](results/final-analysis-20261121/README.md).
 
-The current PC can be the edge and a second Linux/WSL PC can be the cloud once its hardware and network are known. **No separate cloud machine has been validated yet.** These are deployment instructions, not a claim of physical-host results.
+## How it works
 
-1. Check out the same Git commit on both PCs. Install the pinned model environment on the cloud; install it on the edge as well for `edge` and `distributed`. Place and verify the pinned artifact in each host's local cache before using `--offline`. The split loader still needs RAM for a transient full checkpoint on **both** hosts.
-2. Record the cloud PC's actual OS, CPU, RAM, GPU/VRAM, driver, and software in a new `configs/hardware/*.yaml` file with `status: verified`. Do not label [`cloud_pending.yaml`](configs/hardware/cloud_pending.yaml) or [`local_model_cloud.yaml`](configs/hardware/local_model_cloud.yaml) as a physical machine.
-3. Copy the cloud and distributed experiment files into site-specific YAMLs. Point `cloud_hardware_config` at the verified inventory and set `transport.host` to the cloud address reachable from the edge (same port, timeout, and protocol on both machines). Keep `model_config`, generation settings, request manifest/revision, and seed aligned. The server YAML must use `mode: cloud` for `cloud-server` or `mode: distributed` for `distributed-server`. Keep a single shared benchmark YAML for all three client-side `--mode` selections.
-4. Restrict inbound TCP to the edge host on a trusted network, or use a protected VPN/SSH tunnel. The transport has integrity checks but **no encryption or authentication**. Never expose port 5050 directly to the public internet. If the cloud must listen on an interface other than its client-reachable address, pass `--bind-host` appropriately (for example `0.0.0.0` only behind a restrictive firewall).
-5. For all-cloud, start `cloud-server` on the cloud with the site cloud YAML, `--artifact-manifest`, and `--device cpu` or a suitable GPU. Wait for readiness and matching model fingerprint, then run `cloud-infer` or `benchmark --mode cloud` on the edge with the site benchmark YAML. Only the cloud needs the full model for this policy.
-6. Stop that server. For distributed, start `distributed-server` on the cloud using the site distributed YAML. Then run `distributed-infer` or `benchmark --mode distributed` on the edge with its verified vision model and cache. The server holds the text role; the edge sends the projected tensor.
-7. Run `edge` on the edge as a local reference, then `compare-runs` over the three matching manifests. Archive the raw run directories, both host inventories, server readiness metadata, model/dependency hashes, and network topology. Investigate every token mismatch; CPU/GPU floating-point differences are possible. Measure bandwidth/RTT independently before drawing network-performance conclusions.
+```mermaid
+flowchart LR
+    R["Image + question"] --> F["Pre-execution features<br/>(image size, bytes, task)"]
+    S["Live sensing<br/>edge GPU probe · cloud GPU power · network probe"] --> P
+    F --> P["Latency predictor<br/>r2_component, per configuration"]
+    P --> Sel["Selector<br/>lowest predicted latency"]
+    Sel --> E["edge/full"]
+    Sel --> C["cloud/raw_image"]
+    Sel --> D["split: synchronous ·<br/>prompt-first · int8"]
+    E --> A["Answer + timings + bytes"]
+    C --> A
+    D --> A
+```
 
-The actual cloud host, real-link G4 correctness, network-condition campaign, and any cross-device task-quality result remain pending.
+**Five configurations of one pinned model** (Moondream2, revision `9a7d4024`, BF16, greedy decoding):
 
-## Results and limitations
+| Configuration | Edge runs | Cloud runs | Sent over the link |
+| --- | --- | --- | --- |
+| `edge/full` | Whole model | — | Nothing |
+| `cloud/raw_image` | — | Whole model | Encoded image and question |
+| `distributed/projected/synchronous` | Vision encoder and projector | Language model | Projected visual tensor (BF16, 2.99 MB) |
+| `distributed/projected/prompt_first` | Same | Same, preparing the prompt while the edge encodes | Question first, then the tensor |
+| `distributed/projected/int8` | Same, then int8 quantisation | Dequantisation, then the language model | int8 tensor (0.5× the bytes) |
 
-The [Phase 0 handoff](docs/history/local-prototype-validation.md#verified-local-baseline) records a fresh three-policy localhost CPU correctness campaign, its input hashes, passing gates, reproducible runner, and local artifact paths. All 12 measured requests passed in each policy and the comparison found 12/12 matching token sequences. The separate physical cloud host is still unavailable, so the physical-host gate remains pending. These are correctness observations, not controlled performance estimates.
+**Prediction.** `r2_component` predicts latency as edge stage + cloud server + network + client residual. The stages are linear in the image's crop count, per load level; the network term models TCP slow start over the measured goodput and RTT. It was fitted on training conditions only and frozen before validation ([specification](docs/predictor-v2/r2-specification.md)).
 
-The [Phase 1 handoff](docs/history/local-prototype-validation.md#executable-configuration-space-and-resident-dispatcher) records a resident three-policy localhost campaign through the new manual dispatcher and dual-path server. All 36 request/configuration results completed, all 12 request triples matched, and each matched the Phase 0 edge tokens. The report includes the observed client and server memory footprint; it is not a dynamic scheduling or physical-host performance result.
+**Sensing.** Before each decision the system reads the cloud GPU's power draw from a background sampler (C2 when ≥ 58 W), times a short matrix-multiply probe on the edge GPU (L1 when ≥ 20.65 ms), and takes the uplink goodput and RTT from the latest periodic network probe. Sensing and selection time are inside the measured latency ([adaptive runtime](docs/design/adaptive-runtime.md)).
 
-For the unattended 8,100-attempt physical campaign, use the [launch, monitoring and recovery runbook](docs/runbooks/physical-campaign.md). It includes edge orchestration, cloud service templates, mandatory preflights and per-attempt resume.
+**Measurement.** Every request runs all configurations (and, in G5, the adaptive policy) back to back in a seeded random order, so each request has its own measured oracle. Every sub-block is checked against predeclared validity gates: achieved rate and RTT, zero netem drops, load liveness, edge memory, output correctness against same-device references, and failure rate.
 
-The [Phase 2 handoff](docs/history/local-prototype-validation.md#stage-instrumentation-and-local-profile) documents per-stage timing and exact-byte instrumentation, the validated profile command, and a fresh local Moondream campaign. The local profile has 12/12 measured successes per configuration, 12/12 matching token triples, and zero negative accounting residuals. Its declared loopback condition is uncontrolled; the physical-host and controlled-network G2 checks remain pending.
+## Experimental setup
 
-The [Phase 3 handoff](docs/history/local-prototype-validation.md#local-component-predictor-and-holdout) records the frozen local predictor fit. On two held-out requests, per-configuration median latency APE was 2.87–4.89%, but the predictor's fastest-choice ranking was 0/2 versus 2/2 for the constant-median baseline. The local G3 ranking target failed; a controlled-network holdout and physical-host validation remain unavailable.
+| | Physical pair (G2, November 2026) | AWS pair (G2 v2+ and G5) |
+| --- | --- | --- |
+| Edge | Laptop, RTX 3050 (4 GiB) | `g6f.2xlarge`: ¼ NVIDIA L4 vGPU (6 GiB) |
+| Cloud | PC, RTX 2070 SUPER | `g6.xlarge`: NVIDIA L4 (24 GiB) |
+| Network | University LAN with `tc netem`, nine blocks | Same VPC, classified `tc netem` on experiment traffic: 5–200 Mb/s, 5–150 ms added RTT, 22 conditions split into training (T01–T12), validation (V01–V05) and evaluation (E01–E05) |
+| Loads | — | Edge GPU load L0/L1, cloud GPU load C0/C2 |
+| Data | 100 VQA v2 val2014 questions | 120 short-answer VQA v2 questions (60/30/30 by split), plus a 60-request long-answer task (32-token answers, timed only) |
 
-The [Phase 4 handoff](docs/history/local-prototype-validation.md#selector-and-offline-oracle) records the pure selector and offline measured oracle. The two local paired requests produced 1.90% median regret but 0/2 observed top-choice agreement. This is a diagnostic replay of the already inspected Phase 3 holdout; full G4 and validated automatic selection remain pending physical controlled conditions and a passing new G3 fit.
+The AWS edge is a virtual, resource-constrained GPU, not a physical edge device, and the network is emulated; the thesis reports results for this pair and these conditions. The design, its gates and every amendment are in the [protocol](docs/protocols/g2-v2-protocol.md).
 
-The [Phase 5 handoff](docs/history/local-prototype-validation.md#mixed-adaptive-execution) records a real 12-request mixed-choice local Moondream run: 12/12 successful, four selections per configuration, zero same-placement token mismatches or wire/trace errors, and a passing **local G5 integration gate**. The choices were forced by declared replay health exclusions; G3/G4 and physical performance claims remain open.
+## Repository layout
 
-The [Phase 6 handoff](docs/history/local-prototype-validation.md#live-probes-and-network-trace-replay) records a nine-sample synthetic controlled trace with the expected edge-to-split crossover and zero noisy-segment switches after warmup. A three-request local Moondream run recorded live bounded health probes beside every decision; its monitor audit found no unsafe selections and median probe cost of 1.51 ms. Physical network, free GPU memory, and cloud load remain unmeasured.
+```text
+src/adaptive_vlm/
+  models/          Moondream2 adapter (pinned artifact, split at the projector), fake adapter
+  execution/       Edge, cloud and split execution policies
+  transport/       Versioned framed TCP protocol, tensor payloads, int8 quantisation
+  scheduler/       Configuration space, selector, live sensing
+  prediction/      v1 (prototype), v2 (physical r1), r2 (AWS: models, G4, live policy, G5 analysis)
+  benchmark/       Fixed, interleaved and adaptive runners; edge and cloud load generators
+  campaign/        Grids, sub-block gates, supervisor, SSM/SSH runners, shaping, S3 checkpoints
+  evaluation/      Prototype oracle, trace replay and paired analyses
+  data/            Manifests, VQA v2 import and prediction export
+  commands/, cli.py  The adaptive-vlm command-line interface
+scripts/           Campaign drivers and analyses, predictor fitting, cloud tooling, VQA scoring
+configs/           Model, hardware, experiments, grids, campaign settings, loads, G5 inputs
+container/         Application image and Compose services
+infra/             Terraform stacks, cloud-init and host scripts for AWS
+data/manifests/    Frozen request manifests (images and VQA files are not redistributed)
+results/           Committed campaign records, analyses and checksums
+docs/              Protocol, specifications, design, runbooks, history
+tests/             CPU-only test suite
+```
 
-On one WSL host, a real pinned Moondream2 CPU/BF16 correctness campaign ran the 12-request synthetic manifest with one excluded warm-up per policy. All three modes completed 12/12 measured requests, and the local `artifacts/chunk6/correctness-comparison.json` audit reported **12/12 identical token sequences and decoded texts**, zero failures, and a fixture exact-match score of 3/9 scored prompts in each policy. G1 projected-feature equivalence and G2 tensor serialization checks also passed in earlier focused tests. A fake-adapter 100-request fixture run completed 100/100 measured attempts after 10 warm-ups.
+## Getting started
 
-| Policy | Median observed request time | Mean application wire bytes | Fixture score |
-| --- | ---: | ---: | ---: |
-| All edge, CPU | 38.5 s | Not applicable | 3/9 |
-| All cloud, localhost CPU | 35.1 s | 1,580 bytes | 3/9 |
-| Distributed synchronous, localhost CPU | 30.9 s | 2,987,580 bytes | 3/9 |
+Python 3.11 (3.12 works for development). From the repository root:
 
-These are **one-sweep correctness observations**, not controlled latency estimates or evidence that distributed execution is faster. The runs were sequential, not interleaved across policies or subject to verified network conditions. Later physical testing on the RTX 3050 edge and RTX 2070 SUPER cloud completed a clean 12-request GPU campaign with 12/12 exact token agreement across all three paths; see the [physical placement checkpoint](docs/physical-testbed/gpu-placement-and-memory.md#gpu-placements). The edge full-model peak reserved memory was 4,238 MiB against 4,096 MiB reported VRAM, so its feasibility under competing load remains conditional; see the [memory checkpoint](docs/physical-testbed/gpu-placement-and-memory.md#memory-feasibility-v1). Synthetic fixtures are not a recognized VQA benchmark. Official VQA accuracy and controlled network experiments remain to be done.
+```bash
+python3.11 -m venv .venv
+.venv/bin/python -m pip install -e ".[dev]"
+.venv/bin/python -m pytest -q                       # CPU only, no model download
+.venv/bin/adaptive-vlm fake-infer --config configs/experiments/fake_smoke.yaml \
+  --image tests/fixtures/smoke_image.txt --prompt "Describe this fixture."
+```
 
-Generated `artifacts/`, `.model-cache/`, and `data/raw/` are ignored by Git. Preserve and archive raw results separately before moving machines; the README and committed manifests alone do not include the experimental JSONL rows. Project source, config, tests, and this README remain version-controlled.
+The real model needs the pinned CUDA 12.8 environment (`requirements/model-cu128.lock`) and downloads about 3.9 GB on first use. The [usage guide](docs/usage.md) covers the model environment, one-off inference in every configuration, the benchmarks, the interleaved runner and the full CLI.
 
-## Next research steps
+## Reproducing the results
 
-The next research milestone is to verify independently measured and controlled physical network states, freeze a real VQA request/network split, and run repeated paired profiling on the existing edge/cloud host pair. Fit and validate a fresh physical predictor and selector against held-out blocks before enabling automatic performance claims. A local VQA v2 validation subset and the official evaluator are also needed for task-quality claims beyond synthetic fixtures.
+Every thesis table and figure can be regenerated from the archived campaign data without a GPU or AWS: see [Reproducing the results](docs/reproducibility.md). Each result is pinned by an annotated git tag (`g2v2plus-campaign`, `g3-passed`, `g4-passed`, `g5-campaign`, `g5-freeze`, `g5-passed`, `final-analysis` and others) that records the image digest and the protocol and specification hashes. Collecting new measurements on AWS follows the [AWS campaign runbook](docs/runbooks/aws-campaign.md).
 
-## Technology and repository layout
+## Documentation
 
-| Technology | Role |
+| Topic | Where |
 | --- | --- |
-| Python 3.11, PyTorch 2.7.1 + CUDA 12.8 | Model execution, BF16 tensors, device placement, and synchronized measurements. |
-| Hugging Face Transformers/Hub, Safetensors, Tokenizers | Load and verify the immutable Moondream2 checkpoint, source, and tokenizer. |
-| Pillow, NumPy, psutil | Canonical image preparation, tensor support, and process resource metrics. |
-| PyYAML and standard-library TCP/JSON/hashlib | Strict experiment configuration, bounded wire protocol, and content-addressed artifacts. |
-| pytest, Ruff, mypy, GitHub Actions | Unit/integration checks, lint, strict typing, coverage, and CPU-safe CI. |
+| Status of every gate, and an index of all documents | [docs/README.md](docs/README.md) |
+| Experimental protocol and amendments (frozen) | [docs/protocols/](docs/protocols/g2-v2-protocol.md) |
+| Predictor and selector specifications | [r2](docs/predictor-v2/r2-specification.md), [G4](docs/predictor-v2/g4-specification.md) |
+| Design of the adaptive runtime, selector and container | [docs/design/](docs/README.md#design) |
+| Results by campaign | [results/](docs/README.md#results) |
+| Plan and progress | [Roadmap](docs/roadmap.md) |
 
-~~~text
-README.md                         Single project guide
-pyproject.toml                     Package, CLI entry point, test/lint/type settings
-requirements/model-cu128.lock      Pinned model-runtime dependencies
-configs/model/                     VLM and artifact contract; fake adapter settings
-configs/hardware/                  Edge, localhost cloud, and pending cloud inventories
-configs/experiments/               Runnable smoke, local, shared benchmark, and templates
-data/manifests/                    Frozen synthetic correctness and benchmark requests
-docs/                              Design specs, physical testbed records, runbooks, results reports
-results/                           Committed, checksum-verified physical campaign results
-src/adaptive_vlm/cli.py            Argument parsing, routing, and common CLI errors
-src/adaptive_vlm/commands/         Benchmark, adaptive, evaluation, VQA, inference, and server commands
-src/adaptive_vlm/models/           Adapter interface, fake adapter, projected-feature types
-src/adaptive_vlm/models/moondream/ Pinned Moondream2 adapter, artifact checks, weight residency
-src/adaptive_vlm/execution/        Edge, cloud, and distributed execution policies
-src/adaptive_vlm/scheduler/        Configuration space, health state, selector, live monitor
-src/adaptive_vlm/prediction/v1/    Schema-1 component predictor, calibration, holdout evaluation
-src/adaptive_vlm/prediction/v2/    Schema-2 physical predictor: dataset, calibration, evaluation, diagnosis
-src/adaptive_vlm/benchmark/        Fixed and adaptive runners, profiles, comparison, GPU correctness
-src/adaptive_vlm/evaluation/       Offline oracle, trace replay, monitor and thesis analyses
-src/adaptive_vlm/transport/        Framing, checksum, tensor payload, client, server
-src/adaptive_vlm/data/             Manifest validation, VQA v2 import and prediction export
-src/adaptive_vlm/config.py         Strict configuration and model-contract fingerprint
-src/adaptive_vlm/contracts.py      Request, response, status, run schemas
-src/adaptive_vlm/environment.py    Host, GPU, Python, and Git inventory
-scripts/campaign/                  Physical campaign supervisor, profile blocks, cloud server
-scripts/prediction/                Predictor V2 data preparation, fit/review/validate, diagnosis
-scripts/verification/              Equivalence, stability, and local correctness checks
-scripts/model/ network/ vqa/       Model artifact tools, RTT probe, VQA data and official scoring
-tests/                             CPU-safe tests, grouped like src/, plus image fixtures
-artifacts/                         Generated run data (ignored; archive separately)
-.model-cache/                      Downloaded pinned model/cache (ignored)
-~~~
+## Results at a glance
 
-## Running the unattended physical campaign
-
-Use `scripts/campaign/run_physical_campaign.py` on the **edge laptop**. The full campaign runs nine controlled network blocks × three placements × 100 requests × three repetitions: **8,100 measured attempts**, plus 27 excluded warmups. It requires the cloud device for the cloud and distributed placements. **Edge-only inference needs no cloud device**, and can be tested now with the small local run below.
-
-### Test locally on the edge first
-
-From the repository root, run the software checks in the development environment:
-
-```bash
-.venv/bin/ruff check .
-.venv/bin/mypy
-.venv/bin/python -m pytest -q
-```
-
-Then use the model environment for a small **GPU edge-only** smoke run:
-
-```bash
-nvidia-smi
-.venv-model/bin/python -u scripts/campaign/run_physical_campaign.py edge-smoke --requests 3
-```
-
-This selects the first three real VQA requests from the physical manifest and performs **one excluded warmup plus three measured attempts**. It verifies the selected image hashes and pinned offline model artifacts, runs both vision and language stages on `cuda:0`, prints live progress and writes a timestamped log. It requires the local model cache and selected images, but **no cloud settings, SSH connection, server, probes or network shaping**. The experiment YAML's cloud address is unused with `--mode edge`.
-
-The default output directory is `artifacts/unattended/edge-smoke/`:
-
-| File | Purpose |
+| Record | What it contains |
 | --- | --- |
-| `smoke.log` | Model-loading messages, request progress, errors and summary |
-| `requests_manifest.jsonl` | Frozen three-request subset with resolved image paths |
-| `run/requests.jsonl` | Durable per-attempt checkpoints, including any failures |
-| `run/summary.json` | Final measured counts, failure rate and timing statistics |
-| `run/plan.json`, `run/run_manifest.json` | Schedule, model/config/data hashes and environment provenance |
+| [G2 v2+ campaign](results/aws-campaign-20261119/README.md) | The 43,200-request baseline, its [report](results/aws-campaign-20261119/baseline/README.md) (crossover map, load effects, why split loses), [G3](results/aws-campaign-20261119/predictor_r2/README.md) and [G4](results/aws-campaign-20261119/g4/README.md) |
+| [G5](results/g5-aws-20261120/README.md) | The live adaptive policy on 80 trace segments (14,400 requests) |
+| [Final analysis](results/final-analysis-20261121/README.md) | Thesis tables and figures: paired comparisons by load state, bytes, overhead, stability, quality |
+| [Physical G2](results/physical-g2-20261110/README.md) | The real-hardware baseline: 8,100 requests on the laptop/PC pair |
+| [Archive](results/archive-20261121/README.md) | Raw data inventory, verification and restore test |
 
-A successful run ends with `Edge smoke passed: 3/3 measured attempts; checkpoints saved`. To monitor from another terminal or over SSH/Tailscale:
+## Limitations
 
-```bash
-tail -F artifacts/unattended/edge-smoke/smoke.log
-```
+- **One model, one hardware pair per testbed.** Results describe Moondream2 on these GPUs; the split's disadvantage comes from a slow edge vision stage and a large projected tensor, and may differ for other models or edge hardware.
+- **Emulated network and virtual edge.** The AWS link is shaped with netem within one availability zone, and the edge is a time-sliced vGPU.
+- **Step changes only.** G5 traces change conditions between segments; drift within a segment is not tested.
+- **Short-answer task in G5.** The long-answer task was measured in G2 v2+ but has no loaded training data for the live policy.
+- **No security on the wire.** The transport checks integrity but has no encryption or authentication; it is meant for private research networks.
 
-The smoke run stays in the foreground. If interrupted, repeat the same command to resume saved trial IDs. An already finished run checks its saved results without repeating completed inference attempts. For a fresh test, choose a new directory; changing the request count in an existing directory is rejected:
+## License
 
-```bash
-.venv-model/bin/python -u scripts/campaign/run_physical_campaign.py edge-smoke \
-  --requests 5 --smoke-dir artifacts/unattended/edge-smoke-five
-```
-
-One failed inference stops the smoke after preserving that attempt. Fix the cause and use a fresh smoke directory to test again; recorded failures are not erased or retried. These small runs test edge GPU inference, logging and checkpoint/resume. Their results stay separate from the full campaign and do **not** count toward its 8,100 attempts or validate the cloud/network setup.
-
-### Prepare and start the full campaign at university
-
-Follow the [university setup and recovery runbook](docs/runbooks/physical-campaign.md) for cloud service templates, SSH/sudo permissions, LAN/WSL forwarding, Windows power settings and remote access. Both devices must use the same clean source commit, and their pinned model caches and required data must be available.
-
-Create the local settings file:
-
-```bash
-mkdir -p artifacts/unattended
-cp configs/campaigns/physical_unattended.example.json artifacts/unattended/settings.json
-```
-
-Edit `cloud_ssh`, `cloud_repo` and `cloud_python` for the actual cloud Linux/WSL environment. Check the interfaces and paths. If the university LAN addresses differ from the current experiment files, update the grid and experiment/smoke YAMLs consistently and sync the resulting commit to both hosts as described in the runbook.
-
-Run the two-device preflight while both machines are accessible:
-
-```bash
-.venv-model/bin/python scripts/campaign/run_physical_campaign.py preflight \
-  --settings artifacts/unattended/settings.json
-```
-
-This requires host/source/data checks, software tests with **zero skips**, cloud service readiness, and a separate GPU correctness campaign with matching outputs across all three placements. After it passes, start the detached campaign:
-
-```bash
-.venv-model/bin/python scripts/campaign/run_physical_campaign.py start \
-  --settings artifacts/unattended/settings.json
-```
-
-`start` repeats preflight before measured work, controls shaping on both hosts, and continues after the SSH session disconnects. Observe the first committed baseline requests before leaving the machines unattended.
-
-### Monitor, stop and resume
-
-From home, SSH into the edge laptop, enter the checkout, and use:
-
-```bash
-tail -F artifacts/phase2/physical-v1-unattended/campaign.log
-```
-
-Get current counts and supervisor status with:
-
-```bash
-.venv-model/bin/python scripts/campaign/run_physical_campaign.py status \
-  --settings artifacts/unattended/settings.json
-```
-
-The log and `status.json` report the active stage/block, saved attempts out of 8,100, percentage, status counts and a heartbeat every 30 seconds while child processes run. Detailed request logs live in each block's `edge.log`, `cloud.log` and `distributed.log`. Check `supervisor_running` and timestamps to distinguish a live process from stale status after a crash.
-
-To stop gracefully:
-
-```bash
-.venv-model/bin/python scripts/campaign/run_physical_campaign.py stop \
-  --settings artifacts/unattended/settings.json
-```
-
-The supervisor attempts to remove temporary shaping on both hosts. Inspect any `cleanup_errors`. After a failure or reboot, fix the cause, restore cloud services if necessary, and repeat **the same `start` command with the same settings and output directory**. Completed attempts remain saved; completed blocks are hash-checked before being skipped. Live network measurements are repeated for resumed work. Operational failures, stalled progress and three consecutive inference failures stop further baseline work instead of silently consuming the remaining schedule.
-
-Resume requires an operator relaunch after a crash/reboot; local checkpoints require the storage to remain intact. Preserve the complete artifact directory in a separate backup. `state=completed` requires all nine validated blocks and exactly 8,100 measured attempts; declaring scientific G2 complete still requires the final analysis and evidence review in the physical protocol.
-
-### Timing readiness on WSL
-
-The full 100-request local GPU diagnostic passed without OOM, but exposed clock adjustments that distorted the old elapsed-time counter. Duration measurements now use Linux `CLOCK_MONOTONIC_RAW`, with the selected clock recorded in each run's environment. See the [timing findings and site checks](docs/physical-testbed/profiling-protocol.md#elapsed-time-clock). Use a fresh output directory after this timing revision; resume and profile conversion reject mixed clock metadata. Update both hosts to the same clean commit and restart the cloud GPU server before the university preflight. Verify Windows time synchronization there as well as the independent elapsed-time clock checks.
-
-Completed run: [physical G2 results, 10–11 November 2026](results/physical-g2-20261110/README.md), including all 8,100 successful measured requests, summaries, and a checksum-verified evidence archive.
-
-### Current physical site: manual v2 launch
-
-The user-approved [heterogeneous-GPU correctness v2 criterion](docs/physical-testbed/correctness-criteria.md#heterogeneous-gpu-correctness-v2-approved) keeps exact transport and full same-GPU path checks, freezes each placement's reference outputs, and requires repeated outputs and per-request task scores to agree under that criterion. Cross-GPU wording differences remain reported. The original strict N3 pilot is preserved; no inference precision or kernels are changed.
-
-On the currently validated router/host pair, the ignored site configuration is `artifacts/unattended/site-preflight-20261110/launch_settings.json`. Its full same-device reference bundle must exist and pass validation before launch. It uses a **new** campaign output directory, preserving the pilot separately. Keep the cloud WSL console running `sleep infinity`, both hosts on AC, and unused memory-heavy apps closed. This site requires at least 6 GiB available host RAM at startup and monitors a 2 GiB runtime floor. The full edge placement uses WDDM shared memory; it is not classified as fitting in 4 GiB dedicated VRAM.
-
-Run a preflight without starting the 8,100 requests:
-
-```bash
-.venv-model/bin/python scripts/campaign/run_physical_campaign.py preflight \
-  --settings artifacts/unattended/site-preflight-20261110/launch_settings.json
-```
-
-After preflight passes, **start the full run yourself**:
-
-```bash
-.venv-model/bin/python scripts/campaign/run_physical_campaign.py start \
-  --settings artifacts/unattended/site-preflight-20261110/launch_settings.json
-```
-
-`start` detaches and repeats preflight before measured requests. The assistant does not launch this campaign. To inspect status or logs:
-
-```bash
-.venv-model/bin/python scripts/campaign/run_physical_campaign.py status \
-  --settings artifacts/unattended/site-preflight-20261110/launch_settings.json
-tail -F artifacts/unattended/site-preflight-20261110/campaign-heterogeneous-v2/campaign.log
-```
-
-Stop with the same settings and the `stop` action; resume by repeating the same `start` command after repairing the cause. Keep the settings, reference bundle, source revision and complete campaign artifacts intact. A changed router/address, model/runtime or protocol requires revalidation. The current native-runtime planning estimate is approximately **16.6 hours**, with a **14–22 hour** practical range, excluding outage/repair time.
+No open-source license has been chosen yet, so the default copyright applies. VQA v2 and COCO data are not redistributed; the scripts fetch the referenced subset from the official sources.

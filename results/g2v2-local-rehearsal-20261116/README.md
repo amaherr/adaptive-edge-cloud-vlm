@@ -1,6 +1,6 @@
 # G2 v2 local rehearsal and edge pilot (16 November 2026)
 
-This is the local part of W8 in the [G2 v2 preparation](../../docs/g2-v2-preparation.md). The on-site pilot with the cloud PC is still to come; see that document's on-site checklist.
+This is the local part of W8 in the [G2 v2 preparation](../../docs/history/g2-v2-physical-preparation.md). The on-site pilot was never run: the campaign moved to AWS ([G2 v2+](../aws-campaign-20261119/README.md)).
 
 ## Fault-injection rehearsal
 
