@@ -1,0 +1,141 @@
+{
+ "bucket": "terraform output 'bucket' (artifact bucket, us-east-1)",
+ "by_prefix": {
+  "cloud-v1/cloud/ebs-final": {
+   "bytes": 733732,
+   "md5_ok": 42,
+   "objects": 42
+  },
+  "cloud-v1/cloud/g2v2": {
+   "bytes": 399947,
+   "md5_ok": 8,
+   "objects": 8
+  },
+  "cloud-v1/cloud/g5": {
+   "bytes": 237048,
+   "md5_ok": 4,
+   "objects": 4
+  },
+  "cloud-v1/cloud/phase-d": {
+   "bytes": 5061,
+   "md5_ok": 3,
+   "objects": 3
+  },
+  "cloud-v1/data/dataset": {
+   "bytes": 68100698,
+   "md5_ok": 445,
+   "objects": 445
+  },
+  "cloud-v1/data/dev": {
+   "bytes": 32832,
+   "md5_ok": 3,
+   "objects": 3
+  },
+  "cloud-v1/data/g2v2-cloud": {
+   "bytes": 399947,
+   "md5_ok": 8,
+   "objects": 8
+  },
+  "cloud-v1/data/g5-cloud": {
+   "bytes": 237048,
+   "md5_ok": 4,
+   "objects": 4
+  },
+  "cloud-v1/data/source": {
+   "bytes": 123932352,
+   "md5_ok": 10,
+   "multipart_size_ok": 10,
+   "objects": 20
+  },
+  "cloud-v1/edge/drill": {
+   "bytes": 1327259,
+   "md5_ok": 152,
+   "objects": 152
+  },
+  "cloud-v1/edge/ebs-final": {
+   "bytes": 358218617,
+   "md5_ok": 10786,
+   "objects": 10786
+  },
+  "cloud-v1/edge/g2v2": {
+   "bytes": 10296631,
+   "md5_ok": 64,
+   "objects": 64
+  },
+  "cloud-v1/edge/g2v2plus": {
+   "bytes": 227150242,
+   "md5_ok": 5878,
+   "objects": 5878
+  },
+  "cloud-v1/edge/g2v2plus-pilot": {
+   "bytes": 5377219,
+   "md5_ok": 482,
+   "objects": 482
+  },
+  "cloud-v1/edge/g2v2plus-pilot-derived": {
+   "bytes": 6755262,
+   "md5_ok": 52,
+   "objects": 52
+  },
+  "cloud-v1/edge/g5": {
+   "bytes": 8701788,
+   "md5_ok": 131,
+   "objects": 131
+  },
+  "cloud-v1/edge/g5-campaign": {
+   "bytes": 77259004,
+   "md5_ok": 2722,
+   "objects": 2722
+  },
+  "cloud-v1/edge/g5-pilot": {
+   "bytes": 2011668,
+   "md5_ok": 74,
+   "objects": 74
+  },
+  "cloud-v1/edge/g5-pilot-copy": {
+   "bytes": 2149522,
+   "md5_ok": 91,
+   "objects": 91
+  },
+  "cloud-v1/edge/g5-pilot2": {
+   "bytes": 2011604,
+   "md5_ok": 74,
+   "objects": 74
+  },
+  "cloud-v1/edge/g5-pilot2-copy": {
+   "bytes": 2149550,
+   "md5_ok": 91,
+   "objects": 91
+  },
+  "cloud-v1/edge/phase-d": {
+   "bytes": 7201965,
+   "md5_ok": 617,
+   "objects": 617
+  },
+  "cloud-v1/edge/phase-e": {
+   "bytes": 11332295,
+   "md5_ok": 532,
+   "objects": 532
+  },
+  "cloud-v1/infra/49e94159097ecafe4583634335b7926c51dab208cf456e74c717bb112cef9712.json": {
+   "bytes": 2050,
+   "md5_ok": 1,
+   "objects": 1
+  },
+  "research/adaptive-vlm/vultr-v1": {
+   "bytes": 809269,
+   "md5_ok": 2925,
+   "objects": 2925
+  }
+ },
+ "objects_csv_sha256": "d4476f24309fb5a68f6f839fd4812e1038f7d95ce22401dba5a7a769657e0c86",
+ "schema_version": 1,
+ "total": {
+  "bytes": 916832610,
+  "md5_ok": 25199,
+  "multipart_size_ok": 10,
+  "objects": 25209,
+  "problems": 0
+ },
+ "verified_at_utc": "2026-11-21T10:26:13+00:00"
+}

@@ -1,0 +1,18 @@
+{
+  "cleanup_errors": [],
+  "error": null,
+  "measured_attempts": 14400,
+  "percent": 100.0,
+  "pid": 7,
+  "stage": "sub-block 80/80 attempt 1",
+  "state": "completed",
+  "status_counts": {
+    "ok": 14400
+  },
+  "subblock": "cloud-s4-E01-L0-r3",
+  "target_attempts": 14400,
+  "updated_at_utc": "2026-11-21T03:23:41+00:00",
+  "valid_subblocks": 80,
+  "warmup_attempts": 480,
+  "warnings": []
+}
