@@ -18,7 +18,8 @@ Start with the [project README](../README.md) for setup and usage. This folder h
 | Adaptive runtime and dynamic protocol (phase 5) | **Done locally** (20 November 2026): the live adaptive policy with load sensing runs as a sixth interleaved placement, and the trace campaign is specified in amendment A4. The loopback rehearsal with fault injection passed. Next: the image, references and pilot on AWS. | [Amendment A4](protocols/g2-v2-amendment-a4.md), [rehearsal](../results/g5-rehearsal-20261120/README.md) |
 | G5 on AWS (live adaptive policy on dynamic traces) | **Passed** (21 November 2026): 80 of 80 segments valid. The adaptive policy is 118 ms (11.5%) faster than the best static configuration, with 2.2% median regret against the per-request oracle, sensing accuracy of 100% (cloud) and 97.8% (edge), 15.9 ms overhead, and quality unchanged. | [G5 record](../results/g5-aws-20261120/README.md), amendments [A4](protocols/g2-v2-amendment-a4.md), [A4a](protocols/g2-v2-amendment-a4a.md), [A4b](protocols/g2-v2-amendment-a4b.md) |
 | Final analysis (phase 7) | **Done** (21 November 2026): thesis tables and figures; paired G5 breakdowns by load state, trace and repetition; communication (−56% bytes); overhead (84% of the regret); stability; and quality (identical). | [Final analysis](../results/final-analysis-20261121/README.md) |
-| Archive and teardown, thesis | Not started | [Thesis completion roadmap](thesis-completion-roadmap.md) |
+| Archive and teardown (phase 8) | **Done** (21 November 2026): bucket mirrored and verified, backup test-restored, results tagged, compute stack destroyed. Retained: data volumes, bucket and ECR. The off-machine copy is manual. | [Archive record](../results/archive-20261121/README.md), [reproducibility guide](reproducibility.md) |
+| Thesis writing (phase 9) | Not started | [Thesis completion roadmap](thesis-completion-roadmap.md) |
 
 ## Plan and runbook
 

@@ -285,6 +285,18 @@ Budget: about $60–65 spent of $180. G5 needs about $50, which leaves about $65
 
 ## Phase 8: archive and teardown
 
+**Status (21 November 2026): done, except the off-machine copy (manual).** See the [archive record](../results/archive-20261121/README.md).
+- **8.1:**
+  - both data volumes are copied to S3 (`ebs-final`) after G5;
+  - the whole bucket is mirrored and verified (25,209 objects, 0 problems);
+  - a backup tarball (265 MB) test-restores with 0 checksum failures for both campaigns;
+  - every result commit is tagged.
+  - **Still to do by hand:** copy the tarball off the laptop.
+- **8.2:** [reproducibility guide](reproducibility.md).
+- **8.3:** the disposable `cloud-v1` stack is destroyed through a reviewed plan, applied after the user's approval (45 resources; both instances terminated).
+  - **Retained:** the two 20 GB data volumes, the S3 bucket, the ECR repository and the budget, all under `prevent_destroy`. Decide after thesis acceptance.
+  - **Cost:** the retained resources cost a few dollars a month, so the bill is not zero until they are removed.
+
 8.1 **Archive:**
 - the raw data mirrors (G2 v2+ and G5) with SHA256SUMS;
 - tag the source commits used, with image digests and protocol hashes;
