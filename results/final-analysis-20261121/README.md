@@ -151,10 +151,30 @@ Official VQA accuracy (GT-Vision-Lab evaluator, lowercased answers):
 | Latency against link rate | [latency_vs_rate.svg](../aws-campaign-20261119/baseline/latency_vs_rate.svg) | Why the split never catches the cloud |
 | G3 validation | [g3_predicted_vs_observed.svg](g3_predicted_vs_observed.svg) | Predicted against observed per configuration, ±30% band |
 | G5 traces | [g5_traces.svg](g5_traces.svg) | Adaptive against always-cloud, always-edge and the oracle per segment |
+| Load effects | [load_effects.svg](load_effects.svg) | Cloud load adds a fixed delay to the cloud; edge load multiplies the edge, per training condition |
+| Static-policy regret | [static_regret.svg](static_regret.svg) | Mean regret of each static configuration against the per-cell oracle (training cells) |
+| G3 error distribution | [g3_ape_cdf.svg](g3_ape_cdf.svg) | Cumulative absolute percentage error per configuration (validation cells) |
+| G4 regret by load state | [g4_regret.svg](g4_regret.svg) | Mean regret of the selector, always-cloud and always-edge (evaluation cells) |
+| Bytes and latency | [bytes_vs_latency.svg](bytes_vs_latency.svg) | Bytes per request and mean latency per G5 policy |
+| Network verification | [network_verification.svg](network_verification.svg) | Achieved rate and RTT of every G2 v2+ probe against its target and tolerance |
 
 ![G5 traces](g5_traces.svg)
 
 ![G3 validation](g3_predicted_vs_observed.svg)
+
+The six figures above from `load_effects.svg` on are written by `scripts/campaign/thesis_figures.py` (see the [reproducibility guide](../../docs/reproducibility.md)).
+
+![Load effects](load_effects.svg)
+
+![Static-policy regret](static_regret.svg)
+
+![G3 error distribution](g3_ape_cdf.svg)
+
+![G4 regret by load state](g4_regret.svg)
+
+![Bytes and latency](bytes_vs_latency.svg)
+
+![Network verification](network_verification.svg)
 
 ## Limits to state in the thesis
 

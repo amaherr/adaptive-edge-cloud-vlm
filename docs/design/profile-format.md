@@ -23,7 +23,7 @@ Every duration ends in `_ms` and uses a monotonic clock. Bytes are exact binary 
 | `decode_ms` | Remaining token loop, ending with device synchronization where applicable. `decode_steps` remains in `raw_metrics`. |
 | `image_prefill_ms` | Explicit projected-feature image prefill for edge/distributed. All-cloud uses `image_encode_and_prefill_ms`, a combined pinned-model operation. |
 | `stage_sum_ms`, `stage_residual_ms` | Sum of *non-overlapping outer* stages and `observed_end_to_end_ms - stage_sum_ms`. Edge sums its complete model call; cloud sums image file read and TCP exchange; distributed sums edge vision, tensor serialization and TCP exchange. The residual includes Python orchestration, response parsing, decoding, and timer effects. It may be negative and is retained. |
-| `scheduler_overhead_ms` | Null for these fixed-policy benchmark runs with reason `fixed_policy_benchmark_no_scheduler`. The Phase 1 manual dispatcher now separately records `selection_overhead_ms`; the eventual automatic scheduler will need its own timing in Phase 5. |
+| `scheduler_overhead_ms` | Null for these fixed-policy benchmark runs with reason `fixed_policy_benchmark_no_scheduler`. The manual dispatcher records `selection_overhead_ms` separately, and the adaptive runners record their own overhead (`adaptive_overhead_ms` in G5). |
 
 `measurement_call_overhead_ms_median_cpu` in `summary.json` is a 1,000-call no-op calibration of the timing wrapper on the profiling machine. It estimates only the CPU call/timer cost, not CUDA synchronization, model perturbation or per-request cumulative overhead. The stage residual is the per-request accounting check. Further controlled A/B instrumentation work is required before claiming a full overhead bound on another device.
 

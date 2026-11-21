@@ -2,7 +2,7 @@
 
 > **Local prototype (October 2026).** This specification belongs to the local CPU/loopback prototype (three configurations, schema-1 predictor); the commands still work. The AWS campaigns use Predictor V2: [r1](../predictor-v2/specification.md) on the physical pair and [r2](../predictor-v2/r2-specification.md) on AWS.
 
-`adaptive-vlm calibrate-predictor` reads a Phase 2 `profile.jsonl` and a frozen train/holdout specification. It verifies the profile SHA-256 in the specification, exact model/dataset/host identity, disjoint request IDs, and enough successful training rows for all three baseline configurations. Warmups and failed trials do not fit coefficients; held-out request IDs and declared held-out network buckets never enter fitting. The command writes a hash-identified `calibration.json`, `evaluation.json`, `environment.json`, and one `predictions.jsonl` row per held-out attempt. It refuses an existing output directory.
+`adaptive-vlm calibrate-predictor` reads a `profile-runs` `profile.jsonl` and a frozen train/holdout specification. It verifies the profile SHA-256 in the specification, exact model/dataset/host identity, disjoint request IDs, and enough successful training rows for all three baseline configurations. Warmups and failed trials do not fit coefficients; held-out request IDs and declared held-out network buckets never enter fitting. The command writes a hash-identified `calibration.json`, `evaluation.json`, `environment.json`, and one `predictions.jsonl` row per held-out attempt. It refuses an existing output directory.
 
 ## Predictor inputs and coverage
 
@@ -10,7 +10,7 @@
 
 The predictor checks host/model/placement and generation contract first, then the training task bucket and min/max feature bounds. A missing exact prompt-token count, unseen task, or unsupported network condition returns `valid=false` with a named reason. The local profile supports only `loopback-uncontrolled` with null bandwidth/RTT. Giving it a claimed goodput or RTT does not silently extrapolate. A CPU edge profile has no measured per-request peak memory requirement; if a memory budget is supplied, edge and split candidates return `edge_memory_requirement_unknown`. When a CUDA reserved-memory peak exists, the fitter stores its largest training observation plus the predeclared headroom.
 
-Invalid candidates must be excluded by the Phase 4 selector. If no configuration has both a valid prediction and proven memory/executor availability, selection returns a typed failure. This Phase 3 module does not execute a candidate or silently choose an unprofiled fallback.
+Invalid candidates must be excluded by the [selector](selector-and-oracle.md). If no configuration has both a valid prediction and proven memory/executor availability, selection returns a typed failure. This module does not execute a candidate or silently choose an unprofiled fallback.
 
 ## Component equation
 

@@ -1,6 +1,6 @@
 # Container runtime contract
 
-How the application runs on the AWS pair: one image, the services built from it, and what each may do. It applies to both AWS campaigns, G2 v2+ and G5. The procedure that uses it is the [AWS campaign runbook](../runbooks/aws-campaign.md); the infrastructure decisions behind it (D3–D5) are in the [G2 v2+ AWS roadmap](../g2-v2-plus-aws-roadmap.md#3-decisions).
+How the application runs on the AWS pair: one image, the services built from it, and what each may do. It applies to both AWS campaigns, G2 v2+ and G5. The procedure that uses it is the [AWS campaign runbook](../runbooks/aws-campaign.md); the infrastructure decisions behind it are listed there under [Design decisions](../runbooks/aws-campaign.md#design-decisions).
 
 This page merges the two earlier contract versions. Version 1 (5 November 2026) was written for the abandoned `cloud-vqa-v1` campaign. Version 2 (17 November 2026) added the orchestrator and SSM control for G2 v2+. Every rule of version 1 that version 2 kept is included here.
 

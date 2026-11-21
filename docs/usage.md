@@ -2,7 +2,7 @@
 
 How to install the project, run each execution path on one machine or on two hosts, and use every command of the `adaptive-vlm` CLI. The campaign procedures are in the runbooks ([AWS](runbooks/aws-campaign.md), [physical pair](runbooks/physical-campaign.md)); regenerating the thesis results from the archived data is in [Reproducing the results](reproducibility.md).
 
-Many commands below belong to the **local prototype** (phases 0–7 of the [local validation](history/local-prototype-validation.md)), which used three configurations, CPU or loopback hosts and the schema-1 predictor. They still work and are tested. The AWS campaigns use `interleaved-benchmark`, the campaign supervisor and the r2 pipeline instead (see [Interleaved placements](#interleaved-placements-g2-v2-g2-v2-and-g5)).
+Many commands below belong to the **local prototype**: the first, single-machine version of the system, with three configurations, CPU or loopback hosts and the schema-1 predictor. They still work and are tested. The AWS campaigns use `interleaved-benchmark`, the campaign supervisor and the r2 pipeline instead (see [Interleaved placements](#interleaved-placements-g2-v2-g2-v2-and-g5)).
 
 ## Contents
 
@@ -256,7 +256,7 @@ In the campaigns, `scripts/campaign/run_g2v2_campaign.py` builds these commands 
 
 The G2 v2+ derivations, the r2 predictor (G3), the G4 evaluation, the G5 analysis and the final figures run from scripts under `scripts/campaign/` and `scripts/prediction/`. The commands, inputs and outputs for every table and figure are in [Reproducing the results](reproducibility.md).
 
-### Prototype phase 2: profiling
+### Profiling fixed-policy runs
 
 The fixed-policy benchmark now records trial start time, exact model prompt-token count, prompt prefill/decode durations, transport subintervals, response bytes, and memory readings. After three completed runs with the same frozen schedule, build a validated profile:
 
@@ -269,9 +269,9 @@ The fixed-policy benchmark now records trial start time, exact model prompt-toke
 
 Inspect `artifacts/example-profile/summary.json` for coverage/failures and `profile.jsonl` for each warmup, measured success, and failure. The [schema note](design/profile-format.md) defines timing boundaries, null reasons, residuals, and units. The [split inspection](design/split-boundary.md) documents candidate graph boundaries that remain inactive. The supplied specification labels the local loopback network as uncontrolled; it cannot support physical-network crossover claims.
 
-### Prototype phase 3: predictor calibration (schema 1)
+### Prototype predictor calibration (schema 1)
 
-Fit the component predictor and evaluate the frozen request holdout from the Phase 2 local profile:
+Fit the component predictor and evaluate the frozen request holdout from a local profile:
 
 ~~~bash
 .venv/bin/adaptive-vlm calibrate-predictor \
@@ -280,11 +280,11 @@ Fit the component predictor and evaluate the frozen request holdout from the Pha
   --output-dir artifacts/example-predictor
 ~~~
 
-Read `evaluation.json` for per-candidate error, interval coverage, ranking against the constant-median baseline, and gate flags. `calibration.json` contains the fitted components and coverage bounds; `predictions.jsonl` keeps each held-out task snapshot and prediction. The [Phase 3 handoff](history/local-prototype-validation.md#local-component-predictor-and-holdout) reports the local gate miss and the [predictor contract](design/predictor-v1-format.md) defines units and out-of-coverage behavior. This calibration is used only by explicitly flagged diagnostic adaptive runs.
+Read `evaluation.json` for per-candidate error, interval coverage, ranking against the constant-median baseline, and gate flags. `calibration.json` contains the fitted components and coverage bounds; `predictions.jsonl` keeps each held-out task snapshot and prediction. The [predictor contract](design/predictor-v1-format.md) defines units and out-of-coverage behavior. This calibration is used only by explicitly flagged diagnostic adaptive runs.
 
-### Prototype phase 4: offline selector and oracle
+### Prototype offline selector and oracle
 
-Evaluate the pure selector on the frozen local Phase 3 predictions and matched observed outcomes:
+Evaluate the pure selector on frozen local predictions and matched observed outcomes:
 
 ~~~bash
 .venv/bin/adaptive-vlm evaluate-selector \
@@ -293,11 +293,11 @@ Evaluate the pure selector on the frozen local Phase 3 predictions and matched o
   --output-dir artifacts/example-selector
 ~~~
 
-Read `evaluation.json` for regret, top-choice agreement, uncertainty, exclusions, and gate flags. `decisions.jsonl` preserves each candidate prediction and reason beside the retrospective measured oracle. The [Phase 4 handoff](history/local-prototype-validation.md#selector-and-offline-oracle) gives the local result and second-machine steps; the [selector contract](design/selector-and-oracle.md) defines eligibility and pairing. The local prototype never met its G3 or G4 targets, so the prototype's `adaptive-benchmark` requires a diagnostic override. (The thesis gates G3 and G4 passed later on AWS with the r2 pipeline.)
+Read `evaluation.json` for regret, top-choice agreement, uncertainty, exclusions, and gate flags. `decisions.jsonl` preserves each candidate prediction and reason beside the retrospective measured oracle. The [selector contract](design/selector-and-oracle.md) defines eligibility and pairing. The local prototype never met its G3 or G4 targets, so the prototype's `adaptive-benchmark` requires a diagnostic override. (The thesis gates G3 and G4 passed later on AWS with the r2 pipeline.)
 
-### Prototype phase 5: adaptive diagnostic run
+### Prototype adaptive run
 
-With the pinned Moondream cache, start `adaptive-server` as in the [Phase 5 handoff](history/local-prototype-validation.md#mixed-adaptive-execution), then run the frozen local mixed-choice campaign:
+With the pinned Moondream cache, start `adaptive-server` with `configs/experiments/local_campaign.yaml`, then run the frozen local mixed-choice campaign:
 
 ~~~bash
 .venv-model/bin/adaptive-vlm adaptive-benchmark \
@@ -313,7 +313,7 @@ With the pinned Moondream cache, start `adaptive-server` as in the [Phase 5 hand
 
 The diagnostic flag explicitly permits the local fit, which failed its G3 target, for an integration check; it does not approve performance selection. `requests.jsonl` contains every candidate prediction, decision, actual result, overhead and any retry. Use `analyze-adaptive` with matching edge/cloud/distributed fixed controls, as described in the [execution contract](design/adaptive-execution.md). The command requires a resident full edge adapter for exact prompt-token counting.
 
-### Prototype phase 6: network trace and live monitor
+### Prototype network trace replay and live monitor
 
 Replay the [synthetic controlled trace](../configs/network_traces/synthetic_trace.json) through the predictor and selector without loading a model:
 
@@ -324,7 +324,7 @@ Replay the [synthetic controlled trace](../configs/network_traces/synthetic_trac
   --output-dir artifacts/example-network-trace
 ~~~
 
-For a real diagnostic, add `--monitor-mode live --probe-timeout-ms 2000 --probe-max-age-ms 5000` to `adaptive-benchmark`, then run `analyze-monitor RUN_DIR --output RUN_DIR/monitor_analysis.json`. The [Phase 6 handoff](history/local-prototype-validation.md#live-probes-and-network-trace-replay) gives the complete local commands and second-machine setup; the [monitor contract](design/live-monitor-and-trace-replay.md) defines probe age, failure behavior and passive-rate limits. Health-probe round trip and socket-send rate are recorded as distinct application observations and are not fed to the current loopback predictor.
+For a real diagnostic, add `--monitor-mode live --probe-timeout-ms 2000 --probe-max-age-ms 5000` to `adaptive-benchmark`, then run `analyze-monitor RUN_DIR --output RUN_DIR/monitor_analysis.json`. The [monitor contract](design/live-monitor-and-trace-replay.md) defines probe age, failure behavior and passive-rate limits. Health-probe round trip and socket-send rate are recorded as distinct application observations and are not fed to the current loopback predictor.
 
 ### Import a VQA validation subset
 
@@ -343,9 +343,9 @@ Set a copied experiment YAML's `dataset.manifest_path` and `dataset.revision` to
 
 The physical v1 campaign already freezes 100 official validation requests in `data/manifests/physical_vqa_v1.jsonl`, with a disjoint split in `configs/evaluation/physical_vqa_split_v1.json` and experiment config `configs/experiments/physical_vqa_v1.yaml`. Its [dataset protocol](physical-testbed/vqa-dataset.md) records source hashes and edge setup. `scripts/vqa/fetch_vqa_subset_images.py` fetches only the seeded image subset from the official COCO bucket; source files remain ignored under `data/raw/`.
 
-### Prototype phase 7: paired evaluation
+### Prototype paired evaluation
 
-The frozen [Phase 7 protocol](design/evaluation-protocol.md) defines the split, metrics, confidence intervals and open gates. Reproduce the local descriptive report from the archived Phase 2 and Phase 5 runs:
+The frozen [paired evaluation protocol](design/evaluation-protocol.md) defines the split, metrics, confidence intervals and open gates. Produce the local descriptive report from fixed-policy and adaptive runs:
 
 ~~~bash
 .venv/bin/adaptive-vlm analyze-thesis \
@@ -357,7 +357,7 @@ The frozen [Phase 7 protocol](design/evaluation-protocol.md) defines the split, 
   --output-dir artifacts/phase7-reproduction
 ~~~
 
-`report.json` contains validation-only best-static choice, paired latency/SLA intervals, failure counts, bytes, prediction error and measured-oracle regret. `paired_trials.jsonl` keeps the request-level evidence. Each input file and the frozen specification is hashed. This 2-request local holdout was already inspected, so its intervals are descriptive, not independent evidence. The [Phase 7 handoff](history/local-prototype-validation.md#task-aware-evaluation-pipeline) explains the second-machine campaign.
+`report.json` contains validation-only best-static choice, paired latency/SLA intervals, failure counts, bytes, prediction error and measured-oracle regret. `paired_trials.jsonl` keeps the request-level evidence. Each input file and the frozen specification is hashed. This 2-request local holdout was already inspected, so its intervals are descriptive, not independent evidence.
 
 For VQA, run `prepare-vqa-eval-subset` with the imported manifest and original official question/annotation JSONs, then `export-vqa-predictions` for each policy run and repetition. Feed those files to `scripts/vqa/run_official_vqa_eval.py` with a pinned checkout of the [official VQA evaluator](https://github.com/GT-Vision-Lab/VQA/tree/master/PythonEvaluationTools). The upstream source uses Python 2 syntax, so run the adapter in a compatible Python 2 environment. The exporter includes failed requests as empty answers and writes a hash/provenance sidecar. The official loader requires predictions for exactly the annotation IDs, which is why the subset command is needed. Record the upstream commit and the adapter's hashed evaluation output with the campaign. The repository does not claim official accuracy until that evaluation has run.
 
@@ -387,7 +387,7 @@ The parser and command routing live in `cli.py`; command execution lives in [`co
 | `cloud-server` | `--config PATH` | `--artifact-manifest PATH` (required for Moondream, not fake), `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST` (otherwise config host), `-v/--verbose`. |
 | `adaptive-server` | `--config PATH --artifact-manifest PATH` | Loads one full Moondream model for raw-image and projected-tensor requests. `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST`, `--report-resource-state` (sample NVML and host memory every 0.5 s in the background and attach the latest sample to each response as `server_state_*`), `--load-heartbeat PATH` (cloud-load worker heartbeat; adds the load level, liveness and duty to the state), `-v/--verbose`. |
 | `cloud-infer` | `--config PATH --image PATH --prompt TEXT` | `--request-id` (`cloud-0001`), `--output-dir PATH`, `-v/--verbose`. |
-| `adaptive-infer` | `--config PATH --configuration-id ID --image PATH --prompt TEXT` | Manual Phase 1 selection among `edge/full`, `cloud/raw_image`, and `distributed/projected/synchronous`; see the [Phase 1 handoff](history/local-prototype-validation.md#executable-configuration-space-and-resident-dispatcher) for edge component, memory, network-state and artifact options. |
+| `adaptive-infer` | `--config PATH --configuration-id ID --image PATH --prompt TEXT` | Manual selection among `edge/full`, `cloud/raw_image` and `distributed/projected/synchronous` through one resident dispatcher; see `--help` for the edge component, memory, network-state and artifact options. |
 | `distributed-server` | `--config PATH --artifact-manifest PATH` | `--cache-dir` (`.model-cache`), `--device` (`cpu`), `--offline`, `--bind-host HOST`, `-v/--verbose`. |
 | `distributed-infer` | `--config PATH --artifact-manifest PATH --image PATH --prompt TEXT` | `--cache-dir` (`.model-cache`), `--request-id` (`distributed-0001`), `--vision-device` (`cpu`), `--pipeline` (`synchronous` or `prompt_first`), `--offline`, `--output-dir PATH`, `-v/--verbose`. |
 | `benchmark` | `--config PATH --mode edge\|cloud\|distributed --run-dir PATH` | `--manifest PATH` (config dataset path), `--artifact-manifest PATH` (required for real edge/distributed), `--cache-dir` (`.model-cache`), `--vision-device` (`cpu`), `--text-device` (`cpu`), `--offline`, `--warmups N` and `--repetitions N` (config values), `--pipeline` (`synchronous` or `prompt_first`), `--resume`, `-v/--verbose`. |

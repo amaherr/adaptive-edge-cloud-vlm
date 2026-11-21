@@ -52,13 +52,13 @@ git rev-parse HEAD
 
 Record the commit SHA, whether the working tree is dirty, and the model/configuration, request-manifest, calibration, replay, dependency-lock and hardware-inventory hashes with **every** run. A matching source commit alone does not prove matching model weights, devices or network conditions; keep the existing run manifests and artifact verification checks.
 
-This baseline freezes the implemented three-placement scheduler, diagnostic predictor/selector, bounded live monitor and evaluation pipeline after [Phase A1](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/phase_a1_handoff.md). The separate physical cloud PC has not yet been validated. The existing local predictor ranking gate failed and physical G0/G2–G7 remain open. Keep the pinned Moondream revision, BF16 precision, preprocessing and 32-new-token generation contract unchanged for the first physical correctness campaign. Any later source, model or generation change needs a new identified experiment revision and fresh equivalence/profiling evidence.
+This baseline freezes the implemented three-placement scheduler, diagnostic predictor/selector, bounded live monitor and evaluation pipeline after the CI repair ([note](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/phase_a1_handoff.md)). The separate physical cloud PC has not yet been validated. The existing local predictor ranking gate failed and physical G0/G2–G7 remain open. Keep the pinned Moondream revision, BF16 precision, preprocessing and 32-new-token generation contract unchanged for the first physical correctness campaign. Any later source, model or generation change needs a new identified experiment revision and fresh equivalence/profiling evidence.
 
-The next step is Phase B of the [physical validation roadmap](../history/physical-validation-roadmap.md): assign fixed edge/cloud roles and collect verified inventories. Do not treat this baseline tag as evidence that the physical-host or controlled-network gates have passed.
+Do not treat this baseline tag as evidence that the physical-host or controlled-network gates have passed.
 
 ## Baseline tag freeze record
 
-Date: 2026-10-27 (Africa/Cairo). Phase A2 of the [physical validation roadmap](../history/physical-validation-roadmap.md) is complete. The immutable source starting point for future two-machine experiments is:
+Date: 2026-10-27 (Africa/Cairo). The immutable source starting point for future two-machine experiments is:
 
 ```text
 Tag:        physical-experiment-baseline-v1
@@ -82,4 +82,4 @@ This handoff document was added **after** the baseline was tagged so it could re
 
 ### Gate and next step
 
-Phase A1 had 185 passing local tests, Ruff and mypy passes, 80.54% branch-aware coverage against the unchanged 80% threshold, and green GitHub CI. Phase A2 produced a clean, pushed, CI-green baseline commit and remote tag. No model revision, generation contract, scheduler policy or physical-host result changed in A2. Continue with Phase B: assign stable Edge and Cloud roles when the second machine is available, then collect the two verified inventories before physical correctness or performance runs.
+The baseline had 185 passing local tests, Ruff and mypy passes, 80.54% branch-aware coverage against the unchanged 80% threshold, and green GitHub CI. It is a clean, pushed, CI-green commit with a remote tag; freezing it changed no model revision, generation contract, scheduler policy or physical-host result.

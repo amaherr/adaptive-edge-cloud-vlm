@@ -73,7 +73,7 @@ The campaign supervisor passes these when the grid has an `adaptive` section. A 
 
 | Choice | Why |
 | --- | --- |
-| Per-request decisions, no hysteresis or dwell | Switching costs nothing measurable: latency after the same versus a different configuration differs by −0.12% to +0.9%, and stage preparation takes 0 ms (roadmap phase 5.2) |
+| Per-request decisions, no hysteresis or dwell | Switching costs nothing measurable: latency after the same versus a different configuration differs by −0.12% to +0.9%, and stage preparation takes 0 ms, measured on the interleaved G2 v2+ runs |
 | Edge load from a timing probe, not from GPU counters | The L4-6Q vGPU's utilisation counter reads 0% at L0 and 6% at L1 (A4) |
 | A short, synchronised probe | The original 2048 × 5 burst could not separate L0 from L1 on the time-sliced vGPU (A4a) |
 | Cloud load from GPU power | Separates C0 from C2 on training data (95th percentile at C0: 50.6 W; 5th at C2: 65.2 W) |

@@ -114,7 +114,6 @@ Every thesis table and figure can be regenerated from the archived campaign data
 | Predictor and selector specifications | [r2](docs/predictor-v2/r2-specification.md), [G4](docs/predictor-v2/g4-specification.md) |
 | Design of the adaptive runtime, selector and container | [docs/design/](docs/README.md#design) |
 | Results by campaign | [results/](docs/README.md#results) |
-| Plan and progress | [Roadmap](docs/roadmap.md) |
 
 ## Results at a glance
 

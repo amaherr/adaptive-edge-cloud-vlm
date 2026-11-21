@@ -16,7 +16,7 @@ Each result is pinned by a git tag, and every tag message records the image dige
 | `g3-r2-specification`, `g3-r2-candidate`, `g3-passed` | Predictor r2: specification before fitting, frozen candidate with sealed predictions, G3 decision |
 | `g4-specification`, `g4-passed` | G4 specification frozen before the evaluation cells were opened; G4 result |
 | `g5-campaign`, `g5-freeze`, `g5-passed` | G5 campaign source (`6cf005f`, image `sha256:2cd3bd95…`), freeze record, G5 result |
-| `final-analysis` | Phase 7 tables and figures |
+| `final-analysis` | Final tables and figures |
 
 ## 2. Environments
 
@@ -53,7 +53,7 @@ Each result is pinned by a git tag, and every tag message records the image dige
 
 The full argument lists are in the [derived checks](../results/aws-campaign-20261119/derived/README.md).
 
-**Baseline report (phase 2)**, which writes every table and figure in `results/aws-campaign-20261119/baseline/` (about 50 s):
+**G2 v2+ baseline report**, which writes every table and figure in `results/aws-campaign-20261119/baseline/` (about 50 s):
 
 ```bash
 .venv/bin/python scripts/campaign/report_g2v2plus_baseline.py all \
@@ -62,7 +62,7 @@ The full argument lists are in the [derived checks](../results/aws-campaign-2026
   --output results/aws-campaign-20261119/baseline
 ```
 
-**Predictor r2 and G3 (phase 3).** Fit and review reproduce the calibration hashes in the [r2 record](../results/aws-campaign-20261119/predictor_r2/README.md):
+**Predictor r2 and G3.** Fit and review reproduce the calibration hashes in the [r2 record](../results/aws-campaign-20261119/predictor_r2/README.md):
 
 ```bash
 .venv/bin/python scripts/prediction/run_predictor_r2.py fit --partitions ~/g2v2plus-r2/partitions --output <new dir>
@@ -71,7 +71,7 @@ The full argument lists are in the [derived checks](../results/aws-campaign-2026
 
 `validate` refuses to run where a decision already exists. To re-score, give it a new `--output`. The decision it reaches is fixed by the committed predictions and targets.
 
-**G4 (phase 4):**
+**G4:**
 
 ```bash
 .venv/bin/python scripts/prediction/run_g4_r2.py evaluate \
@@ -89,7 +89,7 @@ The evaluation profiles come from the `0948aa8` worktree:
 PYTHONPATH=<worktree>/src .venv/bin/python scripts/campaign/derive_g2v2_tables.py profiles --splits evaluation --unseal-evaluation ...
 ```
 
-**G5 (phase 6):**
+**G5:**
 
 ```bash
 .venv/bin/python scripts/campaign/analyze_g5.py --campaign artifacts/g5-aws/campaign \
@@ -97,13 +97,19 @@ PYTHONPATH=<worktree>/src .venv/bin/python scripts/campaign/derive_g2v2_tables.p
   --features configs/g5/task_features-short.json --output <new dir>
 ```
 
-**Final analysis and thesis figures (phase 7):**
+**Final analysis and thesis figures:**
 
 ```bash
 .venv/bin/python scripts/campaign/final_analysis.py g5 --campaign artifacts/g5-aws/campaign --output <dir>
 .venv/bin/python scripts/campaign/final_analysis.py figures --campaign artifacts/g5-aws/campaign \
   --partitions ~/g2v2plus-r2/partitions \
   --predictions results/aws-campaign-20261119/predictor_r2/candidate/validation_predictions.jsonl --output <dir>
+```
+
+The six supplementary figures (load effects, static regret, G3 error distribution, G4 regret by load state, bytes and latency, network verification):
+
+```bash
+.venv/bin/python scripts/campaign/thesis_figures.py   --campaign artifacts/aws-s3-mirror/cloud-v1/edge/ebs-final/g2v2plus/campaign   --partitions ~/g2v2plus-r2/partitions --output results/final-analysis-20261121
 ```
 
 **Tests:** `.venv/bin/python -m pytest -q`; they need no GPU and no data.

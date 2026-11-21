@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 448" width="960" height="448" role="img" aria-labelledby="title desc">
+<title id="title">Selecting per request removes the regret of any fixed choice</title>
+<desc id="desc">Grouped horizontal bars: mean regret against the per-request oracle on the G4 evaluation cells, by load state, for the selector, always-cloud and always-edge.</desc>
+
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; } .ink2 { fill: #52514e; } .muted { fill: #898781; }
+  .on-fill { fill: #ffffff; }
+  .grid { stroke: #e1e0d9; stroke-width: 1; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .ring { stroke: #fcfcfb; }
+  .f-cloud { fill: #2a78d6; } .k-cloud { stroke: #2a78d6; }
+  .f-edge { fill: #eb6834; } .k-edge { stroke: #eb6834; }
+  .f-synchronous { fill: #1baf7a; } .k-synchronous { stroke: #1baf7a; }
+  .f-int8 { fill: #eda100; } .k-int8 { stroke: #eda100; }
+  .f-prompt_first { fill: #e87ba4; } .k-prompt_first { stroke: #e87ba4; }
+  .f-adaptive { fill: #6250d6; } .k-adaptive { stroke: #6250d6; }
+  .f-neutral { fill: #898781; } .k-neutral { stroke: #898781; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #f0efec; } .ink2 { fill: #c3c2b7; }
+    .grid { stroke: #2c2c2a; } .axis { stroke: #383835; }
+    .ring { stroke: #1a1a19; }
+    .f-cloud { fill: #3987e5; } .k-cloud { stroke: #3987e5; }
+    .f-edge { fill: #d95926; } .k-edge { stroke: #d95926; }
+    .f-synchronous { fill: #199e70; } .k-synchronous { stroke: #199e70; }
+    .f-int8 { fill: #c98500; } .k-int8 { stroke: #c98500; }
+    .f-prompt_first { fill: #d55181; } .k-prompt_first { stroke: #d55181; }
+    .f-adaptive { fill: #9085e9; } .k-adaptive { stroke: #9085e9; }
+    .f-neutral { fill: #898781; } .k-neutral { stroke: #898781; }
+  }
+</style>
+
+<rect class="surface" width="960" height="448"/>
+<text x="24.0" y="32.0" class="ink" font-size="16" font-weight="600">Selecting per request removes the regret of any fixed choice</text>
+<text x="24.0" y="52.0" class="ink2" font-size="12">G4 evaluation cells (E01–E05, unseen networks), 630 request-cells; mean regret against the measured oracle of the same request-cell.</text>
+<rect x="150.0" y="77.0" width="10" height="10" rx="2" class="f-adaptive"/>
+<text x="165.0" y="86.0" class="ink2" font-size="11">selector (r2 + select)</text>
+<rect x="340.0" y="77.0" width="10" height="10" rx="2" class="f-cloud"/>
+<text x="355.0" y="86.0" class="ink2" font-size="11">always cloud</text>
+<rect x="530.0" y="77.0" width="10" height="10" rx="2" class="f-edge"/>
+<text x="545.0" y="86.0" class="ink2" font-size="11">always edge</text>
+<line class="grid" x1="150.0" y1="104.0" x2="150.0" y2="382.0"/>
+<text x="150.0" y="396.0" class="muted" font-size="10" text-anchor="middle">0</text>
+<line class="grid" x1="238.6" y1="104.0" x2="238.6" y2="382.0"/>
+<text x="238.6" y="396.0" class="muted" font-size="10" text-anchor="middle">200</text>
+<line class="grid" x1="327.1" y1="104.0" x2="327.1" y2="382.0"/>
+<text x="327.1" y="396.0" class="muted" font-size="10" text-anchor="middle">400</text>
+<line class="grid" x1="415.7" y1="104.0" x2="415.7" y2="382.0"/>
+<text x="415.7" y="396.0" class="muted" font-size="10" text-anchor="middle">600</text>
+<line class="grid" x1="504.3" y1="104.0" x2="504.3" y2="382.0"/>
+<text x="504.3" y="396.0" class="muted" font-size="10" text-anchor="middle">800</text>
+<line class="grid" x1="592.9" y1="104.0" x2="592.9" y2="382.0"/>
+<text x="592.9" y="396.0" class="muted" font-size="10" text-anchor="middle">1000</text>
+<line class="grid" x1="681.4" y1="104.0" x2="681.4" y2="382.0"/>
+<text x="681.4" y="396.0" class="muted" font-size="10" text-anchor="middle">1200</text>
+<line class="grid" x1="770.0" y1="104.0" x2="770.0" y2="382.0"/>
+<text x="770.0" y="396.0" class="muted" font-size="10" text-anchor="middle">1400</text>
+<text x="138.0" y="140.0" class="ink2" font-size="12" text-anchor="end">L0/C0  (n = 165)</text>
+<path class="f-adaptive" d="M150.0,110.0 h0.0 a0.16950689822510837,0.16950689822510837 0 0 1 0.16950689822510837,0.16950689822510837 v15.7 a0.16950689822510837,0.16950689822510837 0 0 1 -0.16950689822510837,0.16950689822510837 h-0.0 z"/>
+<text x="156.2" y="122.0" class="ink" font-size="10">0 ms</text>
+<path class="f-cloud" d="M150.0,128.0 h0.0 a0.6000249741991341,0.6000249741991341 0 0 1 0.6000249741991341,0.6000249741991341 v14.8 a0.6000249741991341,0.6000249741991341 0 0 1 -0.6000249741991341,0.6000249741991341 h-0.0 z"/>
+<text x="156.6" y="140.0" class="ink" font-size="10">1 ms</text>
+<path class="f-edge" d="M150.0,146.0 h272.3 a4.0,4.0 0 0 1 4.0,4.0 v8.0 a4.0,4.0 0 0 1 -4.0,4.0 h-272.3 z"/>
+<text x="432.3" y="158.0" class="ink" font-size="10">624 ms</text>
+<text x="138.0" y="212.0" class="ink2" font-size="12" text-anchor="end">L1/C0  (n = 165)</text>
+
+<text x="156.0" y="194.0" class="ink" font-size="10">0 ms</text>
+
+<text x="156.0" y="212.0" class="ink" font-size="10">0 ms</text>
+<path class="f-edge" d="M150.0,218.0 h502.7 a4.0,4.0 0 0 1 4.0,4.0 v8.0 a4.0,4.0 0 0 1 -4.0,4.0 h-502.7 z"/>
+<text x="662.7" y="230.0" class="ink" font-size="10">1144 ms</text>
+<text x="138.0" y="284.0" class="ink2" font-size="12" text-anchor="end">L0/C2  (n = 150)</text>
+<path class="f-adaptive" d="M150.0,254.0 h0.0 a0.9088004521904763,0.9088004521904763 0 0 1 0.9088004521904763,0.9088004521904763 v14.2 a0.9088004521904763,0.9088004521904763 0 0 1 -0.9088004521904763,0.9088004521904763 h-0.0 z"/>
+<text x="156.9" y="266.0" class="ink" font-size="10">2 ms</text>
+<path class="f-cloud" d="M150.0,272.0 h68.7 a4.0,4.0 0 0 1 4.0,4.0 v8.0 a4.0,4.0 0 0 1 -4.0,4.0 h-68.7 z"/>
+<text x="228.7" y="284.0" class="ink" font-size="10">164 ms</text>
+<path class="f-edge" d="M150.0,290.0 h2.5 a4.0,4.0 0 0 1 4.0,4.0 v8.0 a4.0,4.0 0 0 1 -4.0,4.0 h-2.5 z"/>
+<text x="162.5" y="302.0" class="ink" font-size="10">15 ms</text>
+<text x="138.0" y="356.0" class="ink2" font-size="12" text-anchor="end">L1/C2  (n = 150)</text>
+<path class="f-adaptive" d="M150.0,326.0 h0.0 a0.00024733423809525015,0.00024733423809525015 0 0 1 0.00024733423809525015,0.00024733423809525015 v16.0 a0.00024733423809525015,0.00024733423809525015 0 0 1 -0.00024733423809525015,0.00024733423809525015 h-0.0 z"/>
+<text x="156.0" y="338.0" class="ink" font-size="10">0 ms</text>
+<path class="f-cloud" d="M150.0,344.0 h2.9 a4.0,4.0 0 0 1 4.0,4.0 v8.0 a4.0,4.0 0 0 1 -4.0,4.0 h-2.9 z"/>
+<text x="162.9" y="356.0" class="ink" font-size="10">16 ms</text>
+<path class="f-edge" d="M150.0,362.0 h117.3 a4.0,4.0 0 0 1 4.0,4.0 v8.0 a4.0,4.0 0 0 1 -4.0,4.0 h-117.3 z"/>
+<text x="277.3" y="374.0" class="ink" font-size="10">274 ms</text>
+<text x="460.0" y="414.0" class="muted" font-size="11" text-anchor="middle">Mean regret against the oracle (ms)</text>
+</svg>

@@ -8,7 +8,6 @@ To **regenerate the thesis tables and figures** from the archived data you need 
 
 Related documents:
 - [Container runtime contract](../design/container-runtime.md): the image, the services and their permissions.
-- [G2 v2+ AWS roadmap](../g2-v2-plus-aws-roadmap.md): why the setup looks like this (decisions D1–D11) and the acceptance results.
 - [Protocol](../protocols/g2-v2-protocol.md) and amendments [A3](../protocols/g2-v2-amendment-a3.md), [A4](../protocols/g2-v2-amendment-a4.md), [A4a](../protocols/g2-v2-amendment-a4a.md), [A4b](../protocols/g2-v2-amendment-a4b.md): what a valid campaign is.
 - [Adaptive runtime](../design/adaptive-runtime.md): the G5 policy.
 
@@ -22,6 +21,22 @@ Related documents:
 | Inventory | [`configs/hardware/aws_edge_g6f_2xlarge.yaml`](../../configs/hardware/aws_edge_g6f_2xlarge.yaml) | [`configs/hardware/aws_cloud_g6_xlarge.yaml`](../../configs/hardware/aws_cloud_g6_xlarge.yaml) |
 
 Both run one AMI (Ubuntu 22.04, GRID driver 580.159.03, Docker, NVIDIA Container Toolkit, SSM agent) in us-east-1d, in one private subnet with no inbound rules. Management is SSM only; there is no SSH. The hosts reach S3 through the gateway endpoint and SSM and ECR through an auto-assigned public IPv4.
+
+## Design decisions
+
+| Decision | Choice | Why |
+| --- | --- | --- |
+| Placement | One availability zone (us-east-1d), one private subnet | Both instance types had capacity there; same-AZ traffic keeps the unshaped RTT at 0.2–0.25 ms, so netem sets the conditions |
+| Edge instance | `g6f.2xlarge` (¼ L4 vGPU), accepted on fit and stability (three 100-request runs: median CV 0.05%, p90/median ≤ 1.10) | A real capability gap: the cloud is about 4× faster per request than the edge |
+| Edge residency | Resident | The model fits (peak 4,781 MiB of 6,144); swap residency does not work on the GRID vGPU |
+| Edge load | In-process generator on its own CUDA stream (A2a-3) | A second CUDA process does not fit next to the resident model |
+| Remote control | SSM `send-command` behind the same runner interface as SSH | No SSH keys, no inbound ports; the edge role may only command the instance tagged `Role=cloud` |
+| Supervisor | An orchestrator container on the edge with `NET_ADMIN` | It shapes the host interface and runs the benchmark on the GPU in one place |
+| Source identity | Same image digest and `org.opencontainers.image.revision` on both hosts | There is no `.git` in the image |
+| Shaping | Classified netem on peer IP and ports 5050–5052 | SSM, S3 and ECR traffic stays unshaped (checked: a 60 MB S3 sync at 5 Mb/s took 2.2 s) |
+| Egress | A public IPv4 with no inbound rules, plus the free S3 gateway endpoint; no interface endpoints | Interface endpoints would cost about $51 a month even with compute stopped |
+| Checkpoints | Every valid sub-block copied to S3 with a SHA-256 receipt | The data volume stays the primary copy; S3 survives an instance loss |
+| Cost | $180 ceiling with alerts and a $165 stop action, on-demand only, a 15-minute idle watchdog, 30 GiB root and 20 GiB data volumes | The spot quota was 0; the whole project cost $67 (1–21 November 2026) |
 
 ## Prerequisites (on the workstation)
 
