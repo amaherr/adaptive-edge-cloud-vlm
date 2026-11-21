@@ -33,8 +33,10 @@ Existing-deployment migration completed on 5 November 2026:
 
 **Teardown (21 November 2026):** after the archive was verified, the disposable
 `cloud-v1` stack (45 resources, including both instances) was destroyed through
-a reviewed plan. This stack still holds the bucket, ECR, the budget and the two
-20 GiB data volumes.
+a reviewed plan. On the same day, after a local restore test, this stack was
+destroyed too (9 resources: bucket, ECR, budget, both data volumes), together
+with `host-image` (17), `account-preflight` (1), the AMI and its snapshot, and
+the bootstrap state bucket. Nothing from the project remains on AWS.
 
 Before removing anything else, archive all logs and results and verify an
 independent restore. Retain the content hashes and

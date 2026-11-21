@@ -2,7 +2,7 @@
 
 ## What is archived
 
-**1. The whole artifact bucket**, mirrored to `artifacts/aws-s3-mirror/` and verified on 21 November 2026 ([bucket_receipt.json](bucket_receipt.json)):
+**1. The whole artifact bucket**, mirrored to `artifacts/aws-s3-mirror/` and verified on 21 November 2026 ([bucket_receipt.json](bucket_receipt.json)). The bucket itself was deleted later that day with every other AWS resource, so this mirror and the tarball below are the only copies:
 
 | Check | Result |
 | --- | --- |
@@ -34,7 +34,7 @@ The tarball was extracted to a temporary directory and both campaigns were check
 
 ## Off-machine copy (to do by hand)
 
-Copy the tarball and its hash file to storage off this laptop, for example an external disk or university storage. Then verify the copy there:
+**Now essential: the AWS copy no longer exists.** Copy the tarball and the committed hash file next to it ([aws-s3-mirror-20261121.tar.gz.sha256](aws-s3-mirror-20261121.tar.gz.sha256), which names the tarball without a folder) to storage off this laptop, for example an external disk or university storage. Then verify the copy there, in the folder that holds both:
 
 ```bash
 sha256sum -c aws-s3-mirror-20261121.tar.gz.sha256

@@ -4,7 +4,7 @@ How the two AWS campaigns were run, and how to run one again: G2 v2+ (the static
 
 To **regenerate the thesis tables and figures** from the archived data you need none of this: see [Reproducing the results](../reproducibility.md). This runbook is for collecting new measurements.
 
-> **State on 21 November 2026.** The disposable `cloud-v1` stack (VPC, instances, roles, watchdog) is destroyed. The retained stack still holds the artifact bucket, the ECR repository, the budget and the two 20 GB data volumes (`prevent_destroy`). A new run starts at step 1.
+> **State since 21 November 2026: nothing exists on AWS.** Every stack was destroyed after the archive was verified, including the retained stack (artifact bucket, ECR repository, budget, data volumes), the host image and the Terraform state bucket. The raw data now lives only in the local mirror and its backup tarball ([archive record](../../results/archive-20261121/README.md)). A new run starts from step 1 with a fresh `bootstrap` state bucket, and the campaign images must be rebuilt, which gives new digests.
 
 Related documents:
 - [Container runtime contract](../design/container-runtime.md): the image, the services and their permissions.
@@ -193,4 +193,4 @@ Never delete lock files, `shaping_active.json`, journals or `invalid/` to force 
 1. **Copy the data volumes to S3** (`cloud-v1/{edge,cloud}/ebs-final/`), then **mirror the bucket** to `artifacts/aws-s3-mirror/` and verify every object by key, size and MD5. The [archive record](../../results/archive-20261121/README.md) shows the result for both campaigns.
 2. **Derive and analyse:** the commands per table are in [Reproducing the results](../reproducibility.md).
 3. **Commit the record** under `results/<campaign>-<date>/` with `SHA256SUMS`, and tag the campaign commit.
-4. **Tear down:** plan `-destroy` in `cloud-v1`, review, apply. The retained stack refuses to delete the bucket, ECR and data volumes; remove those only after the thesis is accepted and the off-machine backup is verified.
+4. **Tear down:** plan `-destroy` in `cloud-v1`, review, apply. The retained stack, the host image and the state bucket carry `prevent_destroy`: to remove them, verify the local mirror and an off-machine backup first, empty the versioned buckets and ECR, lift the protection locally (never in a commit), and destroy through reviewed plans.
