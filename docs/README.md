@@ -82,5 +82,5 @@ Sealed result files keep their original links and commands, and receipts pin the
 | `phase7_evaluation_protocol.md` | [design/evaluation-protocol.md](design/evaluation-protocol.md) |
 | `phase0_handoff.md` … `phase7_handoff.md` | [history/local-prototype-validation.md](history/local-prototype-validation.md) |
 | `dynamic_scheduler_implementation_plan.md` (removed: superseded by the roadmap) | [last version](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/dynamic_scheduler_implementation_plan.md) |
-| `Gate2_Cloud_Migration_Roadmap_v2.md` (removed: AWS/Vultr out of scope; see the `cloud-infrastructure` branch) | [last version](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/Gate2_Cloud_Migration_Roadmap_v2.md) |
+| `Gate2_Cloud_Migration_Roadmap_v2.md` (removed: AWS/Vultr out of scope at the time; the AWS work later moved onto `main`) | [last version](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/Gate2_Cloud_Migration_Roadmap_v2.md) |
 | `cli_refactor_handoff.md`, `phase_a1_handoff.md` (removed: past engineering notes) | [CLI note](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/cli_refactor_handoff.md), [A1 note](https://github.com/amaherr/adaptive-edge-cloud-vlm/blob/035e9f0/docs/phase_a1_handoff.md) |
